@@ -6498,6 +6498,17 @@ components:
           readOnly: true
           type: integer
       type: object
+    PauseSubscription:
+      properties:
+        pause_until:
+          description: 'Date until the subscription is paused (format: YYYY-MM-DD).
+            If omitted, paused indefinitely and auto-cancelled if not resumed within
+            6 months.'
+          format: date
+          type:
+          - string
+          - 'null'
+      type: object
     Payment:
       properties:
         available_express_payment_methods:
@@ -7755,6 +7766,16 @@ components:
       - updated_at
       - user
       type: object
+    ResumeSubscription:
+      properties:
+        next_renewal_date:
+          description: 'Date for the next rebill to reactivate the subscription (format:
+            YYYY-MM-DD). Must be a future date.'
+          format: date
+          type: string
+      required:
+      - next_renewal_date
+      type: object
     RetrySubscription:
       properties:
         payment_gateway:
@@ -8292,6 +8313,18 @@ components:
             $ref: '#/components/schemas/SubscriptionOrder'
           readOnly: true
           type: array
+        paused_at:
+          format: date-time
+          readOnly: true
+          type:
+          - string
+          - 'null'
+        paused_until:
+          format: date-time
+          readOnly: true
+          type:
+          - string
+          - 'null'
         payment_details:
           additionalProperties: {}
           readOnly: true
@@ -8348,6 +8381,8 @@ components:
       - num_lines
       - num_orders
       - orders
+      - paused_at
+      - paused_until
       - payment_details
       - payment_method
       - shipping_price
@@ -17208,6 +17243,48 @@ paths:
         - subscriptions:write
       tags:
       - subscriptions
+  /subscriptions/{id}/pause/:
+    post:
+      description: Pause an existing subscription.
+      operationId: subscriptionsPauseCreate
+      parameters:
+      - description: A unique integer value identifying this Subscription.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - in: header
+        name: X-29next-API-Version
+        required: true
+        schema:
+          default: '2024-04-01'
+          enum:
+          - '2024-04-01'
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PauseSubscription'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PauseSubscription'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PauseSubscription'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionDetail'
+          description: ''
+      security:
+      - oauth2:
+        - subscriptions:write
+      tags:
+      - subscriptions
   /subscriptions/{id}/renew/:
     post:
       description: Trigger a subscription renewal order.
@@ -17227,6 +17304,49 @@ paths:
           enum:
           - '2024-04-01'
           type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionDetail'
+          description: ''
+      security:
+      - oauth2:
+        - subscriptions:write
+      tags:
+      - subscriptions
+  /subscriptions/{id}/resume/:
+    post:
+      description: Resume a paused subscription.
+      operationId: subscriptionsResumeCreate
+      parameters:
+      - description: A unique integer value identifying this Subscription.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - in: header
+        name: X-29next-API-Version
+        required: true
+        schema:
+          default: '2024-04-01'
+          enum:
+          - '2024-04-01'
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResumeSubscription'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResumeSubscription'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResumeSubscription'
+        required: true
       responses:
         '200':
           content:

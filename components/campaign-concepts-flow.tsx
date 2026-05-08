@@ -1,6 +1,6 @@
 /**
  * Campaign Core Concepts animated diagrams:
- *   CampaignFunnelFlow  — Landing → Checkout → Upsell → Receipt
+ *   CampaignFunnelFlow  — Presell → Landing → Checkout → Upsell → Receipt
  *   CampaignAnatomy     — Campaign hub → Packages, Offers, Shipping, Payments, Currency
  *
  * Pure SVG + <animateMotion>; no client-side JS required.
@@ -9,13 +9,14 @@
 // ── Funnel Flow ────────────────────────────────────────────────────────────────
 
 const FUNNEL_PAGES = [
+  { label: 'Presell', sublabel: 'Advertorial', color: '#ec4899' },
   { label: 'Landing', sublabel: 'Marketing', color: '#f97316' },
   { label: 'Checkout', sublabel: 'Order Form', color: '#3c7dff' },
   { label: 'Upsell', sublabel: 'Post-Purchase', color: '#a855f7' },
   { label: 'Receipt', sublabel: 'Confirmation', color: '#22c55e' },
 ];
 
-const FW = 560;
+const FW = 640;
 const FH = 90;
 const FNW = 100;
 const FNH = 44;

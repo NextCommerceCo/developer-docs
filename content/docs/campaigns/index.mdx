@@ -1,218 +1,215 @@
 ---
-title: Introduction
-sidebar_label: Campaigns
+title: Getting Started
 ---
 import { Callout } from 'fumadocs-ui/components/callout';
 import { CampaignFunnelFlow, CampaignAnatomy } from '@/components/campaign-concepts-flow';
 
-Campaigns enable developers to build fully custom external checkout experiences using HTML and JavaScript — **no backend server-side integration required**. Each campaign is backed by a headless, CORS-enabled API that handles products, pricing, payments, and order creation.
+Campaigns are fully custom checkout funnels — landing, checkout, upsell, and receipt pages — backed by a CORS-enabled API that handles products, pricing, payments, and order creation. **No backend integration required.**
 
-You can create multiple campaigns for different product offers, markets, and A/B testing, each with its own set of packages, offers, and shipping options.
-
-## Core Concepts
-
-### Campaigns
-
-A **campaign** is the top-level configuration that ties together everything needed for an external checkout flow:
-
-- **Packages** — what products are being sold, at what quantities and prices
-- **Offers** — discounts that apply automatically or via voucher codes
-- **Shipping Options** — available shipping methods and prices
-- **Payment Methods** — which payment methods customers can use
-- **Currency & Language** — localization settings for the checkout
-
-Each campaign has a unique **API Key** used to authenticate all API requests. Campaigns are created and managed in the Next Commerce dashboard via the **Campaigns App**.
-
-### Domains
-
-Domains are configured in your store's global **Campaign Settings** and apply across all campaigns for that store. They control which domains are authorized to use your campaign API keys.
-
-There are two domain types:
-
-| Type | SDK Access | Analytics Tracking |
-| --- | --- | --- |
-| **Production** | Yes | Yes — analytics events are automatically tracked |
-| **Development** | Yes | No — analytics events are suppressed |
-
-**Production domains** are your live, customer-facing domains. When the SDK runs on a production domain, all configured [analytics providers](/docs/campaigns/analytics) automatically track events (page views, add to cart, purchases, etc.).
-
-**Development domains** are for local development and staging environments (e.g., `localhost`, `staging.example.com`). The SDK is fully functional on development domains — cart, checkout, and payment flows all work — but analytics events are suppressed to keep your production data clean.
-
-<Callout type="idea">
-Add `localhost` and any staging domains as development domains so you can test the full checkout flow without polluting analytics data.
-</Callout>
-
-<Callout type="warn">
-API requests from domains not listed in either production or development will be rejected. Make sure all environments where the SDK runs have their domain added in your store's campaign settings.
-</Callout>
-
-### Available Payment Methods
-
-Campaign responses include `available_payment_methods` and `available_express_payment_methods`, which you can use to render only the payment buttons supported by the campaign's gateway group, market, and configured payment methods.
-
-<CampaignAnatomy />
-
-### Packages
-
-A **package** is a virtual link to a **product variant** (SKU) in your store catalog with a custom quantity and custom pricing. Packages are what customers actually purchase in a campaign — they let you create different purchasing options for the same product without changing the product itself.
-
-For example, a single product could have multiple packages offering different quantities at different price points:
-
-- **1x Widget** — 1 unit at $10.00
-- **3x Widget Bundle** — 3 units at $7.00 each ($21.00 total)
-- **5x Widget Best Value** — 5 units at $6.00 each ($30.00 total)
-
-Packages can also be configured as **recurring** for subscription products, with a custom interval (e.g. every 30 days).
-
-### Offers
-
-**Offers** control pricing discounts based on how many packages a customer adds to their order. Packages in an order can be any mix of variants — for example, 1 white and 1 black of the same product both count toward the offer condition.
-
-There are two types of offers:
-
-- **Offer** — automatically applies when the order meets the condition
-- **Code** — only applies when the code is applied to the order
-
-Offers can also be stacked — for example, an automatic quantity discount and a voucher code can both apply to the same order. When offers apply, the API returns adjusted before/after pricing so you can display savings to the customer.
-
-### Typical Campaign Flow
-
-A campaign funnel guides customers through a series of pages, each backed by the Campaigns API:
-
-<CampaignFunnelFlow />
-
-- **Landing** — Marketing page that drives traffic to the campaign
-- **Checkout** — Customer selects package, enters shipping, billing, and payment details
-- **Upsells** — Post-purchase offers to increase order value
-- **Receipt** — Order confirmation with details
-
-<Callout type="info">
-This is a simplified example of a campaign flow. You can customize the flow to meet your specific needs.
-</Callout>
-
-## Integration Options
-
-There are two ways to build your campaign frontend:
-
-| Approach | Best For | Description |
-| --- | --- | --- |
-| [**Campaign Cart SDK**](/docs/campaigns/cart-system) | Fastest development | An attribute-driven HTML/JS SDK. Build cart, checkout, and upsell flows using `data-next-*` attributes — no custom JavaScript required. |
-| [**Campaigns API**](/docs/campaigns/api) | Full control | A headless REST API for developers who want complete control over the checkout experience with custom JavaScript. |
-
-<Callout type="idea" title="Starter Template">
-The fastest way to get started is with the [Campaign Cart Starter Template](https://github.com/NextCommerceCo/campaign-cart-example) — a ready-to-use campaign flow with landing page, checkout, upsell, and receipt pages pre-configured.
-</Callout>
+The fastest path from zero to a working funnel on localhost is the **[Campaign Page Kit](https://github.com/NextCommerceCo/campaign-page-kit)**: a CLI that scaffolds a starter template, runs a hot-reload dev server, and outputs a static site you can deploy to Netlify, Cloudflare Pages, Vercel, or any static host.
 
 ## Quick Start
 
-### Option 1: Use Starter Template (Recommended)
+### 1. Prerequisites
 
-Get started quickly with our pre-configured starter template:
+- **Node.js 18+**
+- A **Next Commerce store** with a campaign created in the Campaigns App
+- Your **Campaign API key** — find it under your campaign's *Integration* tab
 
-**[Download Starter Template](https://github.com/NextCommerceCo/campaign-cart-example)** — Clone or download a ready-to-use campaign flow (landing → checkout → upsell → receipt) with Campaign Cart integrated.
+### 2. Initialize a new project
 
-### Option 2: Manual Setup
+In a fresh directory:
 
-1. **Get Your API Key**
-
-   Go to Next Commerce Dashboard, open the Campaigns app, select your campaign, click on Integration, and copy your API key.
-
-2. **Add SDK Script**
-
-   Add these two lines to your HTML `<head>` section:
-
-   ```html
-   <!-- Path to Your Campaign Cart Configuration -->
-   <script src="js/config.js"></script>
-
-   <!-- Campaign Cart SDK -->
-   <!-- Replace @v0.3.10 with the latest version from GitHub releases -->
-   <script src="https://cdn.jsdelivr.net/gh/NextCommerceCo/campaign-cart@v0.3.10/dist/loader.js" type="module"></script>
-   ```
-
-   <Callout type="idea" title="Latest Version">
-   Check the [GitHub releases](https://github.com/NextCommerceCo/campaign-cart/releases) for the latest stable version. For development, you can use `@latest`, but we recommend pinning to a specific version (e.g., `@v0.3.10`) in production for stability.
-   </Callout>
-
-3. **Start Building**
-
-   You can now use Campaign Cart attributes in your HTML!
-
-## HTML Page Setup
-
-```html
-<!DOCTYPE html>
-<html>
-<head>
-  <!-- 1. Set configuration -->
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    window.nextReady = window.nextReady || [];
-
-    window.nextConfig = {
-      apiKey: "your-api-key-here",
-    };
-  </script>
-
-  <!-- 2. Meta tag configuration -->
-  <!-- Page Type: product, checkout, upsell, or receipt -->
-  <meta name="next-page-type" content="product">
-
-  <!-- Next URL: Redirect after order completion (for checkout pages) -->
-  <meta name="next-success-url" content="/upsell">
-
-  <!-- 3. Load the SDK -->
-  <!-- Replace @v0.3.10 with the latest version from GitHub releases -->
-  <script src="https://cdn.jsdelivr.net/gh/NextCommerceCo/campaign-cart@v0.3.10/dist/loader.js" type="module"></script>
-</head>
-<body>
-  <!-- Your content here -->
-</body>
-</html>
+```bash
+mkdir my-campaigns && cd my-campaigns
+npm init -y
+npm install next-campaign-page-kit
+npx campaign-init
 ```
 
-## Quick Examples
+`campaign-init` walks you through everything in one prompt-driven flow:
 
-### Add to Cart Button
-```html
-<button data-next-action="add-to-cart"
-        data-next-package-id="1"
-        data-next-quantity="1">
-  Add to Cart
-</button>
+1. Pick a starter template (Olympus, Demeter, multi-variant, two-step, and more)
+2. Enter your campaign **name** and **slug** (the URL path, e.g. `/my-campaign/`)
+3. The template is downloaded into `src/<slug>/` and registered in `_data/campaigns.json`
+4. CLI scripts (`dev`, `build`, `clone`, `config`, `compress`) are added to your `package.json`
+5. Optionally, your **API key** is written to `assets/config.js`
+6. Optionally, an **AI context** doc is installed for Claude Code, Cursor, Codex, or Copilot
+
+<Callout type="idea" title="AI-ready out of the box">
+The `--ai-context` step writes the right context file to the right path for your assistant — `CLAUDE.md`, `AGENTS.md`, `.cursor/rules/`, or `.github/copilot-instructions.md`. Your AI editor will know the project structure, Liquid filters, and SDK conventions immediately.
+</Callout>
+
+<Callout type="info">
+Skipping the API key during init is fine — run `npm run config` later to set it.
+</Callout>
+
+### 3. Start the dev server
+
+```bash
+npm run dev
 ```
 
-### Product Selector
-```html
-<div data-next-cart-selector data-next-selection-mode="swap">
-  <div data-next-selector-card data-next-package-id="1">Option 1</div>
-  <div data-next-selector-card data-next-package-id="2">Option 2</div>
-</div>
+This opens your campaign's first page (e.g. `/<slug>/presell/`) in the browser and hot-reloads as you edit. If you have multiple campaigns in the project, you'll get a picker.
+
+<Callout type="success" title="🎉 You did it!">
+You now have a **complete campaign funnel** running on your local machine — presell, landing, checkout, upsells, and receipt — all wired up to your live store data through the SDK. Click through it. Add something to cart. Watch the prices update. This is the same code you'll deploy to production.
+</Callout>
+
+
+## What you got
+
+Each campaign is fully isolated — its own layouts, assets, and config — so you can run multiple campaigns in one repo without them stepping on each other.
+
+```
+my-campaigns/
+├── _data/
+│   └── campaigns.json          # Registry — all campaigns live here
+├── src/
+│   └── <slug>/                 # Your campaign
+│       ├── _layouts/base.html  # Page wrapper
+│       ├── _includes/          # Reusable components
+│       ├── assets/
+│       │   ├── css/
+│       │   ├── images/
+│       │   ├── js/
+│       │   └── config.js       # SDK config — API key lives here
+│       ├── presell.html
+│       ├── checkout.html
+│       ├── upsell.html
+│       └── receipt.html
+└── package.json
 ```
 
-### Display Cart Total
-```html
-<span data-next-display="cart.total">$0.00</span>
+## Starter templates
+
+Pick one of these at the `campaign-init` template prompt. Each checkout template ships with `presell.html` + `landing.html`, all upsell variants, and a receipt — copy the whole folder to get the full funnel.
+
+| Template | Description | Preview |
+| --- | --- | --- |
+| `olympus` | Single-step checkout | [preview](https://nextcommerce-campaign-templates.netlify.app/olympus/checkout/) |
+| `olympus-mv-single-step` | Single-step · multi-variant | [preview](https://nextcommerce-campaign-templates.netlify.app/olympus-mv-single-step/checkout/) |
+| `olympus-mv-two-step` | Two-step · variant select then checkout | [preview](https://nextcommerce-campaign-templates.netlify.app/olympus-mv-two-step/select/) |
+| `demeter` | Single-step checkout | [preview](https://nextcommerce-campaign-templates.netlify.app/demeter/checkout/) |
+| `limos` | Single-step · native bundle qty on page | [preview](https://nextcommerce-campaign-templates.netlify.app/limos/checkout/) |
+| `shop-single-step` | Shop-style single-step | [preview](https://nextcommerce-campaign-templates.netlify.app/shop-single-step/checkout/?forcePackageId=1:1) |
+| `shop-three-step` | Shop-style three-step (info → shipping → billing) | [preview](https://nextcommerce-campaign-templates.netlify.app/shop-three-step/information/?forcePackageId=1:1) |
+
+Browse the full catalog and source in the [campaign-cart-starter-templates repo](https://github.com/NextCommerceCo/campaign-cart-starter-templates).
+
+## Campaign Flow
+
+A typical campaign funnel guides customers through a series of pages:
+
+<CampaignFunnelFlow />
+
+- **Presell** — advertorial article that warms up cold traffic before the offer
+- **Landing** — marketing page that drives traffic
+- **Checkout** — package selection, shipping, payment
+- **Upsells** — post-purchase offers
+- **Receipt** — order confirmation
+
+You can customize this flow to fit your campaign — add/remove pages, change the order, or even have multiple funnels for different audiences, customize the `next_page` parameter on each page that links pages to the next. 
+
+
+---
+
+## Concepts
+
+### Campaigns
+
+A **campaign** bundles everything needed for a checkout: packages, offers, shipping options, payment methods, and localization. Each campaign has a unique **API key** used by the SDK to authenticate requests.
+
+### Packages
+
+A **package** is a virtual link to a product with custom quantity and pricing. Packages are what customers actually buy:
+
+For bundle-based quantity discounts (e.g. "buy 3 for $21" or "buy 5 for $30"), use **offers** to discount the price at checkout rather than baking the discount into the package price. This keeps the package's list price intact and lets you show savings on the cart.
+
+Packages can also be **recurring** for subscription products. When you reference a package in HTML (`data-next-package-id="…"`), the ID comes from your campaign's package list in the Campaigns App.
+
+### Offers
+
+**Offers** are discounts that apply when an order meets a condition. Two flavours:
+
+- **Offer** — automatic, applies when the cart matches the rule (checkout page only)
+- **Code** — voucher-based, applies when the customer enters a code. Codes stack **on top of** automatic offers, and codes are also the mechanism for applying discounts on **upsell pages** (where automatic offers don't run).
+
+The API returns adjusted before/after pricing so you can show savings.
+
+**Example — quantity-based bundle pricing:**
+
+A single Widget package priced at $49.95/unit. Create one offer per quantity tier — including 1x — to control the discounted price the customer pays at each quantity:
+
+| Quantity | List price | Offer | Customer pays | Savings |
+| --- | --- | --- | --- | --- |
+| **1x** | $49.95 | Buy 1 → $39.95 (Save 20%) | $39.95 | $10.00 |
+| **2x** | $99.90 | Buy 2 → $34.95 each (Save 30%) | $69.90 | $30.00 |
+| **3x** | $149.85 | Buy 3 → $29.95 each (Save 40%) | $89.85 | $60.00 |
+
+The package's list price stays at $49.95/unit. Each offer matches its quantity rule and the API returns the adjusted total so the cart can render before/after pricing automatically.
+
+### Shipping methods
+
+A **shipping method** in a campaign is a virtual link to a shipping method configured on the store, with campaign-specific custom pricing. This lets you charge a different shipping rate (e.g. a flat $4.95 or free shipping) per campaign without changing the underlying store-level shipping method.
+
+### Domains
+
+Domains are configured in your store's **Campaign Settings** and apply across all campaigns. They control which domains are authorized to use your campaign API keys.
+
+| Type | SDK Access | Analytics Tracking |
+| --- | --- | --- |
+| **Production** | Yes | Yes — events tracked automatically |
+| **Development** | Yes | No — events suppressed |
+
+<Callout type="idea">
+Add `localhost` and any staging domains as **development** domains so you can test the full checkout flow without polluting analytics data.
+</Callout>
+
+<Callout type="warn">
+Requests from domains not listed in either production or development will be rejected. Add every environment your SDK runs in.
+</Callout>
+
+---
+
+## Non-interactive setup (agents, CI)
+
+`campaign-init` can run with no prompts — pass every value as a flag:
+
+```bash
+npx campaign-init --non-interactive \
+    --template olympus \
+    --slug my-campaign \
+    --name "My Campaign" \
+    --api-key "$CAMPAIGN_API_KEY" \
+    --ai-context claude
 ```
 
-### Conditional Display
-```html
-<div data-next-show="cart.hasItems">
-  <button onclick="checkout()">Proceed to Checkout</button>
-</div>
-```
+Add `--json` for machine-readable stdout. See the [page-kit CLI reference](https://github.com/NextCommerceCo/campaign-page-kit#non-interactive-agents-ci-scripts) for the full flag list and exit codes.
 
-## Verify the SDK Loaded
+---
 
-Open your browser console and run:
+## Hosting
 
-```javascript
-console.log(window.next ? 'SDK Loaded' : 'SDK Not Found');
+`npm run build` outputs a fully static site to `_site/` — no server, no runtime, just HTML, CSS, JS, and images. That means you can host it on any static host. Configure your provider with:
 
-if (window.next) {
-  console.log('SDK Version:', next.version);
-  console.log('Config:', next.getConfig());
-}
-```
+- **Build command:** `npm run build`
+- **Publish directory:** `_site`
 
-The SDK supports all modern browsers: Chrome, Firefox, Safari, and Edge.
+Make sure to add the host's domain (e.g. `*.netlify.app`, your custom domain) to your campaign's **authorized domains** in the Campaigns App so the SDK can call the API from that origin.
+
+### Netlify
+
+[Netlify](https://www.netlify.com/) — connect your Git repo, Netlify auto-detects the build command and serves `_site/` on a `*.netlify.app` subdomain (custom domains free). Best for: zero-config Git deploys, branch previews, instant rollbacks.
+
+### Cloudflare Pages
+
+[Cloudflare Pages](https://pages.cloudflare.com/) — connect your Git repo, set framework preset to "None", build command to `npm run build`, output directory to `_site`. Best for: global edge network, generous free tier, fast cold starts via Cloudflare's CDN.
+
+### Render
+
+[Render](https://render.com/) — create a new **Static Site**, point it at your repo, set publish path to `_site`. Best for: a single dashboard alongside any backend services you already run on Render.
+
+### Other static hosts
+
+The same `_site/` output works on **[Vercel](https://vercel.com/)**, **[GitHub Pages](https://pages.github.com/)**, **[AWS S3 + CloudFront](https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html)**, **[Surge](https://surge.sh/)**, or any host that serves static files. There is no server-side rendering and no runtime dependency on Node, so any plain static host will do.

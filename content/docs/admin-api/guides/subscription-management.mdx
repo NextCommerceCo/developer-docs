@@ -192,6 +192,30 @@ Subscriptions that are `past_due` status can be attemted to retry the renewal, o
 <Callout type="idea">
 The subscription retry endpoint is useful for custom recovery logic when attempting to recover failing subscriptions.
 </Callout>
+### Pause
+
+To temporarily stop renewals on an active subscription without cancelling it, use the [subscriptionsPauseCreate](/docs/admin-api/reference/subscriptions/subscriptionsPauseCreate) endpoint. Pausing is useful for win-back flows, customer-requested holds, or pausing a cohort during inventory or fulfillment issues.
+
+```json title="Pause Subscription" http-method="POST" http-target="https://{store}.29next.store/api/admin/subscriptions/{id}/pause/"
+{
+  "pause_until": "2026-08-01" // optional date (YYYY-MM-DD) to auto-resume on
+}
+```
+
+If `pause_until` is omitted the subscription is paused indefinitely and will be auto-cancelled if it is not resumed within 6 months. The endpoint returns the full subscription object with status `paused` and the `paused_at` / `paused_until` timestamps populated.
+
+<Callout type="info">
+Paused subscriptions skip all scheduled renewals until the `pause_until` date is reached, at which point renewals resume automatically on the existing schedule.
+</Callout>
+
+To resume a paused subscription before its `pause_until` date — or to reactivate an indefinitely paused subscription — use the [subscriptionsResumeCreate](/docs/admin-api/reference/subscriptions/subscriptionsResumeCreate) endpoint with a future `next_renewal_date`.
+
+```json title="Resume Subscription" http-method="POST" http-target="https://{store}.29next.store/api/admin/subscriptions/{id}/resume/"
+{
+  "next_renewal_date": "2026-06-15" // required, must be a future date
+}
+```
+
 ### Cancel
 
 To cancel a subscription, use the [subscriptionsCancelCreate](/docs/admin-api/reference/subscriptions/subscriptionsCancelCreate) endpoint to stop all future renewals.

@@ -56,6 +56,16 @@ This opens your campaign's first page (e.g. `/<slug>/presell/`) in the browser a
 You now have a **complete campaign funnel** running on your local machine — presell, landing, checkout, upsells, and receipt — all wired up to your live store data through the SDK. Click through it. Add something to cart. Watch the prices update. This is the same code you'll deploy to production.
 </Callout>
 
+### 4. Place a test order
+
+Run the full funnel end-to-end on your local dev server. At checkout, pay with the test card below — it processes without a real transaction so you can verify presell → checkout → upsell(s) → receipt all wire up correctly.
+
+| Card number | Expiry | CVV | What it does |
+| --- | --- | --- | --- |
+| `6011 1111 1111 1117` | Any future date | Any | Test payment success flow without transaction |
+
+See the [Testing Guide](/docs/admin-api/guides/testing-guide) for 3DS, decline, and subscription test cards.
+
 
 ## What you got
 

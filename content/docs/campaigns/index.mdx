@@ -29,7 +29,7 @@ npx campaign-init
 
 `campaign-init` walks you through everything in one prompt-driven flow:
 
-1. Pick a starter template (Olympus, Demeter, multi-variant, two-step, and more)
+1. Pick a starter template (see [Starter templates](#starter-templates) below)
 2. Enter your campaign **name** and **slug** (the URL path, e.g. `/my-campaign/`)
 3. The template is downloaded into `src/<slug>/` and registered in `_data/campaigns.json`
 4. CLI scripts (`dev`, `build`, `clone`, `config`, `compress`) are added to your `package.json`
@@ -93,19 +93,65 @@ my-campaigns/
 
 ## Starter templates
 
-Pick one of these at the `campaign-init` template prompt. Each checkout template ships with `presell.html` + `landing.html`, all upsell variants, and a receipt — copy the whole folder to get the full funnel.
+Pick one at the `campaign-init` template prompt. Each template ships with `presell.html` + `landing.html`, all upsell variants, and a receipt — copy the whole folder to get the full funnel. The two Olympus templates are a good starting point for your first campaign.
 
-| Template | Description | Preview |
-| --- | --- | --- |
-| `olympus` | Single-step checkout | [preview](https://nextcommerce-campaign-templates.netlify.app/olympus/checkout/) |
-| `olympus-mv-single-step` | Single-step · multi-variant | [preview](https://nextcommerce-campaign-templates.netlify.app/olympus-mv-single-step/checkout/) |
-| `olympus-mv-two-step` | Two-step · variant select then checkout | [preview](https://nextcommerce-campaign-templates.netlify.app/olympus-mv-two-step/select/) |
-| `demeter` | Single-step checkout | [preview](https://nextcommerce-campaign-templates.netlify.app/demeter/checkout/) |
-| `limos` | Single-step · native bundle qty on page | [preview](https://nextcommerce-campaign-templates.netlify.app/limos/checkout/) |
-| `shop-single-step` | Shop-style single-step | [preview](https://nextcommerce-campaign-templates.netlify.app/shop-single-step/checkout/?forcePackageId=1:1) |
-| `shop-three-step` | Shop-style three-step (info → shipping → billing) | [preview](https://nextcommerce-campaign-templates.netlify.app/shop-three-step/information/?forcePackageId=1:1) |
+<div className="not-prose grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
 
-Browse the full catalog and source in the [campaign-cart-starter-templates repo](https://github.com/NextCommerceCo/campaign-cart-starter-templates).
+  <div className="rounded-xl border bg-fd-card overflow-hidden flex flex-col">
+    <a href="https://nextcommerce-campaign-templates.netlify.app/olympus/checkout/" target="_blank" rel="noopener" className="block aspect-16/10 bg-fd-muted overflow-hidden">
+      <img src="https://image.thum.io/get/width/1200/viewportWidth/1440/wait/8/https://nextcommerce-campaign-templates.netlify.app/olympus/checkout/" alt="olympus checkout preview" className="w-full h-full object-cover object-top" loading="lazy" />
+    </a>
+    <div className="p-4 flex-1 flex flex-col">
+      <h3 className="m-0 text-sm font-medium">olympus</h3>
+      <p className="mt-1 mb-3 text-sm text-fd-muted-foreground">Default pick. Single-step single-product checkout — lowest-friction conversion, used in most campaigns.</p>
+      <div className="mt-auto text-xs text-fd-muted-foreground flex flex-wrap gap-x-2 gap-y-1">
+        <a href="https://nextcommerce-campaign-templates.netlify.app/olympus/presell/" target="_blank" rel="noopener" className="text-fd-foreground underline underline-offset-2 decoration-blue-500 hover:opacity-80">Presell</a>
+        <span>·</span>
+        <a href="https://nextcommerce-campaign-templates.netlify.app/olympus/landing/" target="_blank" rel="noopener" className="text-fd-foreground underline underline-offset-2 decoration-blue-500 hover:opacity-80">Landing</a>
+        <span>·</span>
+        <a href="https://nextcommerce-campaign-templates.netlify.app/olympus/checkout/" target="_blank" rel="noopener" className="text-fd-foreground underline underline-offset-2 decoration-blue-500 hover:opacity-80">Checkout</a>
+        <span>·</span>
+        <a href="https://nextcommerce-campaign-templates.netlify.app/olympus/upsell-bundle-stepper/" target="_blank" rel="noopener" className="text-fd-foreground underline underline-offset-2 decoration-blue-500 hover:opacity-80">Upsell — stepper</a>
+        <span>·</span>
+        <a href="https://nextcommerce-campaign-templates.netlify.app/olympus/upsell-bundle-tier-pills/" target="_blank" rel="noopener" className="text-fd-foreground underline underline-offset-2 decoration-blue-500 hover:opacity-80">pills</a>
+        <span>·</span>
+        <a href="https://nextcommerce-campaign-templates.netlify.app/olympus/upsell-bundle-tier-cards/" target="_blank" rel="noopener" className="text-fd-foreground underline underline-offset-2 decoration-blue-500 hover:opacity-80">cards</a>
+        <span>·</span>
+        <a href="https://nextcommerce-campaign-templates.netlify.app/olympus/receipt/" target="_blank" rel="noopener" className="text-fd-foreground underline underline-offset-2 decoration-blue-500 hover:opacity-80">Receipt</a>
+      </div>
+    </div>
+  </div>
+
+  <div className="rounded-xl border bg-fd-card overflow-hidden flex flex-col">
+    <a href="https://nextcommerce-campaign-templates.netlify.app/olympus-mv-single-step/checkout/" target="_blank" rel="noopener" className="block aspect-16/10 bg-fd-muted overflow-hidden">
+      <img src="https://image.thum.io/get/width/1200/viewportWidth/1440/wait/8/https://nextcommerce-campaign-templates.netlify.app/olympus-mv-single-step/checkout/" alt="olympus-mv-single-step checkout preview" className="w-full h-full object-cover object-top" loading="lazy" />
+    </a>
+    <div className="p-4 flex-1 flex flex-col">
+      <h3 className="m-0 text-sm font-medium">olympus-mv-single-step</h3>
+      <p className="mt-1 mb-3 text-sm text-fd-muted-foreground">Products with variants (size, flavor, color) on a single-step checkout.</p>
+      <div className="mt-auto text-xs text-fd-muted-foreground flex flex-wrap gap-x-2 gap-y-1">
+        <a href="https://nextcommerce-campaign-templates.netlify.app/olympus-mv-single-step/presell/" target="_blank" rel="noopener" className="text-fd-foreground underline underline-offset-2 decoration-blue-500 hover:opacity-80">Presell</a>
+        <span>·</span>
+        <a href="https://nextcommerce-campaign-templates.netlify.app/olympus-mv-single-step/landing/" target="_blank" rel="noopener" className="text-fd-foreground underline underline-offset-2 decoration-blue-500 hover:opacity-80">Landing</a>
+        <span>·</span>
+        <a href="https://nextcommerce-campaign-templates.netlify.app/olympus-mv-single-step/checkout/" target="_blank" rel="noopener" className="text-fd-foreground underline underline-offset-2 decoration-blue-500 hover:opacity-80">Checkout</a>
+        <span>·</span>
+        <a href="https://nextcommerce-campaign-templates.netlify.app/olympus-mv-single-step/upsell-mv/" target="_blank" rel="noopener" className="text-fd-foreground underline underline-offset-2 decoration-blue-500 hover:opacity-80">Upsell — MV</a>
+        <span>·</span>
+        <a href="https://nextcommerce-campaign-templates.netlify.app/olympus-mv-single-step/upsell-bundle-stepper/" target="_blank" rel="noopener" className="text-fd-foreground underline underline-offset-2 decoration-blue-500 hover:opacity-80">Upsell — stepper</a>
+        <span>·</span>
+        <a href="https://nextcommerce-campaign-templates.netlify.app/olympus-mv-single-step/upsell-bundle-tier-pills/" target="_blank" rel="noopener" className="text-fd-foreground underline underline-offset-2 decoration-blue-500 hover:opacity-80">pills</a>
+        <span>·</span>
+        <a href="https://nextcommerce-campaign-templates.netlify.app/olympus-mv-single-step/upsell-bundle-tier-cards/" target="_blank" rel="noopener" className="text-fd-foreground underline underline-offset-2 decoration-blue-500 hover:opacity-80">cards</a>
+        <span>·</span>
+        <a href="https://nextcommerce-campaign-templates.netlify.app/olympus-mv-single-step/receipt/" target="_blank" rel="noopener" className="text-fd-foreground underline underline-offset-2 decoration-blue-500 hover:opacity-80">Receipt</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+[**See all available templates →**](/docs/campaigns/templates)
 
 ## Campaign Flow
 

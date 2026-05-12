@@ -213,7 +213,7 @@ No layout specified? Defaults to `base.html`.
 
 Every page automatically has access to its campaign's data from `_data/campaigns.json` via the `campaign` object — so you can drive copy, links, and config from the registry instead of hardcoding it into templates.
 
-```liquid
+```html
 <h1>{{ campaign.name }}</h1>
 <p>Contact: {{ campaign.support_email }}</p>
 ```
@@ -231,7 +231,7 @@ Add any keys you want to your campaign's entry, and they become available immedi
 }
 ```
 
-```liquid
+```html
 <h2>{{ campaign.custom_headline }}</h2>
 ```
 
@@ -252,7 +252,7 @@ Every template also has access to an `environment` variable indicating the curre
 | `npm run dev` | `development` |
 | `npm run build` | `production` |
 
-```liquid
+```html
 {% unless environment == "development" %}
   <!-- Google Tag Manager -->
   <script>...</script>
@@ -277,7 +277,7 @@ Always use these filters instead of hardcoding paths — they're what makes clon
 
 Resolves an asset path to the current campaign.
 
-```liquid
+```html
 <script src="{{ 'config.js' | campaign_asset }}"></script>
 <!-- Output: /starter/config.js -->
 
@@ -294,7 +294,7 @@ Resolves an asset path to the current campaign.
 
 Generates a clean URL for inter-page navigation within a campaign.
 
-```liquid
+```html
 <a href="{{ 'checkout.html' | campaign_link }}">Checkout</a>
 <!-- Output: /starter/checkout/ -->
 
@@ -313,7 +313,7 @@ The filter strips `.html`, adds a trailing slash, prepends the campaign slug, an
 
 Includes a file from the **current campaign's** `_includes/` directory.
 
-```liquid
+```html
 {% campaign_include 'slider.html' images=slider_images %}
 
 {% campaign_include 'slider.html' images=slider_images show_package_image=true %}

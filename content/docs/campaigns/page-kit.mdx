@@ -1,0 +1,387 @@
+---
+title: Page Kit
+description: Build, preview, and deploy multiple campaign funnels from a single repo.
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+
+[Next Campaign Page Kit](https://github.com/NextCommerceCo/campaign-page-kit) is the tooling that turns a directory of static HTML into a fully isolated, multi-campaign workspace — with hot-reload dev, deterministic builds, and a static output you can host anywhere.
+
+## Why Page Kit
+
+Most static site generators are designed around a single site. When you need to manage multiple campaign funnels in one repository, you quickly hit problems: shared layouts bleed across campaigns, asset paths collide, and a change to one campaign silently breaks another.
+
+Page Kit treats each campaign as a **fully isolated unit** within a single repo. Every campaign lives in its own subdirectory with its own layouts, assets, and configuration — but they're all built, versioned, and deployed together.
+
+The CLI tools (`setup`, `dev`, `clone`, `config`, `compress`) and template filters (`campaign_asset`, `campaign_link`, `campaign_include`) enforce this isolation at every step, so you can work on one campaign without fear of affecting another.
+
+## Quick Start
+
+### 1. Create a project directory
+
+```bash
+mkdir my-campaigns && cd my-campaigns
+```
+
+### 2. Initialize and install
+
+```bash
+npm init -y
+npm install next-campaign-page-kit
+```
+
+### 3. Run the setup script
+
+```bash
+npx campaign-init
+```
+
+`campaign-init` walks you through everything in one flow:
+
+1. Adds CLI scripts (`dev`, `build`, `clone`, `config`, `compress`, `migrate`, …) to your `package.json`
+2. Creates an empty `_data/campaigns.json` registry
+3. Fetches the list of available starter templates and shows a picker
+4. Asks for your **Campaign name** (display name) and **Campaign slug** (directory + URL path)
+5. Downloads only the chosen template's `src/<slug>/` files into your project
+6. Merges the template's registry data into your local `_data/campaigns.json`
+7. Optionally prompts for your Campaign API key and writes it to `assets/config.js`
+8. Optionally installs an **AI context doc** for your editor or agent
+
+<Callout type="info">
+Get your Campaign API key from the Campaigns App in your store. You can skip this step during init and run `npm run config` later.
+</Callout>
+
+### 4. Start the dev server
+
+```bash
+npm run dev
+```
+
+This will:
+
+1. Show a list of available campaigns
+2. Let you pick which campaign to preview
+3. Start the dev server
+4. Open your browser to the selected campaign
+
+By default the dev server starts on port `3000`. Override it with a positional arg, `--port` flag, or `PORT` env var:
+
+```bash
+npm run dev 8080
+npm run dev --port 8080
+PORT=8080 npm run dev
+```
+
+## Non-interactive setup (agents, CI)
+
+`campaign-init` can run with no prompts. Pass every value as a flag and add `--non-interactive`:
+
+```bash
+npx campaign-init --non-interactive \
+    --template olympus \
+    --slug grounding-mat-v2 \
+    --name "Grounding Mat V2" \
+    --api-key "$CAMPAIGN_API_KEY" \
+    --ai-context claude
+```
+
+Add `--json` for agent-friendly automation — a single structured object on stdout, all human UI suppressed:
+
+```bash
+npx campaign-init --json \
+    --template olympus --slug grounding-mat-v2 --name "Grounding Mat V2" \
+    --api-key "$CAMPAIGN_API_KEY" \
+    --ai-context claude
+```
+
+| Flag | Purpose |
+|---|---|
+| `--template <slug>` | Starter template slug (must exist upstream) |
+| `--slug <name>` | Local campaign slug (folder under `src/`, also URL path) |
+| `--name <"display">` | Display name (defaults to upstream template name) |
+| `--api-key <key>` | Campaign API key, written to `assets/config.js` |
+| `--non-interactive` | Never prompt; missing required input exits with code 5 |
+| `--json` | Machine-readable stdout; suppresses all human UI |
+| `--dry-run` | Resolve plan; no downloads, no writes |
+| `--overwrite` | Replace existing `src/<slug>/` and registry entry |
+| `--ai-context <tool>` | Write AI context doc for `claude`, `codex`, `cursor`, `copilot`, or `none` |
+| `--keep-ai-context` | Preserve an existing AI context file |
+| `--help`, `-h` | Show full help |
+
+**Exit codes:** `0` ok · `2` template not found · `3` target conflict (use `--overwrite`) · `4` upstream fetch failed · `5` missing required input · `6` invalid input · `7` partial write rolled back · `8` rollback failed.
+
+### AI context
+
+`--ai-context` writes the upstream context doc verbatim (with a sentinel header) to wherever your tool auto-loads it:
+
+| Tool | Path |
+|---|---|
+| **Claude Code** | `CLAUDE.md` at the project root |
+| **OpenAI Codex** | `AGENTS.md` at the project root |
+| **Cursor** | `.cursor/rules/campaign-page-kit.mdc` (with `alwaysApply: true`) |
+| **GitHub Copilot** | `.github/copilot-instructions.md` |
+
+If the tool's file already exists, you're asked whether to update it. The written file always carries a sentinel header noting it was generated by `campaign-init` and will be overwritten on re-run unless you pass `--keep-ai-context`.
+
+## Commands
+
+| Command | Description |
+|---|---|
+| `npm start` | Interactive menu: dev server, compress, clone, configure |
+| `npm run setup` | Bootstrap a project, install a starter template, set the API key (alias for `campaign-init`) |
+| `npm run dev` | Start dev server with interactive campaign picker |
+| `npm run build` | Build all campaigns to `_site/` |
+| `npm run clone` | Clone an existing local campaign to a new slug |
+| `npm run config` | Set the API key for an existing local campaign |
+| `npm run compress` | Compress all images in a campaign directory |
+| `npm run compress:preview` | Preview compression savings without modifying files |
+| `npm run migrate` | Migrate `campaigns.json` from old array format to key-based format |
+
+## Project structure
+
+```
+your-project/
+├── _data/
+│   └── campaigns.json          # Campaign registry (all campaigns)
+├── src/
+│   └── [campaign-slug]/        # Individual campaign directory
+│       ├── _layouts/
+│       │   └── base.html       # Base layout template
+│       ├── _includes/          # Reusable campaign components
+│       ├── assets/
+│       │   ├── css/
+│       │   ├── images/
+│       │   ├── js/
+│       │   └── config.js       # SDK configuration
+│       ├── presell.html
+│       ├── checkout.html
+│       ├── upsell.html
+│       ├── receipt.html
+│       └── *.html              # Any other page
+└── package.json
+```
+
+**Key files:**
+
+- `_data/campaigns.json` — registers every campaign and its configuration data. Uses a key-based format where each key is the campaign slug. Older projects on the array format can convert with `npm run migrate`.
+- `src/[campaign]/_layouts/base.html` — campaign's base layout
+- `src/[campaign]/assets/config.js` — Campaign Cart SDK configuration
+
+## Page frontmatter
+
+Each campaign page uses YAML frontmatter to configure how it renders.
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `page_layout` | string | No | Layout file in `_layouts/`. Defaults to `base.html` |
+| `title` | string | Yes | Page title for `<title>` tag |
+| `page_type` | string | Yes | `product`, `checkout`, `upsell`, or `receipt` |
+| `permalink` | string | No | Custom URL path (e.g., `/starter/`) |
+| `next_url` | string | No | Next page in the funnel — the universal forward pointer. Layouts map it to `next-success-url` on checkout pages and `next-upsell-accept-url` on upsell pages. |
+| `decline_url` | string | No | Override for upsell decline. Defaults to `next_url`. Maps to `next-upsell-decline-url`. |
+| `styles` | array | No | Page-specific CSS (relative paths or external URLs) |
+| `scripts` | array | No | Page-specific JS (relative paths or external URLs) |
+| `footer` | boolean | No | Show footer on this page |
+
+**Example:**
+
+```yaml
+---
+page_layout: base.html
+title: Checkout
+page_type: checkout
+next_url: upsell.html
+styles:
+  - https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css
+  - css/offer.css
+scripts:
+  - https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js
+  - js/offer.js
+footer: true
+---
+```
+
+### Layout resolution
+
+Layouts resolve to the **current campaign's** `_layouts/` directory:
+
+- `page_layout: base.html` → `<slug>/_layouts/base.html`
+- `page_layout: custom.html` → `<slug>/_layouts/custom.html`
+
+No layout specified? Defaults to `base.html`.
+
+## Campaign context
+
+Every page automatically has access to its campaign's data from `_data/campaigns.json` via the `campaign` object — so you can drive copy, links, and config from the registry instead of hardcoding it into templates.
+
+```liquid
+<h1>{{ campaign.name }}</h1>
+<p>Contact: {{ campaign.support_email }}</p>
+```
+
+Add any keys you want to your campaign's entry, and they become available immediately:
+
+```json
+{
+  "starter": {
+    "name": "Starter Campaign",
+    "entry_url": "presell.html",
+    "support_email": "support@example.com",
+    "custom_headline": "Welcome to our Store!"
+  }
+}
+```
+
+```liquid
+<h2>{{ campaign.custom_headline }}</h2>
+```
+
+### Reserved fields
+
+These keys have built-in CLI behavior:
+
+| Field | Type | Description |
+|---|---|---|
+| `entry_url` | string | Page that `npm run dev` opens in the browser. Defaults to the campaign root (`/<slug>/`). Accepts a page name like `presell` or `landing.html` — the path is normalized to `/<slug>/<page>/`. A warning is shown if the page doesn't exist under `src/<slug>/`. |
+
+### `environment` variable
+
+Every template also has access to an `environment` variable indicating the current build mode — useful for conditionally including analytics, debug tools, or other environment-specific content.
+
+| Command | Default |
+|---|---|
+| `npm run dev` | `development` |
+| `npm run build` | `production` |
+
+```liquid
+{% unless environment == "development" %}
+  <!-- Google Tag Manager -->
+  <script>...</script>
+{% endunless %}
+```
+
+Override the default by setting `CPK_ENV` — useful for build pipelines like Netlify or GitHub Pages where you want a custom value such as `staging`:
+
+```bash
+CPK_ENV=staging npm run build
+```
+
+## Template filters
+
+Templates use [Liquid](https://shopify.github.io/liquid/basics/introduction/) syntax. Page Kit adds three custom filters and tags for campaign-relative includes, assets, and links.
+
+<Callout type="idea">
+Always use these filters instead of hardcoding paths — they're what makes cloning a campaign to a new slug "just work."
+</Callout>
+
+### `campaign_asset`
+
+Resolves an asset path to the current campaign.
+
+```liquid
+<script src="{{ 'config.js' | campaign_asset }}"></script>
+<!-- Output: /starter/config.js -->
+
+<link href="{{ 'css/custom.css' | campaign_asset }}" rel="stylesheet">
+<!-- Output: /starter/css/custom.css -->
+
+<img src="{{ 'images/logo.png' | campaign_asset }}" alt="Logo">
+<!-- Output: /starter/images/logo.png -->
+```
+
+**Use for:** CSS, JS, images, `config.js`, any campaign asset.
+
+### `campaign_link`
+
+Generates a clean URL for inter-page navigation within a campaign.
+
+```liquid
+<a href="{{ 'checkout.html' | campaign_link }}">Checkout</a>
+<!-- Output: /starter/checkout/ -->
+
+<meta name="next-success-url" content="{{ next_url | campaign_link }}">
+<!-- Output: /starter/upsell/ -->
+
+<button data-next-url="{{ 'upsell.html' | campaign_link }}">Continue</button>
+<!-- Output: /starter/upsell/ -->
+```
+
+The filter strips `.html`, adds a trailing slash, prepends the campaign slug, and passes anchor links (`#section`) and absolute URLs through untouched.
+
+**Use for:** page links, navigation URLs, redirect URLs, SDK meta tags.
+
+### `campaign_include`
+
+Includes a file from the **current campaign's** `_includes/` directory.
+
+```liquid
+{% campaign_include 'slider.html' images=slider_images %}
+
+{% campaign_include 'slider.html' images=slider_images show_package_image=true %}
+```
+
+**Use for:** reusable components within a campaign (sliders, testimonials, badges).
+
+## Building from scratch (no template)
+
+Most users should start with `campaign-init` and pick a starter template. If you'd rather start empty, run `campaign-init` and cancel the template picker (`Ctrl+C`). The bootstrap step still runs — you'll have the CLI scripts and an empty `_data/campaigns.json`.
+
+Then add an entry keyed by slug:
+
+```json
+{
+  "my-campaign": {
+    "name": "My Campaign",
+    "description": "My first campaign",
+    "sdk_version": "0.3.10"
+  }
+}
+```
+
+…and create the matching directory tree under `src/`:
+
+```
+src/
+└── my-campaign/
+    ├── _layouts/
+    │   └── base.html
+    ├── assets/
+    │   └── config.js
+    └── presell.html
+```
+
+Then run `npm run config` to set the API key.
+
+## Compressing images
+
+Compress every image in a campaign directory in-place. Supports JPEG, PNG, WebP, and GIF. The file is only overwritten if the compressed output is actually smaller.
+
+```bash
+npm run compress
+```
+
+This will:
+
+1. Show a list of available campaigns
+2. Let you pick which one to compress
+3. Compress all images anywhere under `src/<campaign>/`
+4. Print a before/after table with file sizes and total savings
+
+**Preview mode** — see what would be saved without modifying any files:
+
+```bash
+npm run compress:preview
+```
+
+Already-optimized images are skipped and reported in a debug line above the summary.
+
+## Building for production
+
+```bash
+npm run build
+```
+
+Output is written to `_site/` — fully static, no server, no runtime. From there, push to any static host. See **Hosting** in [Getting Started](./) for provider-specific setup (Netlify, Cloudflare Pages, Render, Vercel, etc.).
+
+<Callout type="warn">
+Make sure the host's domain is listed under your campaign's **authorized domains** in the Campaigns App — otherwise the SDK calls will be rejected from the deployed origin.
+</Callout>

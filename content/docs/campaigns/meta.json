@@ -4,21 +4,22 @@
     "icon": "Megaphone",
     "description": "Campaign funnels & checkout",
     "pages": [
-        "---Guide---",
+        "---Guides---",
         "index",
-        "---Configuration---",
+        "templates",
+        "page-kit",
+        "---Cart SDK---",
         "configuration",
-        "---Features---",
         "bundle-selector",
         "package-toggle",
         "cart-summary",
         "cart-system",
         "upsells",
+        "data-attributes",
+        "javascript-api",
         "analytics",
         "utilities",
         "---API References---",
-        "data-attributes",
-        "javascript-api",
         "api"
     ]
 }

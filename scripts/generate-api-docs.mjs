@@ -262,24 +262,33 @@ const specs = [
 
 const allMethods = {};
 
-// Pre-clean admin-api reference dirs before regeneration
-function cleanRefDir(dir, keepSubdirs = []) {
+// Pre-clean reference dirs before regeneration
+function cleanRefDir(dir, keepSubdirs = [], keepFiles = []) {
   if (!existsSync(dir)) return;
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
     if (entry.isDirectory()) {
       if (!keepSubdirs.includes(entry.name)) rmSync(full, { recursive: true });
-    } else if (entry.name.endsWith('.mdx') || entry.name === 'meta.json') {
+    } else if ((entry.name.endsWith('.mdx') || entry.name === 'meta.json') && !keepFiles.includes(entry.name)) {
       rmSync(full);
     }
   }
 }
 
-// Clean stable reference dir (preserve versioned subdirs; they're regenerated separately)
+// Admin API: clean stable reference dir (preserve versioned subdirs; they're regenerated separately)
 cleanRefDir(specs[0].output, VERSION_SUBFOLDERS);
 // Clean versioned subdirs entirely (regenerated fresh below)
 for (const version of VERSION_SUBFOLDERS) {
   const vdir = join(specs[0].output, version);
+  if (existsSync(vdir)) rmSync(vdir, { recursive: true });
+  mkdirSync(vdir, { recursive: true });
+}
+
+// Campaigns API: clean stable api dir (preserve versioned subdirs and hand-written index.mdx)
+const campaignsSpecOutput = specs.find(s => s.output === rootPath('content/docs/campaigns/api')).output;
+cleanRefDir(campaignsSpecOutput, CAMPAIGNS_VERSION_SUBFOLDERS, ['index.mdx']);
+for (const version of CAMPAIGNS_VERSION_SUBFOLDERS) {
+  const vdir = join(campaignsSpecOutput, version);
   if (existsSync(vdir)) rmSync(vdir, { recursive: true });
   mkdirSync(vdir, { recursive: true });
 }

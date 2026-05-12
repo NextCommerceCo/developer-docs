@@ -1,0 +1,9 @@
+{
+    "root": true,
+    "title": "Skills",
+    "icon": "Sparkles",
+    "description": "AI agent skills for Next Commerce",
+    "pages": [
+        "index"
+    ]
+}

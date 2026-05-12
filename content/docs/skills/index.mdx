@@ -1,0 +1,76 @@
+---
+title: AI Skills
+description: Pre-built skills that give AI coding agents deep knowledge of the Next Commerce platform.
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+
+[**Next Commerce AI Skills**](https://github.com/NextCommerceCo/skills) are pre-built skills that give AI coding agents deep knowledge of the Next Commerce platform — APIs, CLI workflows, and architecture patterns — so they can work autonomously on your store.
+
+Skills are structured markdown files. Any AI tool that accepts a context file or system prompt can use them — Claude Code, OpenAI Codex, Cursor, GitHub Copilot, Gemini CLI, Windsurf, and 50+ other LLM-powered agents.
+
+## Install
+
+The simplest path is the [`skills` CLI](https://github.com/vercel-labs/skills) — it pulls `SKILL.md` files from a GitHub repo and drops them into the right config directory for whichever assistant you use. The target agent is auto-detected by default.
+
+```bash
+# Install every skill from this repo
+npx skills add NextCommerceCo/skills
+
+# Install one skill
+npx skills add NextCommerceCo/skills -s next-theme-dev
+
+# List skills without installing
+npx skills add NextCommerceCo/skills --list
+
+# Target a specific agent (auto-detected by default)
+npx skills add NextCommerceCo/skills -a claude-code
+```
+
+Once installed, Claude Code auto-detects when a skill is relevant, or you can invoke it directly with `/<skill-name>` (e.g. `/next-theme-dev`). If the skills directory didn't exist before Claude Code started, restart it so it can discover the new directory.
+
+```bash
+# Update every installed skill
+npx skills update
+
+# Update one skill
+npx skills update next-theme-dev
+```
+
+<Callout type="info">
+For agents the `skills` CLI doesn't support, each `SKILL.md` is plain markdown — load it as a system prompt, context file, or chat upload.
+</Callout>
+
+### Ask your AI tool to install
+
+You can also let your AI tool drive the install — it knows where files live for the current OS and assistant:
+
+```text
+Install the Next Commerce AI skill I need from https://github.com/NextCommerceCo/skills.
+Use the installation location for my current AI tool and operating system. If my tool
+supports native skills, install each skill as a directory containing its SKILL.md.
+If it only supports rules, prompts, or context files, add the relevant SKILL.md there.
+Prefer HTTPS clone unless my GitHub SSH access is already configured.
+```
+
+Tell it which skill you want, or ask it to inspect [`skills.json`](https://github.com/NextCommerceCo/skills/blob/main/skills.json) and choose the relevant one.
+
+## Available skills
+
+| Skill | What it does | When to use it |
+| --- | --- | --- |
+| [**next-theme-dev**](https://github.com/NextCommerceCo/skills/tree/main/next-theme-dev) | Build and customize storefront themes — DTL templates, ntk CLI, Tailwind CSS, settings, side cart | You're editing theme files, setting up a new storefront, or debugging template issues |
+| [**next-campaigns-setup**](https://github.com/NextCommerceCo/skills/tree/main/next-campaigns-setup) | End-to-end CPK campaign setup — scaffolds the project, copies a starter template, seeds `campaigns.json`, wires up the API key, store details, and analytics in one pass | Starting a new CPK campaign for a brand |
+| [**next-bulk-fulfill**](https://github.com/NextCommerceCo/skills/tree/main/next-bulk-fulfill) | Update orders to **Fulfilled** with tracking numbers from a CSV | A fulfillment provider shipped orders but tracking didn't sync back — orders stuck in *Processing* |
+| [**next-bulk-move**](https://github.com/NextCommerceCo/skills/tree/main/next-bulk-move) | Move fulfillment orders between warehouse locations in bulk — by order-number file or by Product ID / SKU list | Switching fulfillment providers, or moving every FO containing a given SKU/product to a new location |
+| [**next-bulk-subscription**](https://github.com/NextCommerceCo/skills/tree/main/next-bulk-subscription) | Apply a PATCH (status, renewal date, interval, gateway, address) to a list of subscription IDs | Merchant wants to bulk-pause, bulk-shift renewals, bulk-cancel, or migrate subscriptions between gateways |
+
+## Prerequisites
+
+Each skill lists its own requirements in its `SKILL.md`. Common across all skills:
+
+- Access to a Next Commerce store
+- An API key with the scopes specified by the skill (create at **Dashboard → Settings → API Access**)
+
+## Machine-readable index
+
+For AI agents that need to programmatically discover available skills, [`skills.json`](https://github.com/NextCommerceCo/skills/blob/main/skills.json) is a structured manifest with skill IDs, descriptions, trigger phrases, and prerequisites. Agents can fetch this single file to decide which skill to load.

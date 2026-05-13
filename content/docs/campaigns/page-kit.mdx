@@ -63,12 +63,19 @@ This will:
 3. Start the dev server
 4. Open your browser to the selected campaign
 
-By default the dev server starts on port `3000`. Override it with a positional arg, `--port` flag, or `PORT` env var:
+By default the dev server starts on port `3000` and prompts you to pick a campaign.
+
+| Flag | Purpose |
+|---|---|
+| `--campaign <slug>`, `-c <slug>` | Skip the picker and start this campaign (must exist in `_data/campaigns.json`) |
+| `--port <n>`, `-p <n>` | Port to listen on, 1–65535 (defaults to `3000`) |
+
+Both flags accept `=`-syntax (`--campaign=my-camp`, `--port=8080`). The first bare positional argument is also accepted as a shortcut: numeric → port, non-numeric → campaign slug. The `PORT` env var sets the port when no flag is given.
 
 ```bash
-npm run dev 8080
-npm run dev --port 8080
-PORT=8080 npm run dev
+npm run dev                            # interactive picker, port 3000
+npm run dev my-campaign                # specific campaign, default port
+npm run dev -c my-campaign -p 8080     # specific campaign and port
 ```
 
 ## Non-interactive setup (agents, CI)

@@ -9,6 +9,12 @@ Campaigns App opens up new possibilities for frontend developers to easily creat
 
 The Campaigns App provides an easy to use CORS enabled API that follows the best practices for integrating to our Admin API for an [External Checkout Flow](/docs/admin-api/guides/external-checkout).
 
+<Callout type="idea" title="Recommended: use the Campaign Cart SDK">
+For most projects, reach for the **[Campaign Cart SDK](/docs/campaigns/cart-system)** before calling this API directly. The SDK wraps every endpoint on this page behind data-attribute driven add-to-cart, live cart state, coupon handling, checkout forms, and upsell flows — so you write HTML, not fetch calls. The [JavaScript API](/docs/campaigns/javascript-api) reference covers the programmatic surface when you need it.
+
+Use the raw API on this page only for custom server-side flows or backend integrations the SDK doesn't cover.
+</Callout>
+
 ## Campaigns Overview
 
 A "campaign" is a defined set of packages and payment rules as a backend for the HTML/JS webpages of a campaign (or funnel) frontend. You can easily setup multiple campaigns for different product offers, markets, and A/B testing.
@@ -26,17 +32,12 @@ Session tracking is available to enable visibility into campaign performance by 
 These events flow into Campaign Performance reports for real time monitoring of acvitities on your campaign.
 
 ### Packages
-Each campaign can have multiple "Packages" configured to set quantity based pricing rules for your products. Typically this results in packages such as:
+A **package** is a virtual link to a product in your campaign — what customers reference by `package_id` when creating carts and orders. Each package points to one product with a default quantity (e.g. 1x or 3x for bundles), and can optionally be recurring (subscription).
 
-**Example Packages**
-- Package 1 - 1x Widget at 10.00
-- Package 2 - 3x Widget at 21.00
-- Package 3 - 5x Widget at 30.00
-- Package 4 - 1x Widget at 8.00 Recurring Every 30 Days
+Pricing adjustments — per-quantity bundle discounts, automatic offers, coupon codes — are controlled by **offers**, not by per-package pricing rules. The cart and order APIs return adjusted before/after totals so the frontend can render savings without doing math.
 
-<Callout type="info">
-Package total price needs to be divisible to two digits by the quantity as the total price is sent on a per item level to the store Orders API.
-</Callout>
+See [Concepts → Packages](/docs/campaigns#packages) and [Concepts → Offers](/docs/campaigns#offers) for the full model.
+
 ### Shipping Options
 Campaigns can have custom shipping prices to optimize shipping fees and methods available on your campaign to override the default pricing configured globally in the store.
 
@@ -44,6 +45,15 @@ Campaigns can have custom shipping prices to optimize shipping fees and methods 
 
 - Shipping Method 1 - Default shipping at 7.99
 - Shipping Method 2 - Express shipping at 14.99
+
+### Offers
+**Offers** are the pricing layer. They apply discounts to the cart when conditions are met — either **automatically** (when the cart line/quantity matches an offer's rule) or via a **coupon code** the customer enters.
+
+Coupon codes are submitted through the `vouchers` array on cart, order, and upsell-create requests. Codes stack on top of automatic offers, and they're the only way to apply discounts on upsell pages (automatic offers don't run there).
+
+The cart and order responses include applied `discounts`, `total_discounts`, and per-line discount breakdowns so the frontend can render savings without recalculating. The full set of offers configured on a campaign is returned by [`campaignRetrieve`](/docs/campaigns/api/campaigns/campaignRetrieve).
+
+See [Concepts → Offers](/docs/campaigns#offers) for the full model.
 
 
 ## Getting Started
@@ -70,7 +80,35 @@ Add the script below to every page of your campaign for full session tracking in
 ```
 
 
+### Calculate Cart
+Show customers a live pricing preview — subtotal, discounts, shipping, total — **before** they commit to creating an order. Use this on checkout pages to update totals as the user changes quantity, swaps packages, or enters a coupon code. No cart is persisted; the endpoint accepts the same `lines`/`vouchers` shape as cart create and returns adjusted totals plus a breakdown of applied offer and voucher discounts.
+
+```javascript title="Calculate Cart Totals"
+var payload = {
+  "lines": [
+    { "package_id": 1 }
+  ],
+  "vouchers": ["SAVE10"], // optional coupon codes
+  "shipping_method": 1    // optional — include to factor shipping into the total
+}
+const response = await fetch('https://campaigns.apps.29next.com/api/v1/carts/calculate/', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        "Authorization": '<YOUR CAMPAIGN API KEY>' // Campaign API Key
+    },
+    body: JSON.stringify(payload),
+});
+const result = await response.json();
+console.log(result); // subtotal, total, total_discount, offer_discounts, voucher_discounts, lines
+```
+
+<Callout type="info" title="Calculating on upsell pages">
+Add `?upsell=true` to the URL when calling from an upsell page — this skips site-wide automatic offers (which don't apply post-purchase). Coupon codes passed via `vouchers` still apply.
+</Callout>
+
 ### Create Cart
+Capture customer details (email, name) alongside their selected packages and persist the cart server-side — so the visitor is recorded as a **lead** even if they don't complete checkout. Use this on email-gate or "reserve your order" steps to feed abandoned-cart recovery and lead capture flows. Carts can be referenced later or converted into an order via Create Order.
 
 ```javascript title="Create a Cart"
 var payload = {

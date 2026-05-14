@@ -1,4 +1,12 @@
 {
   "title": "Analytics",
-  "pages": ["index", "configuration", "custom-events", "tracking-api", "debugging", "best-practices", "examples"]
+  "pages": [
+    "index",
+    "best-practices",
+    "configuration",
+    "custom-events",
+    "tracking-api",
+    "debugging",
+    "examples"
+  ]
 }

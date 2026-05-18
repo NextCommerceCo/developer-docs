@@ -5,6 +5,8 @@ sidebar_position: 4
 
 The SDK provides comprehensive attribution tracking capabilities, including support for custom metadata that can be passed with orders.
 
+> **Prerequisites:** Your store must have the [required metadata field definitions](/docs/campaigns/javascript-api/attribution-metadata) configured in Settings → Metadata before attribution data will flow with orders. Missing fields are silently dropped.
+
 ## Simple API via window.next
 
 The easiest way to manage attribution metadata is through the `window.next` object:
@@ -752,7 +754,7 @@ console.log('API Attribution:', window.NextAttributionStore.getAttributionForApi
 ## Common Issues
 
 ### Issue: Metadata not appearing in orders
-**Solution**: Ensure you're calling `updateAttribution()` before order creation and that the metadata object contains valid JSON values.
+**Solution**: The most common cause is that the [attribution metadata fields](/docs/campaigns/javascript-api/attribution-metadata) have not been configured in your store's Settings → Metadata. Fields that don't exist as metadata definitions are silently dropped. If the fields are configured, ensure you're calling `updateAttribution()` before order creation and that the metadata object contains valid JSON values.
 
 ### Issue: Funnel name not updating
 **Solution**: Funnel names are write-once. Use `clearPersistedFunnel()` to reset if needed during development.
@@ -762,5 +764,6 @@ console.log('API Attribution:', window.NextAttributionStore.getAttributionForApi
 
 ## See Also
 
+- [Attribution Metadata Fields](/docs/campaigns/javascript-api/attribution-metadata) - Store-level metadata field configuration
 - [URL Parameters API](/docs/campaigns/javascript-api/url-parameters) - General URL parameter management
 - [Data Attributes - URL Parameters](/docs/campaigns/data-attributes/url-parameters) - Using parameters with HTML attributes

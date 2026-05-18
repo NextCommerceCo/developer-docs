@@ -170,7 +170,7 @@ The SDK automatically collects these metadata fields:
   landing_page: string;      // Entry page URL
   referrer: string;          // Referring URL
   device: string;            // Device info
-  device_type: 'mobile' | 'desktop';
+  device_type: 'mobile' | 'desktop' | 'tablet';
   domain: string;            // Current domain
   timestamp: number;         // Visit timestamp
   conversion_timestamp?: number;

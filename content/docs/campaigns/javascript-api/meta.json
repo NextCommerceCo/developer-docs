@@ -1,4 +1,4 @@
 {
   "title": "JavaScript API",
-  "pages": ["index", "methods", "events", "attribution", "url-parameters"]
+  "pages": ["index", "methods", "events", "attribution", "attribution-metadata", "url-parameters"]
 }

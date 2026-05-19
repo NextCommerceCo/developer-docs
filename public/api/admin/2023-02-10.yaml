@@ -857,7 +857,7 @@ components:
         order:
           readOnly: true
           type:
-            - integer
+            - string
             - 'null'
         report_amount:
           format: decimal
@@ -2199,7 +2199,7 @@ components:
         order:
           readOnly: true
           type:
-            - integer
+            - string
             - 'null'
         report_amount:
           format: decimal
@@ -2418,6 +2418,35 @@ components:
         date_created:
           format: date-time
           type: string
+        delivered_at:
+          format: date-time
+          type:
+            - string
+            - 'null'
+        delivery_status:
+          description: |-
+            Expected delivery statuses.
+
+            * `None` - No Status
+            * `tracking_added` - Tracking Added
+            * `in_transit` - In Transit
+            * `out_for_delivery` - Out For Delivery
+            * `attempted_delivery` - Attempted Delivery
+            * `failed_delivery` - Failed Delivery
+            * `delivered` - Delivered
+            * `delayed` - Delayed
+          enum:
+            - null
+            - tracking_added
+            - in_transit
+            - out_for_delivery
+            - attempted_delivery
+            - failed_delivery
+            - delivered
+            - delayed
+            - ''
+          readOnly: true
+          x-spec-enum-id: 3b886e5b796c0603
         id:
           readOnly: true
           type: integer
@@ -2428,6 +2457,11 @@ components:
         lines:
           readOnly: true
           type: string
+        processing_at:
+          format: date-time
+          type:
+            - string
+            - 'null'
         reference:
           maxLength: 512
           type: string
@@ -2445,6 +2479,7 @@ components:
       required:
         - carrier
         - date_created
+        - delivery_status
         - id
         - last_event_date
         - lines
@@ -2956,6 +2991,11 @@ components:
         created_at:
           format: date-time
           type: string
+        delivered_at:
+          format: date-time
+          type:
+            - string
+            - 'null'
         delivery_status:
           description: |-
             Expected delivery statuses.
@@ -3002,6 +3042,11 @@ components:
           allOf:
             - $ref: '#/components/schemas/LocationAddress'
           readOnly: true
+        processing_at:
+          format: date-time
+          type:
+            - string
+            - 'null'
         requires_shipping:
           type: boolean
         shipping_method:
@@ -4992,7 +5037,7 @@ components:
         order:
           readOnly: true
           type:
-            - integer
+            - string
             - 'null'
         report_amount:
           format: decimal
@@ -11479,16 +11524,18 @@ paths:
           schema:
             format: date
             type: string
-        - description: Product
+        - description: Filter by product ID (supports variant and parent product IDs)
           explode: true
           in: query
           name: product
           schema:
             items:
-              type: string
+              items:
+                type: integer
+              type: array
             type: array
           style: form
-        - description: SKU
+        - description: Filter by SKU
           explode: true
           in: query
           name: sku
@@ -13019,12 +13066,15 @@ paths:
           name: name
           schema:
             type: string
-        - explode: true
+        - description: Filter by product ID (supports variant and parent product IDs)
+          explode: true
           in: query
           name: product
           schema:
             items:
-              type: integer
+              items:
+                type: integer
+              type: array
             type: array
           style: form
         - explode: true
@@ -13035,7 +13085,7 @@ paths:
               type: integer
             type: array
           style: form
-        - description: SKU
+        - description: Filter by SKU
           explode: true
           in: query
           name: sku
@@ -19286,7 +19336,7 @@ webhooks:
                     metadata:
                       type: object
                     order:
-                      type: integer
+                      type: string
                     report_amount:
                       format: decimal
                       pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
@@ -19469,7 +19519,7 @@ webhooks:
                     metadata:
                       type: object
                     order:
-                      type: integer
+                      type: string
                     report_amount:
                       format: decimal
                       pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
@@ -19736,6 +19786,7 @@ webhooks:
               api_version: '2023-02-10'
               data:
                 created_at: '2024-01-01T00:00:00Z'
+                delivered_at: null
                 delivery_status: {}
                 id: 0
                 last_event_date: null
@@ -19777,6 +19828,7 @@ webhooks:
                   phone_number: string
                   postcode: string
                   state: string
+                processing_at: null
                 requires_shipping: false
                 shipping_method: string
                 status: string
@@ -19805,6 +19857,9 @@ webhooks:
                 data:
                   properties:
                     created_at:
+                      format: date-time
+                      type: string
+                    delivered_at:
                       format: date-time
                       type: string
                     delivery_status:
@@ -19990,6 +20045,9 @@ webhooks:
                           title: State/County
                           type: string
                       type: object
+                    processing_at:
+                      format: date-time
+                      type: string
                     requires_shipping:
                       type: boolean
                     shipping_method:
@@ -20088,6 +20146,7 @@ webhooks:
               api_version: '2023-02-10'
               data:
                 created_at: '2024-01-01T00:00:00Z'
+                delivered_at: null
                 delivery_status: {}
                 id: 0
                 last_event_date: null
@@ -20129,6 +20188,7 @@ webhooks:
                   phone_number: string
                   postcode: string
                   state: string
+                processing_at: null
                 requires_shipping: false
                 shipping_method: string
                 status: string
@@ -20157,6 +20217,9 @@ webhooks:
                 data:
                   properties:
                     created_at:
+                      format: date-time
+                      type: string
+                    delivered_at:
                       format: date-time
                       type: string
                     delivery_status:
@@ -20342,6 +20405,9 @@ webhooks:
                           title: State/County
                           type: string
                       type: object
+                    processing_at:
+                      format: date-time
+                      type: string
                     requires_shipping:
                       type: boolean
                     shipping_method:
@@ -20845,9 +20911,12 @@ webhooks:
                 fulfillments:
                   - carrier: string
                     date_created: '2024-01-01T00:00:00Z'
+                    delivered_at: null
+                    delivery_status: {}
                     id: 0
                     last_event_date: '2024-01-01T00:00:00Z'
                     lines: string
+                    processing_at: null
                     reference: string
                     requires_shipping: false
                     status: string
@@ -21244,12 +21313,41 @@ webhooks:
                           date_created:
                             format: date-time
                             type: string
+                          delivered_at:
+                            format: date-time
+                            type: string
+                          delivery_status:
+                            description: |-
+                              Expected delivery statuses.
+
+                              * `None` - No Status
+                              * `tracking_added` - Tracking Added
+                              * `in_transit` - In Transit
+                              * `out_for_delivery` - Out For Delivery
+                              * `attempted_delivery` - Attempted Delivery
+                              * `failed_delivery` - Failed Delivery
+                              * `delivered` - Delivered
+                              * `delayed` - Delayed
+                            enum:
+                              - null
+                              - tracking_added
+                              - in_transit
+                              - out_for_delivery
+                              - attempted_delivery
+                              - failed_delivery
+                              - delivered
+                              - delayed
+                              - ''
+                            x-spec-enum-id: 3b886e5b796c0603
                           id:
                             type: integer
                           last_event_date:
                             format: date-time
                             type: string
                           lines:
+                            type: string
+                          processing_at:
+                            format: date-time
                             type: string
                           reference:
                             maxLength: 512
@@ -21265,6 +21363,7 @@ webhooks:
                         required:
                           - carrier
                           - date_created
+                          - delivery_status
                           - id
                           - last_event_date
                           - lines
@@ -22333,9 +22432,12 @@ webhooks:
                 fulfillments:
                   - carrier: string
                     date_created: '2024-01-01T00:00:00Z'
+                    delivered_at: null
+                    delivery_status: {}
                     id: 0
                     last_event_date: '2024-01-01T00:00:00Z'
                     lines: string
+                    processing_at: null
                     reference: string
                     requires_shipping: false
                     status: string
@@ -22732,12 +22834,41 @@ webhooks:
                           date_created:
                             format: date-time
                             type: string
+                          delivered_at:
+                            format: date-time
+                            type: string
+                          delivery_status:
+                            description: |-
+                              Expected delivery statuses.
+
+                              * `None` - No Status
+                              * `tracking_added` - Tracking Added
+                              * `in_transit` - In Transit
+                              * `out_for_delivery` - Out For Delivery
+                              * `attempted_delivery` - Attempted Delivery
+                              * `failed_delivery` - Failed Delivery
+                              * `delivered` - Delivered
+                              * `delayed` - Delayed
+                            enum:
+                              - null
+                              - tracking_added
+                              - in_transit
+                              - out_for_delivery
+                              - attempted_delivery
+                              - failed_delivery
+                              - delivered
+                              - delayed
+                              - ''
+                            x-spec-enum-id: 3b886e5b796c0603
                           id:
                             type: integer
                           last_event_date:
                             format: date-time
                             type: string
                           lines:
+                            type: string
+                          processing_at:
+                            format: date-time
                             type: string
                           reference:
                             maxLength: 512
@@ -22753,6 +22884,7 @@ webhooks:
                         required:
                           - carrier
                           - date_created
+                          - delivery_status
                           - id
                           - last_event_date
                           - lines
@@ -27419,3 +27551,19 @@ webhooks:
       security: []
       tags:
         - payments
+tags:
+  - name: apps
+  - name: fulfillment
+  - name: carts
+  - name: products
+  - name: payments
+  - name: exports
+  - name: gift-cards
+  - name: metadata
+  - name: orders
+  - name: storefront
+  - name: store
+  - name: subscriptions
+  - name: support
+  - name: customers
+  - name: webhooks

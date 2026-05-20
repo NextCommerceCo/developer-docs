@@ -67,8 +67,8 @@ Place these on elements **inside** a card (or card template) to populate them wi
 | `sku` | Product SKU; empty if not set |
 | `price` | Formatted total price for the card's quantity |
 | `unitPrice` | Per-unit price |
-| `originalPrice` | Retail / compare-at total price |
-| `originalUnitPrice` | Retail / compare-at per-unit price |
+| `originalPrice` | Total before offer/voucher discounts |
+| `originalUnitPrice` | Per-unit price before offer/voucher discounts |
 | `discountAmount` | Savings amount; empty if no discount |
 | `discountPercentage` | Savings as a percentage; empty if no discount |
 | `isSelected` | Shows the element when the package is in the cart; hides it otherwise |
@@ -130,10 +130,10 @@ Use `data-next-display="toggle.{packageId}.{property}"` on any element to bind i
 | `sku` | text | Product SKU (empty if not set) |
 | `price` | currency | Total price for the card's quantity (unit price x quantity) |
 | `unitPrice` | currency | Per-unit price |
-| `originalPrice` | currency | Retail / compare-at total price |
-| `originalUnitPrice` | currency | Retail / compare-at per-unit price |
-| `discountAmount` | currency | Savings amount (compare minus total) |
-| `discountPercentage` | percentage | Discount as a percentage of the compare price |
+| `originalPrice` | currency | Total before offer/voucher discounts |
+| `originalUnitPrice` | currency | Per-unit price before offer/voucher discounts |
+| `discountAmount` | currency | Savings amount from the price calculation |
+| `discountPercentage` | percentage | Discount as a percentage of the pre-discount price |
 | `isSelected` | boolean | `true` when this package is in the cart |
 | `hasDiscount` | boolean | `true` when a discount is applied |
 | `isRecurring` | boolean | `true` when the package bills on a recurring schedule |

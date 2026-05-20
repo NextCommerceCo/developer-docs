@@ -42,7 +42,7 @@ Live values for a specific package. Use `package.[id].<property>` where `[id]` i
 | `package.[id].image` | Image URL |
 | `package.[id].price` | Per-unit price |
 | `package.[id].price_total` | Total package price |
-| `package.[id].price_retail` | Retail (compare-at) per-unit price |
+| `package.[id].price_retail` | Legacy retail (compare-at) per-unit price |
 | `package.[id].savingsAmount` | Total savings |
 | `package.[id].savingsPercentage` | Savings as percentage |
 | `package.[id].hasSavings` | Boolean — has savings |
@@ -55,6 +55,8 @@ Live values for a specific package. Use `package.[id].<property>` where `[id]` i
 For shorthand syntax inside a parent with `data-next-package-id`, see [Package Display](./package-display).
 
 For the full property list (including discount-context properties that require an active cart), see [Reference → Attributes](./reference/attributes).
+
+Package-level retail and quantity values are legacy Campaigns App fields. New SDK 0.4.x campaign pricing should use Offers and component-level price calculation fields such as bundle/toggle `originalPrice`, `price`, and `discountAmount`.
 
 ---
 

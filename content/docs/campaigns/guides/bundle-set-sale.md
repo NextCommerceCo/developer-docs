@@ -24,24 +24,24 @@ The simplest setup is writing cards directly in HTML. Give each card a unique `d
        data-next-bundle-items='[{"packageId": 10, "quantity": 1}]'
        data-next-selected="true">
     <h3>Buy 1</h3>
-    <p><span data-next-bundle-price></span></p>
+    <p><span data-next-bundle-display="price"></span></p>
   </div>
 
   <div data-next-bundle-card
        data-next-bundle-id="buy2"
        data-next-bundle-items='[{"packageId": 10, "quantity": 2}]'>
     <h3>Buy 2</h3>
-    <p><span data-next-bundle-price></span></p>
-    <p>Save <span data-next-bundle-price="savings"></span></p>
+    <p><span data-next-bundle-display="price"></span></p>
+    <p>Save <span data-next-bundle-display="discountAmount"></span></p>
   </div>
 
   <div data-next-bundle-card
        data-next-bundle-id="buy3"
        data-next-bundle-items='[{"packageId": 10, "quantity": 3}]'>
     <h3>Buy 3</h3>
-    <p><span data-next-bundle-price></span></p>
-    <p>Save <span data-next-bundle-price="savings"></span></p>
-    <del><span data-next-bundle-price="compare"></span></del>
+    <p><span data-next-bundle-display="price"></span></p>
+    <p>Save <span data-next-bundle-display="discountAmount"></span></p>
+    <del><span data-next-bundle-display="originalPrice"></span></del>
   </div>
 
 </div>
@@ -69,7 +69,7 @@ The enhancer adds CSS classes you can target:
 }
 
 /* Price is loading */
-.next-bundle-card.next-loading [data-next-bundle-price] {
+.next-bundle-card.next-loading [data-next-bundle-display] {
   opacity: 0.4;
 }
 ```
@@ -117,9 +117,9 @@ When you have more than 2–3 options or want to keep HTML lean, define bundles 
     <span class="badge">{bundle.badge}</span>
     <h3>{bundle.label}</h3>
     <p class="sublabel">{bundle.sublabel}</p>
-    <p class="price"><span data-next-bundle-price></span></p>
-    <p class="savings">Save <span data-next-bundle-price="savings"></span></p>
-    <del><span data-next-bundle-price="compare"></span></del>
+    <p class="price"><span data-next-bundle-display="price"></span></p>
+    <p class="savings">Save <span data-next-bundle-display="discountAmount"></span></p>
+    <del><span data-next-bundle-display="originalPrice"></span></del>
   </div>
 </template>
 ```
@@ -139,7 +139,7 @@ A bundle can include more than one product. List each package in the `items` arr
        data-next-bundle-items='[{"packageId": 10, "quantity": 1}]'
        data-next-selected="true">
     Just the Main Product
-    <span data-next-bundle-price></span>
+    <span data-next-bundle-display="price"></span>
   </div>
 
   <!-- Main product + free gift (hidden from slot list) -->
@@ -150,7 +150,7 @@ A bundle can include more than one product. List each package in the `items` arr
          {"packageId": 99, "quantity": 1, "noSlot": true}
        ]'>
     Main Product + Free Gift
-    <span data-next-bundle-price></span>
+    <span data-next-bundle-display="price"></span>
   </div>
 
 </div>
@@ -172,7 +172,7 @@ When your products have variants (color, size), add a slot template so visitors 
        data-next-selected="true">
     <h3>Buy 2 — Pick Your Colors</h3>
     <div data-next-bundle-slots></div>
-    <p>Total: <span data-next-bundle-price></span></p>
+    <p>Total: <span data-next-bundle-display="price"></span></p>
   </div>
 
 </div>
@@ -224,10 +224,10 @@ When your products have variants (color, size), add a slot template so visitors 
     <span class="badge">{bundle.badge}</span>
     <h3>{bundle.label}</h3>
     <div class="pricing">
-      <span data-next-bundle-price></span>
-      <del data-next-bundle-price="compare"></del>
+      <span data-next-bundle-display="price"></span>
+      <del data-next-bundle-display="originalPrice"></del>
     </div>
-    <p class="savings">You save <span data-next-bundle-price="savings"></span></p>
+    <p class="savings">You save <span data-next-bundle-display="discountAmount"></span></p>
   </div>
 </template>
 

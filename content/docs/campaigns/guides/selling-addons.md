@@ -9,7 +9,7 @@ Add-ons are optional extras — warranties, insurance, accessories, or upgrades 
 An add-on section where:
 - Each add-on is a clickable card that adds or removes the package from the cart
 - Active cards get a visual "selected" state
-- Prices are shown with optional compare-at and savings
+- Prices are shown with optional Offer-based savings
 - One add-on can optionally be pre-selected (auto-added on page load)
 - A warranty add-on can auto-match the quantity of the main product
 
@@ -23,7 +23,7 @@ An add-on section where:
        data-add-text="Add Warranty"
        data-remove-text="✓ Warranty Added">
     <h3>2-Year Warranty</h3>
-    <span data-next-toggle-price></span>
+    <span data-next-toggle-display="price"></span>
   </div>
 
   <div data-next-toggle-card
@@ -31,8 +31,8 @@ An add-on section where:
        data-add-text="Add Insurance"
        data-remove-text="✓ Insurance Added">
     <h3>Shipping Insurance</h3>
-    <span data-next-toggle-price></span>
-    <del data-next-toggle-price="compare"></del>
+    <span data-next-toggle-display="price"></span>
+    <del data-next-toggle-display="originalPrice"></del>
   </div>
 
 </div>
@@ -79,7 +79,7 @@ The enhancer applies CSS classes you can target:
 }
 
 /* Price loading */
-[data-next-toggle-card].next-loading [data-next-toggle-price] {
+[data-next-toggle-card].next-loading [data-next-toggle-display] {
   opacity: 0.4;
 }
 ```
@@ -92,7 +92,7 @@ Add `data-next-toggle-image` to any `<img>` inside a card — the enhancer fills
 <div data-next-toggle-card data-next-package-id="201">
   <img data-next-toggle-image alt="Warranty" />
   <h3>2-Year Warranty</h3>
-  <span data-next-toggle-price></span>
+  <span data-next-toggle-display="price"></span>
 </div>
 ```
 
@@ -116,8 +116,8 @@ When you have several add-ons or want to keep markup clean, define them as JSON 
        data-remove-text="✓ {toggle.label} Added">
     <img data-next-toggle-image alt="{toggle.label}" />
     <h3>{toggle.label}</h3>
-    <span data-next-toggle-price></span>
-    <del data-next-toggle-price="compare"></del>
+    <span data-next-toggle-display="price"></span>
+    <del data-next-toggle-display="originalPrice"></del>
   </div>
 </template>
 ```
@@ -159,7 +159,7 @@ When your add-on quantity should match the main product quantity — for example
        data-add-text="Add Warranty (matches your quantity)"
        data-remove-text="✓ Warranty Added">
     Add Warranty
-    <span data-next-toggle-price></span>
+    <span data-next-toggle-display="price"></span>
   </div>
 </div>
 ```
@@ -194,8 +194,8 @@ The toggle card's quantity is automatically set to the **sum of quantities** of 
       </div>
     </div>
     <div class="addon-price">
-      <span data-next-toggle-price></span>
-      <del data-next-toggle-price="compare"></del>
+      <span data-next-toggle-display="price"></span>
+      <del data-next-toggle-display="originalPrice"></del>
     </div>
     <button class="addon-button">
       <span data-next-button-text>Add</span>

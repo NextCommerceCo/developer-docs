@@ -635,6 +635,22 @@ components:
             - string
             - 'null'
       type: object
+    CardNetwork:
+      properties:
+        acquirer_bin:
+          readOnly: true
+          type: string
+        mcc_code:
+          readOnly: true
+          type: string
+        merchant_id:
+          readOnly: true
+          type: string
+      required:
+        - acquirer_bin
+        - mcc_code
+        - merchant_id
+      type: object
     Cart:
       properties:
         abandoned:
@@ -3736,6 +3752,45 @@ components:
       required:
         - agent
       type: object
+    MerchantProfile:
+      properties:
+        amex:
+          allOf:
+            - $ref: '#/components/schemas/CardNetwork'
+          readOnly: true
+        discover:
+          allOf:
+            - $ref: '#/components/schemas/CardNetwork'
+          readOnly: true
+        mastercard:
+          allOf:
+            - $ref: '#/components/schemas/CardNetwork'
+          readOnly: true
+        merchant_country:
+          description: The country the merchant is registered in.
+          readOnly: true
+          title: ISO 3166-1 alpha-2
+          type:
+            - string
+            - 'null'
+        merchant_name:
+          description: Merchant name assigned by your acquiring bank, contact them if you are not sure.
+          readOnly: true
+          type:
+            - string
+            - 'null'
+        visa:
+          allOf:
+            - $ref: '#/components/schemas/CardNetwork'
+          readOnly: true
+      required:
+        - amex
+        - discover
+        - mastercard
+        - merchant_country
+        - merchant_name
+        - visa
+      type: object
     MerchantRequest:
       properties:
         message:
@@ -6298,11 +6353,38 @@ components:
           readOnly: true
           type: string
         events:
-          description: See dashboard for webhooks for available events.
+          description: List of event triggers for the webhook.
           items:
+            enum:
+              - cart.abandoned
+              - customer.created
+              - customer.deleted
+              - customer.updated
+              - dispute.created
+              - dispute.updated
+              - export.created
+              - fulfillment.created
+              - fulfillment.updated
+              - gateway.created
+              - gateway.updated
+              - gateway_group.created
+              - gateway_group.updated
+              - order.created
+              - order.updated
+              - product.created
+              - product.deleted
+              - product.updated
+              - store.updated
+              - subscription.created
+              - subscription.updated
+              - ticket.created
+              - ticket.updated
+              - transaction.created
+              - transaction.updated
             type:
               - string
               - 'null'
+            x-spec-enum-id: 73dffac0903cc65e
           type: array
         id:
           readOnly: true
@@ -6484,15 +6566,16 @@ components:
           readOnly: true
           type: array
         gateway_type:
+          description: Payment gateway provider.
           maxLength: 100
           type: string
         id:
           readOnly: true
           type: integer
         merchant_profile:
-          type:
-            - integer
-            - 'null'
+          allOf:
+            - $ref: '#/components/schemas/MerchantProfile'
+          readOnly: true
         name:
           description: Used for reporting and transaction references.
           maxLength: 100
@@ -6512,13 +6595,25 @@ components:
             - auth-capture
           type: string
           x-spec-enum-id: 0e887a41ea162b2f
+        re_attemp_group:
+          allOf:
+            - $ref: '#/components/schemas/GatewayGroup'
+          readOnly: true
+        re_attemp_intitial_charge:
+          description: Reattempt soft declines with another gateway.
+          title: Re-attempt declined initial charge attempts
+          type:
+            - boolean
+            - 'null'
       required:
         - card_types
         - currencies
         - gateway_groups
         - gateway_type
         - id
+        - merchant_profile
         - name
+        - re_attemp_group
       type: object
     PaymentGatewayGroup:
       properties:
@@ -6561,6 +6656,7 @@ components:
     PreferredPaymentGateway:
       properties:
         gateway_type:
+          description: Payment gateway provider.
           maxLength: 100
           type: string
         id:
@@ -10518,11 +10614,38 @@ components:
           readOnly: true
           type: string
         events:
-          description: See dashboard for webhooks for available events.
+          description: List of event triggers for the webhook.
           items:
+            enum:
+              - cart.abandoned
+              - customer.created
+              - customer.deleted
+              - customer.updated
+              - dispute.created
+              - dispute.updated
+              - export.created
+              - fulfillment.created
+              - fulfillment.updated
+              - gateway.created
+              - gateway.updated
+              - gateway_group.created
+              - gateway_group.updated
+              - order.created
+              - order.updated
+              - product.created
+              - product.deleted
+              - product.updated
+              - store.updated
+              - subscription.created
+              - subscription.updated
+              - ticket.created
+              - ticket.updated
+              - transaction.created
+              - transaction.updated
             type:
               - string
               - 'null'
+            x-spec-enum-id: 73dffac0903cc65e
           type: array
         id:
           readOnly: true
@@ -18726,13 +18849,39 @@ paths:
           name: name
           schema:
             type: string
-        - description: Event Triggers
-          explode: true
+        - explode: true
           in: query
           name: events
           schema:
             items:
-              type: integer
+              enum:
+                - app.uninstalled
+                - cart.abandoned
+                - customer.created
+                - customer.deleted
+                - customer.updated
+                - dispute.created
+                - dispute.updated
+                - export.created
+                - fulfillment.created
+                - fulfillment.updated
+                - gateway.created
+                - gateway.updated
+                - gateway_group.created
+                - gateway_group.updated
+                - order.created
+                - order.updated
+                - product.created
+                - product.deleted
+                - product.updated
+                - store.updated
+                - subscription.created
+                - subscription.updated
+                - ticket.created
+                - ticket.updated
+                - transaction.created
+                - transaction.updated
+              type: string
             type: array
           style: form
         - description: Is Active?
@@ -21276,10 +21425,45 @@ webhooks:
                     weight: 0
                 gateway_type: string
                 id: 0
-                merchant_profile: null
+                merchant_profile:
+                  amex:
+                    acquirer_bin: string
+                    mcc_code: string
+                    merchant_id: string
+                  discover:
+                    acquirer_bin: string
+                    mcc_code: string
+                    merchant_id: string
+                  mastercard:
+                    acquirer_bin: string
+                    mcc_code: string
+                    merchant_id: string
+                  merchant_country: null
+                  merchant_name: null
+                  visa:
+                    acquirer_bin: string
+                    mcc_code: string
+                    merchant_id: string
                 name: string
                 optimized_3ds: false
                 payment_flow: string
+                re_attemp_group:
+                  available_currencies:
+                    - code: string
+                      label: string
+                  available_express_payment_methods:
+                    - code: string
+                      label: string
+                  available_payment_methods:
+                    - code: string
+                      label: string
+                      supported_currencies: []
+                  card_types:
+                    - code: string
+                      label: string
+                  id: 0
+                  name: string
+                re_attemp_intitial_charge: null
               event_id: a7a26ff2-e851-45b6-9634-d595f45458b7
               event_type: gateway.created
               object: gateway
@@ -21355,12 +21539,57 @@ webhooks:
                         type: object
                       type: array
                     gateway_type:
+                      description: Payment gateway provider.
                       maxLength: 100
                       type: string
                     id:
                       type: integer
                     merchant_profile:
-                      type: integer
+                      properties:
+                        amex:
+                          properties:
+                            acquirer_bin:
+                              type: string
+                            mcc_code:
+                              type: string
+                            merchant_id:
+                              type: string
+                          type: object
+                        discover:
+                          properties:
+                            acquirer_bin:
+                              type: string
+                            mcc_code:
+                              type: string
+                            merchant_id:
+                              type: string
+                          type: object
+                        mastercard:
+                          properties:
+                            acquirer_bin:
+                              type: string
+                            mcc_code:
+                              type: string
+                            merchant_id:
+                              type: string
+                          type: object
+                        merchant_country:
+                          description: The country the merchant is registered in.
+                          title: ISO 3166-1 alpha-2
+                          type: string
+                        merchant_name:
+                          description: Merchant name assigned by your acquiring bank, contact them if you are not sure.
+                          type: string
+                        visa:
+                          properties:
+                            acquirer_bin:
+                              type: string
+                            mcc_code:
+                              type: string
+                            merchant_id:
+                              type: string
+                          type: object
+                      type: object
                     name:
                       description: Used for reporting and transaction references.
                       maxLength: 100
@@ -21380,13 +21609,81 @@ webhooks:
                         - auth-capture
                       type: string
                       x-spec-enum-id: 0e887a41ea162b2f
+                    re_attemp_group:
+                      properties:
+                        available_currencies:
+                          items:
+                            properties:
+                              code:
+                                maxLength: 5
+                                title: Currency Code
+                                type: string
+                              label:
+                                type: string
+                            required:
+                              - code
+                              - label
+                            type: object
+                          type: array
+                        available_express_payment_methods:
+                          items:
+                            properties:
+                              code:
+                                type: string
+                              label:
+                                type: string
+                            required:
+                              - code
+                              - label
+                            type: object
+                          type: array
+                        available_payment_methods:
+                          items:
+                            properties:
+                              code:
+                                type: string
+                              label:
+                                type: string
+                              supported_currencies:
+                                items: {}
+                                type: array
+                            required:
+                              - code
+                              - label
+                              - supported_currencies
+                            type: object
+                          type: array
+                        card_types:
+                          items:
+                            properties:
+                              code:
+                                type: string
+                              label:
+                                type: string
+                            required:
+                              - code
+                              - label
+                            type: object
+                          type: array
+                        id:
+                          type: integer
+                        name:
+                          maxLength: 256
+                          type: string
+                      type: object
+                    re_attemp_intitial_charge:
+                      description: Reattempt soft declines with another gateway.
+                      title: Re-attempt declined initial charge attempts
+                      type: boolean
                   required:
                     - card_types
                     - currencies
                     - gateway_groups
                     - gateway_type
                     - id
+                    - merchant_profile
                     - name
+                    - re_attemp_group
                   type: object
                 event_id:
                   description: Unique id associated with this webhook event.
@@ -21459,10 +21756,45 @@ webhooks:
                     weight: 0
                 gateway_type: string
                 id: 0
-                merchant_profile: null
+                merchant_profile:
+                  amex:
+                    acquirer_bin: string
+                    mcc_code: string
+                    merchant_id: string
+                  discover:
+                    acquirer_bin: string
+                    mcc_code: string
+                    merchant_id: string
+                  mastercard:
+                    acquirer_bin: string
+                    mcc_code: string
+                    merchant_id: string
+                  merchant_country: null
+                  merchant_name: null
+                  visa:
+                    acquirer_bin: string
+                    mcc_code: string
+                    merchant_id: string
                 name: string
                 optimized_3ds: false
                 payment_flow: string
+                re_attemp_group:
+                  available_currencies:
+                    - code: string
+                      label: string
+                  available_express_payment_methods:
+                    - code: string
+                      label: string
+                  available_payment_methods:
+                    - code: string
+                      label: string
+                      supported_currencies: []
+                  card_types:
+                    - code: string
+                      label: string
+                  id: 0
+                  name: string
+                re_attemp_intitial_charge: null
               event_id: a7a26ff2-e851-45b6-9634-d595f45458b7
               event_type: gateway.updated
               object: gateway
@@ -21538,12 +21870,57 @@ webhooks:
                         type: object
                       type: array
                     gateway_type:
+                      description: Payment gateway provider.
                       maxLength: 100
                       type: string
                     id:
                       type: integer
                     merchant_profile:
-                      type: integer
+                      properties:
+                        amex:
+                          properties:
+                            acquirer_bin:
+                              type: string
+                            mcc_code:
+                              type: string
+                            merchant_id:
+                              type: string
+                          type: object
+                        discover:
+                          properties:
+                            acquirer_bin:
+                              type: string
+                            mcc_code:
+                              type: string
+                            merchant_id:
+                              type: string
+                          type: object
+                        mastercard:
+                          properties:
+                            acquirer_bin:
+                              type: string
+                            mcc_code:
+                              type: string
+                            merchant_id:
+                              type: string
+                          type: object
+                        merchant_country:
+                          description: The country the merchant is registered in.
+                          title: ISO 3166-1 alpha-2
+                          type: string
+                        merchant_name:
+                          description: Merchant name assigned by your acquiring bank, contact them if you are not sure.
+                          type: string
+                        visa:
+                          properties:
+                            acquirer_bin:
+                              type: string
+                            mcc_code:
+                              type: string
+                            merchant_id:
+                              type: string
+                          type: object
+                      type: object
                     name:
                       description: Used for reporting and transaction references.
                       maxLength: 100
@@ -21563,13 +21940,81 @@ webhooks:
                         - auth-capture
                       type: string
                       x-spec-enum-id: 0e887a41ea162b2f
+                    re_attemp_group:
+                      properties:
+                        available_currencies:
+                          items:
+                            properties:
+                              code:
+                                maxLength: 5
+                                title: Currency Code
+                                type: string
+                              label:
+                                type: string
+                            required:
+                              - code
+                              - label
+                            type: object
+                          type: array
+                        available_express_payment_methods:
+                          items:
+                            properties:
+                              code:
+                                type: string
+                              label:
+                                type: string
+                            required:
+                              - code
+                              - label
+                            type: object
+                          type: array
+                        available_payment_methods:
+                          items:
+                            properties:
+                              code:
+                                type: string
+                              label:
+                                type: string
+                              supported_currencies:
+                                items: {}
+                                type: array
+                            required:
+                              - code
+                              - label
+                              - supported_currencies
+                            type: object
+                          type: array
+                        card_types:
+                          items:
+                            properties:
+                              code:
+                                type: string
+                              label:
+                                type: string
+                            required:
+                              - code
+                              - label
+                            type: object
+                          type: array
+                        id:
+                          type: integer
+                        name:
+                          maxLength: 256
+                          type: string
+                      type: object
+                    re_attemp_intitial_charge:
+                      description: Reattempt soft declines with another gateway.
+                      title: Re-attempt declined initial charge attempts
+                      type: boolean
                   required:
                     - card_types
                     - currencies
                     - gateway_groups
                     - gateway_type
                     - id
+                    - merchant_profile
                     - name
+                    - re_attemp_group
                   type: object
                 event_id:
                   description: Unique id associated with this webhook event.

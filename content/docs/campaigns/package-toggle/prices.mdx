@@ -44,8 +44,8 @@ The most common fields:
 |-------|---------------|
 | `price` | Total price for the card's quantity |
 | `unitPrice` | Per-unit price |
-| `originalPrice` | Retail / compare-at total price |
-| `originalUnitPrice` | Retail / compare-at per-unit price |
+| `originalPrice` | Total before offer/voucher discounts |
+| `originalUnitPrice` | Per-unit price before offer/voucher discounts |
 
 ### Savings
 
@@ -75,6 +75,10 @@ The most common fields:
 
 <Callout type="info">
 Fields like `hasDiscount`, `isRecurring`, and `isSelected` are yes/no flags. Instead of displaying text, they **show or hide** the element. For example, a "Save!" badge inside an element with `data-next-toggle-display="hasDiscount"` only appears when there is a discount.
+</Callout>
+
+<Callout type="warn">
+Package-level Retail Price is legacy campaign data. For SDK 0.4.x builds, prefer Offers so `originalPrice`, `price`, and savings fields come from the same price calculation response.
 </Callout>
 
 <Callout type="info">

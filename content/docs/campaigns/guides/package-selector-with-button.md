@@ -2,11 +2,15 @@
 title: Package Selector with Add-to-Cart Button
 ---
 
-The most common product page pattern: the visitor picks an option (1 bottle, 3 bottles, 6 bottles) from a set of cards, then clicks a single "Add to Cart" button. The Package Selector tracks the choice; the button writes to the cart.
+Legacy product page pattern: the visitor picks an option from a set of package cards, then clicks a single "Add to Cart" button. The Package Selector tracks the choice; the button writes to the cart.
+
+:::caution
+For new SDK 0.4.x quantity-tier builds, prefer the [Bundle Selector](/docs/campaigns/bundle-selector) with one product/variant package and Offer-based tier pricing. Use this package-selector pattern only when an existing campaign intentionally models each option as a separate package record.
+:::
 
 ## What You're Building
 
-- A row of selectable package cards (e.g. buy 1 / buy 3 / buy 6)
+- A row of selectable package cards from an existing package-per-option campaign
 - Each card shows the price and optional savings pulled from the backend
 - One card is pre-selected by default
 - A single "Add to Cart" button that reads the current selection and adds it

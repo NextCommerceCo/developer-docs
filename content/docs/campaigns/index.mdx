@@ -124,20 +124,27 @@ A **campaign** bundles everything needed for a checkout: packages, offers, shipp
 
 ### Packages
 
-A **package** is a virtual link to a product with custom quantity and pricing. Packages are what customers actually buy:
+A **package** is the campaign's sellable reference to a product or product variant. In SDK 0.4.x-compatible builds, keep packages focused on identity and base price:
 
-For bundle-based quantity discounts (e.g. "buy 3 for $21" or "buy 5 for $30"), use **offers** to discount the price at checkout rather than baking the discount into the package price. This keeps the package's list price intact and lets you show savings on the cart.
+- Create one package for the product or variant customers can buy.
+- Use the package's base list price as the anchor price.
+- Send the selected package ID and quantity from the page.
+- Use **offers** to discount the cart for quantity tiers, bundles, upsells, downsells, and exit-pop incentives.
+
+For bundle-based quantity discounts (e.g. "buy 3 for $21" or "buy 5 for $30"), use **offers** to discount the price at checkout rather than baking the discount into separate package records. This keeps the package list stable and lets the API return before/after pricing so the page can show savings consistently.
+
+Package-level Quantity and Retail Price are legacy compatibility fields in Campaigns App. They may still appear when the campaign setting **Enable Package Retail Price & Quantity** is enabled, but new builds should prefer Offer-based price mutation.
 
 Packages can also be **recurring** for subscription products. When you reference a package in HTML (`data-next-package-id="…"`), the ID comes from your campaign's package list in the Campaigns App.
 
 ### Offers
 
-**Offers** are discounts that apply when an order meets a condition. Two flavours:
+**Offers** are price mutation rules that apply when an order meets a condition. Two flavours:
 
 - **Offer** — automatic, applies when the cart matches the rule (checkout page only)
 - **Code** — voucher-based, applies when the customer enters a code. Codes stack **on top of** automatic offers, and codes are also the mechanism for applying discounts on **upsell pages** (where automatic offers don't run).
 
-The API returns adjusted before/after pricing so you can show savings.
+The API returns adjusted before/after pricing so you can show savings. In modern Campaigns App setup, this replaces package-level compare-at pricing for most campaigns.
 
 **Example — quantity-based bundle pricing:**
 

@@ -115,6 +115,38 @@ window.nextConfig = {
 };
 ```
 
+## Currency Persistence
+
+Once a shopper sees a price in a specific currency, the SDK locks that currency into `sessionStorage` for the rest of the session. The cart, upsells, and order confirmation all stay in the same currency, even if geo-detection would otherwise return a different result on a later page.
+
+### How the currency is chosen on first page load
+
+| Source | Priority |
+|---|---|
+| `?currency=<code>` URL parameter | 1 — highest |
+| Previously stored session currency | 2 |
+| Result of geo-detection (when `currencyBehavior: 'auto'`) | 3 |
+| Campaign default currency | 4 — fallback |
+
+Once chosen, the value is written to `sessionStorage` and reused on every subsequent page load in the session. To reset, close the browser tab or clear sessionStorage.
+
+### `currencyBehavior`
+
+| Value | Behavior |
+|---|---|
+| `'auto'` *(default)* | Geo-detect on first load if no URL parameter or stored currency is present, then lock for the session |
+| `'manual'` | Never auto-detect. Falls back to the campaign default unless `?currency=` or a stored value is set |
+
+### Using `?currency=` to force a currency
+
+```
+https://example.com/checkout?currency=EUR
+```
+
+Useful for currency-specific ad campaigns and affiliate links. The first page to apply it locks the session — subsequent navigations within the session keep `EUR` even without the parameter.
+
+---
+
 ## Meta Tag Configuration
 
 Configure the SDK on a per-page basis using meta tags in your HTML `<head>`:

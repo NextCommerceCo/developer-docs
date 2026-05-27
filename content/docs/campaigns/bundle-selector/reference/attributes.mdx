@@ -49,7 +49,7 @@ sidebar_label: Attributes
 | `data-next-bundle-name` | Human-readable display name; exposed as `bundle.{id}.name` in display elements |
 | `data-next-bundle-items` | JSON array of `{ packageId, quantity, configurable?, noSlot? }` |
 | `data-next-bundle-vouchers` | Comma-separated or JSON array of coupon codes applied when this bundle is selected |
-| `data-next-selected="true"` | Pre-selects this card on init |
+| `data-next-selected="true"` | Pre-selects this card on init. Overridden by `?forceBundleId=` URL parameter. See [Mechanics → Default Selection on Init](../mechanics#default-selection-on-init) |
 | `data-next-shipping-id` | Shipping method `ref_id` to auto-apply when this bundle is selected in swap mode |
 
 ---
@@ -144,7 +144,9 @@ Place inside a bundle card to render one row per discount applied to the bundle.
 | `"offer"` | Only offer/promotion discounts |
 | `"voucher"` | Only voucher/coupon discounts |
 
-Row tokens: `{discount.name}`, `{discount.amount}`, `{discount.description}`.
+Row tokens: `{discount.name}`, `{discount.amount}`, `{discount.percentage}`, `{discount.description}`.
+
+`{discount.percentage}` renders the discount's percentage value formatted with a `%` suffix (e.g. `"15%"` or `"15.50%"`). Empty when the discount has no percentage set.
 
 State classes on the container:
 

@@ -73,9 +73,20 @@ A few parameter names that are commonly used in production landing pages. None o
 
 ---
 
+## SDK-Reserved Parameters
+
+These parameter names are read by the SDK directly — they do not require `data-next-show` / `data-next-hide` bindings.
+
+| Parameter | Behavior |
+|---|---|
+| `?forcePackageId=<id>` | Pre-populate the cart with a specific package on first page load. See [Cart System → State → Force Package ID](/docs/campaigns/cart-system/state#force-package-id). |
+| `?forceBundleId=<id>` | Deep-link into a specific bundle on a `BundleSelector`. Accepts `bundleId`, `selectorId:bundleId`, or a comma-separated list. See [Bundle Selector → Mechanics → Default Selection on Init](/docs/campaigns/bundle-selector/mechanics#default-selection-on-init). |
+| `?currency=<code>` | Lock the session into a specific currency (e.g. `?currency=EUR`). The value is stored in sessionStorage and reused on every subsequent page, so the cart, upsells, and order confirmation stay in the same currency for the full session. |
+
+---
+
 ## Notes
 
 - Parameter names are **case-sensitive** — `?Variant=a` is different from `?variant=a`.
 - The Webflow page builder strips quotes from attribute values. The SDK conditional parser accepts both `param.x == 'n'` and `param.x==n` syntactically.
 - Parameters are stored as strings in sessionStorage. Numeric comparisons work because the parser coerces both sides to numbers when the operator is numeric.
-- Use `forcePackageId` to pre-populate the cart from a URL — see [Cart System → State → Force Package ID](/docs/campaigns/cart-system/state#force-package-id).

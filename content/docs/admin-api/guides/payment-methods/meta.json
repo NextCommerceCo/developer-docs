@@ -1,0 +1,17 @@
+{
+  "title": "Payment Methods",
+  "pages": [
+    "iframe-payment-form",
+    "3ds2",
+    "apple-pay",
+    "google-pay",
+    "paypal",
+    "klarna",
+    "link",
+    "twint",
+    "affirm",
+    "bancontact",
+    "ideal",
+    "sepa-debit"
+  ]
+}

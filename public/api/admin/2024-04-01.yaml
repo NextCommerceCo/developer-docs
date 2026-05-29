@@ -1674,6 +1674,8 @@ components:
 
             * `sofort` - Sofort
 
+            * `swish` - Swish
+
             * `twint` - Twint'
           enum:
           - card_token
@@ -1690,12 +1692,13 @@ components:
           - link
           - sepa_debit
           - sofort
+          - swish
           - twint
           - null
           type:
           - string
           - 'null'
-          x-spec-enum-id: 69bfa799bd6f9e2e
+          x-spec-enum-id: 4ca5ccad821eb2f9
         send_receipt:
           default: true
           type: boolean
@@ -6574,6 +6577,7 @@ components:
             - cart.abandoned
             - customer.created
             - customer.deleted
+            - customer.redacted
             - customer.updated
             - dispute.created
             - dispute.updated
@@ -6599,7 +6603,7 @@ components:
             type:
             - string
             - 'null'
-            x-spec-enum-id: 73dffac0903cc65e
+            x-spec-enum-id: cb01c8453927feb8
           type: array
         id:
           readOnly: true
@@ -10910,6 +10914,7 @@ components:
             - cart.abandoned
             - customer.created
             - customer.deleted
+            - customer.redacted
             - customer.updated
             - dispute.created
             - dispute.updated
@@ -10935,7 +10940,7 @@ components:
             type:
             - string
             - 'null'
-            x-spec-enum-id: 73dffac0903cc65e
+            x-spec-enum-id: cb01c8453927feb8
           type: array
         id:
           readOnly: true
@@ -19325,6 +19330,7 @@ paths:
             - cart.abandoned
             - customer.created
             - customer.deleted
+            - customer.redacted
             - customer.updated
             - dispute.created
             - dispute.updated

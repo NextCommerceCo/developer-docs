@@ -144,7 +144,7 @@ To change the payment gateway used for bankcard payments of a subscription, send
 To change the bankcard on a subscription, pass a new `card_token` with a PATCH request to the [subscriptionsPartialUpdate](/docs/admin-api/reference/subscriptions/subscriptionsPartialUpdate) endpoint.
 
 <Callout type="info">
-To update a bankcard on a subscription, you must use the **[iFrame to tokenize](/docs/admin-api/guides/iframe-payment-form)** the bankcard and use the `card_token` when updating the subscription itself.
+To update a bankcard on a subscription, you must use the **[iFrame to tokenize](/docs/admin-api/guides/payment-methods/iframe-payment-form)** the bankcard and use the `card_token` when updating the subscription itself.
 
 The new bankcard will be automatically verfied with a `verify` request to a payment gateway to ensure the new bankcard is valid and can be used for future renewals. If the bankcard cannot be verified, the update request will fail and return an error.
 </Callout>

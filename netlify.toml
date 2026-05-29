@@ -72,3 +72,64 @@
   from = "/docs/api/campaigns/:path"
   to = "/docs/campaigns/api/:path"
   status = 301
+
+# Admin API payment-method guides moved under /payment-methods/ sub-section
+[[redirects]]
+  from = "/docs/admin-api/guides/iframe-payment-form"
+  to = "/docs/admin-api/guides/payment-methods/iframe-payment-form"
+  status = 301
+
+[[redirects]]
+  from = "/docs/admin-api/guides/3ds2"
+  to = "/docs/admin-api/guides/payment-methods/3ds2"
+  status = 301
+
+[[redirects]]
+  from = "/docs/admin-api/guides/affirm"
+  to = "/docs/admin-api/guides/payment-methods/affirm"
+  status = 301
+
+[[redirects]]
+  from = "/docs/admin-api/guides/apple-pay"
+  to = "/docs/admin-api/guides/payment-methods/apple-pay"
+  status = 301
+
+[[redirects]]
+  from = "/docs/admin-api/guides/google-pay"
+  to = "/docs/admin-api/guides/payment-methods/google-pay"
+  status = 301
+
+[[redirects]]
+  from = "/docs/admin-api/guides/paypal"
+  to = "/docs/admin-api/guides/payment-methods/paypal"
+  status = 301
+
+[[redirects]]
+  from = "/docs/admin-api/guides/klarna"
+  to = "/docs/admin-api/guides/payment-methods/klarna"
+  status = 301
+
+[[redirects]]
+  from = "/docs/admin-api/guides/link"
+  to = "/docs/admin-api/guides/payment-methods/link"
+  status = 301
+
+[[redirects]]
+  from = "/docs/admin-api/guides/bancontact"
+  to = "/docs/admin-api/guides/payment-methods/bancontact"
+  status = 301
+
+[[redirects]]
+  from = "/docs/admin-api/guides/ideal"
+  to = "/docs/admin-api/guides/payment-methods/ideal"
+  status = 301
+
+[[redirects]]
+  from = "/docs/admin-api/guides/sepa-debit"
+  to = "/docs/admin-api/guides/payment-methods/sepa-debit"
+  status = 301
+
+[[redirects]]
+  from = "/docs/admin-api/guides/twint"
+  to = "/docs/admin-api/guides/payment-methods/twint"
+  status = 301

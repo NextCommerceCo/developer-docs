@@ -166,10 +166,12 @@ CUSTOM_WEBHOOK_EVENT_PAYLOADS = [
                 },
                 'orders': {
                     'type': 'array',
+                    'items': {'type': 'integer'},
                     'description': 'List of order IDs associated with the redacted customer.',
                 },
                 'subscriptions': {
                     'type': 'array',
+                    'items': {'type': 'integer'},
                     'description': 'List of subscription IDs associated with the redacted customer.',
                 },
             }

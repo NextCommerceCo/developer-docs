@@ -19944,10 +19944,10 @@ webhooks:
                 email: string
                 id: 0
                 orders:
-                  - {}
+                  - 0
                 phone_number: string
                 subscriptions:
-                  - {}
+                  - 0
               event_id: a7a26ff2-e851-45b6-9634-d595f45458b7
               event_type: customer.redacted
               object: customer
@@ -19974,12 +19974,16 @@ webhooks:
                       type: integer
                     orders:
                       description: List of order IDs associated with the redacted customer.
+                      items:
+                        type: integer
                       type: array
                     phone_number:
                       description: The phone number of the redacted customer.
                       type: string
                     subscriptions:
                       description: List of subscription IDs associated with the redacted customer.
+                      items:
+                        type: integer
                       type: array
                   type: object
                 event_id:

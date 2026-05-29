@@ -76,12 +76,12 @@
 # Admin API payment-method guides moved under /payment-methods/ sub-section
 [[redirects]]
   from = "/docs/admin-api/guides/iframe-payment-form"
-  to = "/docs/admin-api/guides/payment-methods/iframe-payment-form"
+  to = "/docs/admin-api/guides/payment-methods/bankcard"
   status = 301
 
 [[redirects]]
   from = "/docs/admin-api/guides/3ds2"
-  to = "/docs/admin-api/guides/payment-methods/3ds2"
+  to = "/docs/admin-api/guides/payment-methods/bankcard"
   status = 301
 
 [[redirects]]
@@ -132,4 +132,16 @@
 [[redirects]]
   from = "/docs/admin-api/guides/twint"
   to = "/docs/admin-api/guides/payment-methods/twint"
+  status = 301
+
+# 3DS2 merged into the Bankcard guide
+[[redirects]]
+  from = "/docs/admin-api/guides/payment-methods/3ds2"
+  to = "/docs/admin-api/guides/payment-methods/bankcard#3d-secure-3ds2"
+  status = 301
+
+# Bankcard guide slug renamed from iframe-payment-form
+[[redirects]]
+  from = "/docs/admin-api/guides/payment-methods/iframe-payment-form"
+  to = "/docs/admin-api/guides/payment-methods/bankcard"
   status = 301

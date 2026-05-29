@@ -1,8 +1,7 @@
 {
   "title": "Payment Methods",
   "pages": [
-    "iframe-payment-form",
-    "3ds2",
+    "bankcard",
     "apple-pay",
     "google-pay",
     "paypal",

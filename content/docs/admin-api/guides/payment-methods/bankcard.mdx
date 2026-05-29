@@ -1,0 +1,393 @@
+---
+title: Bankcard
+sidebar_label: Bankcard
+sidebar_position: 2
+tags:
+ - Guide
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+import RedirectPaymentFlow from '../../../../_snippets/_redirect-payment-flow.mdx';
+import RedirectPaymentStep3 from '../../../../_snippets/_redirect-payment-flows-step-3.mdx';
+
+Bankcard is the core payment method on the Admin API. Cards are charged by passing `payment_method: card_token` with a tokenized card in `payment_details`. Tokenizing the card with our iFrame payment form keeps sensitive card data off your servers and reduces your PCI compliance scope.
+
+This guide covers the full bankcard flow:
+
+- **[Gateway routing](#gateway-routing)** — route charges across one or more payment gateways
+- **[Card tokenization](#card-tokenization-iframe)** — get a `card_token` with the iFrame payment form
+- **[3D Secure (3DS2)](#3d-secure-3ds2)** — process cards through an authentication flow
+
+## Order payment payload
+
+Bankcard orders set `payment_method` to `card_token` and pass the tokenized card (and any optional fields) in `payment_details`:
+
+```json title="Bankcard Payment Detail"
+"payment_method": "card_token",
+"payment_details": {
+    "card_token": "<card token>",        // from the iFrame (see below)
+    "save_card": true,                    // retain card for future charges (default true)
+    "statement_descriptor": "BRANDNAME",  // optional, up to 22 chars
+    "payment_gateway": 12,                // optional, route to a specific gateway
+    "payment_gateway_group": 3,           // optional, route to a gateway group
+    "payment_return_url": "<url>"         // required for 3DS (see below)
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `card_token` | string | Tokenized card produced by the iFrame payment form. |
+| `save_card` | boolean | Retain the card for future charges (subscriptions, one-click upsells). Defaults to `true`. |
+| `statement_descriptor` | string | Custom bank-statement descriptor (≤ 22 alphanumeric chars, spaces, and `& , . - #`). |
+| `payment_gateway` | integer | Optional — charge a **specific gateway** by id. See [Gateway routing](#gateway-routing). |
+| `payment_gateway_group` | integer | Optional — charge a **gateway group** by id. See [Gateway routing](#gateway-routing). |
+| `payment_return_url` | string (uri) | Required for **3DS** — your endpoint that receives the final order data. See [3D Secure](#3d-secure-3ds2). |
+
+<Callout type="info">
+For the complete order request (lines, user, addresses, shipping), see the [External Checkout Flow](/docs/admin-api/guides/external-checkout) guide. This guide focuses on the bankcard-specific payment detail.
+</Callout>
+
+## Gateway Routing
+
+By default, bankcard charges route through your store's configured payment gateway. For stores with **more than one gateway**, you can optionally pin a charge to a specific gateway or gateway group by passing one of these fields in `payment_details`:
+
+| Field | Type | Routes to |
+| --- | --- | --- |
+| `payment_gateway` | integer | A **single gateway** by its `id`. |
+| `payment_gateway_group` | integer | A **gateway group** by its `id` — the platform selects a member gateway. |
+
+```json title="Route to a specific gateway or group"
+"payment_method": "card_token",
+"payment_details": {
+    "card_token": "<card token>",
+    "payment_gateway": 12          // OR "payment_gateway_group": 3
+}
+```
+
+<Callout type="info">
+Pass **either** `payment_gateway` **or** `payment_gateway_group` — not both. If neither is provided, the store's default routing is used.
+</Callout>
+
+### Get gateway and group ids
+
+The ids are integers from the Payments API:
+
+- **Gateways** — [`gatewaysList`](/docs/admin-api/reference/payments/gatewaysList) / [`gatewaysRetrieve`](/docs/admin-api/reference/payments/gatewaysRetrieve)
+- **Gateway groups** — [`gatewayGroupsList`](/docs/admin-api/reference/payments/gatewayGroupsList) / [`gatewayGroupsRetrieve`](/docs/admin-api/reference/payments/gatewayGroupsRetrieve)
+
+A gateway group also exposes its supported `available_currencies`, `available_payment_methods`, and `card_types`, so you can pick the right group for a given order.
+
+### When to route
+
+Most stores let the platform route automatically. Pass an explicit gateway or group when you need to:
+
+- **Load balance** — distribute volume across multiple gateways/processors.
+- **Region or currency routing** — send orders to the gateway that supports a given currency or market.
+- **Failover** — direct traffic to a backup gateway, or use a group so a soft-declined charge can be re-attempted on another gateway in the group.
+
+<Callout type="info">
+Group membership, distribution weighting, and soft-decline re-attempt behavior are configured per gateway in your store dashboard — the API selects among what's already configured.
+</Callout>
+
+## Card Tokenization (iFrame)
+
+Custom off-site checkouts can reduce their PCI compliance scope by leveraging our iFrame payment form to tokenize credit cards before submitting them on the Admin API.
+
+<Callout type="info">
+View a fully functional [Demo](https://29next.github.io/demo-iframe-payment-form/) to see all of the concepts in action. The demo source code is also available on [Github](https://github.com/NextCommerceCo/demo-iframe-payment-form/blob/main/index.html).
+</Callout>
+
+The iframe payment form is a pure JS library that provides managed fields for the card number and security code to safely collect sensitive credit card information. The fields can be styled to match your external checkout HTML pages for a seamless end-user experience.
+
+<Callout type="info">
+We have partnered with [Spreedly](https://docs.spreedly.com/reference/iframe/v1/#setfieldtype) for all bankcard payments; this guide leverages their iFrame payment documentation and how to use the iFrame JS with our platform.
+</Callout>
+
+### Setup
+
+Before you get started, grab your Payments Environment Key from your store dashboard (**Settings > Payments**) — we'll use this to map the iFrame to your store's payment environment.
+
+**Card tokenization steps**
+
+1. Add a payment form with card fields (name, card number, expiration, and cvv).
+2. Add Spreedly JS and initialize the iFrame on managed fields.
+3. Style the iFrame form fields to match your design.
+4. Tokenize the card with a form submit handler.
+5. Retrieve the card token.
+
+```html title="Example Payment Form HTML"
+
+<form id="payment-form" action="https://yoursite.com/checkout"
+  onsubmit='submitPaymentForm(); return false;'>
+
+  <label for="full_name">Cardholder Name</label>
+  <input type="text" id="full_name" name="full_name"><br/>
+
+  <label>Card Number</label>
+  <div id="bankcard-number" style="width:225px; height:35px; border: 2px solid"></div><br/>
+
+  <label for="month">Expiration Date</label>
+  <input type="text" id="month" name="month" maxlength="2">
+  <input type="text" id="year" name="year" maxlength="4"><br/>
+
+  <label>CVV</label>
+  <div id="bankcard-cvv" style="width:60px; height:35px; border: 2px solid "></div><br/>
+
+  <input id="submit-button" type="submit" value="Pay Now" disabled>
+
+</form>
+
+```
+
+After you have the form on your page, initialize the iFrame fields on card number and cvv.
+
+```html title="Add JS and Configure"
+
+<script src="https://core.spreedly.com/iframe/iframe-v1.min.js"></script>
+<script>
+Spreedly.init("<STORE PAYMENT ENVIRONMENT KEY>", {
+  "numberEl": "bankcard-number",
+  "cvvEl": "bankcard-cvv"
+});
+</script>
+```
+<Callout type="info">
+Note how the `numberEl` and `cvvEl` map to div element ids in the form to render the managed fields.
+</Callout>
+
+### Style iFrame Fields
+
+For the best end-user experience, customize the iFrame form fields so they blend in with your native form fields.
+
+```js title="Example form customization"
+// example styles for iframe fields, accepts any style that can be applied with JS
+var style = 'color: #212529; font-size: 1rem; line-height: 1.5; font-weight: 400; \
+width: calc(100% - 20px); height: calc(100% - 2px); position: absolute;';
+
+// set placeholders and styles for iframe fields to make UI style
+Spreedly.on("ready", function () {
+    Spreedly.setFieldType('text');
+    Spreedly.setPlaceholder('cvv', "CVV");
+    Spreedly.setPlaceholder('number', "Card Number");
+    Spreedly.setNumberFormat('prettyFormat');
+    Spreedly.setStyle('cvv', style);
+    Spreedly.setStyle('number', style);
+
+    submitBtn.removeAttribute('disabled');
+});
+
+```
+
+### Tokenize Card
+
+Tokenize the card with your form submission handler. The `tokenizeCreditCard` method requires that the `requiredFields` are passed as an object for form validation.
+
+```js title="Tokenize Card on Form Submit"
+
+function submitPaymentForm() {
+    var requiredFields = {};
+    // Get required, non-sensitive, values from host page form
+    requiredFields["full_name"] = document.getElementById("full_name").value;
+    requiredFields["month"] = document.getElementById("month").value;
+    requiredFields["year"] = document.getElementById("year").value;
+    // tokenize the card
+    Spreedly.tokenizeCreditCard(requiredFields);
+}
+```
+
+### Retrieve Card Token
+
+When a card has been tokenized, the `paymentMethod` event is fired that includes the generated payment method token as well as the details of the payment method record. **Use the token from your custom checkout backend to send to the Admin API when creating the order.**
+
+```js title="Retrieve Card Token"
+
+Spreedly.on('paymentMethod', function (token, pmData) {
+    // create your own handler to capture the token and send to your backend
+    console.log(token);
+    console.log(pmData);
+});
+```
+
+### Error Handling
+
+When a card fails validation, the `errors` event is fired which includes an array of objects with `attribute`, `key`, and `message` fields describing the errors for each field.
+
+```js title="Error Handling"
+
+Spreedly.on('errors', function(errors) {
+  // add your own error handler to show errors to users so they can fix them
+  for (var i=0; i < errors.length; i++) {
+    var error = errors[i];
+    console.log(error);
+  };
+});
+```
+
+```json title="Example Errors"
+[
+  {
+    "attribute":"first_name",
+    "key":"errors.blank",
+    "message":"First name can't be blank"
+  }, {
+    "attribute":"last_name",
+    "key":"errors.blank",
+    "message":"Last name can't be blank"
+  }
+]
+```
+
+### Customizing the iFrame Fields
+
+The iFrame fields can be customized to match your site styles. See the [demo](https://github.com/NextCommerceCo/demo-iframe-payment-form/blob/main/index.html) for a full example.
+
+#### setFieldType
+
+Set the input type of the iFrame fields. This is useful when you want different keyboards to display on mobile devices.
+
+By default, the iFrame fields are set to `type=number`, which displays the numerical keyboard in most browsers on most mobile devices. However, behavior does vary by browser. If you'd like to manually control the input field type you can do so with `setFieldType`.
+
+**Arguments**
+
+| Name | Description |
+| --- | --- |
+| field | The iFrame field to set the placeholder. Can be one of number or cvv. |
+| type | The input field type. Can be one of number, text or tel. |
+
+```js title="setFieldType"
+Spreedly.on('ready', function() {
+  Spreedly.setFieldType("number", "tel");
+});
+```
+
+#### setNumberFormat
+
+Set the card number format. If set to `prettyFormat`, the card number value will include spaces in the credit card number as they appear on a physical card. **The number field must be set to type text or tel for pretty formatting to take effect.**
+
+**Arguments**
+
+| Format | User Input | Display |
+| --- | --- | --- |
+| prettyFormat | `4111111111111111` | `4111 1111 1111 1111` |
+| plainFormat (default) | `4111111111111111` | `4111111111111111` |
+| maskedFormat | `4111111111111111` | `****************` |
+
+```js title="setNumberFormat"
+// Pretty format
+Spreedly.on('ready', function() {
+  Spreedly.setFieldType("number", "text");
+  Spreedly.setNumberFormat("prettyFormat");
+});
+
+// Masked format
+Spreedly.on('ready', function() {
+  Spreedly.setFieldType("cvv", "text");
+  Spreedly.setFieldType("number", "text");
+  Spreedly.setNumberFormat("maskedFormat");
+});
+```
+
+#### setPlaceholder
+
+Style iFrame fields' placeholder text if page design requires so.
+
+**Arguments**
+
+| Name | Description |
+| --- | --- |
+| field | The iFrame field to set the placeholder. Can be one of number or cvv. |
+| placeholder | The placeholder text value. |
+
+```js title="setPlaceholder"
+Spreedly.on('ready', function() {
+  Spreedly.setPlaceholder("number", "Card");
+  Spreedly.setPlaceholder("cvv", "CVV");
+});
+```
+
+#### setStyle
+
+Style iFrame fields using CSS. More than one invocation of setStyle can be used per field to organize and better structure styling directives.
+
+**Arguments**
+
+| Name | Description |
+| --- | --- |
+| field | The iFrame field to set the placeholder. Can be one of number or cvv. |
+| css | The CSS to apply. Should be vanilla CSS, -moz-appearance, or -webkit-appearance. All CSS properties should be constructed as a single string. |
+
+```js title="setStyle"
+Spreedly.on("ready", function() {
+  Spreedly.setStyle("number", "width:225px;  height:35px;");
+  Spreedly.setStyle("number", "font-size: 20px; text-align: center");
+  Spreedly.setStyle("cvv", "width:60px;  height:35px;");
+});
+```
+<Callout type="warn">
+Importing external fonts or images is not supported due to CORS restrictions.
+</Callout>
+
+#### transferFocus
+
+Set the cursor focus to one of the iFrame fields. This is useful if you want to load your form with the card number field already in focus, or auto-focus a field that contains an input error.
+
+```js title="transferFocus"
+Spreedly.transferFocus("number");
+```
+
+**Arguments**
+
+| Name | Description |
+| --- | --- |
+| field | The iFrame field to set the placeholder. Can be one of number or cvv. |
+
+#### toggleAutoComplete
+
+Toggle autocomplete functionality for card number and cvv fields. **By default, the autocomplete attribute is enabled**, so the first call of this function will disable autocomplete.
+
+```js title="toggleAutoComplete"
+Spreedly.toggleAutoComplete();
+```
+
+## 3D Secure (3DS2)
+
+3DS2 payments are fully supported via the Admin API to process the customer through an authentication flow, with the final transaction information and results provided back to your application.
+
+<Callout type="info">
+Your store must have a 3DS2-enabled gateway to process 3DS2 transactions.
+</Callout>
+
+### API payment redirect flow
+
+<RedirectPaymentFlow />
+
+### Create the order
+
+When creating an order using a 3DS2-enabled gateway, use `payment_method=card_token` and provide a `payment_return_url`. The `payment_return_url` is your endpoint that will receive a POST request containing the final order data.
+
+```json title="Payment Details for Order with 3DS2 Payment"
+"payment_method": "card_token",
+"payment_details": {
+    "card_token": "<card token>",
+    "payment_return_url": "<external checkout url>",
+    "payment_gateway": 12,             // optional
+    "payment_gateway_group": 3         // optional
+}
+```
+<Callout type="idea">
+You can optionally provide a `payment_gateway` or `payment_gateway_group` (see [Gateway routing](#gateway-routing)) to authenticate against a specific gateway configured in the store.
+</Callout>
+
+### Redirect to the payment complete URL
+
+The order response provides a `payment_complete_url`. Redirect the customer to this URL to complete the payment authentication.
+
+```json title="Response with Payment Complete URL"
+{
+    "reference_transaction_id": null,
+    "payment_complete_url": "https://<domain>/payments/3ds-auth/?token=<transaction token>"
+}
+```
+
+### Receive order data
+
+<RedirectPaymentStep3 />

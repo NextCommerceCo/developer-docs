@@ -413,7 +413,7 @@ const processEvent = (event) => {
 
    ```html
    <!-- Campaign Cart SDK -->
-   <script src="https://cdn.jsdelivr.net/gh/NextCommerceCo/campaign-cart@v0.3.10/dist/loader.js" type="module"></script>
+   <script src="https://cdn.jsdelivr.net/gh/NextCommerceCo/campaign-cart@v0.4.24/dist/loader.js" type="module"></script>
 
    <!-- Your Transformer -->
    <script src="/path/to/transformer-tiktok.js"></script>
@@ -428,7 +428,7 @@ const processEvent = (event) => {
    <script src="https://analytics.tiktok.com/i18n/pixel/sdk.js?sdkid=YOUR_PIXEL_ID"></script>
 
    <!-- Campaign Cart SDK -->
-   <script src="https://cdn.jsdelivr.net/gh/NextCommerceCo/campaign-cart@v0.3.10/dist/loader.js" type="module"></script>
+   <script src="https://cdn.jsdelivr.net/gh/NextCommerceCo/campaign-cart@v0.4.24/dist/loader.js" type="module"></script>
 
    <!-- TikTok Transformer -->
    <script src="/path/to/transformer-tiktok.js"></script>

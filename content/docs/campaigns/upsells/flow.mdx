@@ -24,10 +24,7 @@ Every upsell page needs four pieces:
   <meta name="next-upsell-accept-url" content="/upsell-2">
   <meta name="next-upsell-decline-url" content="/upsell-2">
 
-  <!-- optional: prevent the customer from going back to checkout -->
-  <meta name="next-prevent-back-navigation" content="true">
-
-  <script src="https://cdn.jsdelivr.net/gh/NextCommerceCo/campaign-cart@v0.3.10/dist/loader.js" type="module"></script>
+  <script src="https://cdn.jsdelivr.net/gh/NextCommerceCo/campaign-cart@v0.4.24/dist/loader.js" type="module"></script>
 </head>
 <body>
   <!-- Offer markup here -->
@@ -79,22 +76,6 @@ If a page has more than one offer with different next steps, override on the but
   Basic track
 </button>
 ```
-
----
-
-## Prevent Back Navigation
-
-To stop the customer from using the browser Back button to return to checkout (which would let them re-pay or change the order), add this to the **first** upsell page:
-
-```html
-<meta name="next-prevent-back-navigation" content="true">
-```
-
-The SDK pushes a guard state into history on load. If the customer presses Back, the browser navigates forward again, keeping them on the current page.
-
-<Callout type="warn">
-Use this only on the first upsell page. Adding it to every page traps the customer in the funnel and gives them no way out.
-</Callout>
 
 ---
 

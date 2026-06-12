@@ -30,7 +30,7 @@ All fields use `object: "attribution"` and `enable_export: true`.
 | `domain` | text | Domain where the conversion occurred |
 | `landing_page` | text | Page URL where the customer landed or converted |
 | `referrer` | text | Full referrer URL including tracking parameters |
-| `sdk_version` | text | Campaign Cart SDK version that processed the order (e.g., `0.3.10`) |
+| `sdk_version` | text | Campaign Cart SDK version that processed the order (e.g., `0.4.24`) |
 | `timestamp` | integer | Order submission timestamp in epoch milliseconds |
 | `user_ip` | text | Customer IP address at time of order (IPv4 or IPv6) |
 
@@ -83,7 +83,7 @@ When all fields are configured, the SDK sends attribution metadata like this wit
   "domain": "osmo-official.com",
   "landing_page": "https://osmo-official.com/us/checkout-flashlight-v2",
   "referrer": "https://osmo-official.com/us/flashlight-v4?clickid=69e039c421910a0bc1ffecc6&rtkcid=...",
-  "sdk_version": "0.3.10",
+  "sdk_version": "0.4.24",
   "timestamp": 1776302818758,
   "user_ip": "2601:441:4580:5760:b4c4:2214:9d19:2e54"
 }

@@ -79,10 +79,11 @@ Include this script **after** the SDK loader but **before** the SDK initializes:
 </html>
 ```
 
-### 3. Ensure Cart Has Items
+### 3. Ensure Cart State Is Available
 
 - Add items to cart before testing
-- Cart must not be empty for events to fire
+- Let the SDK emit at least one `cart:updated` event before relying on custom analytics output
+- Use the `cart:updated` payload as the primary cart source; treat `window.next.getCartData()` as a fallback snapshot
 
 ## How It Works
 
@@ -118,6 +119,10 @@ The `dl_` prefix is Campaign Cart SDK's standard event naming convention (e.g., 
 
 `ElevarDataLayer` is a separate data layer specifically for Elevar compatibility. If you're not using Elevar, you can remove the `ElevarDataLayer` references from the script - events will still work with standard GTM via `window.dataLayer`.
 </Callout>
+
+<Callout type="warn" title="Cart data source">
+For custom analytics, prefer SDK event payloads such as `cart:updated`. Current SDK builds can return a snapshot where `getCartData().cartLines` is empty even after rendered cart controls update, so do not use that property as proof that checkout or QA cart state is empty.
+</Callout>
 ## Complete Script
 
 Here's the complete JavaScript code for the custom analytics triggers:
@@ -148,12 +153,27 @@ Here's the complete JavaScript code for the custom analytics triggers:
   // Track if events have been fired to prevent duplicates
   let hasFiredAddToCart = false;
   let hasFiredBeginCheckout = false;
+  let latestCartData = null;
+
+  function rememberCartData(data) {
+    if (data) {
+      latestCartData = data;
+    }
+  }
+
+  function getCartLines(cartData) {
+    return cartData?.cartLines || cartData?.enrichedItems || cartData?.items || [];
+  }
 
   /**
-   * Get cart data from SDK
+   * Get cart data from SDK events first, then fallback snapshots
    */
   function getCartData() {
     try {
+      if (latestCartData) {
+        return latestCartData;
+      }
+
       if (typeof window.next !== 'undefined' && window.next.getCartData) {
         return window.next.getCartData();
       }
@@ -231,13 +251,14 @@ Here's the complete JavaScript code for the custom analytics triggers:
    * Format cart items for analytics
    */
   function formatCartItems(cartData, campaignData) {
-    if (!cartData || !cartData.cartLines || cartData.cartLines.length === 0) {
+    const cartLines = getCartLines(cartData);
+    if (!cartLines.length) {
       return [];
     }
 
     const currency = campaignData?.currency || cartData.campaignData?.currency || 'USD';
     
-    return cartData.cartLines.map((item, index) => {
+    return cartLines.map((item, index) => {
       // Extract packageId from enriched item (could be in different places)
       const packageId = item.packageId || item.package_id || item.id;
       
@@ -273,9 +294,10 @@ Here's the complete JavaScript code for the custom analytics triggers:
 
     const cartData = getCartData();
     const campaignData = getCampaignData();
+    const cartLines = getCartLines(cartData);
     
-    if (!cartData || !cartData.cartLines || cartData.cartLines.length === 0) {
-      console.warn('Cannot fire add_to_cart: cart is empty');
+    if (!cartLines.length) {
+      console.warn('Cannot fire add_to_cart: no cart items in latest cart:updated payload or fallback snapshot');
       return;
     }
 
@@ -346,9 +368,10 @@ Here's the complete JavaScript code for the custom analytics triggers:
 
     const cartData = getCartData();
     const campaignData = getCampaignData();
+    const cartLines = getCartLines(cartData);
     
-    if (!cartData || !cartData.cartLines || cartData.cartLines.length === 0) {
-      console.warn('Cannot fire begin_checkout: cart is empty');
+    if (!cartLines.length) {
+      console.warn('Cannot fire begin_checkout: no cart items in latest cart:updated payload or fallback snapshot');
       return;
     }
 
@@ -471,6 +494,12 @@ Here's the complete JavaScript code for the custom analytics triggers:
   function setupTriggers() {
     console.log('Setting up custom analytics triggers');
 
+    if (typeof window.next !== 'undefined' && window.next.on) {
+      window.next.on('cart:updated', function(cartState) {
+        rememberCartData(cartState);
+      });
+    }
+
     // 1. Fire add_to_cart when checkout page loads
     if (isCheckoutPage()) {
       // Wait a bit for cart to be populated
@@ -540,7 +569,7 @@ Here's the complete JavaScript code for the custom analytics triggers:
 
 1. ✅ **Config.js Setup** - Add `blockedEvents` to both GTM and Facebook providers
 2. ✅ **Include Script in HTML** - Script included after SDK loader
-3. ✅ **Ensure Cart Has Items** - Cart must not be empty for events to fire
+3. ✅ **Ensure Cart State Is Available** - Add items through rendered controls and let `cart:updated` fire before testing
 
 ### Test `add_to_cart` Event (Checkout Page Load)
 
@@ -684,10 +713,11 @@ function testCustomTriggers() {
   // Check SDK
   console.log('SDK ready:', typeof window.next !== 'undefined');
   
-  // Check cart
+  // Check cart snapshot. For proof, inspect cart:updated payloads and rendered totals too.
   if (window.next) {
     const cart = window.next.getCartData();
-    console.log('Cart items:', cart?.cartLines?.length || 0);
+    const lines = cart?.cartLines || cart?.enrichedItems || cart?.items || [];
+    console.log('Cart items in snapshot:', lines.length);
     console.log('Cart total:', cart?.cartTotals?.total?.value || 0);
   }
   
@@ -750,7 +780,7 @@ testCustomTriggers();
 
 **Check:**
 1. ✅ Script is included after SDK loader
-2. ✅ Cart has items (not empty)
+2. ✅ Cart has items from a recent `cart:updated` event or fallback snapshot
 3. ✅ Console shows "🔧 Setting up custom analytics triggers"
 4. ✅ No JavaScript errors in console
 5. ✅ SDK is initialized (`window.next` exists)
@@ -764,7 +794,8 @@ console.log('SDK ready:', typeof window.next !== 'undefined');
 if (window.next) {
   const cart = window.next.getCartData();
   console.log('Cart data:', cart);
-  console.log('Cart has items:', cart?.cartLines?.length > 0);
+  const lines = cart?.cartLines || cart?.enrichedItems || cart?.items || [];
+  console.log('Cart has items in snapshot:', lines.length > 0);
 }
 ```
 
@@ -785,9 +816,9 @@ if (window.next) {
 ### Issue: Missing Data in Events
 
 **Check:**
-- Cart must have items before events fire
+- Cart state must include items before events fire
 - Campaign data must be loaded (for currency, package info)
-- Check console for warnings: `"Cannot fire add_to_cart: cart is empty"`
+- Check console for warnings: `"Cannot fire add_to_cart: no cart items in latest cart:updated payload or fallback snapshot"`
 
 ## Success Criteria
 
@@ -823,7 +854,6 @@ Open browser console to see these messages and verify events are firing correctl
 
 - Events are only fired once per page load (duplicate prevention)
 - Script waits for SDK to be ready before setting up listeners
-- Cart must have items for events to fire
+- Cart state must include items for events to fire
 - Script gracefully handles missing SDK or analytics tools
 - Events use the same format as SDK defaults for consistency
-

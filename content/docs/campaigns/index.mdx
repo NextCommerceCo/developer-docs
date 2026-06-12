@@ -6,7 +6,7 @@ import { CampaignFunnelFlow, CampaignAnatomy } from '@/components/campaign-conce
 
 Campaigns are fully custom checkout funnels — landing, checkout, upsell, and receipt pages — backed by a CORS-enabled API that handles products, pricing, payments, and order creation. **No backend integration required.**
 
-The fastest path from zero to a working funnel on localhost is the **[Campaign Page Kit](https://github.com/NextCommerceCo/campaign-page-kit)**: a CLI that scaffolds a starter template, runs a hot-reload dev server, and outputs a static site you can deploy to Netlify, Cloudflare Pages, Vercel, or any static host.
+The fastest path from zero to a working funnel on localhost is the **[Campaign Page Kit](https://github.com/NextCommerceCo/campaign-page-kit)**: a CLI that scaffolds an SDK-ready starter template, runs a hot-reload dev server, and outputs a static site you can deploy to Netlify, Cloudflare Pages, Vercel, or any static host.
 
 ## Quick Start
 
@@ -53,7 +53,7 @@ npm run dev
 This opens your campaign's first page (e.g. `/<slug>/presell/`) in the browser and hot-reloads as you edit. If you have multiple campaigns in the project, you'll get a picker.
 
 <Callout type="success" title="🎉 You did it!">
-You now have a **complete campaign funnel** running on your local machine — presell, landing, checkout, upsells, and receipt — all wired up to your live store data through the SDK. Click through it, created a test order (see test card below).
+You now have a **complete campaign funnel** running on your local machine — presell, landing, checkout, upsells, and receipt — all wired up to your live store data through the SDK. Click through it and create a test order using the test card below.
 </Callout>
 
 ### 4. Place a test order
@@ -93,7 +93,7 @@ my-campaigns/
 
 ## Starter templates
 
-Pick one at the `campaign-init` template prompt. Each template ships with `presell.html` + `landing.html`, all upsell variants, and a receipt — copy the whole folder to get the full funnel. The two Olympus templates are a good starting point for your first campaign.
+Pick one at the `campaign-init` template prompt. Each template ships with SDK-ready checkout, upsell, and receipt surfaces, plus the supporting presell and landing pages for that family. Start from a maintained template, then replace campaign-specific copy, assets, package IDs, offer codes, shipping methods, tracking, and routes with values from Campaigns App and your build brief. The two Olympus templates are a good starting point for your first campaign.
 
 <CampaignTemplatesGrid slugs={['olympus', 'olympus-mv-single-step']} />
 
@@ -129,9 +129,9 @@ A **package** is the campaign's sellable reference to a product or product varia
 - Create one package for the product or variant customers can buy.
 - Use the package's base list price as the anchor price.
 - Send the selected package ID and quantity from the page.
-- Use **offers** to discount the cart for quantity tiers, bundles, upsells, downsells, and exit-pop incentives.
+- Use **offers** to discount checkout quantity tiers and **Code** offers for upsells, downsells, and exit-pop incentives.
 
-For bundle-based quantity discounts (e.g. "buy 3 for $21" or "buy 5 for $30"), use **offers** to discount the price at checkout rather than baking the discount into separate package records. This keeps the package list stable and lets the API return before/after pricing so the page can show savings consistently.
+For bundle-based quantity discounts (e.g. "buy 3 for $21" or "buy 5 for $30"), use **offers** to discount the price at checkout rather than baking the discount into separate package records. This keeps the package list stable and lets the API return before/after pricing so template components can show savings consistently.
 
 Package-level Quantity and Retail Price are legacy compatibility fields in Campaigns App. They may still appear when the campaign setting **Enable Package Retail Price & Quantity** is enabled, but new builds should prefer Offer-based price mutation.
 

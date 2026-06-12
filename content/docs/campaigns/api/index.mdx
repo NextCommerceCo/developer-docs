@@ -5,9 +5,9 @@ sidebar_position: 1
 ---
 import { Callout } from 'fumadocs-ui/components/callout';
 
-Campaigns App opens up new possibilities for frontend developers to easily create complex external campaign flows using Javascript, **no backend server-side integration required**.
+Campaigns App opens up new possibilities for frontend developers to easily create complex external campaign flows using JavaScript, **no backend server-side integration required**.
 
-The Campaigns App provides an easy to use CORS enabled API that follows the best practices for integrating to our Admin API for an [External Checkout Flow](/docs/admin-api/guides/external-checkout).
+The Campaigns App provides an easy-to-use CORS-enabled API that follows the best practices for integrating to our Admin API for an [External Checkout Flow](/docs/admin-api/guides/external-checkout).
 
 <Callout type="idea" title="Recommended: use the Campaign Cart SDK">
 For most projects, start with the **[Campaigns Getting Started guide](/docs/campaigns)** — it walks you through scaffolding a working funnel with Page Kit and the Campaign Cart SDK, which wraps every endpoint on this page behind data-attribute driven add-to-cart, live cart state, coupon handling, checkout forms, and upsell flows. You write HTML, not fetch calls. The [Cart System](/docs/campaigns/cart-system) and [JavaScript API](/docs/campaigns/javascript-api) docs cover the SDK in depth.
@@ -17,22 +17,22 @@ Use the raw API on this page only for custom server-side flows or backend integr
 
 ## Campaigns Overview
 
-A "campaign" is a defined set of packages and payment rules as a backend for the HTML/JS webpages of a campaign (or funnel) frontend. You can easily setup multiple campaigns for different product offers, markets, and A/B testing.
+A "campaign" is a defined set of packages, offers, shipping options, payment rules, and localization settings that backs the HTML/JS pages of a campaign funnel. You can set up multiple campaigns for different product offers, markets, and A/B tests.
 
 
 ### Session Tracking
 
 Session tracking is available to enable visibility into campaign performance by adding a [javascript snippet](#add-session-tracking) to the head of every page on your campaign. With session tracking configured, we'll automatically track events for:
 
-- Page Veiw
+- Page View
 - Cart Create
 - Order Create
 - Upsell Create
 
-These events flow into Campaign Performance reports for real time monitoring of acvitities on your campaign.
+These events flow into Campaign Performance reports for real-time monitoring of activity on your campaign.
 
 ### Packages
-A **package** is a virtual link to a product in your campaign — what customers reference by `package_id` when creating carts and orders. Each package points to one product with a default quantity (e.g. 1x or 3x for bundles), and can optionally be recurring (subscription).
+A **package** is a virtual link to a product or product variant in your campaign — what customers reference by `package_id` when creating carts and orders. In SDK 0.4.x-compatible builds, create packages for product or variant identity and send the selected quantity from the page. Older campaigns may still expose package-level quantity for compatibility, but new quantity tiers should be modeled with offers rather than separate `1x`, `2x`, and `3x` package records.
 
 Pricing adjustments — per-quantity bundle discounts, automatic offers, coupon codes — are controlled by **offers**, not by per-package pricing rules. The cart and order APIs return adjusted before/after totals so the frontend can render savings without doing math.
 

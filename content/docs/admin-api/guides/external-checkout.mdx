@@ -160,6 +160,26 @@ Subscription line items have two `price` fields available. The order line item l
 <Callout type="warn">
 Orders with Subscription line items **must have an initial payment** (order total > 0.00) to validate and retain the bankcard for future usage.
 </Callout>
+#### Custom Line Item Properties
+
+Lines accept an optional `properties` object of key/value pairs to capture customization details for personalized or made-to-order products, such as an engraving, monogram, or gift message. The values are stored on the line item and persist to the created order (and to the subscription line item when the line creates a subscription).
+
+```json title="Custom Line Item Properties"
+"lines": [
+    {
+        "product_id": 1,
+        "quantity": 1,
+        "properties": {
+            "engraving": "Best Dad Ever",
+            "font": "Serif",
+            "gift_message": "Happy Birthday!"
+        }
+    }
+]
+```
+<Callout type="info">
+Line item `properties` are used to determine the uniqueness of line item products and flow all the way through to fulfillment order line items for customized product fulfillment.
+</Callout>
 ### Cart / Order User Detail
 
 The `user` object on carts/orders represents the **customer** which includes their contact details.  Below are the recommended fields to pass for the user for ease of use and support of external integrations that may rely on the data, i.e. `user_agent`.

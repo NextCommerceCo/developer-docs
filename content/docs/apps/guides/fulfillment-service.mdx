@@ -145,6 +145,29 @@ Requests to the location callback indicate the request `type` that should be pas
 
 For example, to see new fulfillment requests pending acceptance, pass `assignment_status=fulfillment_requested` to the Assigned Fulfillment Orders API, `fulfillment_requested` was passed as `type` to the callback.
 </Callout>
+## Customized Products
+
+Customized or personalized products carry their customization details in the line item `properties`. When an order is created with line item `properties` (see [Custom Line Item Properties](/docs/admin-api/guides/external-checkout#custom-line-item-properties)), those values flow through to the fulfillment order line items so your fulfillment service can fulfill the customization.
+
+Each `line_item` returned from the [Assigned Fulfillment Orders](#assigned-fulfillment-orders) API includes a `properties` object with the customization details to fulfill.
+
+```json title="Fulfillment Order Line Item Properties"
+"line_items": [
+    {
+        "product_title": "Engraved Bottle",
+        "sku": "BOTTLE-001",
+        "quantity": 1,
+        "properties": {
+            "engraving": "Best Dad Ever",
+            "font": "Serif",
+            "gift_message": "Happy Birthday!"
+        }
+    }
+]
+```
+<Callout type="info">
+Line item `properties` also determine the uniqueness of line item products — identical products with different `properties` are kept as separate line items.
+</Callout>
 ## Accepting Fulfillment Requests
 
 To `Accept` a Fulfillment Request assignment, send a POST request to the [Fulfillment Request Accept](/docs/admin-api/reference/fulfillment/fulfillmentRequestAccept) Endpoint. The Fulfillment Order will show as **Accepted** in the dashboard and the Order will transition fulfillment_status to processing.

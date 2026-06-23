@@ -102,6 +102,27 @@ When placed inside a `data-summary-lines` row template, renders per-line discoun
 
 See [Cart Lines & Discounts → Discount Lists](../summary-lists#discount-lists) for usage examples.
 
+### `data-next-item-properties`
+
+Place **inside** a `data-summary-lines` row template to render one row per line item property.
+
+```html
+<ul data-summary-lines>
+  <template>
+    <li>
+      <span>{item.name}</span>
+      <div data-next-item-properties>
+        <template>
+          <span class="property">{property.key}: {property.value}</span>
+        </template>
+      </div>
+    </li>
+  </template>
+</ul>
+```
+
+Items that share the same `package_id` but carry different properties are rendered as separate rows, each with their own `data-next-item-properties` list.
+
 ### `data-line-discounts`
 
 Place **inside** a `data-summary-lines` row template to render per-line discount breakdowns.

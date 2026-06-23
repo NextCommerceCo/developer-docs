@@ -68,6 +68,17 @@ The following pre-v0.4.11 token names were removed when the namespace was reorga
 
 ---
 
+## `ItemProperty`
+
+One entry in the `data-next-item-properties` list rendered inside a `data-summary-lines` row. Only present when the line item carries custom properties (e.g. personalisation text collected via `data-next-property-key`).
+
+| Token | Type | Description |
+|-------|------|-------------|
+| `{property.key}` | string | Property name (e.g. `"engraving"`) |
+| `{property.value}` | string | Property value as entered by the shopper |
+
+---
+
 ## `Discount`
 
 One discount entry in an offer, voucher, or per-line discount list.

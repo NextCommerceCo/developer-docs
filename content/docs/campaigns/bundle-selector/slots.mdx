@@ -195,6 +195,47 @@ This renders three slot rows, each with independent variant dropdowns. The cart 
 
 ---
 
+## Collecting Properties in Slot Templates
+
+Add `data-next-property-key` to any `<input>`, `<textarea>`, or `<select>` inside a slot template to capture per-slot metadata and attach it to the corresponding line item in the cart.
+
+```html
+<template id="slot-tpl">
+  <div class="slot-row">
+    <img src="{item.image}" alt="{item.name}" />
+    <strong>{item.name}</strong>
+    <span>{item.price}</span>
+
+    <!-- Each unit carries its own engraving text as a line item property -->
+    <input type="text"
+           data-next-property-key="engraving"
+           placeholder="Add personalisation text" />
+  </div>
+</template>
+```
+
+The value syncs to `slot.properties` on every `input` event. When the bundle is in `swap` mode, blurring the field immediately updates the cart — no extra submit step required. User-typed values survive slot re-renders caused by variant changes.
+
+### Page-Level Default Properties
+
+For properties that apply to every slot across all bundles (e.g. a single gift message), use `data-next-default-property-key` anywhere on the page instead:
+
+```html
+<!-- Applies to every line item from every bundle selector on the page -->
+<textarea data-next-default-property-key="gift_message"
+          placeholder="Gift message (optional)"></textarea>
+
+<div data-next-bundle-selector ...>
+  <!-- bundle cards -->
+</div>
+```
+
+Per-slot `data-next-property-key` values override page-level defaults when both share the same key.
+
+Merge priority (highest wins): slot-level `data-next-property-key` → page-level `data-next-default-property-key`.
+
+---
+
 ## Silent Add-Ons (`noSlot`)
 
 Set `"noSlot": true` on any bundle item to suppress its slot row. Useful for free gifts or invisible add-ons you want to include in the cart but not show in the slot list.

@@ -65,6 +65,38 @@ sidebar_label: Attributes
 
 ---
 
+## Line Item Properties
+
+Place `data-next-property-key` on `<input>`, `<textarea>`, or `<select>` elements inside a slot template to attach user input as metadata to that line item.
+
+| Attribute | Description |
+|-----------|-------------|
+| `data-next-property-key="<key>"` | Attaches this input's value to the line item as a custom property under the given key. |
+| `data-next-default-property-key="<key>"` | Attaches this input's value as a custom property to every line item across all bundle selectors. |
+
+Inside a slot template:
+
+```html
+<template id="slot-tpl">
+  <div class="slot-row">
+    <strong>{item.name}</strong>
+    <input type="text"
+           data-next-property-key="engraving"
+           placeholder="Personalisation text" />
+  </div>
+</template>
+```
+
+For a property that applies to every slot — such as a gift message — place `data-next-default-property-key` outside the slot template anywhere on the page. A `data-next-property-key` with the same key within a slot takes precedence.
+
+```html
+<input type="text"
+       data-next-default-property-key="gift_message"
+       placeholder="Gift message (optional)" />
+```
+
+---
+
 ## Slot Placeholder
 
 | Attribute | Description |

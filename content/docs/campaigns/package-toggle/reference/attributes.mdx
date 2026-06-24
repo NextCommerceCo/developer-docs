@@ -25,8 +25,12 @@ Complete reference of all Addon Toggle attributes. For guided explanations with 
 | `data-next-toggle-card` | Marks an element as a toggleable card |
 | `data-next-package-id` | Package `ref_id` — required per card |
 | `data-next-selected="true"` | Adds this package to the cart automatically on page load; will not be added again if already in the cart |
-| `data-next-quantity` | Quantity to add when toggling on (default `1`); ignored when `data-next-package-sync` is set |
+| `data-next-quantity` | Quantity to add when toggling on (default `1`); ignored when `data-next-package-sync` or `data-next-product-sync` is set |
 | `data-next-package-sync` | Comma-separated list of package IDs — quantity mirrors the sum of those packages currently in the cart |
+| `data-next-product-sync` | Product ID — quantity mirrors the sum of **all variants** of that product in the cart. Use for configurable (multi-variant) products. See [Quantity Sync → Syncing Across All Variants](../quantity-sync#syncing-across-all-variants--data-next-product-sync) |
+| `data-next-property` | On an `<input>`, `<textarea>`, or `<select>` inside the card — attaches the field value to the line item as a named property (e.g. `data-next-property="engraving"`) |
+| `data-next-default-property` | On any input outside a card — applies the field value as a property to every toggle line item. Per-card `data-next-property` values with the same key take precedence |
+| `data-next-exclude-property` | Comma-separated property keys to exclude from the order API for this card (e.g. `"team, number"`), or `"*"` to exclude all properties. Can be set on the card element, its state container, or via `data-next-packages` JSON as `excludeProperties` |
 | `data-next-is-upsell="true"` | Marks the item as an upsell/bump for order tracking |
 | `data-next-url` | Navigation URL after a successful upsell add; only used when `data-next-upsell-context` is set on the container. Falls back to a `<meta name="next-upsell-url">` tag if not provided |
 | `data-add-text` | Text shown in the button text target when the package is **not** in the cart |

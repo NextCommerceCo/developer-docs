@@ -122,6 +122,23 @@ When the customer navigates away and presses the browser Back button, the page m
 
 ---
 
+## Line Item Properties
+
+Any `data-next-property` or `data-next-default-property` inputs present on the upsell page are included in the `lines[].properties` payload sent to the order API — the same way they work on the main checkout page. No extra configuration is required.
+
+```html
+<!-- Collected and sent with the upsell -->
+<input data-next-property="engraving" placeholder="Personalisation text" />
+
+<button data-next-action="accept-upsell" data-next-package-id="42">
+  Add to my order
+</button>
+```
+
+Use `data-next-exclude-property` on a PackageToggle card if you need to suppress specific keys for that upsell item.
+
+---
+
 ## Conflicts
 
 - Do not put `data-next-action="add-to-cart"` on the same button. `add-to-cart` writes to the **cart** store; `accept-upsell` writes to the **order** API. They are independent stores and writing to both for the same item produces duplicate records.

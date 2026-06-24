@@ -59,3 +59,41 @@ You can place `data-next-package-sync` on either the card element or its contain
   <div data-next-toggle-card data-next-package-id="201">...</div>
 </div>
 ```
+
+---
+
+## Syncing Across All Variants — `data-next-product-sync`
+
+Multi-variant products (configurable products) have a separate package `ref_id` per variant. When a customer swaps to a different variant, `data-next-package-sync` may miss the new variant's ID and undercount the quantity.
+
+Use `data-next-product-sync` to sync against **all variants of a product** at once, using the single `product_id` shared by every variant:
+
+```html
+<!-- Covers every variant of product 400, present and future -->
+<div data-next-toggle-card data-next-package-id="200"
+     data-next-product-sync="400">
+  Extended Warranty
+</div>
+```
+
+Find the `product_id` in the campaign API response under `packages[].product_id` — it is the same value for every variant of the same product.
+
+| What happens in the cart | What happens to the toggle |
+|--------------------------|---------------------------|
+| Any variant of the synced product is in the cart | Toggle quantity matches the total across all variants |
+| All variants are removed | Toggle item is automatically removed |
+| A variant is swapped for another | Toggle quantity stays correct without any extra configuration |
+
+### Using Both Attributes Together
+
+`data-next-package-sync` and `data-next-product-sync` can be set on the same card. Items already counted by `data-next-package-sync` are excluded from the `data-next-product-sync` pass to prevent double-counting.
+
+```html
+<div data-next-toggle-card data-next-package-id="200"
+     data-next-package-sync="10"
+     data-next-product-sync="400">
+  Extended Warranty (covers single-pack + all variants)
+</div>
+```
+
+Use `data-next-package-sync` alone for single-package (non-variant) products; use `data-next-product-sync` whenever the main product has multiple variants.

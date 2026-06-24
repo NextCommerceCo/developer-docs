@@ -28,7 +28,10 @@ function parseFrontmatter(raw: string): {
 }
 
 export function parsePlaygroundFile(src: string): ParsedPlaygroundFile {
-  const filePath = path.join(PLAYGROUND_DIR, `${src}.html`);
+  // Snippet examples live at `<src>.html`; full-site pages at `<src>/index.html`.
+  const flat = path.join(PLAYGROUND_DIR, `${src}.html`);
+  const nested = path.join(PLAYGROUND_DIR, src, 'index.html');
+  const filePath = fs.existsSync(flat) ? flat : nested;
   const raw = fs.readFileSync(filePath, 'utf-8');
   const { meta, body } = parseFrontmatter(raw);
   return { meta, content: body };

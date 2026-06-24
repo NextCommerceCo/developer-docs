@@ -16,6 +16,7 @@ export function usePreviewUpdater(
         currentExample.code,
         html,
         cfg,
+        currentExample.fullPage,
       );
       onIframeSrcChange(url);
     },

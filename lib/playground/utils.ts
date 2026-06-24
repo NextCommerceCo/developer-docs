@@ -20,10 +20,21 @@ export function buildPreviewUrl(
   exampleCode: string,
   userHtml: string,
   config: Config,
+  fullPage = false,
 ): string {
   const slashIdx = exampleId.indexOf('/');
   const category = slashIdx === -1 ? '' : exampleId.slice(0, slashIdx);
   const name = slashIdx === -1 ? exampleId : exampleId.slice(slashIdx + 1);
+
+  // Full-site pages are served verbatim from their copied directory
+  // (build-preview.mjs preserves `<page>/index.html`). Link to the explicit
+  // index.html — `next dev` serves public/ files at their exact path only, so a
+  // bare directory URL 404s. Config/code overrides don't apply to a verbatim
+  // document, so there are no query params to attach.
+  if (fullPage) {
+    return `/preview/${slugCategory(category)}/${name}/index.html`;
+  }
+
   const path = category
     ? `/preview/${slugCategory(category)}/${name}.html`
     : `/preview/${name}.html`;

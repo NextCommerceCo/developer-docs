@@ -1,0 +1,123 @@
+---
+title: Get Started
+sidebar_label: Get Started
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Build a checkout form that collects contact details, a shipping address, and a card, then creates the order.
+
+---
+
+## Mark the Form
+
+Add `data-next-checkout` to a `<form>` element. This is the activation attribute — the SDK enhances exactly one form per element.
+
+```html
+<form data-next-checkout>
+  <!-- fields go here -->
+</form>
+```
+
+<Callout type="warn">
+The enhancer must be on a `<form>` element, not a `<div>`. There should be only one checkout form per page.
+</Callout>
+
+---
+
+## Add Contact &amp; Address Fields
+
+Tag each input with `data-next-checkout-field`. The SDK finds fields by this attribute, so the input's `name` and `id` are yours to set. Use the standard field names below.
+
+```html
+<form data-next-checkout>
+  <input data-next-checkout-field="email"    type="email" />
+  <input data-next-checkout-field="fname"    type="text" />
+  <input data-next-checkout-field="lname"    type="text" />
+  <input data-next-checkout-field="address1" type="text" />
+  <input data-next-checkout-field="address2" type="text" />
+  <input data-next-checkout-field="city"     type="text" />
+  <select data-next-checkout-field="province"></select>
+  <input data-next-checkout-field="postal"   type="text" />
+  <select data-next-checkout-field="country"></select>
+  <input data-next-checkout-field="phone"    type="tel" />
+</form>
+```
+
+The `country` and `province` dropdowns are populated automatically. Selecting a country refreshes the state/province list and re-labels the postal and state fields for that country.
+
+---
+
+## Add Card Fields
+
+Credit card number and CVV are secure Spreedly iframes — give them the IDs `spreedly-number` and `spreedly-cvv` (or the matching field attributes). Expiry month/year and cardholder name are normal inputs.
+
+```html
+<div id="spreedly-number"></div>
+<div id="spreedly-cvv"></div>
+<select data-next-checkout-field="cc-month"></select>
+<select data-next-checkout-field="cc-year"></select>
+<input  data-next-checkout-field="card-name" type="text" />
+```
+
+<Callout>
+Card data never touches your page or server — Spreedly tokenizes it in the iframe and the SDK submits only the token. You need a Spreedly environment key set in your SDK config. See [Payment](./payment).
+</Callout>
+
+---
+
+## Add the Submit Button
+
+A normal submit button inside the form triggers checkout.
+
+```html
+<button type="submit">Complete Order</button>
+```
+
+---
+
+## Minimal Working Example
+
+```html
+<form data-next-checkout>
+  <input data-next-checkout-field="email"    type="email" />
+  <input data-next-checkout-field="fname"    type="text" />
+  <input data-next-checkout-field="lname"    type="text" />
+  <input data-next-checkout-field="address1" type="text" />
+  <input data-next-checkout-field="city"     type="text" />
+  <select data-next-checkout-field="province"></select>
+  <input data-next-checkout-field="postal"   type="text" />
+  <select data-next-checkout-field="country"></select>
+
+  <div id="spreedly-number"></div>
+  <div id="spreedly-cvv"></div>
+  <select data-next-checkout-field="cc-month"></select>
+  <select data-next-checkout-field="cc-year"></select>
+  <input  data-next-checkout-field="card-name" type="text" />
+
+  <button type="submit">Complete Order</button>
+</form>
+```
+
+---
+
+## Verify It Is Working
+
+After loading the page you should see:
+
+- The `country` dropdown filled with the campaign's available shipping countries
+- The `province` dropdown and postal label change when you switch country
+- Validation messages appear under fields when you submit with errors
+- On a valid submit, the page shows a loading overlay, then redirects to your confirmation page with an empty cart
+
+In the browser console with debug enabled, the SDK emits `checkout:form-initialized` on load and `order:completed` on a successful order.
+
+---
+
+## Next Steps
+
+- Configure fields, validation, and billing: [The Form](./form)
+- Set up card and payment methods: [Payment](./payment)
+- Add PayPal / Apple Pay / Google Pay: [Express Checkout](./express-checkout)
+- Understand the submit-to-redirect sequence: [Order Flow](./order-flow)
+- Full attribute tables: [Reference → Attributes](./reference/attributes)

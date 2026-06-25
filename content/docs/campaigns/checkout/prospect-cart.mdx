@@ -1,0 +1,70 @@
+---
+title: Prospect Cart
+sidebar_label: Prospect Cart
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+A prospect cart captures the visitor's email (and name) **before** they complete the order, so an abandoned checkout can be recovered later. It is created automatically by the checkout form once enough contact detail is valid — no address or payment is required.
+
+---
+
+## How It Activates
+
+The prospect cart runs inside the main checkout form — you do **not** add a separate attribute for it. As long as the page has a `data-next-checkout` form, the prospect cart is initialized with it.
+
+It watches the contact fields (email, first name, last name) and, when they are valid, creates a prospect cart through the API containing the email, name, cart items, and attribution (UTM, referrer, device). Address data is intentionally **not** included.
+
+<Callout>
+The prospect cart stores its state in `sessionStorage` under `next_prospect_cart` and expires after 30 minutes by default.
+</Callout>
+
+---
+
+## Configuration
+
+Tune behavior with attributes on the checkout `<form>`:
+
+| Attribute | Purpose | Default |
+|---|---|---|
+| `data-auto-create` | Set to `false` to disable automatic creation | enabled |
+| `data-trigger-on` | When to create: `emailEntry`, `phoneEntry`, `emailAndPhone`, `formStart`, `manual` | `emailEntry` |
+| `data-email-field` | Override the email input's `name` to watch | `email` |
+| `data-phone-field` | Override the phone input's `name` to watch | `phone` |
+| `data-min-phone-digits` | Minimum digits to accept a phone when `intl-tel-input` is unavailable | — |
+| `data-prospect-config` | A JSON config object applied before the individual attributes | — |
+
+```html
+<form data-next-checkout
+      data-trigger-on="emailAndPhone"
+      data-min-phone-digits="10">
+  ...
+</form>
+```
+
+The trigger decides which contact fields are required: `emailEntry`/`formStart`/`manual` need a valid email, `phoneEntry` needs a valid phone, and `emailAndPhone` needs both.
+
+---
+
+## Lifecycle Events
+
+The prospect cart dispatches DOM `CustomEvent`s on `document`:
+
+| Event | When |
+|---|---|
+| `next:prospect-cart-created` | A prospect cart was created — detail includes the cart and prospect cart |
+| `next:prospect-cart-abandoned` | The visitor abandoned without ordering |
+| `next:prospect-cart-converted` | The visitor completed the order |
+
+```js
+document.addEventListener('next:prospect-cart-created', (e) => {
+  console.log('Prospect captured', e.detail.prospectCart);
+});
+```
+
+---
+
+## Next Steps
+
+- The contact fields it watches: [The Form](./form)
+- All events: [Reference → Events](./reference/events)

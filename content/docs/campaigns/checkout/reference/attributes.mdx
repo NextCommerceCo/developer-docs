@@ -48,8 +48,8 @@ Same names prefixed with `billing-`: `billing-fname`, `billing-lname`, `billing-
 
 | Field | Attribute / ID |
 |---|---|
-| Card number | `id="spreedly-number"` or `data-next-checkout-field="cc-number"` |
-| CVV | `id="spreedly-cvv"` or `data-next-checkout-field="cvv"` |
+| Card number | `data-next-checkout-field="cc-number"` (or `id="spreedly-number"`) — empty `<div>`, not `<input>` |
+| CVV | `data-next-checkout-field="cvv"` (or `id="spreedly-cvv"`) — empty `<div>`, not `<input>` |
 | Expiry month | `data-next-checkout-field="cc-month"` or `="exp-month"` |
 | Expiry year | `data-next-checkout-field="cc-year"` or `="exp-year"` |
 | Cardholder name | `data-next-checkout-field="card-name"` |

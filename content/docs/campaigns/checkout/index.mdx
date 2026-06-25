@@ -4,12 +4,17 @@ sidebar_label: Checkout
 ---
 
 import { Play, FileText, CreditCard, Zap, MapPin, ListChecks, MailCheck, Workflow, BookOpen } from 'lucide-react';
+import { Callout } from 'fumadocs-ui/components/callout';
 
-The Checkout turns a plain HTML `<form>` into a working order page. Add `data-next-checkout` to a `<form>`, tag each input with a field attribute, and the SDK collects the data, validates it, tokenizes the card, creates the order, and redirects to your confirmation page.
+The Checkout turns a plain HTML `<form>` into a working order page. Add `data-next-checkout` to a `<form>`, tag each input with a field attribute, and the SDK collects the data, validates it, tokenizes the card (swaps the card number for a secure token so it never touches your server), creates the order, and redirects to your confirmation page.
+
+<Callout type="info">
+New to Campaigns? Set up the SDK, an API key, and a cart first at [Campaigns → Getting Started](/docs/campaigns). This section assumes those are already in place — see [Get Started → Prerequisites](./get-started#prerequisites).
+</Callout>
 
 ## How It Works
 
-1. A single `<form data-next-checkout>` becomes the checkout — one enhancer drives the whole flow
+1. A single `<form data-next-checkout>` becomes the checkout — one *enhancer* (a class the SDK attaches to an element with a `data-next-*` attribute) drives the whole flow
 2. Inputs are matched by `data-next-checkout-field` attributes, not by their `name` — so your HTML structure is up to you
 3. On submit, the SDK validates every field, tokenizes the card with Spreedly, and posts the order to the API
 4. On success it clears the cart, then redirects to the order confirmation (or upsell) page

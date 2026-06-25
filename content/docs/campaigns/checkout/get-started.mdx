@@ -9,6 +9,20 @@ Build a checkout form that collects contact details, a shipping address, and a c
 
 ---
 
+## Prerequisites
+
+This page is about the checkout form itself. Before any of the HTML below does anything, three things must already be in place:
+
+1. **The SDK is loaded on the page.** A loader script in your `<head>` (with your Campaign API key) is what turns the `data-next-*` attributes into working behavior. If you haven't set that up, start at [Campaigns → Getting Started](/docs/campaigns) and [Configuration](../configuration).
+2. **You have a campaign with at least one package.** A *campaign* is your checkout's configuration — its products (packages), prices, shipping options, and payment methods — created in the Campaigns App. The checkout reads available countries, payment methods, and the cart from it.
+3. **The cart has items.** Checkout creates an order from whatever is in the cart, so the customer must have added a package first (see [Cart System](../cart-system)). With an empty cart there is nothing to submit.
+
+<Callout type="info">
+The fastest way to get all three in place is the **Campaign Page Kit** starter — it scaffolds a full funnel (landing → checkout → upsell → receipt) with the SDK already wired up. See [Campaigns → Getting Started](/docs/campaigns).
+</Callout>
+
+---
+
 ## Mark the Form
 
 Add `data-next-checkout` to a `<form>` element. This is the activation attribute — the SDK enhances exactly one form per element.
@@ -50,15 +64,19 @@ The `country` and `province` dropdowns are populated automatically. Selecting a 
 
 ## Add Card Fields
 
-Credit card number and CVV are secure Spreedly iframes — give them the IDs `spreedly-number` and `spreedly-cvv` (or the matching field attributes). Expiry month/year and cardholder name are normal inputs.
+Credit card number and CVV are secure iframes hosted by **Spreedly** — the payment vault the SDK uses so raw card numbers never touch your page or server. Tag them with `data-next-checkout-field` like every other field, but use empty `<div>` containers (not `<input>`s) — Spreedly injects its iframe into them. Expiry month/year and cardholder name are normal inputs.
 
 ```html
-<div id="spreedly-number"></div>
-<div id="spreedly-cvv"></div>
+<div data-next-checkout-field="cc-number"></div>
+<div data-next-checkout-field="cvv"></div>
 <select data-next-checkout-field="cc-month"></select>
 <select data-next-checkout-field="cc-year"></select>
 <input  data-next-checkout-field="card-name" type="text" />
 ```
+
+<Callout>
+You may also see `id="spreedly-number"` / `id="spreedly-cvv"` in older pages — that is the low-level ID Spreedly requires. Both work, but `data-next-checkout-field` is the convention the starter templates use.
+</Callout>
 
 <Callout>
 Card data never touches your page or server — Spreedly tokenizes it in the iframe and the SDK submits only the token. You need a Spreedly environment key set in your SDK config. See [Payment](./payment).
@@ -78,26 +96,54 @@ A normal submit button inside the form triggers checkout.
 
 ## Minimal Working Example
 
+This is a complete page you can save as an `.html` file and open in a browser. The only things to change are the API key and the package ID (use real values from your campaign in the Campaigns App).
+
 ```html
-<form data-next-checkout>
-  <input data-next-checkout-field="email"    type="email" />
-  <input data-next-checkout-field="fname"    type="text" />
-  <input data-next-checkout-field="lname"    type="text" />
-  <input data-next-checkout-field="address1" type="text" />
-  <input data-next-checkout-field="city"     type="text" />
-  <select data-next-checkout-field="province"></select>
-  <input data-next-checkout-field="postal"   type="text" />
-  <select data-next-checkout-field="country"></select>
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- 1. Configure the SDK before it loads -->
+  <script>
+    window.nextConfig = { apiKey: "your-api-key-here" };
+  </script>
+  <!-- 2. Load the SDK -->
+  <script src="https://cdn.jsdelivr.net/gh/NextCommerceCo/campaign-cart@v0.4.24/dist/loader.js" type="module"></script>
 
-  <div id="spreedly-number"></div>
-  <div id="spreedly-cvv"></div>
-  <select data-next-checkout-field="cc-month"></select>
-  <select data-next-checkout-field="cc-year"></select>
-  <input  data-next-checkout-field="card-name" type="text" />
+  <!-- Where to send the customer after a successful order -->
+  <meta name="next-success-url" content="/thank-you.html" />
+</head>
+<body>
+  <!-- 3. Put something in the cart (checkout needs cart items) -->
+  <button data-next-action="add-to-cart" data-next-package-id="1" data-next-quantity="1">
+    Add to Cart
+  </button>
 
-  <button type="submit">Complete Order</button>
-</form>
+  <!-- 4. The checkout form -->
+  <form data-next-checkout>
+    <input data-next-checkout-field="email"    type="email" />
+    <input data-next-checkout-field="fname"    type="text" />
+    <input data-next-checkout-field="lname"    type="text" />
+    <input data-next-checkout-field="address1" type="text" />
+    <input data-next-checkout-field="city"     type="text" />
+    <select data-next-checkout-field="province"></select>
+    <input data-next-checkout-field="postal"   type="text" />
+    <select data-next-checkout-field="country"></select>
+
+    <div data-next-checkout-field="cc-number"></div>
+    <div data-next-checkout-field="cvv"></div>
+    <select data-next-checkout-field="cc-month"></select>
+    <select data-next-checkout-field="cc-year"></select>
+    <input  data-next-checkout-field="card-name" type="text" />
+
+    <button type="submit">Complete Order</button>
+  </form>
+</body>
+</html>
 ```
+
+<Callout type="warn">
+The card number / CVV iframes only render once a Spreedly environment key is configured for your campaign. See [Payment](./payment) for the full card setup.
+</Callout>
 
 ---
 
@@ -109,6 +155,12 @@ After loading the page you should see:
 - The `province` dropdown and postal label change when you switch country
 - Validation messages appear under fields when you submit with errors
 - On a valid submit, the page shows a loading overlay, then redirects to your confirmation page with an empty cart
+
+To complete a test order without a real charge, pay with the test card below (add `localhost` as a *development* domain in the Campaigns App first so the request is authorized):
+
+| Card number | Expiry | CVV |
+| --- | --- | --- |
+| `6011 1111 1111 1117` | Any future date | Any |
 
 In the browser console with debug enabled, the SDK emits `checkout:form-initialized` on load and `order:completed` on a successful order.
 

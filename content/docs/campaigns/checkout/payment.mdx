@@ -15,21 +15,21 @@ Card number and CVV are rendered by Spreedly inside iframes, so raw card data ne
 
 | Field | Mount point |
 |---|---|
-| Card number | `id="spreedly-number"` or `data-next-checkout-field="cc-number"` |
-| CVV | `id="spreedly-cvv"` or `data-next-checkout-field="cvv"` |
+| Card number | `data-next-checkout-field="cc-number"` (or `id="spreedly-number"`) |
+| CVV | `data-next-checkout-field="cvv"` (or `id="spreedly-cvv"`) |
 | Expiry month | `data-next-checkout-field="cc-month"` or `data-next-checkout-field="exp-month"` |
 | Expiry year | `data-next-checkout-field="cc-year"` or `data-next-checkout-field="exp-year"` |
 | Cardholder name | `data-next-checkout-field="card-name"` |
 
 ```html
-<div id="spreedly-number"></div>
-<div id="spreedly-cvv"></div>
+<div data-next-checkout-field="cc-number"></div>
+<div data-next-checkout-field="cvv"></div>
 <select data-next-checkout-field="cc-month"></select>
 <select data-next-checkout-field="cc-year"></select>
 <input  data-next-checkout-field="card-name" type="text" />
 ```
 
-The month and year dropdowns are populated automatically on load.
+Card number and CVV must be empty `<div>` containers, not `<input>`s — Spreedly mounts a secure iframe inside each. The SDK assigns the `id` Spreedly needs (`spreedly-number` / `spreedly-cvv`) automatically, so the `id="…"` form is equivalent but not something you need to write. The month and year dropdowns are populated automatically on load.
 
 <Callout type="warn">
 A Spreedly environment key must be set in your SDK configuration. Without it the credit card fields will not initialize. See [Configuration](../configuration).

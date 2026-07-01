@@ -35,7 +35,7 @@ Quantity in cart matches selector quantity:
 
 ```javascript
 const QUANTITY_MAPS = {
-  'limos-card': {
+  'product-card': {
     1: 2,   // Selector qty 1 → Package 2, cart qty 1
     2: 3,   // Selector qty 2 → Package 3, cart qty 2
     3: 4,   // Selector qty 3 → Package 4, cart qty 3
@@ -48,7 +48,7 @@ Specify different quantity in cart:
 
 ```javascript
 const QUANTITY_MAPS = {
-  'limos-card': {
+  'product-card': {
     1: { packageId: 2, quantity: 1 },   // Selector qty 1 → Package 2, cart qty 1
     2: { packageId: 3, quantity: 5 },   // Selector qty 2 → Package 3, cart qty 5
     3: { packageId: 4, quantity: 10 },  // Selector qty 3 → Package 4, cart qty 10
@@ -61,7 +61,7 @@ Add multiple packages to cart:
 
 ```javascript
 const QUANTITY_MAPS = {
-  'limos-card': {
+  'product-card': {
     1: 2,   // Simple format
     2: { packageId: 3, quantity: 3 },  // Custom quantity
     3: [    // Multiple packages!
@@ -103,7 +103,7 @@ Uses **custom `data-qty-*` attributes** to avoid conflicts with SDK's native sel
 
 ```html
 <!-- Custom quantity selector (independent from SDK selectors) -->
-<div data-qty-selector="limos-card">
+<div data-qty-selector="product-card">
 
   <div data-qty-card
        data-next-package-id="2"
@@ -183,7 +183,7 @@ The script exposes a global API for manual control:
 
 ```javascript
 // Manually sync a selector from cart
-QuantityPackageSwapper.syncSelectorFromCart('limos-card');
+QuantityPackageSwapper.syncSelectorFromCart('product-card');
 
 // Sync all selectors
 QuantityPackageSwapper.syncAllSelectorsFromCart();
@@ -289,7 +289,7 @@ const CONFIG = {
 <body>
 
   <!-- Custom quantity selector -->
-  <div data-qty-selector="limos-card">
+  <div data-qty-selector="product-card">
     <div data-qty-card
          data-next-package-id="2"
          data-qty-current="1"
@@ -316,7 +316,7 @@ const CONFIG = {
       'use strict';
 
       const QUANTITY_MAPS = {
-        'limos-card': {
+        'product-card': {
           1: 2,
           2: 3,
           3: 4,

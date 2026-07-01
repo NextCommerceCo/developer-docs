@@ -81,22 +81,6 @@ const TEMPLATES: CampaignTemplate[] = [
     ],
   },
   {
-    name: 'limos',
-    slug: 'limos',
-    description:
-      'Quantity-tier campaigns ("buy 1 / 3 / 6") with the bundle selector on the checkout page itself.',
-    link: `${BASE}/limos/checkout/`,
-    page_links: [
-      { label: 'Presell', url: `${BASE}/limos/presell/` },
-      { label: 'Landing', url: `${BASE}/limos/landing/` },
-      { label: 'Checkout', url: `${BASE}/limos/checkout/` },
-      { label: 'Upsell — stepper', url: `${BASE}/limos/upsell-bundle-stepper/` },
-      { label: 'pills', url: `${BASE}/limos/upsell-bundle-tier-pills/` },
-      { label: 'cards', url: `${BASE}/limos/upsell-bundle-tier-cards/` },
-      { label: 'Receipt', url: `${BASE}/limos/receipt/` },
-    ],
-  },
-  {
     name: 'shop-single-step',
     slug: 'shop-single-step',
     description: 'Shopify-style single-step layout — familiar ecommerce feel.',

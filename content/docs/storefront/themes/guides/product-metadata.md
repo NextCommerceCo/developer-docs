@@ -5,7 +5,7 @@ tags:
  - Guide
 ---
 
-Product metadata lets you add custom data for products to use in theme templates. This provides a robust structured way for theme developers to customize products display in the storefront. [See our user guide on adding custom metadata fields](https://docs.29next.com/build-a-store/technical-settings/metadata-fields).
+Product metadata lets you add custom data for products to use in theme templates. This provides a robust structured way for theme developers to customize products display in the storefront. [See our user guide on adding custom metadata fields](https://docs.nextcommerce.com/docs/build-a-store/technical-settings/metadata-fields-and-tags).
 
 
 ### Template Access
@@ -37,5 +37,4 @@ In your theme's product template, add the code below to render the tagline by ac
 **Add Tagline Value to Product**
 
 In your product metadata settings, add your tagline field with a value to render the your storefront product details. :clap:
-
 

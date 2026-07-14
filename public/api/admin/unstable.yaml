@@ -37,11 +37,15 @@ components:
         carrier:
           description: '* `amazon` - amazon
 
+            * `aramex` - aramex
+
             * `asendia` - asendia
 
             * `australia_post` - australia_post
 
             * `china_post` - china_post
+
+            * `cirro` - cirro
 
             * `deutsche_de` - deutsche_de
 
@@ -49,15 +53,29 @@ components:
 
             * `dhl_ecommerce` - dhl_ecommerce
 
+            * `dor` - dor
+
+            * `dpd` - dpd
+
+            * `emile_express` - emile_express
+
             * `fedex` - fedex
 
             * `firstmile` - firstmile
 
             * `4px` - 4px
 
+            * `gls` - gls
+
             * `gofo_express` - gofo_express
 
             * `hermesworld_uk` - hermesworld_uk
+
+            * `hua_han` - hua_han
+
+            * `jt_express` - jt_express
+
+            * `jy_express` - jy_express
 
             * `myhermes` - myhermes
 
@@ -65,13 +83,29 @@ components:
 
             * `other` - other
 
+            * `postnl` - postnl
+
             * `royal_mail` - royal_mail
+
+            * `sfyd_express` - sfyd_express
+
+            * `shipx` - shipx
 
             * `speedx` - speedx
 
+            * `speedy` - speedy
+
+            * `sunyou` - sunyou
+
+            * `swiftx` - swiftx
+
             * `swiss_post` - swiss_post
 
+            * `ts_express` - ts_express
+
             * `ulala` - ulala
+
+            * `united_delivery_service` - united_delivery_service
 
             * `uniuni` - uniuni
 
@@ -79,36 +113,56 @@ components:
 
             * `usps` - usps
 
+            * `ysd_post` - ysd_post
+
             * `yunexpress` - yunexpress'
           enum:
           - amazon
+          - aramex
           - asendia
           - australia_post
           - china_post
+          - cirro
           - deutsche_de
           - dhl
           - dhl_ecommerce
+          - dor
+          - dpd
+          - emile_express
           - fedex
           - firstmile
           - 4px
+          - gls
           - gofo_express
           - hermesworld_uk
+          - hua_han
+          - jt_express
+          - jy_express
           - myhermes
           - ontrac
           - other
+          - postnl
           - royal_mail
+          - sfyd_express
+          - shipx
           - speedx
+          - speedy
+          - sunyou
+          - swiftx
           - swiss_post
+          - ts_express
           - ulala
+          - united_delivery_service
           - uniuni
           - ups
           - usps
+          - ysd_post
           - yunexpress
           - null
           type:
           - string
           - 'null'
-          x-spec-enum-id: 8408719985f36b77
+          x-spec-enum-id: 0615dfb0936c2c3f
         date_created:
           format: date-time
           readOnly: true
@@ -1021,7 +1075,7 @@ components:
           - {}
           - type: 'null'
         user:
-          $ref: '#/components/schemas/CreateCartUser'
+          $ref: '#/components/schemas/CreateUser'
         vouchers:
           items:
             type: string
@@ -1030,75 +1084,6 @@ components:
           - 'null'
       required:
       - lines
-      type: object
-    CreateCartUser:
-      properties:
-        accepts_marketing:
-          title: Subscribe to Marketing Emails
-          type: boolean
-        email:
-          format: email
-          type:
-          - string
-          - 'null'
-        first_name:
-          maxLength: 255
-          type: string
-        id:
-          type:
-          - integer
-          - 'null'
-        ip:
-          title: Ip address
-          type:
-          - string
-          - 'null'
-        language:
-          description: "required : E164\n\n* `en` - English\n* `fr` - Fran\xE7ais\n\
-            * `th` - \u0E20\u0E32\u0E29\u0E32\u0E44\u0E17\u0E22\n* `de` - Deutsch\n\
-            * `sv` - Svenska\n* `no` - Norsk\n* `it` - Italiano\n* `es` - Espa\xF1\
-            ol\n* `nl` - Nederlands\n* `pt` - Portugu\xEAs\n* `da` - Dansk\n* `fi`\
-            \ - Suomi"
-          enum:
-          - en
-          - fr
-          - th
-          - de
-          - sv
-          - 'no'
-          - it
-          - es
-          - nl
-          - pt
-          - da
-          - fi
-          - ''
-          - null
-          type:
-          - string
-          - 'null'
-          x-spec-enum-id: 70ceea9c8488568b
-        last_name:
-          maxLength: 255
-          type: string
-        metadata:
-          oneOf:
-          - {}
-          - type: 'null'
-        phone_number:
-          type:
-          - string
-          - 'null'
-        tags:
-          items:
-            type:
-            - string
-            - 'null'
-          type: array
-        user_agent:
-          type:
-          - string
-          - 'null'
       type: object
     CreateDefinition:
       properties:
@@ -9065,11 +9050,15 @@ components:
 
             * `amazon` - amazon
 
+            * `aramex` - aramex
+
             * `asendia` - asendia
 
             * `australia_post` - australia_post
 
             * `china_post` - china_post
+
+            * `cirro` - cirro
 
             * `deutsche_de` - deutsche_de
 
@@ -9077,13 +9066,27 @@ components:
 
             * `dhl_ecommerce` - dhl_ecommerce
 
+            * `dor` - dor
+
+            * `dpd` - dpd
+
+            * `emile_express` - emile_express
+
             * `fedex` - fedex
 
             * `firstmile` - firstmile
 
+            * `gls` - gls
+
             * `gofo_express` - gofo_express
 
             * `hermesworld_uk` - hermesworld_uk
+
+            * `hua_han` - hua_han
+
+            * `jt_express` - jt_express
+
+            * `jy_express` - jy_express
 
             * `myhermes` - myhermes
 
@@ -9091,13 +9094,29 @@ components:
 
             * `other` - other
 
+            * `postnl` - postnl
+
             * `royal_mail` - royal_mail
+
+            * `sfyd_express` - sfyd_express
+
+            * `shipx` - shipx
 
             * `speedx` - speedx
 
+            * `speedy` - speedy
+
+            * `sunyou` - sunyou
+
+            * `swiftx` - swiftx
+
             * `swiss_post` - swiss_post
 
+            * `ts_express` - ts_express
+
             * `ulala` - ulala
+
+            * `united_delivery_service` - united_delivery_service
 
             * `uniuni` - uniuni
 
@@ -9105,33 +9124,53 @@ components:
 
             * `usps` - usps
 
+            * `ysd_post` - ysd_post
+
             * `yunexpress` - yunexpress'
           enum:
           - 4px
           - amazon
+          - aramex
           - asendia
           - australia_post
           - china_post
+          - cirro
           - deutsche_de
           - dhl
           - dhl_ecommerce
+          - dor
+          - dpd
+          - emile_express
           - fedex
           - firstmile
+          - gls
           - gofo_express
           - hermesworld_uk
+          - hua_han
+          - jt_express
+          - jy_express
           - myhermes
           - ontrac
           - other
+          - postnl
           - royal_mail
+          - sfyd_express
+          - shipx
           - speedx
+          - speedy
+          - sunyou
+          - swiftx
           - swiss_post
+          - ts_express
           - ulala
+          - united_delivery_service
           - uniuni
           - ups
           - usps
+          - ysd_post
           - yunexpress
           type: string
-          x-spec-enum-id: 8924f253485e6d5f
+          x-spec-enum-id: c0cf6bc6e54c4dfa
         carrier_other_name:
           type:
           - string

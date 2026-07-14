@@ -33,6 +33,22 @@ const TEMPLATES: CampaignTemplate[] = [
     ],
   },
   {
+    name: 'apollo',
+    slug: 'apollo',
+    description:
+      'Single-step checkout with a direct-response layout, include-driven bundle selector with interchangeable card styles, and optional checkout reveal.',
+    link: `${BASE}/apollo/checkout/`,
+    page_links: [
+      { label: 'Presell', url: `${BASE}/apollo/presell/` },
+      { label: 'Landing', url: `${BASE}/apollo/landing/` },
+      { label: 'Checkout', url: `${BASE}/apollo/checkout/` },
+      { label: 'Upsell — stepper', url: `${BASE}/apollo/upsell-bundle-stepper/` },
+      { label: 'pills', url: `${BASE}/apollo/upsell-bundle-tier-pills/` },
+      { label: 'cards', url: `${BASE}/apollo/upsell-bundle-tier-cards/` },
+      { label: 'Receipt', url: `${BASE}/apollo/receipt/` },
+    ],
+  },
+  {
     name: 'olympus-mv-single-step',
     slug: 'olympus-mv-single-step',
     description: 'Products with variants (size, flavor, color) on a single-step checkout.',
@@ -46,6 +62,23 @@ const TEMPLATES: CampaignTemplate[] = [
       { label: 'pills', url: `${BASE}/olympus-mv-single-step/upsell-bundle-tier-pills/` },
       { label: 'cards', url: `${BASE}/olympus-mv-single-step/upsell-bundle-tier-cards/` },
       { label: 'Receipt', url: `${BASE}/olympus-mv-single-step/receipt/` },
+    ],
+  },
+  {
+    name: 'apollo-mv-single-step',
+    slug: 'apollo-mv-single-step',
+    description:
+      'Apollo layout for products with variants — configurable multi-variant bundle slots on a single-step checkout.',
+    link: `${BASE}/apollo-mv-single-step/checkout/`,
+    page_links: [
+      { label: 'Presell', url: `${BASE}/apollo-mv-single-step/presell/` },
+      { label: 'Landing', url: `${BASE}/apollo-mv-single-step/landing/` },
+      { label: 'Checkout', url: `${BASE}/apollo-mv-single-step/checkout/` },
+      { label: 'Upsell — MV', url: `${BASE}/apollo-mv-single-step/upsell-mv/` },
+      { label: 'Upsell — stepper', url: `${BASE}/apollo-mv-single-step/upsell-bundle-stepper/` },
+      { label: 'pills', url: `${BASE}/apollo-mv-single-step/upsell-bundle-tier-pills/` },
+      { label: 'cards', url: `${BASE}/apollo-mv-single-step/upsell-bundle-tier-cards/` },
+      { label: 'Receipt', url: `${BASE}/apollo-mv-single-step/receipt/` },
     ],
   },
   {

@@ -10,7 +10,30 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 Most static site generators are designed around a single site. When you need to manage multiple campaign funnels in one repository, you quickly hit problems: shared layouts bleed across campaigns, asset paths collide, and a change to one campaign silently breaks another.
 
-Page Kit treats each campaign as a **fully isolated unit** within a single repo. Every campaign lives in its own subdirectory with its own layouts, assets, and configuration — but they're all built, versioned, and deployed together.
+Page Kit treats each campaign as a **fully isolated unit** within a single repo. Every campaign lives in its own subdirectory with its own layouts, assets, and configuration — but they're all built, versioned, and deployed together. A repo with three campaigns looks like this:
+
+```
+my-campaigns/
+├── _data/
+│   └── campaigns.json        # one registry — every campaign is keyed by slug
+├── src/
+│   ├── espresso-blend/       # each campaign owns its own…
+│   │   ├── _layouts/         #   …layouts
+│   │   ├── _includes/        #   …components
+│   │   ├── assets/           #   …css, js, images, config.js
+│   │   ├── checkout.html     #   …and pages
+│   │   ├── upsell.html
+│   │   └── receipt.html
+│   ├── cold-brew-kit/        # same structure, fully independent
+│   │   └── …
+│   └── pour-over-set/        # cloning or deleting one never touches the others
+│       └── …
+└── package.json
+```
+
+<Callout type="info">
+Nothing is shared between campaigns — editing a layout or stylesheet in one cannot break the others. `npm run build` outputs every campaign to its own URL path (`/espresso-blend/checkout/`, `/cold-brew-kit/checkout/`, …) in a single `_site/` folder.
+</Callout>
 
 The CLI tools (`setup`, `dev`, `clone`, `config`, `compress`) and template filters (`campaign_asset`, `campaign_link`, `campaign_include`) enforce this isolation at every step, so you can work on one campaign without fear of affecting another.
 

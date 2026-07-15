@@ -71,58 +71,9 @@ Returning a `410` response code indicates the target resource is no longer avail
 | `ticket.created`          | Triggers a new support ticket is created. |  [View Example](/docs/webhooks/reference/support/ticket.created) |
 | `ticket.updated`          | Triggers when an existing support ticket is updated. | [View Example](/docs/webhooks/reference/support/ticket.updated) |
 
-### Event Trigger Sources
-
-Most `*.created` events fire once per resource creation, but `*.updated` events typically trigger on changes to **multiple related models** — not just the headline resource. Subscribing to a noisy `*.updated` event without understanding the fan-out can produce unexpected event volume.
-
-The table below lists every model whose change fires each event. Use this when picking the leanest event for your use case — for example, if you only care about payment captures, `transaction.created` filtered to `type: "debit"` fires once per capture, whereas `order.updated` fires on any line, transaction, fulfillment, address, or tag change.
-
-| Event | Fires when these models change |
-| ----- | ------------------------------ |
-| `order.created` | `Order` (on creation) |
-| `order.updated` | `Order`, `Line`, `Transaction`, `Refund`, `MarketingAttribution`, `ShippingAddress`, `BillingAddress`, `Fulfillment`, plus order tag changes |
-| `transaction.created` | `Transaction` (on creation) |
-| `transaction.updated` | `Transaction` (on update) |
-| `subscription.created` | `Subscription` (on creation) |
-| `subscription.updated` | `Subscription`, `SubscriptionLine`, `MarketingAttribution`, `SubscriptionRebillInfo`, `UserAddress` |
-| `customer.created` | `User` (on creation) |
-| `customer.updated` | `User`, `UserAddress`, plus user tag changes |
-| `fulfillment.created` | `Fulfillment` (on creation) |
-| `fulfillment.updated` | `Fulfillment`, `FulfillmentLine`, `Tracking` |
-| `dispute.created` | `Dispute` (on creation) |
-| `dispute.updated` | `Dispute`, related `Transaction` |
-| `ticket.created` | `Ticket` (on creation) |
-| `ticket.updated` | `Ticket`, `TicketComment`, plus ticket tag changes |
-| `product.created` | `Product` (on creation) |
-| `product.updated` | `Product`, `ProductImage`, `ProductAttribute`, `Category`, `ProductCategory`, `ProductPrice`, `StockRecord`, `AttributeOption*`, `Option` |
-| `gateway.created` / `gateway.updated` | `PaymentGateway`, `PaymentGatewayGroup` |
-| `gateway_group.created` / `gateway_group.updated` | `GatewayGroup`, `PaymentGateway` |
-| `store.updated` | `SpreedlyConfig`, `AdditionalLanguage`, `Currency`, `Domain`, plus store config changes |
-
-<Callout type="info">
-**Picking the right event for fulfillment-on-charge.** A common pattern is "do something when a customer is charged, including on subscription rebills." The leanest signal is `transaction.created` filtered to `data.type == "debit"` — this fires once per capture and avoids the broader fan-out of `order.updated`.
+<Callout type="info" title="Handling subscription charges">
+To react to a successful subscription charge, use `transaction.created` and check both the transaction type and status. See [Handle Subscription Charge Webhooks](/docs/admin-api/guides/subscription-charge-webhooks) for renewal detection, external-ID correlation, and retry-safe processing.
 </Callout>
-
-### Identifying Rebill Orders
-
-Renewal orders fire `order.created` like any other order. To distinguish a rebill from a new-customer order, check the order payload's `subscriptions` block (and the `subscription_lifecycle` field on the order) — both are populated only on renewal orders.
-
-For payment events, `transaction.created` payloads include a `subscription` block with the subscription `id` and the `billing_cycle` counter:
-
-```json title="Subscription block on transaction.created"
-"subscription": {
-    "id": 12345,
-    "billing_cycle": 2
-}
-```
-
-`billing_cycle` is the integer cycle number for that subscription's charge:
-- `0` — initial purchase
-- `1` — first rebill
-- `2` — second rebill
-- ...and so on
-
-This is the canonical way to tell, from a charge event alone, which rebill cycle the customer is on.
 
 ### Webhook Data Structure
 

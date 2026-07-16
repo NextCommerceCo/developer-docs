@@ -25,8 +25,8 @@ export function TopBar({ onMenuOpen, onReset, onShare, onConfigOpen, copied }: T
         </button>
       )}
       <a href="/" className="flex items-center">
-        <img src="/logo-dark.png" alt="Docs" className="hidden dark:block h-6 w-auto" />
-        <img src="/logo-light.png" alt="Docs" className="block dark:hidden h-6 w-auto" />
+        <img src="/next-white.svg" alt="Next Commerce" className="hidden h-auto w-24 dark:block" />
+        <img src="/next-dark.svg" alt="Next Commerce" className="block h-auto w-24 dark:hidden" />
       </a>
       <span className="text-fd-border hidden sm:inline">|</span>
       <span className="font-semibold text-sm hidden sm:inline">Playground</span>

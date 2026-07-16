@@ -103,7 +103,7 @@ export function HeroFlow() {
 
       {/* Center logo */}
       <image
-        href="/icon.png"
+        href="/next-icon-white.svg"
         x={CX - 20}
         y={CY - 20}
         width={40}

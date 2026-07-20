@@ -150,8 +150,8 @@ export default function HomePage() {
         <div className="mx-auto flex sm:grid h-14 max-w-6xl sm:grid-cols-[auto_1fr_auto] items-center justify-between gap-4 px-6">
           {/* Left: Logo */}
           <Link href="/" className="flex items-center gap-3">
-            <img src="/logo-light.png" alt={siteConfig.companyName} width={105} height={21} className="dark:hidden" />
-            <img src="/logo-dark.png" alt={siteConfig.companyName} width={105} height={21} className="hidden dark:block" />
+            <img src="/next-dark.svg" alt={siteConfig.companyName} width={451} height={148} className="h-auto w-24 dark:hidden" />
+            <img src="/next-white.svg" alt={siteConfig.companyName} width={451} height={148} className="hidden h-auto w-24 dark:block" />
             <span className="hidden sm:inline text-xs font-medium text-fd-muted-foreground border-l border-fd-border pl-3">
               Developers
             </span>

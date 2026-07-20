@@ -69,3 +69,4 @@ The site is built as a static export. Cloudflare Workers Builds runs `npm run bu
 ## Search
 
 Site search is powered by Algolia DocSearch. The search index is updated automatically on pushes to `main` through GitHub Actions.
+

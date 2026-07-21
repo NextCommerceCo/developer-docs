@@ -64,22 +64,22 @@ RudderStack events follow the Segment specification. The SDK automatically maps 
 
 ## Campaign and Journey Context
 
-RudderStack events include the campaign context provided by the SDK using the original snake_case field names:
+RudderStack events include campaign and page context using the original snake_case field names:
 
 | Field | Description |
 | --- | --- |
-| `campaign_id` | Campaign ID |
+| `campaign_id` | Campaign ID returned by the Campaigns API |
 | `campaign_name` | Campaign name |
 | `campaign_currency` | Campaign currency |
 | `campaign_language` | Campaign language |
-| `campaign_session_id` | Campaigns session ID |
+| `campaign_session_id` | Session ID created by Campaigns session tracking |
 | `page_type` | Current funnel page type |
 | `page_name` | Current funnel page name |
 
-The adapter also uses the SDK session ID to connect events across the funnel:
+The adapter also uses the SDK's internal analytics session ID as a correlation value on selected events:
 
-- `Product Added`, `Product Removed`, and `Cart Viewed` include `cart_id`.
-- Checkout step, payment, and completed-order events include `checkout_id`.
+- `Product Added`, `Product Removed`, and `Cart Viewed` use it as `cart_id`.
+- Checkout step, payment, and completed-order events use it as `checkout_id`.
 - Checkout and completed-order events include `coupon` and `discount` when those values are present.
 
 ## Product Format

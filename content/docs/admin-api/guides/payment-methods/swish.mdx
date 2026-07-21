@@ -1,0 +1,62 @@
+---
+title: Swish Admin API Guide
+sidebar_label: Swish
+sidebar_position: 5
+tags:
+ - Guide
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+
+**Swish** is a fully integrated payment method through NEXT Payments, supported in the storefront checkout and through the Admin API.
+
+Swish transactions send the customer through a hosted payment flow, with the resulting order information returned to your application. Before using Swish, make sure it is enabled for the NEXT Payments account and store. Swish is available for eligible Swedish checkout traffic in SEK.
+
+### API Payment Redirect Flow
+
+import RedirectPaymentFlow from '../../../../_snippets/_redirect-payment-flow.mdx';
+
+<RedirectPaymentFlow />
+
+### Create Order on Admin API
+
+When creating an order with the `orders_create` API method, specify `payment_method=swish` and provide a `payment_return_url`. The `payment_return_url` is your endpoint that receives a POST request containing the final order data.
+
+```json title="Payment Details for Order with Swish"
+{
+    "payment_method": "swish",
+    "payment_details": {
+        "payment_return_url": "<external checkout url>",
+        "payment_gateway": "<gateway id>", // optional
+        "payment_gateway_group": "<gateway group id>" // optional
+    }
+}
+```
+
+<Callout type="idea">
+You can optionally provide a `payment_gateway` or `payment_gateway_group` to route the order through a specific eligible NEXT Payments configuration.
+</Callout>
+
+### Redirect Customer to Swish
+
+The order response provides a `payment_complete_url`. Redirect the customer to this URL to complete the payment with Swish.
+
+```json title="Response with Payment Complete URL"
+{
+    "reference_transaction_id": null,
+    "payment_complete_url": "<unique checkout url>"
+}
+```
+
+### Receiving Order Data
+
+import RedirectPaymentStep3 from '../../../../_snippets/_redirect-payment-flows-step-3.mdx';
+
+<RedirectPaymentStep3 />
+
+### Upsells
+
+One-click post-purchase upsells are not supported with Swish payments.
+
+### Recurring
+
+Swish cannot be used as the payment method for subscription items.

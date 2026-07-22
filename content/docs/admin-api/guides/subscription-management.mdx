@@ -125,17 +125,13 @@ The subscription must be in an `active` status to trigger a renewal. For subscri
 
 ### Identifying Subscription Charges
 
-Use the `transaction.created` webhook to identify charges associated with a subscription. A successful charge has a `data.type` of `debit` and a `data.status` of `succeeded`.
-
-When a transaction is associated with a subscription, `data.subscription` contains the subscription ID and billing cycle:
+When a `transaction.created` webhook is associated with a subscription, `data.subscription` contains the subscription ID and billing cycle:
 
 ```json title="Subscription Transaction"
 {
     "event_type": "transaction.created",
     "data": {
         "id": 10416,
-        "type": "debit",
-        "status": "succeeded",
         "subscription": {
             "id": 12345,
             "billing_cycle": 3

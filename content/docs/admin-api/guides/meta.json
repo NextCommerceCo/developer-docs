@@ -4,7 +4,6 @@
     "external-checkout",
     "order-management",
     "subscription-management",
-    "subscription-charge-webhooks",
     "exports",
     "testing-guide",
     "iframe-payment-form",

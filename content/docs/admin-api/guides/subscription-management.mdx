@@ -123,6 +123,33 @@ The endpoint returns the full subscription object with updated renewal details o
 The subscription must be in an `active` status to trigger a renewal. For subscriptions in `past_due` status, use the [subscriptionsRetryCreate](/docs/admin-api/reference/subscriptions/subscriptionsRetryCreate) endpoint instead.
 </Callout>
 
+### Identifying Subscription Charges
+
+Use the `transaction.created` webhook to identify charges associated with a subscription. A successful charge has a `data.type` of `debit` and a `data.status` of `succeeded`.
+
+When a transaction is associated with a subscription, `data.subscription` contains the subscription ID and billing cycle:
+
+```json title="Subscription Transaction"
+{
+    "event_type": "transaction.created",
+    "data": {
+        "id": 10416,
+        "type": "debit",
+        "status": "succeeded",
+        "subscription": {
+            "id": 12345,
+            "billing_cycle": 3
+        }
+    }
+}
+```
+
+- `billing_cycle: 0` identifies the initial subscription charge.
+- `billing_cycle: 1` identifies the first renewal.
+- Each subsequent renewal increments the value by one.
+
+The subscription object is empty when the transaction is not associated with a subscription.
+
 ### Updating Payment Details
 
 Updating the Payment Gateway of a subscription can done through the [subscriptionsPartialUpdate](/docs/admin-api/reference/subscriptions/subscriptionsPartialUpdate) endpoint.

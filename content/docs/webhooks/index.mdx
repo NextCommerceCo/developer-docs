@@ -72,7 +72,7 @@ Returning a `410` response code indicates the target resource is no longer avail
 | `ticket.updated`          | Triggers when an existing support ticket is updated. | [View Example](/docs/webhooks/reference/support/ticket.updated) |
 
 <Callout type="info" title="Handling subscription charges">
-To react to a successful subscription charge, use `transaction.created` and check both the transaction type and status. See [Handle Subscription Charge Webhooks](/docs/admin-api/guides/subscription-charge-webhooks) for renewal detection, external-ID correlation, and retry-safe processing.
+The `subscription` object on a `transaction.created` webhook links the charge to its subscription and identifies the billing cycle. See [Identifying Subscription Charges](/docs/admin-api/guides/subscription-management#identifying-subscription-charges).
 </Callout>
 
 ### Webhook Data Structure

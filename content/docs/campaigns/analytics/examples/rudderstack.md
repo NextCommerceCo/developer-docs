@@ -62,6 +62,26 @@ RudderStack events follow the Segment specification. The SDK automatically maps 
 | `dl_add_payment_info` | `Payment Info Entered` | Fired when payment information is provided |
 | `dl_purchase` | `Order Completed` | Fired when an order is successfully completed |
 
+## Campaign and Journey Context
+
+RudderStack events include campaign and page context using the original snake_case field names:
+
+| Field | Description |
+| --- | --- |
+| `campaign_id` | Campaign ID returned by the Campaigns API |
+| `campaign_name` | Campaign name |
+| `campaign_currency` | Campaign currency |
+| `campaign_language` | Campaign language |
+| `campaign_session_id` | Session ID created by Campaigns session tracking |
+| `page_type` | Current funnel page type |
+| `page_name` | Current funnel page name |
+
+The adapter also uses the SDK's internal analytics session ID as a correlation value on selected events:
+
+- `Product Added`, `Product Removed`, and `Cart Viewed` use it as `cart_id`.
+- Checkout step, payment, and completed-order events use it as `checkout_id`.
+- Checkout and completed-order events include `coupon` and `discount` when those values are present.
+
 ## Product Format
 
 Products are automatically converted to the Segment specification format. Each product in your events will be transformed to include these standardized properties:

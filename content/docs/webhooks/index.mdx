@@ -72,6 +72,10 @@ Returning a `410` response code indicates the target resource is no longer avail
 | `ticket.created`          | Triggers a new support ticket is created. |  [View Example](/docs/webhooks/reference/support/ticket.created) |
 | `ticket.updated`          | Triggers when an existing support ticket is updated. | [View Example](/docs/webhooks/reference/support/ticket.updated) |
 
+<Callout type="info" title="Handling subscription charges">
+The `subscription` object on a `transaction.created` webhook links the charge to its subscription and identifies the billing cycle. See [Identifying Subscription Charges](/docs/admin-api/guides/subscription-management#identifying-subscription-charges).
+</Callout>
+
 ### Webhook Data Structure
 
 Webhook payloads follow the same structure as Admin API data serializers, which makes them predictable. In general, the data in a webhook payload matches the data you would get by retrieving the same resource through the API. You can set up test webhooks and view the webhook logs in the dashboard to help build and verify your receiver.

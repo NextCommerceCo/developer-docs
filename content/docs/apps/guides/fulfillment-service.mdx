@@ -76,7 +76,7 @@ graph
 
 Fulfillment Services need to create `Locations` which represent their warehouses where physical products are stored and fulfilled from. Product `stockrecords` must be associated with a location for fulfillment.
 
-When new orders are created, the fulfillment orders are assigned to the locations based on [Fulfillment Routing](https://docs.29next.com/features/fulfillment-guide/location-based-routing). The Location Address is also used for Tax calculation. See the [Locations Create](/docs/admin-api/reference/fulfillment/locationsCreate) endpoint to create a location.
+When new orders are created, the fulfillment orders are assigned to the locations based on [Fulfillment Routing](https://docs.nextcommerce.com/docs/features/fulfillment-guide/location-based-routing). The Location Address is also used for Tax calculation. See the [Locations Create](/docs/admin-api/reference/fulfillment/locationsCreate) endpoint to create a location.
 
 ### Location Callback
 The location `callback` is a URL the store will send `Fulfillment Request` webhooks to notify them of a new fulfillment assigned. Fulfillment Services need to query their [Assigned Fulfillment Orders](#assigned-fulfillment-orders) to retrieve the fulfillment order details.
@@ -144,6 +144,29 @@ Retrieve all pending Cancellation Requests
 Requests to the location callback indicate the request `type` that should be passed to the [Assigned Fulfillment Orders](/docs/admin-api/reference/fulfillment/assignedFulfillmentOrdersList) API as the `assignment_status` querystring value to filter fulfillment orders to those for the flow.
 
 For example, to see new fulfillment requests pending acceptance, pass `assignment_status=fulfillment_requested` to the Assigned Fulfillment Orders API, `fulfillment_requested` was passed as `type` to the callback.
+</Callout>
+## Customized Products
+
+Customized or personalized products carry their customization details in the line item `properties`. When an order is created with line item `properties` (see [Custom Line Item Properties](/docs/admin-api/guides/external-checkout#custom-line-item-properties)), those values flow through to the fulfillment order line items so your fulfillment service can fulfill the customization.
+
+Each `line_item` returned from the [Assigned Fulfillment Orders](#assigned-fulfillment-orders) API includes a `properties` object with the customization details to fulfill.
+
+```json title="Fulfillment Order Line Item Properties"
+"line_items": [
+    {
+        "product_title": "Engraved Bottle",
+        "sku": "BOTTLE-001",
+        "quantity": 1,
+        "properties": {
+            "engraving": "Best Dad Ever",
+            "font": "Serif",
+            "gift_message": "Happy Birthday!"
+        }
+    }
+]
+```
+<Callout type="info">
+Line item `properties` also determine the uniqueness of line item products — identical products with different `properties` are kept as separate line items.
 </Callout>
 ## Accepting Fulfillment Requests
 
@@ -234,7 +257,7 @@ Once you have tracking information for your the outgoing shipment to the custome
 
 ## Sync Product Inventory
 
-Products have "stock records" which represent the available physical stock at a fulfillment location. Often a single product can be stocked at multiple locations, with [Fulfillment Routing](https://docs.29next.com/features/fulfillment-guide/location-based-routing) governing the order fulfillment location assignment.
+Products have "stock records" which represent the available physical stock at a fulfillment location. Often a single product can be stocked at multiple locations, with [Fulfillment Routing](https://docs.nextcommerce.com/docs/features/fulfillment-guide/location-based-routing) governing the order fulfillment location assignment.
 
 ``` mermaid
 flowchart TD

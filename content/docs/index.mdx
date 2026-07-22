@@ -3,7 +3,8 @@ title: Getting Started
 sidebar_position: 0
 ---
 
-import { ChevronsLeftRightEllipsis, Megaphone, ShoppingBag, Puzzle, Webhook } from 'lucide-react';
+import { ChevronsLeftRightEllipsis, Megaphone, ShoppingBag, Puzzle, Webhook, Sparkles } from 'lucide-react';
+import { Callout } from 'fumadocs-ui/components/callout';
 
 Next Commerce is an ecommerce platform for DTC merchants. It includes a full storefront, checkout, payments, and order management — plus a headless campaigns layer for building custom checkout funnels. Use this guide to find the right starting point for what you're building.
 
@@ -43,9 +44,17 @@ Campaigns and storefronts are the customer-facing layer — both produce orders 
     title="Webhooks"
     description="Subscribe to store events and trigger real-time workflows in your integrations."
   />
+  <Card
+    href="/docs/skills"
+    icon={<div className="size-9 rounded-md flex items-center justify-center bg-yellow-500/15 text-yellow-500"><Sparkles className="size-4" /></div>}
+    title="AI Skills"
+    description="Pre-built skills that teach Claude Code, Cursor, Codex, and Copilot how to work on your store."
+  />
 </Cards>
 
-
+<Callout type="idea" title="Building with AI?">
+Install [**Next Commerce AI Skills**](/docs/skills) so your coding agent (Claude Code, Cursor, Codex, Copilot, …) knows the platform — APIs, CLI workflows, and architecture patterns — and can work autonomously on your store. One command: `npx skills add NextCommerceCo/skills`.
+</Callout>
 
 
 ## What Are You Building?

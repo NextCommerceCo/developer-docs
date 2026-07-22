@@ -28,7 +28,7 @@ export const APIPage = createAPIPage(openapi, {
           {slots.apiPlayground}
           {slots.description}
           {slots.authSchemes}
-          {slots.paremeters}
+          {slots.parameters}
           {slots.body}
           {slots.responses}
           {slots.callbacks}
@@ -42,7 +42,7 @@ export const APIPage = createAPIPage(openapi, {
           {slots.header}
           {slots.description}
           {slots.authSchemes}
-          {slots.paremeters}
+          {slots.parameters}
           {slots.body}
           {slots.responses}
           {slots.callbacks}

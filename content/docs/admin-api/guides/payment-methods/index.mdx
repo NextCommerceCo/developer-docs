@@ -1,0 +1,37 @@
+---
+title: Payment Methods
+sidebar_label: Payment Methods
+tags:
+ - Guide
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+import RedirectPaymentFlow from '../../../../_snippets/_redirect-payment-flow.mdx';
+
+Guides for creating [Admin API](/docs/admin-api/guides/external-checkout) orders with each supported payment method. The matrix below summarizes each method's flow type and capabilities — see the individual guide for request details and payment-specific data.
+
+## Capability matrix
+
+| Payment Method | Flow | Express | Upsells | Subscriptions |
+| --- | --- | --- | --- | --- |
+| [`card_token`](/docs/admin-api/guides/payment-methods/bankcard) | Direct & Redirect ([3DS](/docs/admin-api/guides/payment-methods/bankcard#3d-secure-3ds2)) | Yes | Yes | Yes |
+| [`apple_pay`](/docs/admin-api/guides/payment-methods/apple-pay) | Redirect | Yes | Yes | Yes |
+| [`google_pay`](/docs/admin-api/guides/payment-methods/google-pay) | Redirect | Yes | Yes | Yes |
+| [`paypal`](/docs/admin-api/guides/payment-methods/paypal) | Redirect | Yes | Yes | Yes |
+| [`klarna`](/docs/admin-api/guides/payment-methods/klarna) | Redirect | No | Yes | Yes |
+| [`link`](/docs/admin-api/guides/payment-methods/link) | Redirect | Yes | Yes | Yes |
+| [`twint`](/docs/admin-api/guides/payment-methods/twint) | Redirect | No | Yes | Yes |
+| [`swish`](/docs/admin-api/guides/payment-methods/swish) | Redirect | No | No | No |
+| [`affirm`](/docs/admin-api/guides/payment-methods/affirm) | Redirect | No | No | No |
+| [`bancontact`](/docs/admin-api/guides/payment-methods/bancontact) | Redirect | No | No | No |
+| [`ideal`](/docs/admin-api/guides/payment-methods/ideal) | Redirect | No | No | No |
+| [`sepa_direct`](/docs/admin-api/guides/payment-methods/sepa-debit) | Redirect | No | No | No |
+
+<Callout type="info">
+**Upsells** (post-purchase, one-click) are added via [`ordersAddLineItemsCreate`](/docs/admin-api/reference/orders/ordersAddLineItemsCreate), which reuses the order's initial payment method to collect payment. This requires the payment method to support merchant-initiated charges — see each guide's **Upsells** section.
+</Callout>
+
+## Redirect payment flow
+
+Every method except direct card tokenization completes payment through a redirect flow:
+
+<RedirectPaymentFlow />

@@ -178,10 +178,7 @@ console.log(init.store);
             "code": "CAD",
             "label": "CA$ CAD"
         }
-    ],
-    "payments": {
-        "environment_key": "X1lbCiGPapQbN11W3tig4OOTRVD"
-    }
+    ]
 }
 ```
 
@@ -207,37 +204,9 @@ console.log(init.user);
     "email": "johndoe@gmail.com",
     "first_name": "John",
     "last_name": "Doe",
-    "ip": "123.123.123.123",
+    "orders_count": 29,
     "phone_number": "+12706814477",
-    "date_joined": "2023-03-15T06:27:46.253558-04:00",
-    "language": "en",
-    "is_blocked": false,
-    "addresses": [
-        {
-            "id": 1001,
-            "first_name": "John",
-            "last_name": "Doe",
-            "line1": "2200 Western Pl W",
-            "line2": "",
-            "line3": "",
-            "line4": "Hoptown",
-            "state": "KY",
-            "postcode": "42234",
-            "country": "US",
-            "phone_number": "",
-            "notes": "",
-            "is_default_for_shipping": true,
-            "is_default_for_billing": true
-        }
-    ],
-    "orders_count": 1,
-    "subscriptions_count": 1,
-    "total_spent": "100.00",
-    "user_type": "customer",
-    "tags": [],
-    "accepts_marketing": true,
-    "metadata": {},
-    "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36..."
+    "language": "en"
 }
 ```
 
@@ -323,117 +292,35 @@ analytics.subscribe("product_category_viewed", event => {
             "url": "https://examplestore.com/catalogue/timeless-watch_111/",
             "title": "Timeless Watch",
             "slug": "timeless-watch",
-            "sku": null,
-            "track_stock": true,
-            "allow_backorders": false,
-            "structure": "parent",
-            "is_discountable": true,
-            "is_public": true,
-            "ranking": 10,
-            "categories": [
-                {
-                    "id": 1,
-                    "name": "Example Category",
-                    "slug": "example-category"
-                }
-            ],
-            "enable_subscription": true,
-            "interval": "day",
-            "interval_counts": [
-                90,
-                60,
-                30
-            ],
             "images": [
                 {
-                    "id": 2,
-                    "original": "https://assets.29nex.store/media/demostore/images/products/2021/03/watch.jpg",
+                    "id": 629,
+                    "attachment": "https://assets.29nex.store/media/demostore/images/products/2021/03/watch.jpg",
                     "caption": "",
                     "display_order": 0,
-                    "product": 111
+                    "product": 111,
+                    "variants": [112, 113]
                 }
             ],
-            "unit_cost": "0.00",
-            "prices": [],
-            "requires_shipping": true,
-            "recommended_products": [
-                3,
-                47
-            ],
-            "upc": "",
-            "external_tax_code": null,
-            "variant_attributes": [],
-            "variants": [
-                {
-                    "id": 2,
-                    "product_id": 111,
-                    "title": "Timeless Watch",
-                    "sku": "TIMELESS-WATCH-B-BL",
-                    "track_stock": true,
-                    "allow_backorders": false,
-                    "images": [
-                        {
-                            "id": 2,
-                            "original": "https://assets.29nex.store/media/demostore/images/products/2021/03/watch.jpg",
-                            "caption": "",
-                            "display_order": 0,
-                            "product": 111
-                        }
-                    ],
-                    "variant_attribute_values": [],
-                    "prices": [
-                        {
-                            "currency": "CAD",
-                            "price": "99.99",
-                            "retail": null,
-                            "subscription": "65.99",
-                            "subscription_suggested_downsell": "55.99"
-                        },
-                        {
-                            "currency": "GBP",
-                            "price": "99.99",
-                            "retail": "99.99",
-                            "subscription": null,
-                            "subscription_suggested_downsell": null
-                        },
-                        {
-                            "currency": "USD",
-                            "price": "79.99",
-                            "retail": "120.00",
-                            "subscription": "69.99",
-                            "subscription_suggested_downsell": "49.99"
-                        }
-                    ],
-                    "stockrecords": [
-                        {
-                            "id": 16,
-                            "location_id": 1,
-                            "num_in_stock": 9995,
-                            "num_allocated": 169,
-                            "low_stock_threshold": 500
-                        },
-                        {
-                            "id": 77,
-                            "location_id": 299,
-                            "num_in_stock": 997,
-                            "num_allocated": 39,
-                            "low_stock_threshold": 10
-                        }
-                    ],
-                    "unit_cost": "1.00",
-                    "date_created": "2017-09-28T08:23:08.368000-04:00",
-                    "date_updated": "2024-11-26T03:11:56.747405-05:00",
-                    "metadata": {
-                        "external_id": "12345"
-                    }
+            "purchase_info": {
+                "availability": "available",
+                "subscription": {
+                    "currency": "USD",
+                    "price": "29.99",
+                    "format": "$29.99"
+                },
+                "price": {
+                    "currency": "USD",
+                    "price": "29.99",
+                    "format": "$29.99"
+                },
+                "price_retail": {
+                    "currency": "USD",
+                    "price": "39.99",
+                    "format": "$39.99"
                 }
-            ],
-            "rating": 5,
-            "date_created": "2024-01-24T02:02:52.811742-05:00",
-            "date_updated": "2024-10-03T04:32:52.860659-04:00",
-            "metadata": {
-                "external_id": "12345"
-            }
+            },
+            "structure": "parent"
         }
     ],
     "event_type": "product_category_viewed",

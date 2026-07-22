@@ -1,0 +1,77 @@
+---
+title: Review Step
+sidebar_label: Review Step
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+On a multi-step checkout, the review step shows the contact, address, and shipping details the visitor already entered. The review enhancer reads that data from the checkout store and renders it read-only — it stays in sync if the data changes.
+
+---
+
+## Add a Review Block
+
+Activate the enhancer with `data-next-enhancer="checkout-review"` on a container, then mark each element that should display a value with `data-next-checkout-review="<field>"`:
+
+```html
+<div data-next-enhancer="checkout-review">
+  <span data-next-checkout-review="email"></span>
+  <span data-next-checkout-review="fname" data-next-format="name"></span>
+  <span data-next-checkout-review="shippingAddress" data-next-format="address"></span>
+  <span data-next-checkout-review="phone" data-next-format="phone"></span>
+</div>
+```
+
+Each element's text content is set from the stored checkout data and updates automatically when the store changes.
+
+<Callout>
+This block is read-only display. It does not collect input — the data comes from earlier form steps stored in the checkout state.
+</Callout>
+
+---
+
+## Formats
+
+Set `data-next-format` to control how a value renders. Default is `text`.
+
+| Format | Output |
+|---|---|
+| `text` | Raw value (default) |
+| `name` | First and last name combined |
+| `address` | Multi-part address: street, line 2, "city state postal", country |
+| `phone` | Formatted phone; US numbers become `(123) 456-7890` |
+| `currency` | Value formatted as currency |
+
+The `address` and `name` formats build their output from the underlying form fields, so the `data-next-checkout-review` value you point them at is just an anchor (commonly `shippingAddress` and `fname`).
+
+---
+
+## Fallbacks
+
+Provide `data-next-fallback` text to show when the field is empty:
+
+```html
+<span data-next-checkout-review="phone"
+      data-next-format="phone"
+      data-next-fallback="No phone provided"></span>
+```
+
+When a value is empty the element gets the `next-review-empty` class so you can style placeholders.
+
+---
+
+## Nested Fields
+
+Dot notation reads nested checkout state, including `shippingMethod`, `billingAddress`, and `paymentMethod`:
+
+```html
+<span data-next-checkout-review="shippingMethod.name"></span>
+<span data-next-checkout-review="billingAddress.city"></span>
+```
+
+---
+
+## Next Steps
+
+- The form that captures this data: [The Form](./form)
+- All review attributes: [Reference → Attributes](./reference/attributes)

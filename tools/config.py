@@ -146,6 +146,36 @@ CUSTOM_WEBHOOK_EVENT_PAYLOADS = [
                 }
             }
         }
+    },
+    {
+        "event": "customer.redacted",
+        "data": {
+            'type': 'object',
+            'properties': {
+                'id': {
+                    'type': 'integer',
+                    'description': 'The unique identifier of the redacted customer.',
+                },
+                'email': {
+                    'type': 'string',
+                    'description': 'The email address of the redacted customer.',
+                },
+                'phone_number': {
+                    'type': 'string',
+                    'description': 'The phone number of the redacted customer.',
+                },
+                'orders': {
+                    'type': 'array',
+                    'items': {'type': 'integer'},
+                    'description': 'List of order IDs associated with the redacted customer.',
+                },
+                'subscriptions': {
+                    'type': 'array',
+                    'items': {'type': 'integer'},
+                    'description': 'List of subscription IDs associated with the redacted customer.',
+                },
+            }
+        }
     }
 ]
 
@@ -171,6 +201,13 @@ WEBHOOKS = [
         "schema_ref": "#/components/schemas/User",
         "tag": "customers",
         "description": "Triggers when a new customer is created.",
+    },
+    {
+        "event": "customer.redacted",
+        "object": "customer",
+        "schema_ref": None,
+        "tag": "customers",
+        "description": "Triggers when a customer is redacted.",
     },
     {
         "event": "customer.updated",

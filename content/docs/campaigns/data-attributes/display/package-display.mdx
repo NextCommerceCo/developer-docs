@@ -14,14 +14,14 @@ Display data for a specific package using the `package.[id].*` syntax. When the 
 <div>
   <h3 data-next-display="package.123.name">Product Name</h3>
   <span data-next-display="package.123.price">$0</span>
-  <s data-next-display="package.123.price_retail">$0</s>
+  <s data-next-display="package.123.price_retail">$0</s> <!-- legacy retail field -->
 </div>
 
 <!-- Shorthand — package ID inferred from parent -->
 <div data-next-package-id="123">
   <h3 data-next-display="package.name">Product Name</h3>
   <span data-next-display="package.price">$0</span>
-  <s data-next-display="package.price_retail">$0</s>
+  <s data-next-display="package.price_retail">$0</s> <!-- legacy retail field -->
 </div>
 ```
 
@@ -51,13 +51,15 @@ The shorthand makes product card components reusable across packages — use the
 | `package.[id].unitPrice` | Alias for `price` |
 | `package.[id].packageTotal` | Alias for `price_total` |
 
-### Retail / compare prices
+### Legacy retail / compare prices
+
+These fields read package-level Retail Price from Campaigns App. They are preserved for existing campaigns, but new SDK 0.4.x builds should prefer Offer-based before/after pricing from bundle selector, package toggle, cart summary, and upsell price calculations.
 
 | Path | Description |
 |---|---|
-| `package.[id].price_retail` | Per-unit retail price |
-| `package.[id].price_retail_total` | Total retail price |
-| `package.[id].unitRetailPrice` | Calculated unit retail |
+| `package.[id].price_retail` | Legacy per-unit retail price |
+| `package.[id].price_retail_total` | Legacy total retail price |
+| `package.[id].unitRetailPrice` | Calculated legacy unit retail |
 | `package.[id].comparePrice` | Alias for `price_retail_total` |
 | `package.[id].compareTotal` | Alias for `price_retail_total` |
 
@@ -90,9 +92,9 @@ These read from the active cart and reflect any applied coupons. They evaluate t
 
 ---
 
-## Combined Savings (Retail + Discounts)
+## Combined Savings (Legacy Retail + Discounts)
 
-Combines retail savings with cart discounts.
+Combines legacy retail savings with cart discounts.
 
 | Path | Description |
 |---|---|
@@ -109,6 +111,8 @@ Combines retail savings with cart discounts.
 | `package.[id].qty` | Units in the package |
 | `package.[id].unitsInPackage` | Alias for `qty` |
 | `package.[id].isBundle` | Boolean — is multi-pack (qty > 1) |
+
+Package-level `qty` is legacy Campaigns App data. For new builds, send the selected quantity from the page or component and use Offers to calculate quantity-tier pricing.
 
 ---
 

@@ -10,7 +10,7 @@ import { Callout } from 'fumadocs-ui/components/callout';
 Testing your integration is a critical step when developing on the Next Commerce platform. There are two distinct paths to creating Test Orders, Transactions, and Subscriptions through the Admin API or storefront checkout flow.
 
 <Callout type="info" title="Card Tokenization">
-Cards must be tokenized before submitting on the Admin API, see [iframe card tokenization](/docs/admin-api/guides/iframe-payment-form) guide.
+Cards must be tokenized before submitting on the Admin API, see [iframe card tokenization](/docs/admin-api/guides/payment-methods/bankcard) guide.
 </Callout>
 ### Test Cards
 
@@ -34,7 +34,7 @@ Test card tokens can be used on the API directly without needing to tokenize the
 | `test_3ds_card` | Test 3DS payment flow without transaction. |
 
 <Callout type="idea">
-Use the test card tokens before you've integrated the [iFrame Card Tokenization](/docs/admin-api/guides/iframe-payment-form) to validate your API requests.
+Use the test card tokens before you've integrated the [iFrame Card Tokenization](/docs/admin-api/guides/payment-methods/bankcard) to validate your API requests.
 </Callout>
 ### Test Gateway
 

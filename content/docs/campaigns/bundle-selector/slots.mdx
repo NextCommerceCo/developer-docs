@@ -195,6 +195,72 @@ This renders three slot rows, each with independent variant dropdowns. The cart 
 
 ---
 
+## Collecting Properties in Slot Templates
+
+Add `data-next-property` to any `<input>`, `<textarea>`, or `<select>` inside a slot template to capture per-slot metadata and attach it to the corresponding line item in the cart.
+
+```html
+<template id="slot-tpl">
+  <div class="slot-row">
+    <img src="{item.image}" alt="{item.name}" />
+    <strong>{item.name}</strong>
+    <span>{item.price}</span>
+
+    <!-- Each unit carries its own engraving text as a line item property -->
+    <input type="text"
+           data-next-property="engraving"
+           placeholder="Add personalisation text" />
+  </div>
+</template>
+```
+
+The value syncs to `slot.properties` on every `input` event. When the bundle is in `swap` mode, blurring the field immediately updates the cart — no extra submit step required. User-typed values survive slot re-renders caused by variant changes.
+
+### Page-Level Default Properties
+
+For properties that apply to every slot across all bundles (e.g. a single gift message), use `data-next-default-property` anywhere on the page instead:
+
+```html
+<!-- Applies to every line item from every bundle selector on the page -->
+<textarea data-next-default-property="gift_message"
+          placeholder="Gift message (optional)"></textarea>
+
+<div data-next-bundle-selector ...>
+  <!-- bundle cards -->
+</div>
+```
+
+Per-slot `data-next-property` values override page-level defaults when both share the same key.
+
+Merge priority (highest wins): slot-level `data-next-property` → page-level `data-next-default-property`.
+
+### Unique Line Items by Properties
+
+When two slots in a bundle share the same `package_id` but carry different property values (for example, two shirts with different engraving text), the cart treats them as **separate line items** rather than merging them. The cart summary also renders a separate row per unique property set automatically — no extra configuration needed.
+
+---
+
+### Excluding Properties from a Slot
+
+Use `data-next-exclude-property` on a slot template to prevent specific property keys from being sent to the order API for that line, without removing the inputs from the page.
+
+| Value | Effect |
+|-------|--------|
+| `"team"` | Excludes the `team` key from this slot |
+| `"team, number"` | Excludes multiple keys (comma-separated) |
+| `"*"` | Excludes all properties from this slot |
+
+Set it in the bundle item JSON via `excludeProperties`:
+
+```json
+// data-next-bundle-items JSON
+{ "packageId": 123, "quantity": 1, "excludeProperties": "team, number" }
+```
+
+When `"*"` is set, property listeners are not attached to the slot at all. For specific-key exclusions, values are collected live but filtered out at send time.
+
+---
+
 ## Silent Add-Ons (`noSlot`)
 
 Set `"noSlot": true` on any bundle item to suppress its slot row. Useful for free gifts or invisible add-ons you want to include in the cart but not show in the slot list.

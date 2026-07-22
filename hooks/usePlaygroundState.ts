@@ -42,7 +42,8 @@ export function usePlaygroundState(
   const [showConfig, setShowConfig] = useState(false);
   const [iframeSrc, setIframeSrc] = useState('');
   const [previewWidth, setPreviewWidth] = useState<number | null>(null);
-  const [previewExpanded, setPreviewExpanded] = useState(false);
+  // Editor hidden by default — revealed via the "Code" toggle in the preview bar.
+  const [previewExpanded, setPreviewExpanded] = useState(true);
   const [editorWidthPct, setEditorWidthPct] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const [copied, setCopied] = useState(false);

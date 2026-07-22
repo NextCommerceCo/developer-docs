@@ -3,6 +3,8 @@ title: Properties
 sidebar_label: Properties
 ---
 
+import { Callout } from 'fumadocs-ui/components/callout';
+
 Properties you can read inside `data-next-show` and `data-next-hide` expressions, grouped by namespace.
 
 ---
@@ -37,12 +39,28 @@ Properties you can read inside `data-next-show` and `data-next-hide` expressions
 |---|---|
 | `cart.hasItem(packageId)` | `true` when that package is in the cart |
 | `cart.hasPackage(packageId)` | Alias for `hasItem` |
+| `cart.hasCoupon()` | `true` when any coupon is applied to the cart |
+| `cart.hasCoupon("CODE")` | `true` when the specified coupon code is applied. Codes are compared case-insensitively; surrounding quotes are stripped. |
 
 ```html
 <div data-next-show="cart.hasItem(123)">
   Package 123 is in your cart
 </div>
+
+<!-- Any coupon -->
+<div data-next-show="cart.hasCoupon()">
+  Coupon applied — see your savings in the summary.
+</div>
+
+<!-- Specific coupon -->
+<div data-next-show='cart.hasCoupon("FREESHIP")'>
+  Free shipping unlocked.
+</div>
 ```
+
+<Callout type="info">
+`cart.hasCoupon` (no parens) returns `true` for any coupon — same as `cart.hasCoupon()`. Use the function form when checking a specific code.
+</Callout>
 
 ---
 

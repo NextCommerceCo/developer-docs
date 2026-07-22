@@ -6,17 +6,6 @@
     "subscription-management",
     "exports",
     "testing-guide",
-    "iframe-payment-form",
-    "3ds2",
-    "affirm",
-    "apple-pay",
-    "google-pay",
-    "paypal",
-    "klarna",
-    "link",
-    "bancontact",
-    "ideal",
-    "sepa-debit",
-    "twint"
+    "payment-methods"
   ]
 }

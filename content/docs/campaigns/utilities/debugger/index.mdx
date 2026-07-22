@@ -16,12 +16,13 @@ The debugger is an in-page overlay and console API for inspecting SDK state, mon
 
 ## Panels
 
-The overlay has six panels:
+The overlay has seven panels:
 
 - **Cart** — current items, totals, discounts; add/remove/update from buttons
 - **Campaign** — packages and campaign metadata; sort, inspect, test shipping
 - **Config** — active SDK config and feature flags
 - **Checkout** — form state and validation errors
+- **Offers & Discounts** — applied coupons, offer/voucher discount breakdown, totals, and a live log of the last 20 coupon attempts (applied, removed, or rejected with the failure message). Useful when diagnosing why a coupon did not stack or a bundle voucher did not apply. Reactive — updates from store changes, no polling.
 - **Event Timeline** — live feed of SDK events with payloads
 - **Storage** — `localStorage` and `sessionStorage` browser; edit and delete keys
 

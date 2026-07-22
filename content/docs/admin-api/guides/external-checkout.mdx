@@ -96,7 +96,7 @@ Creating an order is the core resource in an external checkout flow, see the exa
 - Attribution detail are not necessary if you have already added it to the users active cart.
 - `shipping_code` and `shipping_price` are optional parameters you can set to specify the shipping method and shipping price.
 - If you already created an address for the user, pass `use_default_shipping_address` and `use_default_billing_address` as true to use their default address for the order.
-- For additional payment methods, see our guides on [Card Tokenization](/docs/admin-api/guides/iframe-payment-form), [3DS2](/docs/admin-api/guides/3ds2), [Apple Pay](/docs/admin-api/guides/apple-pay), [PayPal](/docs/admin-api/guides/paypal), [Klarna](/docs/admin-api/guides/klarna), [Twint](/docs/admin-api/guides/twint), [Bancontact](/docs/admin-api/guides/bancontact), and [SEPA](/docs/admin-api/guides/sepa-debit).
+- For additional payment methods, see the [Payment Methods](/docs/admin-api/guides/payment-methods) guides — [Bankcard](/docs/admin-api/guides/payment-methods/bankcard), [3DS2](/docs/admin-api/guides/payment-methods/bankcard#3d-secure-3ds2), [Apple Pay](/docs/admin-api/guides/payment-methods/apple-pay), [PayPal](/docs/admin-api/guides/payment-methods/paypal), [Klarna](/docs/admin-api/guides/payment-methods/klarna), [Twint](/docs/admin-api/guides/payment-methods/twint), [Swish](/docs/admin-api/guides/payment-methods/swish), [Bancontact](/docs/admin-api/guides/payment-methods/bancontact), and [SEPA](/docs/admin-api/guides/payment-methods/sepa-debit).
 </Callout>
 ### Add Upsells
 
@@ -160,6 +160,26 @@ Subscription line items have two `price` fields available. The order line item l
 <Callout type="warn">
 Orders with Subscription line items **must have an initial payment** (order total > 0.00) to validate and retain the bankcard for future usage.
 </Callout>
+#### Custom Line Item Properties
+
+Lines accept an optional `properties` object of key/value pairs to capture customization details for personalized or made-to-order products, such as an engraving, monogram, or gift message. The values are stored on the line item and persist to the created order (and to the subscription line item when the line creates a subscription).
+
+```json title="Custom Line Item Properties"
+"lines": [
+    {
+        "product_id": 1,
+        "quantity": 1,
+        "properties": {
+            "engraving": "Best Dad Ever",
+            "font": "Serif",
+            "gift_message": "Happy Birthday!"
+        }
+    }
+]
+```
+<Callout type="info">
+Line item `properties` are used to determine the uniqueness of line item products and flow all the way through to fulfillment order line items for customized product fulfillment.
+</Callout>
 ### Cart / Order User Detail
 
 The `user` object on carts/orders represents the **customer** which includes their contact details.  Below are the recommended fields to pass for the user for ease of use and support of external integrations that may rely on the data, i.e. `user_agent`.
@@ -183,7 +203,7 @@ Users are first checked for an existing user by `email` before creating a new us
 **It is not recommended to pass `phone_number` directly on the user when creating a cart or order, we recommend passing a local phone number in the `shipping_address` instead.** Address fields have country context, which allows local phone numbers to be passed and converted to [E.164 format](https://en.wikipedia.org/wiki/E.164) before being saved. A `phone_number` passed to the `user` object directly must be in E.164 format.
 </Callout>
 ### Cart / Order Attribution Detail
-Cart and Order `attribution` object sets the [marketing attribution](https://docs.29next.com/features/marketing-attribution) on the order for tracking the source of orders and use in orders reporting. You can also pass in [metadata](https://docs.29next.com/start-here/technical-settings/metadata-fields) fields that are configured on the store to track custom attribution parameters and integrate external tracking platforms.
+Cart and Order `attribution` object sets the [marketing attribution](https://docs.nextcommerce.com/docs/features/offers/marketing-attribution) on the order for tracking the source of orders and use in orders reporting. You can also pass in [metadata](https://docs.nextcommerce.com/docs/build-a-store/technical-settings/metadata-fields-and-tags) fields that are configured on the store to track custom attribution parameters and integrate external tracking platforms.
 
 ```json title="Attribution Detail"
 "attribution": {
@@ -247,20 +267,6 @@ Merchants have the option to pass a custom `statement_descriptor` on orders so t
 Descriptors can be up to 22 alphanumeric characters, spaces, and these special characters: `& , . - #`.  Passing in an invalid statement descriptor will be ignored.
 </Callout>
 #### Payment Method Guides
-See payment method specific guides on creating orders below. 
+See the [**Payment Methods**](/docs/admin-api/guides/payment-methods) section for method-specific guides on creating orders, plus the full capability matrix (flow type, express checkout, upsell, and subscription support per method).
 
-| Payment Method | Flow | Express | Upsells | Subscriptions |
-| --- | --- | --- | --- | --- | 
-| [`card_token`](/docs/admin-api/guides/iframe-payment-form) | Direct & Redirect ([3DS](/docs/admin-api/guides/3ds2)) | Yes | Yes | Yes |
-| [`apple_pay`](/docs/admin-api/guides/apple-pay) | Redirect | Yes | Yes | Yes |
-| [`google_pay`](/docs/admin-api/guides/google-pay) | Redirect | Yes | Yes | Yes |
-| [`paypal`](/docs/admin-api/guides/paypal) | Redirect | Yes | Yes | Yes |
-| [`klarna`](/docs/admin-api/guides/klarna) | Redirect | No | Yes | Yes |
-| [`link`](/docs/admin-api/guides/link) | Redirect | Yes | Yes | Yes |
-| [`twint`](/docs/admin-api/guides/twint) | Redirect | No | Yes | Yes |
-| [`affirm`](/docs/admin-api/guides/affirm) | Redirect | No | No | No |
-| [`bancontact`](/docs/admin-api/guides/bancontact) | Redirect | No | No | No |
-| [`ideal`](/docs/admin-api/guides/ideal) | Redirect | No | No | No |
-| [`sepa_direct`](/docs/admin-api/guides/sepa-debit) | Redirect | No | No | No |
-
-
+**[View all payment methods →](/docs/admin-api/guides/payment-methods)**

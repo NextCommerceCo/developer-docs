@@ -1,0 +1,107 @@
+---
+title: Payment
+sidebar_label: Payment
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Checkout supports credit cards (tokenized with Spreedly) and express wallets (PayPal, Apple Pay, Google Pay). This page covers the card form and payment-method selection; wallet buttons are in [Express Checkout](./express-checkout).
+
+---
+
+## Credit Card Fields
+
+Card number and CVV are rendered by Spreedly inside iframes, so raw card data never enters your page or server. Provide mount points by ID or field attribute:
+
+| Field | Mount point |
+|---|---|
+| Card number | `data-next-checkout-field="cc-number"` (or `id="spreedly-number"`) |
+| CVV | `data-next-checkout-field="cvv"` (or `id="spreedly-cvv"`) |
+| Expiry month | `data-next-checkout-field="cc-month"` or `data-next-checkout-field="exp-month"` |
+| Expiry year | `data-next-checkout-field="cc-year"` or `data-next-checkout-field="exp-year"` |
+| Cardholder name | `data-next-checkout-field="card-name"` |
+
+```html
+<div data-next-checkout-field="cc-number"></div>
+<div data-next-checkout-field="cvv"></div>
+<select data-next-checkout-field="cc-month"></select>
+<select data-next-checkout-field="cc-year"></select>
+<input  data-next-checkout-field="card-name" type="text" />
+```
+
+Card number and CVV must be empty `<div>` containers, not `<input>`s — Spreedly mounts a secure iframe inside each. The SDK assigns the `id` Spreedly needs (`spreedly-number` / `spreedly-cvv`) automatically, so the `id="…"` form is equivalent but not something you need to write. The month and year dropdowns are populated automatically on load.
+
+<Callout type="warn">
+A Spreedly environment key must be set in your SDK configuration. Without it the credit card fields will not initialize. See [Configuration](../configuration).
+</Callout>
+
+### Tokenization
+
+On submit, the SDK calls Spreedly to tokenize the card and receives a single-use token. Only that token — never the card number — is sent to the order API. If tokenization fails, the SDK shows the error and does not create an order.
+
+When the iframe fields are ready the SDK emits `checkout:spreedly-ready`; on a successful token it emits `payment:tokenized`; on failure it emits `payment:error`.
+
+### Card validation
+
+| Field | Rule |
+|---|---|
+| Card number | Validated live by Spreedly |
+| CVV | Validated live by Spreedly |
+| Expiry month | Must be selected |
+| Expiry year | Must be selected |
+| Expiry combined | Card must not be expired |
+| Cardholder name | Minimum 2 characters |
+
+---
+
+## Payment Method Selection
+
+When the page offers more than one payment method, use radio inputs named `payment_method`:
+
+```html
+<label><input type="radio" name="payment_method" value="credit" checked /> Credit Card</label>
+<label><input type="radio" name="payment_method" value="paypal" /> PayPal</label>
+```
+
+The SDK reads the selected method and shows or hides the matching form section. You can also mark a method element with `data-next-payment-method="<value>"` (or legacy `os-payment-method`).
+
+### Supported values
+
+| UI value | Sent to API as |
+|---|---|
+| `credit` | `card_token` |
+| `paypal` | `paypal` |
+| `apple-pay` | `apple_pay` |
+| `google-pay` | `google_pay` |
+
+<Callout>
+The selected payment method element gets the `next-selected` class. Payment form sections animate open and closed using the `payment-method__form--expanded` / `--collapsed` classes.
+</Callout>
+
+---
+
+## Payment Errors
+
+Card and wallet errors are written into dedicated containers when present:
+
+```html
+<div data-next-component="credit-error">
+  <span data-next-component="credit-error-text"></span>
+</div>
+```
+
+| Container | Used for |
+|---|---|
+| `data-next-component="credit-error"` / `credit-error-text` | Credit card / tokenization errors |
+| `data-next-component="paypal-error"` / `paypal-error-text` | PayPal errors |
+| `data-next-component="express-error"` / `express-error-text` | Express wallet errors |
+
+Every payment failure also emits a `payment:error` event with a message you can listen for.
+
+---
+
+## Next Steps
+
+- Add wallet buttons: [Express Checkout](./express-checkout)
+- See the full submit sequence: [Order Flow](./order-flow)
+- All events: [Reference → Events](./reference/events)

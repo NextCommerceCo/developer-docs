@@ -1,0 +1,15 @@
+{
+  "title": "Checkout",
+  "pages": [
+    "index",
+    "get-started",
+    "form",
+    "payment",
+    "express-checkout",
+    "address-autocomplete",
+    "review",
+    "prospect-cart",
+    "order-flow",
+    "reference"
+  ]
+}

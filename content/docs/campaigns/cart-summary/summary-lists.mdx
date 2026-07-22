@@ -75,6 +75,49 @@ Don't mix them in the same template. Every `{item.X}` token below is also reacha
 | `{item.frequency}` | Human-readable billing frequency (e.g. `"Monthly"`, `"Every 3 months"`) |
 | `{item.currency}` | Active currency code for this line (e.g. `"USD"`) |
 
+### Displaying Line Item Properties
+
+When a line item carries custom properties (personalisation fields collected via `data-next-property`), add a `data-next-item-properties` container inside the row template. The SDK renders one child row per property without any hardcoded keys.
+
+```html
+<ul data-summary-lines>
+  <template>
+    <li>
+      <span>{item.name}</span>
+      <span>{item.quantity} × {item.unitPrice}</span>
+
+      <!-- Renders one row per property on this line -->
+      <div data-next-item-properties>
+        <template>
+          <div class="cart-item__property">
+            <span>{property.key}</span>
+            <span>{property.value}</span>
+          </div>
+        </template>
+      </div>
+    </li>
+  </template>
+</ul>
+```
+
+**Property row tokens:**
+
+| Token | Description |
+|-------|-------------|
+| `{property.key}` | Property name (e.g. `"engraving"`) |
+| `{property.value}` | Customer-entered value (e.g. `"Happy Birthday"`) |
+
+**State classes on the container:**
+
+| Class | When |
+|-------|------|
+| `next-summary-empty` | This line has no properties |
+| `next-summary-has-items` | One or more properties are present |
+
+Use `.next-summary-empty { display: none }` to hide the container when the line has no properties.
+
+When two slots share the same `package_id` but have different properties (e.g. two shirts with different engraving text), the cart renders them as separate line items — each row has its own `data-next-item-properties` output.
+
 <Callout type="warn" title="Pre-v0.4.11 line.* names removed">
 Several pre-v0.4.11 `{line.*}` token names no longer exist and will render as empty strings: `{line.qty}`, `{line.priceTotal}`, `{line.packagePrice}`, `{line.originalPackagePrice}`, `{line.totalDiscount}`, `{line.priceRetail}`, `{line.priceRetailTotal}`, `{line.priceRecurring}`, `{line.priceRecurringTotal}`, `{line.hasSavings}`. Note also that `{line.price}` previously rendered the per-unit price; it now renders the **line total** (matching `{item.price}`). See the [migration table](./reference/object-attributes#line-tokens-alias).
 </Callout>

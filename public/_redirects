@@ -1,0 +1,34 @@
+# Ported from netlify.toml — Cloudflare Workers static assets redirects
+/api/admin /docs/admin-api 301
+/apps/oauth /docs/apps/oauth 301
+/apps/app-development-flow /docs/apps/app-development-flow 301
+/apps /docs/apps 301
+/themes /docs/storefront/themes 301
+/docs/themes /docs/storefront/themes 301
+/docs/themes/event-tracking /docs/storefront/event-tracking 301
+/webhooks /docs/webhooks 301
+/docs/api/admin/:path /docs/admin-api/:path 301
+/docs/campaign-cart/:path /docs/campaigns/:path 301
+/docs/campaigns/campaign-cart/:path /docs/campaigns/:path 301
+/docs/campaigns/api/reference /docs/campaigns/api 301
+/docs/api/campaigns/:path /docs/campaigns/api/:path 301
+
+# Admin API payment-method guides moved under /payment-methods/ sub-section
+/docs/admin-api/guides/iframe-payment-form /docs/admin-api/guides/payment-methods/bankcard 301
+/docs/admin-api/guides/3ds2 /docs/admin-api/guides/payment-methods/bankcard 301
+/docs/admin-api/guides/affirm /docs/admin-api/guides/payment-methods/affirm 301
+/docs/admin-api/guides/apple-pay /docs/admin-api/guides/payment-methods/apple-pay 301
+/docs/admin-api/guides/google-pay /docs/admin-api/guides/payment-methods/google-pay 301
+/docs/admin-api/guides/paypal /docs/admin-api/guides/payment-methods/paypal 301
+/docs/admin-api/guides/klarna /docs/admin-api/guides/payment-methods/klarna 301
+/docs/admin-api/guides/link /docs/admin-api/guides/payment-methods/link 301
+/docs/admin-api/guides/bancontact /docs/admin-api/guides/payment-methods/bancontact 301
+/docs/admin-api/guides/ideal /docs/admin-api/guides/payment-methods/ideal 301
+/docs/admin-api/guides/sepa-debit /docs/admin-api/guides/payment-methods/sepa-debit 301
+/docs/admin-api/guides/twint /docs/admin-api/guides/payment-methods/twint 301
+
+# 3DS2 merged into the Bankcard guide
+/docs/admin-api/guides/payment-methods/3ds2 /docs/admin-api/guides/payment-methods/bankcard#3d-secure-3ds2 301
+
+# Bankcard guide slug renamed from iframe-payment-form
+/docs/admin-api/guides/payment-methods/iframe-payment-form /docs/admin-api/guides/payment-methods/bankcard 301

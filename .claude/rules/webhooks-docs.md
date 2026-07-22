@@ -39,7 +39,7 @@ Called by `tools/update_api_docs.py` during spec download. For each webhook even
 
 ## Webhook Event Registry
 
-All 22 events are defined in `tools/config.py` `WEBHOOKS` list. Each entry:
+All 24 events are defined in `tools/config.py` `WEBHOOKS` list. Each entry:
 
 ```python
 {
@@ -54,7 +54,7 @@ All 22 events are defined in `tools/config.py` `WEBHOOKS` list. Each entry:
 **Events by tag:**
 - **apps**: `app.uninstalled`
 - **carts**: `cart.abandoned`
-- **customers**: `customer.created`, `customer.updated`
+- **customers**: `customer.created`, `customer.redacted`, `customer.updated`
 - **fulfillment**: `fulfillment.created`, `fulfillment.updated`
 - **orders**: `order.created`, `order.updated`
 - **payments**: `dispute.created`, `dispute.updated`, `gateway.created`, `gateway.updated`, `transaction.created`, `transaction.updated`
@@ -68,6 +68,7 @@ All 22 events are defined in `tools/config.py` `WEBHOOKS` list. Each entry:
 Some events don't follow their object's schema. These are defined in `CUSTOM_WEBHOOK_EVENT_PAYLOADS`:
 
 - `product.deleted` — Only includes `{ id: integer }` (no full product data since the product is deleted)
+- `customer.redacted` — Includes `{ id, email, phone_number, orders, subscriptions }` (GDPR redaction payload, not the full customer schema)
 
 Set `schema_ref: None` in the webhook config and add a custom payload entry.
 

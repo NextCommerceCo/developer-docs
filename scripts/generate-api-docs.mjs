@@ -126,6 +126,31 @@ function generateExample(schema, depth) {
   return null;
 }
 
+/**
+ * fumadocs-openapi ≥10.8 silently skips operations whose tags aren't listed in
+ * the document's top-level `tags` array. Walk paths + webhooks, collect every
+ * tag in use, and write them back to the spec so `groupBy: 'tag'` keeps working.
+ */
+function ensureTopLevelTags(specPath) {
+  const raw = readFileSync(specPath, 'utf8');
+  const spec = yaml.load(raw);
+  const seen = new Set();
+  const collect = (container) => {
+    for (const methods of Object.values(container ?? {})) {
+      for (const op of Object.values(methods ?? {})) {
+        if (!op || typeof op !== 'object') continue;
+        for (const tag of op.tags ?? []) seen.add(tag);
+      }
+    }
+  };
+  collect(spec.paths);
+  collect(spec.webhooks);
+  const existing = new Map((spec.tags ?? []).map(t => [t.name, t]));
+  for (const name of seen) if (!existing.has(name)) existing.set(name, { name });
+  spec.tags = [...existing.values()];
+  writeFileSync(specPath, yaml.dump(spec, { lineWidth: -1 }));
+}
+
 /** Recursively fix array-style types to plain strings. Returns true if any changes were made. */
 function fixTypes(obj) {
   if (!obj || typeof obj !== 'object') return false;
@@ -235,6 +260,12 @@ for (const specPath of ADMIN_SPECS) {
   console.log(`Fixed webhook schemas in ${specPath}`);
 }
 
+// Inject top-level tags so fumadocs-openapi ≥10.8 doesn't drop tagged operations
+const ALL_SPECS = [...ADMIN_SPECS, 'public/api/campaigns/v1.yaml'];
+for (const specPath of ALL_SPECS) {
+  ensureTopLevelTags(specPath);
+}
+
 const specs = [
   {
     input: [ADMIN_SPECS[0]],
@@ -262,24 +293,33 @@ const specs = [
 
 const allMethods = {};
 
-// Pre-clean admin-api reference dirs before regeneration
-function cleanRefDir(dir, keepSubdirs = []) {
+// Pre-clean reference dirs before regeneration
+function cleanRefDir(dir, keepSubdirs = [], keepFiles = []) {
   if (!existsSync(dir)) return;
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
     if (entry.isDirectory()) {
       if (!keepSubdirs.includes(entry.name)) rmSync(full, { recursive: true });
-    } else if (entry.name.endsWith('.mdx') || entry.name === 'meta.json') {
+    } else if ((entry.name.endsWith('.mdx') || entry.name === 'meta.json') && !keepFiles.includes(entry.name)) {
       rmSync(full);
     }
   }
 }
 
-// Clean stable reference dir (preserve versioned subdirs; they're regenerated separately)
+// Admin API: clean stable reference dir (preserve versioned subdirs; they're regenerated separately)
 cleanRefDir(specs[0].output, VERSION_SUBFOLDERS);
 // Clean versioned subdirs entirely (regenerated fresh below)
 for (const version of VERSION_SUBFOLDERS) {
   const vdir = join(specs[0].output, version);
+  if (existsSync(vdir)) rmSync(vdir, { recursive: true });
+  mkdirSync(vdir, { recursive: true });
+}
+
+// Campaigns API: clean stable api dir (preserve versioned subdirs and hand-written index.mdx)
+const campaignsSpecOutput = specs.find(s => s.output === rootPath('content/docs/campaigns/api')).output;
+cleanRefDir(campaignsSpecOutput, CAMPAIGNS_VERSION_SUBFOLDERS, ['index.mdx']);
+for (const version of CAMPAIGNS_VERSION_SUBFOLDERS) {
+  const vdir = join(campaignsSpecOutput, version);
   if (existsSync(vdir)) rmSync(vdir, { recursive: true });
   mkdirSync(vdir, { recursive: true });
 }

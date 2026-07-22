@@ -1,0 +1,92 @@
+---
+title: Express Checkout
+sidebar_label: Express Checkout
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Express checkout renders PayPal, Apple Pay, and Google Pay buttons that create an order without filling out the full form. The SDK only shows a button when the campaign enables that method **and** the visitor's device/browser supports it.
+
+---
+
+## Add the Container
+
+Express buttons are managed by a container enhancer. Add a container marked `data-next-express-checkout="container"` with a child target where buttons are injected:
+
+```html
+<div data-next-express-checkout="container">
+  <div data-next-express-checkout="buttons"></div>
+</div>
+```
+
+The SDK injects the supported buttons into the `buttons` element. You do not create the buttons yourself.
+
+<Callout>
+This is a separate enhancer from the main `data-next-checkout` form. It can live on the same page as the form (shown above it) or stand alone on a cart page.
+</Callout>
+
+---
+
+## Which Buttons Appear
+
+A button is rendered only when **both** conditions are true:
+
+1. **The campaign enables it** — the method is in the campaign's available express payment methods (or enabled in your payment config).
+2. **The device supports it** — Apple Pay requires Safari/iOS, Google Pay requires a compatible Chrome/Android environment, PayPal is broadly available.
+
+| Method | Injected value | Availability check |
+|---|---|---|
+| PayPal | `paypal` | Broadly available |
+| Apple Pay | `apple_pay` | Safari / iOS with Payment Request support |
+| Google Pay | `google_pay` | Chrome / Android with Google Pay |
+
+If the cart is empty the buttons are disabled and get the `next-cart-empty` class.
+
+---
+
+## The Express Flow
+
+1. Visitor clicks an express button
+2. The SDK marks checkout as processing, sets the payment method, and shows a loading overlay
+3. It validates the cart is not empty and tracks an `add_payment_info` analytics event
+4. It creates a minimal order (cart items + payment method — no address yet) and receives a payment-completion URL
+5. The visitor is redirected to the wallet provider to authorize payment
+6. On return, the SDK finalizes the redirect to your confirmation page and clears the cart
+
+<Callout type="warn">
+Express orders are created without shipping/billing address up front — the wallet supplies those details to the gateway. Do not expect form field values to be present during an express checkout.
+</Callout>
+
+---
+
+## Error Display
+
+Express errors are written into the express error container when present:
+
+```html
+<div data-next-component="express-error">
+  <span data-next-component="express-error-text"></span>
+</div>
+```
+
+---
+
+## Events
+
+The container and processor emit:
+
+| Event | When |
+|---|---|
+| `express-checkout:initialized` | A wallet button has been rendered and wired up |
+| `express-checkout:started` | The visitor started an express payment |
+| `express-checkout:completed` | The express order completed |
+| `express-checkout:failed` / `express-checkout:error` | The express payment failed |
+
+See [Reference → Events](./reference/events) for payloads.
+
+---
+
+## Next Steps
+
+- Card payments and method selection: [Payment](./payment)
+- The shared order + redirect logic: [Order Flow](./order-flow)

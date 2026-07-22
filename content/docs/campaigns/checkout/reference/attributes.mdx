@@ -1,0 +1,142 @@
+---
+title: Attributes
+sidebar_label: Attributes
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Complete attribute reference for the checkout enhancers.
+
+## Activation Attributes
+
+These attributes turn a DOM element into a checkout component.
+
+| Attribute | Element | Activates |
+|---|---|---|
+| `data-next-checkout` | `<form>` | The main checkout form (fields, validation, payment, order, prospect cart) |
+| `data-next-enhancer="checkout-review"` | container | Read-only review of stored checkout data |
+| `data-next-express-checkout="container"` | container | PayPal / Apple Pay / Google Pay buttons |
+
+`data-next-checkout-type` (e.g. `standard`) may be set on the form as an optional type hint.
+
+---
+
+## Form Field Attributes
+
+Fields are matched by attribute, not by `name`. Use `data-next-checkout-field="<name>"` (preferred) or the legacy `os-checkout-field="<name>"`.
+
+### Contact &amp; address
+
+| Field name | Purpose |
+|---|---|
+| `email` | Email address |
+| `fname` | First name |
+| `lname` | Last name |
+| `phone` | Phone number |
+| `address1` | Street address |
+| `address2` | Apartment / suite (optional) |
+| `city` | City |
+| `province` | State / province (`select`) |
+| `postal` | Postal / ZIP code |
+| `country` | Country (`select`) |
+
+### Billing (separate billing address)
+
+Same names prefixed with `billing-`: `billing-fname`, `billing-lname`, `billing-address1`, `billing-address2`, `billing-city`, `billing-province`, `billing-postal`, `billing-country`, `billing-phone`.
+
+### Card fields
+
+| Field | Attribute / ID |
+|---|---|
+| Card number | `data-next-checkout-field="cc-number"` (or `id="spreedly-number"`) — empty `<div>`, not `<input>` |
+| CVV | `data-next-checkout-field="cvv"` (or `id="spreedly-cvv"`) — empty `<div>`, not `<input>` |
+| Expiry month | `data-next-checkout-field="cc-month"` or `="exp-month"` |
+| Expiry year | `data-next-checkout-field="cc-year"` or `="exp-year"` |
+| Cardholder name | `data-next-checkout-field="card-name"` |
+
+---
+
+## Component Containers
+
+Wrap sections of the form so the SDK can manage them. Preferred form is `data-next-component`; legacy `os-checkout-component` / `os-checkout-element` are also accepted.
+
+| Attribute | Purpose |
+|---|---|
+| `data-next-component="shipping-form"` | Shipping fields wrapper |
+| `data-next-component="billing-form"` | Billing fields wrapper |
+| `data-next-component="different-billing-address"` | Toggles billing visibility |
+| `data-next-component="location"` | City / state / postal, revealed after `address1` |
+| `data-next-component="billing-location"` | Billing city / state / postal |
+| `data-next-component="shipping-field-row"` | A single field row |
+
+---
+
+## Error Containers
+
+| Attribute | Purpose |
+|---|---|
+| `data-next-error="<field>"` / `os-checkout-error="<field>"` | Field-level validation message target |
+| `data-next-component="credit-error"` / `credit-error-text` | Credit card / tokenization error |
+| `data-next-component="paypal-error"` / `paypal-error-text` | PayPal error |
+| `data-next-component="express-error"` / `express-error-text` | Express wallet error |
+
+---
+
+## Payment Selection
+
+| Attribute / selector | Purpose |
+|---|---|
+| `input[name="payment_method"]` | Radio group selecting the payment method |
+| `data-next-payment-method="<value>"` / `os-payment-method` | Marks an element as a payment method |
+| `input[name="shipping_method"]` | Radio group selecting the shipping method |
+| `input[name="use_shipping_address"]` | Checkbox: billing same as shipping |
+
+**Payment method values:** `credit` → `card_token`, `paypal` → `paypal`, `apple-pay` → `apple_pay`, `google-pay` → `google_pay`.
+
+---
+
+## Express Checkout
+
+| Attribute | Purpose |
+|---|---|
+| `data-next-express-checkout="container"` | Activates the express button container |
+| `data-next-express-checkout="buttons"` | Child element where buttons are injected |
+
+Buttons are injected with `data-next-express-checkout` set to `paypal`, `apple_pay`, or `google_pay`.
+
+---
+
+## Review Block
+
+| Attribute | Purpose |
+|---|---|
+| `data-next-enhancer="checkout-review"` | Activates the review container |
+| `data-next-checkout-review="<field>"` | Displays a stored checkout value (dot notation supported) |
+| `data-next-format` | `text` (default), `name`, `address`, `phone`, `currency` |
+| `data-next-fallback` | Text shown when the value is empty |
+
+---
+
+## Prospect Cart
+
+Set on the checkout `<form>`.
+
+| Attribute | Purpose | Default |
+|---|---|---|
+| `data-auto-create` | `false` disables automatic creation | enabled |
+| `data-trigger-on` | `emailEntry`, `phoneEntry`, `emailAndPhone`, `formStart`, `manual` | `emailEntry` |
+| `data-email-field` | Email input `name` to watch | `email` |
+| `data-phone-field` | Phone input `name` to watch | `phone` |
+| `data-min-phone-digits` | Min digits when `intl-tel-input` is unavailable | — |
+| `data-prospect-config` | JSON config applied before individual attributes | — |
+
+---
+
+## Meta Tags (redirect URLs)
+
+Set in the page `<head>`.
+
+| Meta name | Purpose |
+|---|---|
+| `next-success-url` (aliases: `next-next-url`, `os-next-page`) | Success redirect after order |
+| `next-failure-url` (alias: `os-failure-url`) | Payment failure redirect |

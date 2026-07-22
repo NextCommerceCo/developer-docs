@@ -171,7 +171,7 @@ To change the payment gateway used for bankcard payments of a subscription, send
 To change the bankcard on a subscription, pass a new `card_token` with a PATCH request to the [subscriptionsPartialUpdate](/docs/admin-api/reference/subscriptions/subscriptionsPartialUpdate) endpoint.
 
 <Callout type="info">
-To update a bankcard on a subscription, you must use the **[iFrame to tokenize](/docs/admin-api/guides/iframe-payment-form)** the bankcard and use the `card_token` when updating the subscription itself.
+To update a bankcard on a subscription, you must use the **[iFrame to tokenize](/docs/admin-api/guides/payment-methods/bankcard)** the bankcard and use the `card_token` when updating the subscription itself.
 
 The new bankcard will be automatically verfied with a `verify` request to a payment gateway to ensure the new bankcard is valid and can be used for future renewals. If the bankcard cannot be verified, the update request will fail and return an error.
 </Callout>
@@ -219,6 +219,30 @@ Subscriptions that are `past_due` status can be attemted to retry the renewal, o
 <Callout type="idea">
 The subscription retry endpoint is useful for custom recovery logic when attempting to recover failing subscriptions.
 </Callout>
+### Pause
+
+To temporarily stop renewals on an active subscription without cancelling it, use the [subscriptionsPauseCreate](/docs/admin-api/reference/subscriptions/subscriptionsPauseCreate) endpoint. Pausing is useful for win-back flows, customer-requested holds, or pausing a cohort during inventory or fulfillment issues.
+
+```json title="Pause Subscription" http-method="POST" http-target="https://{store}.29next.store/api/admin/subscriptions/{id}/pause/"
+{
+  "pause_until": "2026-08-01" // optional date (YYYY-MM-DD) to auto-resume on
+}
+```
+
+If `pause_until` is omitted the subscription is paused indefinitely and will be auto-cancelled if it is not resumed within 6 months. The endpoint returns the full subscription object with status `paused` and the `paused_at` / `paused_until` timestamps populated.
+
+<Callout type="info">
+Paused subscriptions skip all scheduled renewals until the `pause_until` date is reached, at which point renewals resume automatically on the existing schedule.
+</Callout>
+
+To resume a paused subscription before its `pause_until` date — or to reactivate an indefinitely paused subscription — use the [subscriptionsResumeCreate](/docs/admin-api/reference/subscriptions/subscriptionsResumeCreate) endpoint with a future `next_renewal_date`.
+
+```json title="Resume Subscription" http-method="POST" http-target="https://{store}.29next.store/api/admin/subscriptions/{id}/resume/"
+{
+  "next_renewal_date": "2026-06-15" // required, must be a future date
+}
+```
+
 ### Cancel
 
 To cancel a subscription, use the [subscriptionsCancelCreate](/docs/admin-api/reference/subscriptions/subscriptionsCancelCreate) endpoint to stop all future renewals.
@@ -232,13 +256,25 @@ To cancel a subscription, use the [subscriptionsCancelCreate](/docs/admin-api/re
 }
 ```
 
-### Bulk Subscription Updates
+### Bulk Subscription Actions
 
 <Callout type="idea">
-The [`/next-bulk-subscription`](https://github.com/NextCommerceCo/skills/tree/main/next-bulk-subscription) skill in the Next Commerce AI skills repo wraps this workflow — CSV ingestion, dry-run validation, rate limiting, and results reporting — for Claude Code, Cursor, and other AI coding agents.
+The [`/next-bulk-subscription`](https://github.com/NextCommerceCo/skills/tree/main/next-bulk-subscription) skill in the Next Commerce AI skills repo wraps this workflow — CSV ingestion, dry-run validation, rate limiting, and results reporting for bulk pauses, cancellations, renewal-date shifts, and other subscription updates — for Claude Code, Cursor, and other AI coding agents.
 </Callout>
 
-For operations that affect a cohort of subscriptions — shifting renewal dates, cancelling a churn-risk segment, or migrating subscriptions between payment gateways — iterate the [subscriptionsPartialUpdate](/docs/admin-api/reference/subscriptions/subscriptionsPartialUpdate) endpoint over your list of subscription IDs. Respect the **4 requests/second rate limit** (sleep ~0.26s between calls) and write the result of each PATCH to a log file so failures can be retried without re-running the whole batch.
+For operations that affect a cohort of subscriptions, iterate the endpoint that matches the subscription action: use [subscriptionsPauseCreate](/docs/admin-api/reference/subscriptions/subscriptionsPauseCreate) for pauses, [subscriptionsCancelCreate](/docs/admin-api/reference/subscriptions/subscriptionsCancelCreate) for cancellations, and [subscriptionsPartialUpdate](/docs/admin-api/reference/subscriptions/subscriptionsPartialUpdate) for field updates such as renewal dates, cadence, addresses, or payment gateway details. Respect the **4 requests/second rate limit** (sleep ~0.26s between calls) and write each response to a log file so failures can be retried without re-running the whole batch.
+
+**Bulk pause.** Loop [subscriptionsPauseCreate](/docs/admin-api/reference/subscriptions/subscriptionsPauseCreate) across the list, passing the same `pause_until` date for the cohort, a per-row `pause_until` from your input file, or `{}` for indefinite pauses.
+
+```json title="Pause Subscription" http-method="POST" http-target="https://{store}.29next.store/api/admin/subscriptions/{id}/pause/"
+{
+    "pause_until": "2026-08-01"
+}
+```
+
+<Callout type="warn">
+Do not bulk pause by PATCHing `status: "paused"`. Use the pause endpoint so the platform records the pause lifecycle fields and applies pause behavior consistently.
+</Callout>
 
 **Bulk renewal-date shift.** Update each subscription's `next_renewal_date` to defer or align upcoming charges across a cohort.
 

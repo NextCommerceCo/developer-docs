@@ -64,8 +64,9 @@ npm run validate-links
 
 ## Deployment
 
-The site is built as a static export. Netlify runs `npm run build` and publishes the `out/` directory.
+The site is built as a static export. Cloudflare Workers Builds runs `npm run build` and serves the `out/` directory as static assets (see `wrangler.jsonc`). Redirects live in `public/_redirects`.
 
 ## Search
 
 Site search is powered by Algolia DocSearch. The search index is updated automatically on pushes to `main` through GitHub Actions.
+

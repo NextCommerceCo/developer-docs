@@ -9,6 +9,17 @@ The SDK is configured via `window.nextConfig` before the SDK script loads, and v
 Replace `your-api-key-here` with your actual Campaign API key from the dashboard.
 </Callout>
 
+## Include the SDK
+
+Add the Campaign Cart SDK loader script to every page of your campaign, ideally in the head. 
+
+```html
+<!-- Campaign Cart SDK -->
+<script src="https://cdn.jsdelivr.net/gh/NextCommerceCo/campaign-cart@v0.4.24/dist/loader.js" type="module"></script>
+```
+
+
+
 ## JavaScript Configuration
 
 ### Minimal Setup
@@ -33,29 +44,32 @@ window.nextConfig = {
   // Currency behavior when country changes
   currencyBehavior: 'auto', // 'auto' | 'manual'
 
+  // Required for purchase deduplication with the NEXT Storefront Meta App
+  storeName: 'store-name',
+
   // Payment and checkout configuration
   paymentConfig: {
     expressCheckout: {
-      enabled: true,
-      requireValidation: false, // Require form validation before express checkout
-      requiredFields: ['email', 'fname', 'lname'],
-      methodOrder: ['paypal', 'apple_pay', 'google_pay']
+      enabled: true, // Enable/disable express checkout methods
+      requireValidation: true, // Require form validation before express checkout (radio option only, not express buttons)
+      requiredFields: ['email', 'fname', 'lname'], // Fields required for express checkout radio option
+      methodOrder: ['paypal', 'apple_pay', 'google_pay'] // Display order of express payment method buttons
     }
   },
 
   // Address and country configuration
   addressConfig: {
-    defaultCountry: "US",
-    showCountries: ["US", "CA", "GB", "AU", "DE", "FR"],
-    dontShowStates: ["AS", "GU", "PR", "VI"],
-    enableAutocomplete: true, // NEXT Address Autocomplete
+    // defaultCountry: "US",              // Low-priority fallback, used only when the campaign country list is empty
+    // showCountries: ["US", "CA", "GB"], // Deprecated — the campaign API provides countries; fallback only
+    dontShowStates: ["AS", "GU", "PR", "VI"], // State codes to hide from dropdowns
+    enableAutocomplete: true, // Use NEXT address autocomplete (leave googleMaps.apiKey empty)
   },
 
   // Google Maps integration (address autocomplete)
+  // Leave apiKey empty to use NEXT autocomplete. Set a key to use Google Maps instead — it takes priority when non-empty.
   googleMaps: {
-    apiKey: "your-google-maps-api-key",
+    apiKey: "",
     region: "US",
-    enableAutocomplete: false 
   },
 
   // Analytics providers
@@ -63,6 +77,7 @@ window.nextConfig = {
     enabled: true,
     mode: 'auto', // 'auto' | 'manual' | 'disabled'
     providers: {
+      // NEXT Campaign analytics (always enabled when analytics.enabled is true)
       nextCampaign: {
         enabled: true
       },
@@ -72,16 +87,19 @@ window.nextConfig = {
           containerId: "GTM-XXXXXX",
           dataLayerName: "dataLayer"
         },
+        // Optional: blockedEvents: ["PageView"]
       },
       facebook: {
         enabled: false,
         settings: {
           pixelId: "YOUR_PIXEL_ID"
         },
+        // Optional: blockedEvents: ["PageView"]
       },
       rudderstack: {
         enabled: false,
-        settings: {},
+        settings: {}, // RudderStack config is handled by its own SDK; this just enables the adapter
+        // Optional: blockedEvents: ["PageView"]
       },
       custom: {
         enabled: false,
@@ -96,13 +114,17 @@ window.nextConfig = {
   // UTM parameter transfer (preserve tracking params across pages)
   utmTransfer: {
     enabled: true,
-    applyToExternalLinks: false,
-    debug: false,
-    // Optional: excludedDomains: ['example.com'],
-    // Optional: paramsToCopy: ['utm_source', 'utm_medium', 'utm_campaign', 'gclid', 'fbclid']
+    applyToExternalLinks: false, // Add UTM params to external links
+    debug: false, // Enable debug logging for UTM transfer
+    // Optional: excludedDomains: ['example.com', 'test.org'],
+    // Optional: paramsToCopy: ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid', 'fbclid']
   }
 };
 ```
+
+<Callout type="info">
+`storeName` is required for purchase deduplication when using the NEXT Storefront Meta App. Set it to your store identifier.
+</Callout>
 
 ## Meta Tag Configuration
 
@@ -121,10 +143,35 @@ Configure the SDK on a per-page basis using meta tags in your HTML `<head>`:
 <!-- Next URL: Redirect after order completion (checkout pages) -->
 <meta name="next-success-url" content="/upsell">
 
-<!-- Prevent Back Navigation: Usually on first upsell page -->
-<meta name="next-prevent-back-navigation" content="true">
-
 <!-- Upsell URLs: For upsell pages -->
 <meta name="next-upsell-accept-url" content="/receipt">
 <meta name="next-upsell-decline-url" content="/receipt">
 ```
+
+<Callout type="info">
+The upsell meta tags (`next-page-type`, `next-upsell-accept-url`, `next-upsell-decline-url`) are covered in depth on the [Upsell Flow](/docs/campaigns/upsells/flow) page. For the separate analytics meta tag family (`next-analytics-*`), see [Analytics Meta Tags](/docs/campaigns/analytics/meta-tags).
+</Callout>
+
+---
+
+## Currency Behavior
+
+The `currencyBehavior` setting controls whether the SDK geo-detects the shopper's currency. Once a shopper sees a price in a specific currency, the SDK locks that currency into `sessionStorage` for the rest of the session, so the cart, upsells, and order confirmation all stay consistent even if geo-detection would return a different result on a later page.
+
+| Value | Behavior |
+|---|---|
+| `'auto'` *(default)* | Geo-detect on first load if no URL parameter or stored currency is present, then lock for the session |
+| `'manual'` | Never auto-detect. Falls back to the campaign default unless `?currency=` or a stored value is set |
+
+### How the currency is chosen on first page load
+
+| Source | Priority |
+|---|---|
+| `?currency=<code>` URL parameter | 1 — highest |
+| Previously stored session currency | 2 |
+| Result of geo-detection (when `currencyBehavior: 'auto'`) | 3 |
+| Campaign default currency | 4 — fallback |
+
+Once chosen, the value is written to `sessionStorage` and reused on every subsequent page load in the session. To reset, close the browser tab or clear sessionStorage.
+
+To force a specific currency from a link (e.g. for currency-specific ad campaigns), use the [`?currency=` URL parameter](/docs/campaigns/data-attributes/url-parameters/reference/attributes).

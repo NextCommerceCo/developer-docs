@@ -7,6 +7,40 @@ This page explains how the bundle selector manages cart state. You don't need to
 
 ---
 
+## Default Selection on Init
+
+When the page loads, the bundle selector decides which card is initially selected using this precedence:
+
+| Priority | Source | Description |
+|----------|--------|-------------|
+| 1 | `?forceBundleId=` URL parameter | Deep-link from an ad, email, or affiliate link |
+| 2 | `data-next-selected="true"` on a card | Pre-selected in markup |
+| 3 | First card | Fallback when neither of the above is set |
+
+In swap mode, the chosen card is applied to the cart on init. In select mode, the chosen card is marked as selected but the cart is not written until the linked Add-to-Cart button fires.
+
+### `?forceBundleId=` URL Parameter
+
+`forceBundleId` overrides the default selection and lets a URL deep-link into a specific bundle.
+
+Three formats are supported:
+
+```
+?forceBundleId=premium
+?forceBundleId=tier:premium
+?forceBundleId=tier:premium,gift:luxury
+```
+
+| Format | Behavior |
+|--------|----------|
+| `premium` | Unscoped — matches any bundle selector on the page whose cards include `data-next-bundle-id="premium"` |
+| `tier:premium` | Scoped — only applies to a selector with `data-next-selector-id="tier"` |
+| `tier:premium,gift:luxury` | Multiple selectors at once |
+
+If the bundle ID does not match any card in the targeted selector, the enhancer falls back to the standard default-selection rules and logs a warning.
+
+---
+
 ## Tagged Items and the Retain-Replace Pattern
 
 Every cart item written by the bundle selector is tagged with the selector's `selectorId`. This tag is what makes safe swapping possible when multiple bundles share the same package — items are identified for replacement by tag, not by package ID.

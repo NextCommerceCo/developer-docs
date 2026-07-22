@@ -17,7 +17,7 @@ Build custom bundles with real-time pricing updates:
   
   <!-- SDK Configuration -->
   <meta name="next-api-key" content="your-api-key-here">
-  <script src="https://cdn.jsdelivr.net/gh/NextCommerceCo/campaign-cart@v0.3.10/dist/loader.js" type="module"></script>
+  <script src="https://cdn.jsdelivr.net/gh/NextCommerceCo/campaign-cart@v0.4.24/dist/loader.js" type="module"></script>
   
   <style>
     .bundle-builder {

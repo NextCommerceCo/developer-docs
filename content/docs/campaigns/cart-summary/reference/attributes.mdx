@@ -71,13 +71,13 @@ Row tokens: see [Object Attributes → SummaryLine](./object-attributes).
 
 Renders one row per offer (promotion) discount.
 
-Row tokens: `{discount.name}`, `{discount.amount}`, `{discount.description}`.
+Row tokens: `{discount.name}`, `{discount.amount}`, `{discount.percentage}`, `{discount.description}`.
 
 ### `data-summary-voucher-discounts`
 
 Renders one row per voucher (coupon) discount.
 
-Row tokens: `{discount.name}`, `{discount.amount}`, `{discount.description}`.
+Row tokens: `{discount.name}`, `{discount.amount}`, `{discount.percentage}`, `{discount.description}`.
 
 ### `data-next-discounts`
 
@@ -89,7 +89,7 @@ Unified discount list container. Place inside the cart summary template to rende
 | `"offer"` | Only offer/promotion discounts |
 | `"voucher"` | Only voucher/coupon discounts |
 
-Row tokens: `{discount.name}`, `{discount.amount}`, `{discount.description}`.
+Row tokens: `{discount.name}`, `{discount.amount}`, `{discount.percentage}`, `{discount.description}`.
 
 State classes on the container:
 
@@ -102,11 +102,32 @@ When placed inside a `data-summary-lines` row template, renders per-line discoun
 
 See [Cart Lines & Discounts → Discount Lists](../summary-lists#discount-lists) for usage examples.
 
+### `data-next-item-properties`
+
+Place **inside** a `data-summary-lines` row template to render one row per line item property.
+
+```html
+<ul data-summary-lines>
+  <template>
+    <li>
+      <span>{item.name}</span>
+      <div data-next-item-properties>
+        <template>
+          <span class="property">{property.key}: {property.value}</span>
+        </template>
+      </div>
+    </li>
+  </template>
+</ul>
+```
+
+Items that share the same `package_id` but carry different properties are rendered as separate rows, each with their own `data-next-item-properties` list.
+
 ### `data-line-discounts`
 
 Place **inside** a `data-summary-lines` row template to render per-line discount breakdowns.
 
-Row tokens: `{discount.name}`, `{discount.amount}`, `{discount.description}`.
+Row tokens: `{discount.name}`, `{discount.amount}`, `{discount.percentage}`, `{discount.description}`.
 
 Receives `next-summary-empty` / `next-summary-has-items` classes.
 
@@ -178,6 +199,7 @@ Available in `data-summary-offer-discounts`, `data-summary-voucher-discounts`, a
 | `discount.name` | string | Offer or voucher name |
 | `discount.amount` | number | Discount amount as a raw number (currency symbols stripped) |
 | `discount.amountFormatted` | string | Original currency-formatted amount string |
+| `discount.percentage` | string | Discount percentage formatted with `%` (e.g. `"15%"` or `"15.50%"`). Empty when the discount has no percentage value. |
 | `discount.description` | string | Offer or voucher description |
 
 ### Examples

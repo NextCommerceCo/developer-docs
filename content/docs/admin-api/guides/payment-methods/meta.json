@@ -1,0 +1,17 @@
+{
+  "title": "Payment Methods",
+  "pages": [
+    "bankcard",
+    "apple-pay",
+    "google-pay",
+    "paypal",
+    "klarna",
+    "link",
+    "twint",
+    "swish",
+    "affirm",
+    "bancontact",
+    "ideal",
+    "sepa-debit"
+  ]
+}

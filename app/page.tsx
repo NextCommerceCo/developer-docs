@@ -11,6 +11,7 @@ import {
   Globe,
   Code2,
   Activity,
+  Sparkles,
 } from 'lucide-react';
 import { siteConfig } from '@/lib/config';
 import { AlgoliaDocSearch, AlgoliaDocSearchMobile } from '@/components/search';
@@ -149,8 +150,8 @@ export default function HomePage() {
         <div className="mx-auto flex sm:grid h-14 max-w-6xl sm:grid-cols-[auto_1fr_auto] items-center justify-between gap-4 px-6">
           {/* Left: Logo */}
           <Link href="/" className="flex items-center gap-3">
-            <img src="/logo-light.png" alt={siteConfig.companyName} width={105} height={21} className="dark:hidden" />
-            <img src="/logo-dark.png" alt={siteConfig.companyName} width={105} height={21} className="hidden dark:block" />
+            <img src="/next-dark.svg" alt={siteConfig.companyName} width={451} height={148} className="h-auto w-24 dark:hidden" />
+            <img src="/next-white.svg" alt={siteConfig.companyName} width={451} height={148} className="hidden h-auto w-24 dark:block" />
             <span className="hidden sm:inline text-xs font-medium text-fd-muted-foreground border-l border-fd-border pl-3">
               Developers
             </span>
@@ -195,27 +196,32 @@ export default function HomePage() {
       <main className="flex-1">
         {/* Hero */}
         <MouseSpotlight className="relative overflow-hidden">
-          {/* Dot grid + floating orbs */}
-          <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
+          {/* Aurora mesh — animated soft color blobs, no patterns */}
+          <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
             <div
-              className="absolute inset-0 mask-[radial-gradient(ellipse_at_center,transparent_20%,black_70%)]"
-              style={{
-                backgroundImage: 'radial-gradient(circle, var(--color-fd-muted-foreground) 1px, transparent 1px)',
-                backgroundSize: '24px 24px',
-                opacity: 0.2,
-              }}
+              className="absolute top-[5%] left-[10%] h-[600px] w-[600px] rounded-full"
+              style={{ background: 'radial-gradient(circle, rgba(59, 130, 246, 0.12), transparent 70%)', filter: 'blur(60px)', animation: 'aurora-1 22s ease-in-out infinite' }}
             />
             <div
-              className="absolute inset-0 mask-[radial-gradient(ellipse_at_center,black_10%,transparent_60%)]"
-              style={{
-                backgroundImage: 'radial-gradient(circle, #3C7DFF 1px, transparent 1px)',
-                backgroundSize: '24px 24px',
-                opacity: 0.3,
-              }}
+              className="absolute top-[10%] right-[5%] h-[700px] w-[700px] rounded-full"
+              style={{ background: 'radial-gradient(circle, rgba(168, 85, 247, 0.11), transparent 70%)', filter: 'blur(70px)', animation: 'aurora-2 26s ease-in-out infinite' }}
             />
-            <div className="absolute -top-40 -left-40 w-125 h-125 rounded-full bg-blue-500/3 blur-[100px]" style={{ animation: 'float1 20s ease-in-out infinite' }} />
-            <div className="absolute -bottom-40 -right-40 w-150 h-150 rounded-full bg-purple-500/3 blur-[120px]" style={{ animation: 'float2 25s ease-in-out infinite' }} />
-            <div className="absolute top-1/3 left-1/2 w-100 h-100 rounded-full bg-orange-500/2 blur-[100px]" style={{ animation: 'float3 22s ease-in-out infinite' }} />
+            <div
+              className="absolute bottom-[-10%] left-[30%] h-[650px] w-[650px] rounded-full"
+              style={{ background: 'radial-gradient(circle, rgba(96, 165, 250, 0.1), transparent 70%)', filter: 'blur(70px)', animation: 'aurora-3 28s ease-in-out infinite' }}
+            />
+            <div
+              className="absolute top-[40%] left-[45%] h-[500px] w-[500px] rounded-full"
+              style={{ background: 'radial-gradient(circle, rgba(34, 211, 238, 0.06), transparent 70%)', filter: 'blur(55px)', animation: 'aurora-4 24s ease-in-out infinite' }}
+            />
+            <div
+              className="absolute top-[-10%] left-[40%] h-[450px] w-[450px] rounded-full"
+              style={{ background: 'radial-gradient(circle, rgba(244, 114, 182, 0.06), transparent 70%)', filter: 'blur(60px)', animation: 'aurora-2 30s ease-in-out infinite 4s' }}
+            />
+            <div
+              className="absolute bottom-[10%] right-[20%] h-[480px] w-[480px] rounded-full"
+              style={{ background: 'radial-gradient(circle, rgba(251, 146, 60, 0.05), transparent 70%)', filter: 'blur(65px)', animation: 'aurora-1 32s ease-in-out infinite 2s' }}
+            />
           </div>
 
           <div className="relative mx-auto max-w-6xl px-6 pt-20 pb-12 md:pt-28 md:pb-16 flex flex-col items-center text-center gap-6">
@@ -265,6 +271,42 @@ export default function HomePage() {
 
             <div className="w-full max-w-130 pt-2">
               <HeroFlow />
+            </div>
+          </div>
+
+          {/* AI Skills callout */}
+          <div className="relative mx-auto max-w-6xl px-6">
+            <div className="rounded-2xl border border-yellow-500/20 bg-linear-to-br from-yellow-500/6 via-yellow-500/2 to-transparent p-8 md:p-10">
+              <div className="flex flex-col gap-6">
+                <div className="flex items-start gap-4">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-yellow-500/15 text-yellow-500">
+                    <Sparkles size={20} />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-yellow-500/30 bg-yellow-500/10 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-yellow-500">
+                      New
+                    </span>
+                    <h2 className="text-2xl font-bold tracking-tight text-fd-foreground md:text-3xl">
+                      Build with AI agents
+                    </h2>
+                    <p className="max-w-2xl text-fd-muted-foreground leading-relaxed">
+                      Install <strong className="text-fd-foreground">Next Commerce AI Skills</strong> so Claude Code, Cursor, Codex, or Copilot know the platform — APIs, CLI workflows, and architecture patterns — and can work autonomously on your store.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-3 sm:pl-14">
+                  <code className="rounded-md border border-fd-border bg-fd-muted px-3 py-2 text-sm font-mono text-fd-foreground">
+                    npx skills add NextCommerceCo/skills
+                  </code>
+                  <Link
+                    href="/docs/skills"
+                    className="inline-flex items-center gap-2 rounded-md bg-fd-primary px-4 py-2 text-sm font-medium text-fd-primary-foreground hover:opacity-90 transition-opacity duration-150"
+                  >
+                    View skills
+                    <ArrowRight size={14} aria-hidden="true" />
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
 

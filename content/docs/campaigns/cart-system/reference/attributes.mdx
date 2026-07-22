@@ -215,8 +215,8 @@ Used inside the `<template>` of a `data-summary-lines` container. Replace `{line
 |----------|-------------|
 | `{line.price}` | Per-unit price as configured in the campaign |
 | `{line.priceTotal}` | `{line.price}` × quantity for this line |
-| `{line.priceRetail}` | Full retail (compare-at) price per unit |
-| `{line.priceRetailTotal}` | Retail price × quantity |
+| `{line.priceRetail}` | Legacy retail (compare-at) price per unit |
+| `{line.priceRetailTotal}` | Legacy retail price × quantity |
 | `{line.priceRecurring}` | Per-unit recurring billing price (subscriptions only) |
 | `{line.priceRecurringTotal}` | Recurring price × quantity (subscriptions only) |
 | `{line.isRecurring}` | `"true"` if this line bills on a recurring schedule |
@@ -238,7 +238,7 @@ Used inside the `<template>` of a `data-summary-lines` container. Replace `{line
 | Variable | Values | Description |
 |----------|--------|-------------|
 | `{line.hasDiscount}` | `"show"` / `"hide"` | `"show"` when any promotion reduces this line's price |
-| `{line.hasSavings}` | `"show"` / `"hide"` | `"show"` when the unit price is below the retail (compare-at) price |
+| `{line.hasSavings}` | `"show"` / `"hide"` | Legacy helper: `"show"` when the unit price is below the package retail price |
 
 ```html
 <!-- Show a "Sale" badge only when a discount is applied to this line -->

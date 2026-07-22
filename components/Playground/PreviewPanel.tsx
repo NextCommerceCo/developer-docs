@@ -1,6 +1,6 @@
 'use client';
 
-import { ExternalLink, Maximize2, Minimize2, RotateCcw } from 'lucide-react';
+import { Code2, ExternalLink, RotateCcw } from 'lucide-react';
 import React, { useCallback, useRef, useState } from 'react';
 import { sdkHostLabel } from '@/lib/playground/utils';
 import { MIN_PREVIEW_WIDTH } from '@/lib/playground/constants';
@@ -83,6 +83,21 @@ export function PreviewPanel({
   return (
     <div className="flex-1 min-w-0 flex flex-col bg-fd-muted/20">
       <div className="px-3 py-1.5 border-b border-fd-border bg-fd-muted/30 flex items-center gap-2 min-w-0">
+        {onExpandToggle && (
+          <button
+            type="button"
+            title={expanded ? 'Show code editor' : 'Hide code editor'}
+            aria-pressed={!expanded}
+            onClick={onExpandToggle}
+            className={`hidden lg:inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium shrink-0 transition-colors ${
+              expanded
+                ? 'text-fd-muted-foreground hover:text-fd-foreground border border-fd-border'
+                : 'bg-blue-600 text-white hover:bg-blue-700 border border-transparent'
+            }`}
+          >
+            <Code2 size={13} /> Code
+          </button>
+        )}
         <span className="text-xs text-fd-muted-foreground font-mono shrink-0">Preview</span>
         <span className="text-[11px] text-fd-muted-foreground font-mono shrink-0 tabular-nums">
           {widthLabel}
@@ -115,16 +130,6 @@ export function PreviewPanel({
               className="text-fd-muted-foreground hover:text-fd-foreground transition-colors"
             >
               <ExternalLink size={14} />
-            </button>
-          )}
-          {onExpandToggle && (
-            <button
-              type="button"
-              title="Expand preview"
-              onClick={onExpandToggle}
-              className="hidden lg:inline-flex text-fd-muted-foreground hover:text-fd-foreground transition-colors"
-            >
-              {expanded ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
             </button>
           )}
         </div>

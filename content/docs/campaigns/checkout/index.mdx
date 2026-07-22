@@ -1,0 +1,79 @@
+---
+title: Checkout
+sidebar_label: Checkout
+---
+
+import { Play, FileText, CreditCard, Zap, MapPin, ListChecks, MailCheck, Workflow, BookOpen } from 'lucide-react';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+The Checkout turns a plain HTML `<form>` into a working order page. Add `data-next-checkout` to a `<form>`, tag each input with a field attribute, and the SDK collects the data, validates it, tokenizes the card (swaps the card number for a secure token so it never touches your server), creates the order, and redirects to your confirmation page.
+
+<Callout type="info">
+New to Campaigns? Set up the SDK, an API key, and a cart first at [Campaigns → Getting Started](/docs/campaigns). This section assumes those are already in place — see [Get Started → Prerequisites](./get-started#prerequisites).
+</Callout>
+
+## How It Works
+
+1. A single `<form data-next-checkout>` becomes the checkout — one *enhancer* (a class the SDK attaches to an element with a `data-next-*` attribute) drives the whole flow
+2. Inputs are matched by `data-next-checkout-field` attributes, not by their `name` — so your HTML structure is up to you
+3. On submit, the SDK validates every field, tokenizes the card with Spreedly, and posts the order to the API
+4. On success it clears the cart, then redirects to the order confirmation (or upsell) page
+
+Express buttons (PayPal, Apple Pay, Google Pay), address autocomplete, and prospect-cart email capture all attach to the same form.
+
+<Cards>
+  <Card
+    href="/docs/campaigns/checkout/get-started"
+    icon={<div className="size-9 rounded-md flex items-center justify-center bg-blue-500/15 text-blue-500"><Play className="size-4" /></div>}
+    title="Get Started"
+    description="Build a working checkout form with contact, address, and card fields in a few lines of HTML."
+  />
+  <Card
+    href="/docs/campaigns/checkout/form"
+    icon={<div className="size-9 rounded-md flex items-center justify-center bg-red-500/15 text-red-500"><FileText className="size-4" /></div>}
+    title="The Form"
+    description="Field attributes, validation, country/state handling, and separate billing address."
+  />
+  <Card
+    href="/docs/campaigns/checkout/payment"
+    icon={<div className="size-9 rounded-md flex items-center justify-center bg-green-500/15 text-green-500"><CreditCard className="size-4" /></div>}
+    title="Payment"
+    description="Credit card fields via Spreedly, payment method selection, and tokenization."
+  />
+  <Card
+    href="/docs/campaigns/checkout/express-checkout"
+    icon={<div className="size-9 rounded-md flex items-center justify-center bg-yellow-500/15 text-yellow-500"><Zap className="size-4" /></div>}
+    title="Express Checkout"
+    description="Auto-rendered PayPal, Apple Pay, and Google Pay buttons gated by device support."
+  />
+  <Card
+    href="/docs/campaigns/checkout/address-autocomplete"
+    icon={<div className="size-9 rounded-md flex items-center justify-center bg-purple-500/15 text-purple-500"><MapPin className="size-4" /></div>}
+    title="Address Autocomplete"
+    description="Google Maps or NextCommerce address suggestions that fill the address fields."
+  />
+  <Card
+    href="/docs/campaigns/checkout/review"
+    icon={<div className="size-9 rounded-md flex items-center justify-center bg-orange-500/15 text-orange-500"><ListChecks className="size-4" /></div>}
+    title="Review Step"
+    description="Show previously entered checkout data on a multi-step review page."
+  />
+  <Card
+    href="/docs/campaigns/checkout/prospect-cart"
+    icon={<div className="size-9 rounded-md flex items-center justify-center bg-pink-500/15 text-pink-500"><MailCheck className="size-4" /></div>}
+    title="Prospect Cart"
+    description="Capture the visitor's email before they finish — for abandoned-cart recovery."
+  />
+  <Card
+    href="/docs/campaigns/checkout/order-flow"
+    icon={<div className="size-9 rounded-md flex items-center justify-center bg-cyan-500/15 text-cyan-500"><Workflow className="size-4" /></div>}
+    title="Order Flow"
+    description="What happens on submit: validation, tokenization, order creation, redirect, and state reset."
+  />
+  <Card
+    href="/docs/campaigns/checkout/reference/attributes"
+    icon={<div className="size-9 rounded-md flex items-center justify-center bg-slate-500/15 text-slate-500"><BookOpen className="size-4" /></div>}
+    title="Reference"
+    description="Complete tables for attributes, field names, events, and CSS classes."
+  />
+</Cards>

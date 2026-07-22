@@ -31,6 +31,10 @@ Currency formatting uses the ISO 4217 code returned by the price fetch API. Befo
 
 A `next-loading` class and `data-next-loading="true"` are set on the card element during price fetches.
 
+<Callout type="warn">
+For SDK 0.4.x campaigns, `originalPrice` is the pre-discount value returned by the price calculation. Do not rely on package-level Retail Price for new bundle-selector builds; model compare-at savings with Campaign Offers instead.
+</Callout>
+
 ---
 
 ## External Price Display
@@ -143,6 +147,7 @@ Filter by discount type using the attribute value:
 |-------|-------------|
 | `{discount.name}` | Discount or offer name |
 | `{discount.amount}` | Formatted discount amount (e.g. `"$10.00"`) |
+| `{discount.percentage}` | Discount percentage formatted with `%` (e.g. `"15%"` or `"15.50%"`); empty when no percentage is set on the discount |
 | `{discount.description}` | Human-readable description; empty when absent |
 
 ### State classes

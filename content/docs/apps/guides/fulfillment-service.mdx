@@ -255,6 +255,41 @@ Once you have tracking information for your the outgoing shipment to the custome
 }
 ```
 
+## Partial Fulfillments
+
+Sometimes a fulfillment order can't be shipped in a single shipment — for example when items are backordered, or part of the order is ready early. The [Fulfillments Create](/docs/admin-api/reference/fulfillment/fulfillmentsCreate) endpoint supports partial fulfillments by accepting the optional `fulfillment_order_line_items` array. Pass only the line items (and quantities) you are ready to ship in this call, and the remaining items stay on the original fulfillment order for a later fulfillment.
+
+### Behavior
+
+- The fulfilled line items are moved from the current fulfillment order into a new closed fulfillment order.
+- The remaining items stay on the original fulfillment order, which stays open waiting to be fulfilled.
+
+### Example Partial Fulfillment Request
+
+The example below fulfills 1 of 2 units of `line_item` `101` and leaves the other unit — along with all of `line_item` `102` — on the original fulfillment order.
+
+```json title="Partial Fulfillment Create Payload" http-method="POST" http-target="https://{store}.29next.store/api/admin/fulfillment-orders/{id}/fulfillments/"
+{
+  "notify": true,
+  "fulfillment_order_line_items": [
+    {
+      "id": 101,
+      "quantity": 1
+    }
+  ],
+  "tracking_info": [
+    {
+      "tracking_code": "EXAMPLECODE",
+      "carrier": "dhl_ecommerce"
+    }
+  ]
+}
+```
+
+<Callout type="info">
+  Omit `fulfillment_order_line_items` (as in the standard [Creating Fulfillments](#creating-fulfillments) example) to fulfill every remaining item on the fulfillment order in one call.
+</Callout>
+
 ## Sync Product Inventory
 
 Products have "stock records" which represent the available physical stock at a fulfillment location. Often a single product can be stocked at multiple locations, with [Fulfillment Routing](https://docs.nextcommerce.com/docs/features/fulfillment-guide/location-based-routing) governing the order fulfillment location assignment.

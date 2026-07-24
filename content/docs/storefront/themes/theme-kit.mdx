@@ -6,8 +6,9 @@ tags:
  - Tools
 ---
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
-[Theme Kit](https://github.com/NextCommerceCo/theme-kit) is a command line tool for developers to build an maintain storefront themes programmatically, allowing theme developers to:
+[Theme Kit](https://github.com/NextCommerceCo/theme-kit) is a command line tool for developers to build and maintain storefront themes programmatically, allowing theme developers to:
 
 - Work on theme templates and assets using their local code editor or favorite IDE.
 - Use git version control to work on a theme collectively with many theme collaborators.
@@ -36,22 +37,56 @@ See how to install `python` and `pip` with [HomeBrew](https://docs.brew.sh/Homeb
 * **Option 2** - Installing `python` in Windows natively can be done with through the [Windows App Store](https://apps.microsoft.com/store/detail/python-39/9P7QFQMJRFP7?hl=en-us&gl=us). Recommend using [Windows Powershell](https://apps.microsoft.com/store/detail/powershell/9MZ1SNWT0N5D?hl=en-us&gl=us). This route is a little more tricky and some knowledge on how to manage python in windows will be required.
 
 <Callout type="idea">
-**Use Python Virtual Environments** - For Mac, Windows, and Linux, it's a best practice to use a Python Virtual Environment to isolate python packages and dependecies to reduce potential conflicts or errors, [more on creating a Python Virutal Environment](https://www.freecodecamp.org/news/how-to-setup-virtual-environments-in-python/).
+**Use Python Virtual Environments** - For Mac, Windows, and Linux, it's a best practice to use a Python Virtual Environment to isolate python packages and dependencies to reduce potential conflicts or errors, [more on creating a Python Virtual Environment](https://www.freecodecamp.org/news/how-to-setup-virtual-environments-in-python/).
 </Callout>
-### Generate an API Key
-Store authentication uses [Oauth](https://auth0.com/intro-to-iam/what-is-oauth-2/) and requires creating a store Oauth App with `theme:read` and `theme:write` permissions.
+### Setup
+Connect `ntk` to a store in three steps.
 
-1. In the Storefornt admin area create an Oauth App from **Settings>API Access** by clicking **Create App**
-2. From the **Create Oauth App** window give the app a name and assign a user from the select field
-3. In the new app's **Permissions** tab enable the `theme:read` and `theme:write` permissions.
-4. Click **save** and this will generate the API key needed for the themekit commands
+#### 1. Create the API Key
+Store authentication uses [OAuth 2.0](https://auth0.com/intro-to-iam/what-is-oauth-2/) and requires creating a store OAuth App with the `themes:read` and `themes:write` permissions.
+
+1. In the Storefront admin, go to **Settings > API Access**.
+2. Click **Create App**.
+3. Give the app a name and assign a user.
+4. In the **Permissions** tab, enable `themes:read` and `themes:write`.
+5. **Save**. Copy the generated API key — you will need it in the next step.
+
+#### 2. Configure Theme Kit
+`ntk` reads its connection settings from two places: command flags (`--apikey`, `--store`, `--theme_id`) and the `config.yml` file in your theme directory. You do not need to create `config.yml` by hand — `ntk checkout` and `ntk init` write it for you, and after that commands run without flags:
+
+```yaml title="config.yml (written by ntk checkout / ntk init)"
+development:
+  apikey: <api key>
+  store: https://{store}.29next.store
+  theme_id: <theme id>
+```
+
+<Callout type="warn">
+Keep the API key out of source control. Do not commit `config.yml` to git if it contains the key.
+</Callout>
+
+<Callout type="info">
+`config.yml` supports multiple environments. Commands use the `development` entry by default; pass `-e` / `--env` to target another environment (e.g. `ntk push --env=production`). The `[development]` prefix in command output is the active environment.
+</Callout>
+
+#### 3. Connect to a Theme
+Work from a copy of an existing theme rather than an empty directory — a complete theme is the reference for the required directories, templates, and settings.
+
+**Work on a theme already on the store** — `ntk checkout` downloads the theme into your current directory and writes `config.yml`:
+
+```bash
+ntk checkout --theme_id=<id> --apikey="<api key>" --store="https://{store}.29next.store"
+```
+
+**Add a new theme to the store** — start from a copy of an existing theme, such as the [Intro Bootstrap](https://github.com/NextCommerceCo/intro-bootstrap) starter theme, then register it as a new theme with `ntk init` and upload the files with `ntk push`:
+
+```bash
+ntk init --name="<Theme Name>" --apikey="<api key>" --store="https://{store}.29next.store"
+ntk push
+```
 
 ### Usage
 With the package installed, you can now use the commands inside your theme directory and work on a storefront theme.
-
-<Callout type="idea">
-You must pass the `apikey` and `store` parameters for all commands **if** there is not an existing `config.yml` file in your current directory.
-</Callout>
 | Command      | Description                          |
 | ----------- | ------------------------------------ |
 | `ntk init`       | Initialize a new theme  |
@@ -63,7 +98,113 @@ You must pass the `apikey` and `store` parameters for all commands **if** there 
 | `ntk sass`       | Process sass to css, see [Sass Processing](#sass-processing) |
 
 
-### Sass Processing
+#### Browse Store Themes
+To see what themes exist on the store, run `ntk list` to print the theme ID and name of each, with the active theme marked.
+
+```bash
+ntk list
+```
+
+Output looks like:
+
+```
+[development] Available themes:
+[development] 	[42] 	Spring Launch
+[development] 	[43] 	Holiday Promo (Active)
+```
+
+If you do not have a `config.yml`, also pass `--apikey` and `--store`.
+
+#### Work on an Existing Theme
+To start working on a theme that already exists on the store, `ntk checkout` downloads it into your directory and writes `config.yml` with the theme ID.
+
+```bash
+ntk checkout --theme_id=<id>
+```
+
+`--theme_id` / `-t` is required. If you do not have a `config.yml`, also pass `--apikey` and `--store`:
+
+```bash
+ntk checkout --theme_id=<id> --apikey="<api key>" --store="https://{store}.29next.store"
+```
+
+`ntk checkout` differs from `ntk pull` in one way: `checkout` writes `config.yml` so the directory is ready for subsequent `ntk push` / `ntk watch` runs; `pull` downloads the same files without writing `config.yml`.
+
+#### Add a New Theme to the Store
+`ntk init` registers your current directory as a new theme on the store and writes a `config.yml`. It does not download or scaffold any files — run it inside an existing theme codebase, then `ntk push` to upload the files.
+
+<Callout type="warn">
+Building a theme from an empty directory is not advised. Start from a copy of a complete theme — the [Intro Bootstrap](https://github.com/NextCommerceCo/intro-bootstrap) starter theme or an existing theme from your store via [`ntk checkout`](#work-on-an-existing-theme).
+</Callout>
+
+```bash
+ntk init --name="<Theme Name>"
+```
+
+`--name` / `-n` is required. If you do not have a `config.yml` yet, also pass `--apikey` and `--store`:
+
+```bash
+ntk init --name="<Theme Name>" --apikey="<api key>" --store="https://{store}.29next.store"
+```
+
+On success, `ntk init` logs the new theme ID and name, and persists the theme ID into `config.yml` so subsequent commands can omit `--theme_id`.
+
+#### Sync Files to the Store
+To sync files between your local directory and the store, use `ntk push` to upload and `ntk pull` to download. Both upload or download the whole theme by default, and both accept file paths as positional arguments to limit the operation to specific files.
+
+<Callout type="info">
+File paths are relative to the theme root. `ntk push` only uploads files inside the theme directories (`assets`, `checkout`, `configs`, `layouts`, `locales`, `partials`, `sass`, `templates`) with valid theme file extensions — a path outside of them is skipped silently, not reported as an error.
+</Callout>
+
+<Tabs items={['Push a single file', 'Push a subset of files', 'Pull a single file', 'Pull a subset of files']}>
+<Tab value="Push a single file">
+
+```bash
+ntk push templates/index.html
+```
+
+</Tab>
+<Tab value="Push a subset of files">
+
+```bash
+ntk push templates/index.html assets/main.css
+```
+
+</Tab>
+<Tab value="Pull a single file">
+
+```bash
+ntk pull templates/index.html
+```
+
+</Tab>
+<Tab value="Pull a subset of files">
+
+```bash
+ntk pull templates/index.html assets/main.css
+```
+
+</Tab>
+</Tabs>
+
+#### Watch for File Changes
+`ntk watch` monitors your theme directory and automatically pushes changed files to the store. Use it while you develop — save a file and the change is uploaded moments later.
+
+```bash
+ntk watch
+```
+
+On start, `ntk watch` logs the store, theme ID, a preview-theme URL, and the directory it is watching. Press `Ctrl + C` to stop.
+
+<Callout type="warn">
+Deletes sync too — deleting a local file while `ntk watch` is running deletes that file from the theme on the store.
+</Callout>
+
+<Callout type="info">
+`ntk watch` watches the current directory tree (subdirectories included) and only uploads files with valid theme extensions. It does not accept file arguments. To scope changes to specific files, run `ntk push` with file paths instead.
+</Callout>
+
+#### Sass Processing
 Theme kit includes support for Sass processing via [Python Libsass](https://sass.github.io/libsass-python/). Sass processing includes support for variables, imports, nesting, mixins, inheritance, custom functions, and more.
 
 <Callout type="warn">

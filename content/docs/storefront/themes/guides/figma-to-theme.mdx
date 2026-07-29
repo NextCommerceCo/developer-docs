@@ -1,0 +1,46 @@
+---
+title: Figma-to-Theme Handoff
+sidebar_label: Figma-to-Theme Handoff
+tags:
+ - Guide
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Use the [`next-theme-figma`](/docs/skills) skill to turn a storefront design into a low-inference handoff, then use `next-theme-dev` to implement it in a Spark-derived theme.
+
+### Validate the Source Before Coding
+
+Capture the exact Figma file and node IDs, inventory desktop and mobile frames, identify reusable sections, and map design tokens and assets. A large metadata response with an empty child list is a truncation or tooling failure, not proof that the frame is empty.
+
+When a large file cannot be read reliably:
+
+1. Query the known frame or component node directly.
+2. Split a full page into smaller frame or section reads.
+3. Export assets by exact node ID in bounded batches.
+4. Retry selection synchronization no more than three times.
+5. If tool access still fails and the owner authorizes it, use an exported `.fig` source.
+
+Record unresolved gaps explicitly instead of inferring missing layout or asset details.
+
+### Require Visual Evidence
+
+Before declaring visual parity, keep both sides of the comparison:
+
+- A matching Figma frame image for each reviewed route and viewport.
+- A real storefront PNG for the same route and viewport.
+- Desktop and mobile coverage, including responsive behavior and touch states.
+
+Use Theme Kit for deterministic storefront capture:
+
+```bash
+ntk capture --url="/?preview_theme=<theme-id>&skip_cache=1" \
+  --output=qa-output --viewports=desktop,mobile --json --no-progress
+```
+
+<Callout type="warn">
+DOM dimensions, text dumps, and screenshots of the wrong frame are diagnostics, not visual QA. If the matching Figma image cannot be obtained, stop the parity claim or record an accepted evidence gap with an owner.
+</Callout>
+
+### Preserve Route Coverage
+
+Review every route in the handoff, not only the homepage. Product detail work must exercise the assigned custom product template, and every route must include a 1440px desktop and 390px mobile artifact before sign-off.

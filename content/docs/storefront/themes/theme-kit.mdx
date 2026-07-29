@@ -27,14 +27,19 @@ If you already have `python` and `pip`, install with the following command:
 pip install next-theme-kit
 ```
 
+The core CLI installs without native Sass bindings on macOS (including Apple Silicon), Linux, and native Windows. Install optional features only when needed:
+
+```bash
+pip install 'next-theme-kit[sass]'     # legacy libsass compilation
+pip install 'next-theme-kit[capture]'  # screenshots; then run: playwright install chromium
+```
+
 #### Mac OSX Requirements
 See how to install `python` and `pip` with [HomeBrew](https://docs.brew.sh/Homebrew-and-Python#python-3x). Once you have completed this step you can install using the `pip` instructions above.
 
 #### Windows Requirements
 
-* **Option 1 (Recommended)** - Windows 10 and above feature WSL (Windows Subsystem for Linux) which provides a native Linux environment, see how to [Install WSL with Ubuntu](https://docs.microsoft.com/en-us/windows/wsl/install). Once you have installed WSL, follow the [best practice guides to configure and use with VS Code](https://docs.microsoft.com/en-us/windows/wsl/setup/environment) and then follow the `pip` instructions above to install Theme Kit.
-
-* **Option 2** - Installing `python` in Windows natively can be done with through the [Windows App Store](https://apps.microsoft.com/store/detail/python-39/9P7QFQMJRFP7?hl=en-us&gl=us). Recommend using [Windows Powershell](https://apps.microsoft.com/store/detail/powershell/9MZ1SNWT0N5D?hl=en-us&gl=us). This route is a little more tricky and some knowledge on how to manage python in windows will be required.
+Theme Kit's core commands run in native Windows PowerShell as well as WSL. Install Python from [python.org](https://www.python.org/downloads/windows/) or the Windows App Store, create a virtual environment, then use the same `pip` command shown above.
 
 <Callout type="idea">
 **Use Python Virtual Environments** - For Mac, Windows, and Linux, it's a best practice to use a Python Virtual Environment to isolate python packages and dependencies to reduce potential conflicts or errors, [more on creating a Python Virtual Environment](https://www.freecodecamp.org/news/how-to-setup-virtual-environments-in-python/).
@@ -96,6 +101,8 @@ With the package installed, you can now use the commands inside your theme direc
 | `ntk push`       | Push current theme state to store |
 | `ntk watch`    | Watch for local changes and automatically push changes to store |
 | `ntk sass`       | Process sass to css, see [Sass Processing](#sass-processing) |
+| `ntk validate`   | Validate theme files locally or against the store |
+| `ntk capture`    | Capture deterministic desktop and mobile PNGs |
 
 
 #### Browse Store Themes
@@ -153,7 +160,7 @@ On success, `ntk init` logs the new theme ID and name, and persists the theme ID
 To sync files between your local directory and the store, use `ntk push` to upload and `ntk pull` to download. Both upload or download the whole theme by default, and both accept file paths as positional arguments to limit the operation to specific files.
 
 <Callout type="info">
-File paths are relative to the theme root. `ntk push` only uploads files inside the theme directories (`assets`, `checkout`, `configs`, `layouts`, `locales`, `partials`, `sass`, `templates`) with valid theme file extensions — a path outside of them is skipped silently, not reported as an error.
+File paths are relative to the theme root. `ntk push` only uploads files inside the theme directories (`assets`, `checkout`, `configs`, `layouts`, `locales`, `partials`, `sass`, `templates`) with valid theme file extensions. Explicit unsupported or missing paths are reported as rejected and make the command fail.
 </Callout>
 
 <Tabs items={['Push a single file', 'Push a subset of files', 'Pull a single file', 'Pull a subset of files']}>
@@ -196,6 +203,8 @@ ntk watch
 
 On start, `ntk watch` logs the store, theme ID, a preview-theme URL, and the directory it is watching. Press `Ctrl + C` to stop.
 
+Opening a plain storefront URL does not leave a pinned preview session. Use the visible preview indicator's **Exit preview** link or open `/?deactivate-theme=true`.
+
 <Callout type="warn">
 Deletes sync too — deleting a local file while `ntk watch` is running deletes that file from the theme on the store.
 </Callout>
@@ -203,6 +212,36 @@ Deletes sync too — deleting a local file while `ntk watch` is running deletes 
 <Callout type="info">
 `ntk watch` watches the current directory tree (subdirectories included) and only uploads files with valid theme extensions. It does not accept file arguments. To scope changes to specific files, run `ntk push` with file paths instead.
 </Callout>
+
+#### Validate Before Upload
+
+Local validation checks supported paths, JSON syntax, template block balance, and unsafe custom-product inheritance. It does not claim to prove a complete runtime render.
+
+```bash
+ntk validate templates/catalogue/product.subscription.html configs/settings.json
+ntk validate --server templates/catalogue/product.subscription.html
+```
+
+`--server` submits locally valid text templates to the store validator without saving. It requires the store, API key, and theme ID from flags or `config.yml`.
+
+#### Capture Desktop and Mobile Evidence
+
+With the capture extra and Chromium installed, generate real rendered PNGs at the fixed 1440px desktop and 390px mobile widths:
+
+```bash
+ntk capture --url="/?preview_theme=<theme-id>&skip_cache=1" \
+  --output=qa-output --viewports=desktop,mobile --json --no-progress
+```
+
+Capture waits for network idle, web fonts, lazy content, and images. DOM measurements are useful diagnostics but are not a substitute for these visual artifacts.
+
+#### Automation Contract
+
+Finite commands accept `--json`, `--quiet`, and `--no-progress`. JSON mode writes exactly one schema-versioned result to stdout, keeps diagnostics on stderr, disables interactive progress, and reports file outcomes individually. Authentication, connection, validation, rejection, and partial-transfer failures return a non-zero exit status.
+
+```json
+{"schema_version":"1","command":"push","ok":true,"count":1,"results":[{"path":"templates/index.html","status":"uploaded"}]}
+```
 
 #### Sass Processing
 Theme kit includes support for Sass processing via [Python Libsass](https://sass.github.io/libsass-python/). Sass processing includes support for variables, imports, nesting, mixins, inheritance, custom functions, and more.

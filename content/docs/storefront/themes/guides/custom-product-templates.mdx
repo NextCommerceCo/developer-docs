@@ -6,61 +6,59 @@ tags:
 ---
 import { Callout } from 'fumadocs-ui/components/callout';
 
-Products can have very diverse design requirements that often require custom layouts. In this guide, we'll go over some of the best practices for creating and managing custom product templates.
+Products can have very different design requirements. Assign a named custom product template when a product needs a purpose-built layout.
 
-### Product Templates Location
+### Product Template Location
 
-In the `templates/catalogue` directory of a theme, theme developers can edit/manage the product page templates.
+Store product templates under `templates/catalogue`:
 
-```bash title="Product Templates Location"
-catalogue
-  └── product.html (default)
-  └── product.<custom1>.html
-  └── product.<custom2>.html
+```text title="Product Templates Location"
+templates/catalogue/
+  product.html
+  product.subscription.html
+  product.bundle.html
 ```
 
-### Extend & Override
+The segment between `product.` and `.html` is the product's template key. A product URL slug does not select the template.
 
-**Create a Custom Product Template**
+### Build a Standalone Product Document
 
-Create a new product template in the **templates>catalogue** directory with the following naming convention:
+Create the exact file for the key you plan to assign:
 
-```bash title="Custom Product Template Naming"
-templates/catalogue/product.<custom>.html
+```text title="Custom Product Template Naming"
+templates/catalogue/product.<template-key>.html
 ```
 
-Templates that follow this naming convention will be selectable on the product detail to use on the storefront.
+Do not extend `templates/catalogue/product.html` from a `product.<template-key>.html` file. Runtime template resolution already treats the generic template as a fallback; inheriting from it can hide selection mistakes and couples the custom design to a separate page implementation.
 
-
-**Extend & Override Default Product Template**
-
-As a best practice, you should [extend](/docs/storefront/themes/templates/tags#extends--block) the default product template to override the necessary [template blocks](/docs/storefront/themes/templates/tags#extends--block) to achieve your customization with a limited amount of duplicate code.
-
+A custom product template may be a complete document or extend the shared `layouts/base.html` shell. Keep independently replaceable global surfaces in named [template blocks](/docs/storefront/themes/templates/tags#extends--block).
 
 ```django title="Example Custom Product Template"
+{% extends "layouts/base.html" %}
 
-{% extends "templates/catalogue/product.html" %}
+{% block title %}{{ product.title }}{% endblock title %}
 
-{% block header %}
-    // Custom Product Header Code
-{% endblock header %}
-
-{% block product_description %}
-    // Custom Product Content Template Code
-{% endblock %}
-
-
+{% block content %}
+    <article data-product-id="{{ product.id }}">
+        <h1>{{ product.title }}</h1>
+        {# Render the complete custom product experience here. #}
+    </article>
+{% endblock content %}
 ```
 
-This strategy will simplify the creation and management of custom product templates so you can focus on the customized areas for the new custom product template.
+Validate and upload the exact file before assigning it:
 
+```bash
+ntk validate --server templates/catalogue/product.subscription.html
+ntk push templates/catalogue/product.subscription.html --json --no-progress
+```
 
-**Select Template for Product**
+### Assign and Verify the Template
 
-On your product of choice, select your newly created template as the Product Template to activate the template on your product in the storefront.
+On the product, set **Product Template** to the template key—for example, `subscription`. You can use the dashboard or the Admin API. Then open the product route in a preview session with `skip_cache=1`.
 
+On the network domain, confirm `X-Theme-Template: templates/catalogue/product.subscription.html`. If the header reports `templates/catalogue/product.html`, the platform fell back to the generic template; check the product's template field, filename, validation result, and upload outcome.
 
 <Callout type="idea">
-
-You are not limited to overriding the existing template blocks in the default product template. You can create and add your own to the default template to overide in your custom template. For example, adding `{% block my_custom_block %}{% endblock %}` to product.html, around any area you wish to customize, will allow you to overide it in the custom template
+Preview selection is pinned in the `preview_theme` cookie. Use the storefront preview indicator's **Exit preview** action or `/?deactivate-theme=true` when you finish; opening a plain URL does not deactivate the preview.
 </Callout>

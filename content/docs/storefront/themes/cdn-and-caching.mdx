@@ -10,6 +10,8 @@ Storefront leverages CDNs and many caching strategies to ensure fast performant 
 <Callout type="info" title="Use Network Domain while Building Themes">
 Always use the store network domain `{store}.29next.store` when developing themes to bypass full page caching and preview your latest updates.
 </Callout>
+
+The network domain bypasses the full-page cache. It does not, by itself, prove that a template lookup is fresh.
 ### Asset CDN
 
 All merchant uploaded media assets and theme assets are loaded from our CDN for the fastest performance. 
@@ -27,13 +29,28 @@ All pages on storefront are cached for 5 minutes to ensure popular pages are as 
 
 
 <Callout type="idea">
-To skip the cache, you can append a unique querystring such as `?skip_cache` to skip existing cache and see the latest. 
+On the network domain or in an active preview session, append `?skip_cache=1` to bypass both the full-page and theme-template caches for that request. On a mapped production domain without a preview session, the parameter is ignored.
 </Callout>
 ### Template Caching
 
 Themes use many templates ie `layouts`, `partials`, and `assets` that when compiled together create amazing customer experiences. Templates are cached in memory to reduce database queries when compiling templates into the full html response. 
 
-Updating a template through the dashboard or [Theme Kit](/docs/storefront/themes/theme-kit) should automatically purge the cache for you to see your latest changes on the network domain, see notes above. 
+Each theme has a shared revision. Saving or deleting a template rotates that revision, so every application worker stops using its prior process-local or shared-cache entry. If a request must prove current database content, use the authorized `skip_cache=1` flow above.
+
+Network-domain responses include diagnostic headers:
+
+| Header | Meaning |
+| --- | --- |
+| `X-Theme-Id` | Active or previewed theme ID |
+| `X-Theme-Template` | Effective template selected after fallback |
+| `X-Theme-Template-Candidates` | Ordered custom and generic candidates |
+| `X-Theme-Template-Revision` | Version of the selected template |
+| `X-Theme-Revision` | Shared theme revision used for cache keys |
+| `X-Theme-Cache` | `local`, `shared`, `db`, or `bypass-db` source |
+
+These headers are intentionally omitted from mapped production domains. For a custom product page, verify that `X-Theme-Template` names the intended `product.<template-key>.html`; a product URL slug does not select the template.
+
+Theme assets use one canonical storage key per logical asset name. Replacing an asset updates that key and its versioned URL rather than accumulating suffixed filenames.
 
 
 <Callout type="warn">

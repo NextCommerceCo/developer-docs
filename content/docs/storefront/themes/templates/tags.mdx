@@ -100,23 +100,60 @@ The `cart_form` tag generates an add-to-cart form for a product. Required on eve
 {% cart_form request product 'single' as cart_form %}
 ```
 
-```django title="Example Product Add to Cart Form"
-{% cart_form request product 'single' as cart_form %}
-<form method="post" action="{% url 'cart:add' product.slug %}">
-    {% csrf_token %}
-    {{ cart_form }}
-    <button type="submit" class="btn btn-primary">
-        Add to Cart
-    </button>
-</form>
+The tag returns a form object, not rendered HTML. Loop over it to render each field in your own markup, as the Intro Bootstrap theme does through its `partials/form_fields.html` partial.
+
+```django title="templates/catalogue/product.html"
+{% block product_cart_form %}
+    <div class="catalogue_product-action">
+        {% purchase_info_for_product request product as session %}
+        {% if session.availability.is_available_to_buy %}
+        {% cart_form request product 'single' as cart_form %}
+        <form id="add-to-cart" class="row g-3" action="{% url 'cart:add' pk=product.pk %}" method="post">
+            {% csrf_token %}
+            {% include "partials/form_fields.html" with form=cart_form breakpoint_col='col-3 col-md-2' size='lg' nolabel=True %}
+            <div class="col-9 col-md-10">
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg omnisend-add-to-cart-button" data-loading-text='{% t "store.catalogue.add_to_cart_loading" %}' data-disabled-text='{% t "store.catalogue.product_unavailable" %}'>{% t "store.catalogue.add_to_cart" %}</button>
+                </div>
+            </div>
+        </form>
+        {% else %}
+        <div class="fs-6">{% t "store.catalogue.out_of_stock" %}</div>
+        {% endif %}
+    </div>
+{% endblock %}
+```
+
+```django title="partials/form_fields.html"
+{% if form.is_bound and not form.is_valid %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        {% t "global.error.please_check_error" %}
+    </div>
+{% endif %}
+
+{% if form.non_field_errors %}
+    {% for error in form.non_field_errors %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            {{ error }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% for field in form %}
+    {% include 'partials/form_field.html' with field=field style=style %}
+{% endfor %}
 ```
 
 | Argument | Description |
 | --- | --- |
 | request | The current `request` context object. |
 | product | The `product` context object. |
-| form_type | The form type, typically `'single'`. |
+| quantity_type | Accepts `'single'` or `'multiple'`. |
 | variable | Assigned template variable name for the form. |
+
+Add [line item property](/docs/storefront/themes/guides/personalized-products) inputs to this form to capture customer personalization such as an engraving or gift message.
 
 ### comment
 

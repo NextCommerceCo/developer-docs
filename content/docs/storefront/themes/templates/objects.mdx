@@ -758,6 +758,32 @@ There are three filter types: `price_range`, `boolean`, and `list`. Each type ha
 | `label` | String | Display label for this value. |
 
 
+### line
+
+Cart line object available on the cart page (`templates/cart.html`) through the `formset` context. Each form in the formset exposes its cart line as `form.instance`.
+
+```django title="Example Cart Line Properties"
+{% for form in formset %}
+    {% with line=form.instance %}
+        {% for property in line.properties %}
+            <div>{{ property.key }}: {{ property.value }}</div>
+        {% endfor %}
+    {% endwith %}
+{% endfor %}
+```
+
+| Property | Type | Description |
+| ----- | ------ | ------ |
+| `properties` | List | Line item properties captured on the product page, see [Personalized Products](/docs/storefront/themes/guides/personalized-products). Property names starting with an underscore are excluded. |
+
+**line.properties**
+
+| Property | Type | Description |
+| ----- | ------ | ------ |
+| `key` | String | The property name, taken from the `properties[<name>]` input on the product page. |
+| `value` | String | The value submitted by the customer. |
+
+
 ## Template Contexts
 
 All templates receive the [Global Objects](#global-objects) (`store`, `settings`, `currencies`, `languages_active_storefront`, `menus`, `products`, `product_categories`, `posts`, `post_categories`, `privacy_policy`, `terms_and_conditions`, `subscription_terms_and_conditions`, `request`, `storefront_geos`). The table below lists additional view-specific context variables passed to each template.
@@ -765,6 +791,7 @@ All templates receive the [Global Objects](#global-objects) (`store`, `settings`
 | Template | View-Specific Context |
 | ----- | ------ |
 | `templates/index.html` | Global objects only. Use the [`where`](/docs/storefront/themes/templates/tags#where) tag to query products and categories. |
+| `templates/cart.html` | `formset` (cart line forms, each `form.instance` is a [line](#line)) |
 | `templates/catalogue/product.html` | `product`, `variant_form`, `interval_count_choices` |
 | `templates/catalogue/index.html` | `products` (paginated), `paginator`, `page_obj` |
 | `templates/catalogue/category.html` | `category`, `products` (paginated), `filters`, `has_active_filter`, `paginator`, `page_obj` |

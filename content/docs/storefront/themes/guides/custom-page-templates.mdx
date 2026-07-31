@@ -23,7 +23,7 @@ pages
 
 **Create a Custom Page Template**
 
-Create a new page template in the **templates>pages** directory with the following naming convention:
+Create a new page template in the `templates/pages` directory with the following naming convention:
 
 ```bash title="Custom Page Template Naming"
 templates/pages/page.<custom>.html
@@ -50,7 +50,7 @@ This strategy will simplify the creation and management of custom page templates
 
 On your page of choice, select your newly created template as the **Theme Template** to activate the template for your page in the storefront.
 
-After uploading and selecting the template, open the page on `https://{store}.29next.store` and verify the served HTML, expected assets, and behavior. Do not use a mapped public storefront domain to decide whether the template change landed.
+After uploading and selecting the template, navigate to that page's full storefront URL on the `https://{store}.29next.store` network domain and verify the served HTML, expected assets, and behavior. Do not use a mapped public storefront domain to decide whether the template change landed.
 
 <Callout type="idea">
 You are not limited to overriding the existing template blocks in the default page template. You can create and add your own to the default template to overide in your custom template. For example, adding `{% block my_custom_block %}{% endblock %}` to page.html, around any area you wish to customize, will allow you to overide it in the custom template

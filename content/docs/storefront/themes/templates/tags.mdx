@@ -113,7 +113,7 @@ The tag returns a form object, not rendered HTML. Loop over it to render each fi
             {% include "partials/form_fields.html" with form=cart_form breakpoint_col='col-3 col-md-2' size='lg' nolabel=True %}
             <div class="col-9 col-md-10">
                 <div class="d-grid">
-                    <button type="submit" class="btn btn-primary btn-lg omnisend-add-to-cart-button" data-loading-text='{% t "store.catalogue.add_to_cart_loading" %}' data-disabled-text='{% t "store.catalogue.product_unavailable" %}'>{% t "store.catalogue.add_to_cart" %}</button>
+                    <button type="submit" class="btn btn-primary btn-lg" data-loading-text='{% t "store.catalogue.add_to_cart_loading" %}' data-disabled-text='{% t "store.catalogue.product_unavailable" %}'>{% t "store.catalogue.add_to_cart" %}</button>
                 </div>
             </div>
         </form>

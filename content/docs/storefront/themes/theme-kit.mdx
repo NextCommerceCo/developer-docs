@@ -196,6 +196,10 @@ ntk watch
 
 On start, `ntk watch` logs the store, theme ID, a preview-theme URL, and the directory it is watching. Press `Ctrl + C` to stop.
 
+<Callout type="info" title="Verify Changes on the Network Domain">
+After each upload, open the affected route on `https://{store}.29next.store` and verify the served HTML, expected assets, and behavior. Do not use a mapped public storefront domain to decide whether a push succeeded. Check the public domain only after network-domain verification.
+</Callout>
+
 <Callout type="warn">
 Deletes sync too — deleting a local file while `ntk watch` is running deletes that file from the theme on the store.
 </Callout>

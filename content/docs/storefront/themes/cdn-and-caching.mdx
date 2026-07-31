@@ -8,7 +8,7 @@ import { Callout } from 'fumadocs-ui/components/callout';
 Storefront leverages CDNs and many caching strategies to ensure fast performant user experiences for your end customers. 
 
 <Callout type="info" title="Use Network Domain while Building Themes">
-Always use the store network domain `{store}.29next.store` when developing themes to bypass full page caching and preview your latest updates.
+Always use the store network domain `https://{store}.29next.store` when developing, previewing, debugging, and verifying themes. Do not use a mapped public storefront domain to decide whether a theme change landed.
 </Callout>
 ### Asset CDN
 
@@ -26,8 +26,8 @@ All pages on storefront are cached for 5 minutes to ensure popular pages are as 
 - Page is not dynamic, ie `/cart/`, `/checkout/`, `/accounts/` do not use full page caching. 
 
 
-<Callout type="idea">
-To skip the cache, you can append a unique querystring such as `?skip_cache` to skip existing cache and see the latest. 
+<Callout type="idea" title="Verify the Network Domain First">
+Confirm the latest theme on `https://{store}.29next.store` first. After it is correct there, check the mapped public storefront domain as a final customer-path smoke test.
 </Callout>
 ### Template Caching
 

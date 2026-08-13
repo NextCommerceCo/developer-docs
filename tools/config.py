@@ -45,6 +45,24 @@ Setting a rate limit helps to prevent API abuse and provide overall fairness of 
 
 ADMIN_API_SPEC_SOURCE = "https://sandbox.29next.store/api/schema/admin/"
 
+# Campaigns endpoints merchants reach through the store admin API, which proxies the
+# request to the campaigns app. Only the paths are merged into the admin spec — its
+# components, securitySchemes and info are left behind.
+CAMPAIGNS_ADMIN_API_SPEC_SOURCE = "https://campaigns.apps.29next.com/api/admin/schema/"
+
+# Admin spec paths are relative to the admin server url, which already ends in /api/admin/.
+CAMPAIGNS_ADMIN_PATH_PREFIX = "/api/admin"
+
+# Headers the store platform injects when it proxies. The store header never comes from
+# the merchant, and the version header is replaced with the admin spec's own casing.
+CAMPAIGNS_ADMIN_DROP_PARAMETERS = ["X-29Next-Store", "X-29Next-Api-Version"]
+
+# Match the admin spec's operationId convention, which sets the docs page filename and title.
+CAMPAIGNS_ADMIN_OPERATION_IDS = {
+    "adminCampaignList": "campaignsList",
+    "adminCampaignRetrieve": "campaignsRetrieve",
+}
+
 ADMIN_API_SPEC_ADDITIONS = {
     "servers": [
         {
@@ -122,6 +140,7 @@ API_VERSIONS = [
         "source": ADMIN_API_SPEC_SOURCE,
         "additions": ADMIN_API_SPEC_ADDITIONS,
         "description": ADMIN_API_DESCRIPTION,
+        "campaigns_admin": True,
     },
     {
         "type": "admin",
@@ -129,6 +148,7 @@ API_VERSIONS = [
         "source": ADMIN_API_SPEC_SOURCE,
         "additions": ADMIN_API_SPEC_ADDITIONS,
         "description": ADMIN_API_DESCRIPTION,
+        "campaigns_admin": True,
     },
 ]
 

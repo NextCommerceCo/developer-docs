@@ -6403,14 +6403,12 @@ components:
               - store.updated
               - subscription.created
               - subscription.updated
-              - ticket.created
-              - ticket.updated
               - transaction.created
               - transaction.updated
             type:
               - string
               - 'null'
-            x-spec-enum-id: cb01c8453927feb8
+            x-spec-enum-id: 2fff8156f601ff82
           type: array
         id:
           readOnly: true
@@ -10713,14 +10711,12 @@ components:
               - store.updated
               - subscription.created
               - subscription.updated
-              - ticket.created
-              - ticket.updated
               - transaction.created
               - transaction.updated
             type:
               - string
               - 'null'
-            x-spec-enum-id: cb01c8453927feb8
+            x-spec-enum-id: 2fff8156f601ff82
           type: array
         id:
           readOnly: true
@@ -10771,6 +10767,8 @@ components:
           scopes:
             admin:read: Access to list and view all data
             admin:write: Access to create and update all data
+            campaigns:read: Access to list and view campaigns
+            campaigns:write: Access to create and update campaigns
             carts:read: Access to list and view carts
             carts:write: Access to create and update carts
             catalogue:read: Access to list and view catalogue related objects
@@ -11100,6 +11098,295 @@ paths:
             - fulfillment_service:read
       tags:
         - fulfillment
+  /campaigns/:
+    get:
+      description: List every campaign belonging to the store.
+      operationId: campaignsList
+      parameters:
+        - description: Created on or after this date (YYYY-MM-DD, UTC).
+          in: query
+          name: created_date_from
+          schema:
+            format: date
+            type: string
+        - description: Created on or before this date (YYYY-MM-DD, UTC).
+          in: query
+          name: created_date_to
+          schema:
+            format: date
+            type: string
+        - description: Default currency, as an ISO 4217 code (e.g. USD).
+          in: query
+          name: currency
+          schema:
+            type: string
+        - description: The pagination cursor value.
+          in: query
+          name: cursor
+          required: false
+          schema:
+            type: string
+        - description: Campaign language, as an ISO 639-1 code (e.g. en).
+          in: query
+          name: language
+          schema:
+            type: string
+        - description: Campaign name contains this text, case-insensitive.
+          in: query
+          name: name
+          schema:
+            type: string
+        - description: Number of results to return per page.
+          in: query
+          name: page_size
+          required: false
+          schema:
+            type: integer
+        - description: Last updated on or after this date (YYYY-MM-DD, UTC).
+          in: query
+          name: updated_date_from
+          schema:
+            format: date
+            type: string
+        - description: Last updated on or before this date (YYYY-MM-DD, UTC).
+          in: query
+          name: updated_date_to
+          schema:
+            format: date
+            type: string
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: '2024-04-01'
+            enum:
+              - '2024-04-01'
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  next:
+                    example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    format: uri
+                    nullable: true
+                    type: string
+                  previous:
+                    example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    format: uri
+                    nullable: true
+                    type: string
+                  results:
+                    items:
+                      description: Enough to pick a campaign; its settings live on the detail endpoint.
+                      properties:
+                        created_at:
+                          description: When the campaign was created.
+                          format: date-time
+                          readOnly: true
+                          type: string
+                        currency:
+                          description: Default currency for orders created through this campaign.
+                          maxLength: 3
+                          title: Default Currency
+                          type: string
+                        id:
+                          description: Campaign ID, the path parameter on the detail endpoint.
+                          readOnly: true
+                          type: integer
+                        language:
+                          description: Preferred language for customers of this campaign.
+                          maxLength: 3
+                          type: string
+                        name:
+                          description: Campaign name used internally for reference.
+                          maxLength: 200
+                          type: string
+                        updated_at:
+                          description: When the campaign was last updated.
+                          format: date-time
+                          readOnly: true
+                          type: string
+                      required:
+                        - created_at
+                        - currency
+                        - id
+                        - language
+                        - name
+                        - updated_at
+                      type: object
+                    type: array
+                required:
+                  - results
+                type: object
+          description: ''
+      security:
+        - oauth2:
+            - campaigns:read
+      tags:
+        - campaigns
+  /campaigns/{id}/:
+    get:
+      description: Retrieve a campaign's settings.
+      operationId: campaignsRetrieve
+      parameters:
+        - description: Campaign ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: '2024-04-01'
+            enum:
+              - '2024-04-01'
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                description: |-
+                  `campaigns.campaigns.forms.CampaignConfigForm` plus identifiers and timestamps, minus
+                  `enable_retail_price_and_quantity` (a legacy internal toggle) and `store` (already named
+                  in the request header, and its model carries `api_key`, the outbound OAuth token this app
+                  calls prime with).
+
+                  `test_fields_match_the_campaign_settings_form` asserts the payload against the form's own
+                  field list, so adding a form field surfaces as a failing test rather than silent drift.
+                properties:
+                  additional_currencies:
+                    description: Currencies supported in addition to the default currency.
+                    items:
+                      maxLength: 3
+                      nullable: true
+                      type: string
+                    nullable: true
+                    type: array
+                  api_key:
+                    description: Key the storefront authenticates against the campaigns API with.
+                    readOnly: true
+                    type: string
+                  available_express_payment_methods:
+                    description: Express payment methods enabled on the campaign.
+                    items:
+                      properties:
+                        code:
+                          description: Express payment method code.
+                          maxLength: 255
+                          nullable: true
+                          type: string
+                        name:
+                          description: Human-readable express payment method name.
+                          maxLength: 128
+                          nullable: true
+                          type: string
+                      type: object
+                    readOnly: true
+                    type: array
+                  available_payment_methods:
+                    description: Payment methods enabled on the campaign.
+                    items:
+                      properties:
+                        code:
+                          description: Payment method code.
+                          maxLength: 255
+                          nullable: true
+                          type: string
+                        name:
+                          description: Human-readable payment method name.
+                          maxLength: 128
+                          nullable: true
+                          type: string
+                      type: object
+                    readOnly: true
+                    type: array
+                  available_shipping_countries:
+                    description: Countries the campaign can ship to.
+                    items:
+                      properties:
+                        code:
+                          description: ISO 3166-1 alpha-2 country code.
+                          type: string
+                        name:
+                          description: Country name.
+                          type: string
+                      required:
+                        - code
+                        - name
+                      type: object
+                    readOnly: true
+                    type: array
+                  created_at:
+                    description: When the campaign was created.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                  currency:
+                    description: Default currency for orders created through this campaign.
+                    maxLength: 3
+                    title: Default Currency
+                    type: string
+                  id:
+                    description: Campaign ID, the path parameter on this endpoint.
+                    readOnly: true
+                    type: integer
+                  language:
+                    description: Preferred language for customers of this campaign.
+                    maxLength: 3
+                    type: string
+                  name:
+                    description: Campaign name used internally for reference.
+                    maxLength: 200
+                    type: string
+                  payment_gateway_group_id:
+                    description: Payment gateway group used instead of the store default.
+                    maximum: 2147483647
+                    minimum: 0
+                    type: integer
+                  payment_gateway_group_name:
+                    description: Name of the payment gateway group.
+                    maxLength: 200
+                    nullable: true
+                    type: string
+                  paypal_account_id:
+                    description: PayPal account used instead of the store default.
+                    nullable: true
+                    type: integer
+                  statement_descriptor:
+                    description: Descriptor shown on the customer's card statement.
+                    maxLength: 255
+                    nullable: true
+                    type: string
+                  updated_at:
+                    description: When the campaign was last updated.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                required:
+                  - api_key
+                  - available_express_payment_methods
+                  - available_payment_methods
+                  - available_shipping_countries
+                  - created_at
+                  - currency
+                  - id
+                  - language
+                  - name
+                  - payment_gateway_group_id
+                  - updated_at
+                type: object
+          description: ''
+      security:
+        - oauth2:
+            - campaigns:read
+      tags:
+        - campaigns
   /carts/:
     get:
       description: Retrieve a list of all open carts.
@@ -12010,7 +12297,7 @@ paths:
               - subscription_list
               - transaction_list
             type: string
-            x-spec-enum-id: 0ef8a3327896084c
+            x-spec-enum-id: d0060bc4b12d9a83
         - description: YYYY-MM-DD
           in: query
           name: date_created_from
@@ -18953,8 +19240,6 @@ paths:
                 - store.updated
                 - subscription.created
                 - subscription.updated
-                - ticket.created
-                - ticket.updated
                 - transaction.created
                 - transaction.updated
               type: string
@@ -29247,6 +29532,7 @@ webhooks:
 tags:
   - name: apps
   - name: fulfillment
+  - name: campaigns
   - name: carts
   - name: products
   - name: payments

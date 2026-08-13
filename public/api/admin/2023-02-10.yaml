@@ -5937,14 +5937,12 @@ components:
               - store.updated
               - subscription.created
               - subscription.updated
-              - ticket.created
-              - ticket.updated
               - transaction.created
               - transaction.updated
             type:
               - string
               - 'null'
-            x-spec-enum-id: cb01c8453927feb8
+            x-spec-enum-id: 2fff8156f601ff82
           type: array
         id:
           readOnly: true
@@ -10145,14 +10143,12 @@ components:
               - store.updated
               - subscription.created
               - subscription.updated
-              - ticket.created
-              - ticket.updated
               - transaction.created
               - transaction.updated
             type:
               - string
               - 'null'
-            x-spec-enum-id: cb01c8453927feb8
+            x-spec-enum-id: 2fff8156f601ff82
           type: array
         id:
           readOnly: true
@@ -10203,6 +10199,8 @@ components:
           scopes:
             admin:read: Access to list and view all data
             admin:write: Access to create and update all data
+            campaigns:read: Access to list and view campaigns
+            campaigns:write: Access to create and update campaigns
             carts:read: Access to list and view carts
             carts:write: Access to create and update carts
             catalogue:read: Access to list and view catalogue related objects
@@ -11442,7 +11440,7 @@ paths:
               - subscription_list
               - transaction_list
             type: string
-            x-spec-enum-id: 0ef8a3327896084c
+            x-spec-enum-id: d0060bc4b12d9a83
         - description: YYYY-MM-DD
           in: query
           name: date_created_from
@@ -18139,8 +18137,6 @@ paths:
                 - store.updated
                 - subscription.created
                 - subscription.updated
-                - ticket.created
-                - ticket.updated
                 - transaction.created
                 - transaction.updated
               type: string

@@ -36,14 +36,14 @@ Upsell and post-purchase flows work the same way: the test card carries through 
 Test cards create orders with **no** transactions. If your integration needs realistic transaction objects — captures, declines, refunds — set up the **Test Gateway** (Settings > Payments > Add Gateway), which behaves like a real gateway and produces Test transactions, including a dedicated declined-payment card.
 
 <Callout type="warn">
-Adding the Test Gateway to your default gateway group can affect live order flows. On stores with live traffic, prefer test cards, or target the Test Gateway by ID through the API. See [Test Gateway setup](/docs/admin-api/guides/testing-guide#test-gateway).
+Adding the Test Gateway to your default gateway group can affect live order flows. On stores with live traffic, prefer test cards, or target the Test Gateway by ID through the API. See [Test Gateway setup](/docs/admin-api/guides/testing-guide).
 </Callout>
 
 ## Testing Subscriptions and Renewals
 
 You don't have to wait calendar time to test a renewal:
 
-- Create a test subscription through the [Test Gateway](/docs/admin-api/guides/testing-guide#test-subscriptions) (Test Gateway subscriptions can create renewal orders; test-card subscriptions cannot).
+- Create a test subscription through the [Test Gateway](/docs/admin-api/guides/testing-guide) (Test Gateway subscriptions can create renewal orders; test-card subscriptions cannot).
 - Trigger a renewal on demand with the [subscriptionsRenewCreate](/docs/admin-api/reference/subscriptions/subscriptionsRenewCreate) endpoint, or set `next_renewal_date` to a past date and the renewal processes within about 30 minutes. Both are covered in [Subscription Management](/docs/admin-api/guides/subscription-management).
 
 ## Testing Webhooks

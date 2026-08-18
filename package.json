@@ -17,6 +17,7 @@
     "@graphql-markdown/cli": "^0.7.0",
     "@graphql-tools/url-loader": "^9.0.6",
     "@monaco-editor/react": "^4.7.0",
+    "@next/third-parties": "^16.3.1",
     "@radix-ui/react-presence": "^1.1.5",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@types/mdx": "^2",

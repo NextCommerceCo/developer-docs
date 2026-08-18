@@ -1,0 +1,55 @@
+---
+title: Testing
+description: Test checkout, orders, subscriptions, and webhooks on a live store without moving real money
+sidebar_position: 1
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+You can test every order flow on Next Commerce — checkout, upsells, subscriptions, webhooks — **on a live store, without moving real money and without changing any payment settings**. Test cards create tagged Test Orders that never touch a payment gateway, and Test Orders can be deleted when you're done.
+
+<Callout type="info" title="No separate sandbox needed">
+There is no separate sandbox environment to provision. Test cards work on live stores and live integrations, so you QA against the exact configuration that will serve real customers.
+</Callout>
+
+## Test Cards
+
+Use these card numbers in any checkout — storefront, campaign funnel, or API-driven — to create Test Orders with no attached transactions:
+
+| Test Card Number | Expiration | CVV | Use Case |
+| ---- | ---- | ---- | ---- |
+| 6011111111111117 | Any Future Date | Any | Test payment success flow without transaction. |
+| 6011000990139424 | Any Future Date | Any | Test 3DS payment flow without transaction. |
+
+Orders created this way are tagged as **Test Orders** in the dashboard, skip the gateway entirely, and are safe to create on stores with live traffic.
+
+On the Admin API, you can skip card tokenization during early integration work by using the `test_card` and `test_3ds_card` tokens directly — see the [Testing Guide](/docs/admin-api/guides/testing-guide) for the token flow.
+
+## Testing Checkout and Campaign Funnels
+
+To QA a campaign funnel (landing → checkout → upsell → receipt) end to end, add your development domain (e.g. `localhost`) as a *development* domain in the Campaigns App so requests are authorized, then pay with a test card at checkout. The [Campaigns getting-started guide](/docs/campaigns/checkout/get-started) walks through this, including placing a complete test order.
+
+Upsell and post-purchase flows work the same way: the test card carries through the whole funnel, so every accept/decline path can be exercised without a real charge.
+
+## Testing Full Transaction Flows
+
+Test cards create orders with **no** transactions. If your integration needs realistic transaction objects — captures, declines, refunds — set up the **Test Gateway** (Settings > Payments > Add Gateway), which behaves like a real gateway and produces Test transactions, including a dedicated declined-payment card.
+
+<Callout type="warn">
+Adding the Test Gateway to your default gateway group can affect live order flows. On stores with live traffic, prefer test cards, or target the Test Gateway by ID through the API. See [Test Gateway setup](/docs/admin-api/guides/testing-guide#test-gateway).
+</Callout>
+
+## Testing Subscriptions and Renewals
+
+You don't have to wait calendar time to test a renewal:
+
+- Create a test subscription through the [Test Gateway](/docs/admin-api/guides/testing-guide#test-subscriptions) (Test Gateway subscriptions can create renewal orders; test-card subscriptions cannot).
+- Trigger a renewal on demand with the [subscriptionsRenewCreate](/docs/admin-api/reference/subscriptions/subscriptionsRenewCreate) endpoint, or set `next_renewal_date` to a past date and the renewal processes within about 30 minutes. Both are covered in [Subscription Management](/docs/admin-api/guides/subscription-management).
+
+## Testing Webhooks
+
+Webhook payloads mirror Admin API serializers, so the data your receiver gets matches what a GET on the same resource returns. Set up a test webhook and inspect delivery logs from the dashboard to verify your receiver, and drive events with your test order flows — see the [Webhooks overview](/docs/webhooks) for payload structure, signature verification, and retry behavior.
+
+## Cleaning Up
+
+Test Orders are identifiable and deletable, so QA runs don't pollute reporting. Filter for Test Orders in the dashboard to review or remove them once you're done.

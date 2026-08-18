@@ -1,0 +1,9 @@
+{
+    "root": true,
+    "title": "Testing",
+    "icon": "FlaskConical",
+    "description": "Test cards & safe QA",
+    "pages": [
+        "index"
+    ]
+}

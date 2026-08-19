@@ -100,10 +100,12 @@ The selected payment method element gets the `next-selected` class. Payment form
 
 Which validation runs on submit is decided by the selected method, in this order:
 
-1. **Express buttons** (the [Express Checkout](./express-checkout) container, including Link) — one click, no form validation.
-2. **PayPal / Apple Pay / Google Pay radios** — controlled by `paymentConfig.expressCheckout`: with `requireValidation: false` the form is skipped like a button; with `requireValidation: true` only the fields in `requiredFields` are checked.
+1. **Express buttons** (the [Express Checkout](./express-checkout) container, including the Link button) — one click, no form validation.
+2. **PayPal / Apple Pay / Google Pay radios** — controlled by `paymentConfig.expressCheckout`: with `requireValidation: false` the submit is handed straight to the express checkout processor — the same path as the buttons — and no form validation runs; with `requireValidation: true` only the fields in `requiredFields` are checked.
 3. **Card** — always full form validation plus card fields.
-4. **Everything else** (Klarna, Affirm, the Link radio, iDEAL, Bancontact, giropay, SEPA, TWINT, Swish, Sofort) — always full form validation. `requireValidation` and `requiredFields` have no effect on these methods.
+4. **Everything else** (Klarna, Affirm, iDEAL, Bancontact, giropay, SEPA `sepa_debit`, Sofort, Swish, TWINT, and the Link radio) — always full form validation. `requireValidation` and `requiredFields` have no effect on these methods.
+
+Link appears in both paths: as an express **button** it skips the form entirely, but as a `payment_method` **radio** it always runs full form validation, like the other redirect methods.
 
 `requiredFields` is a single shared list — there is no per-method configuration. To require an extra field for one method only (for example, phone for Affirm), toggle `data-next-required="true"` on that input when the method is selected; the attribute is re-read at submit. See [required fields](./form#required-fields).
 

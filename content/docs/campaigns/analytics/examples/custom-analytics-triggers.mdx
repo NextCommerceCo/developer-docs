@@ -162,7 +162,7 @@ Here's the complete JavaScript code for the custom analytics triggers:
   }
 
   function getCartLines(cartData) {
-    return cartData?.cartLines || cartData?.enrichedItems || cartData?.items || [];
+    return cartData?.cartLines || cartData?.items || [];
   }
 
   /**
@@ -184,7 +184,7 @@ Here's the complete JavaScript code for the custom analytics triggers:
         const campaignStore = window.nextDebug.stores.campaign;
         if (cartStore && campaignStore) {
           return {
-            cartLines: cartStore.getState().enrichedItems || cartStore.getState().items,
+            cartLines: cartStore.getState().items,
             cartTotals: cartStore.getState().totals,
             campaignData: campaignStore.getState().data,
             appliedCoupons: cartStore.getState().appliedCoupons || []
@@ -716,7 +716,7 @@ function testCustomTriggers() {
   // Check cart snapshot. For proof, inspect cart:updated payloads and rendered totals too.
   if (window.next) {
     const cart = window.next.getCartData();
-    const lines = cart?.cartLines || cart?.enrichedItems || cart?.items || [];
+    const lines = cart?.cartLines || cart?.items || [];
     console.log('Cart items in snapshot:', lines.length);
     console.log('Cart total:', cart?.cartTotals?.total?.value || 0);
   }
@@ -794,7 +794,7 @@ console.log('SDK ready:', typeof window.next !== 'undefined');
 if (window.next) {
   const cart = window.next.getCartData();
   console.log('Cart data:', cart);
-  const lines = cart?.cartLines || cart?.enrichedItems || cart?.items || [];
+  const lines = cart?.cartLines || cart?.items || [];
   console.log('Cart has items in snapshot:', lines.length > 0);
 }
 ```

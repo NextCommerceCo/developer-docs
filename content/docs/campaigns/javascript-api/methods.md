@@ -864,7 +864,7 @@ const isVisible = nextDebug.overlay.isVisible();
 
 ## Related Documentation
 
-- **[Utilities](/docs/campaigns/utilities)** - FOMO, exit intent, and debugging tools
+- **[Utilities](/docs/campaigns/utilities)** - Exit intent and debugging tools
 - **[Events](/docs/campaigns/javascript-api/events)** - Complete event system documentation
 - **[Profiles API](/docs/campaigns/javascript-api/profiles)** - Profile-based package mapping
 - **[Attribution API](/docs/campaigns/javascript-api/attribution)** - Attribution tracking

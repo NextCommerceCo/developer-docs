@@ -32,3 +32,7 @@
 
 # Bankcard guide slug renamed from iframe-payment-form
 /docs/admin-api/guides/payment-methods/iframe-payment-form /docs/admin-api/guides/payment-methods/bankcard 301
+
+# FOMO removed from the SDK in v0.4.37 — docs section deleted
+/docs/campaigns/utilities/fomo /docs/campaigns/utilities 301
+/docs/campaigns/utilities/fomo/:path /docs/campaigns/utilities 301

@@ -399,10 +399,6 @@ const abTests = {
   urgency: {
     control: false,
     variant: true
-  },
-  socialProof: {
-    control: 'none',
-    variant: 'fomo'
   }
 };
 
@@ -428,18 +424,12 @@ window.addEventListener('next:initialized', function() {
     document.querySelector('.urgency-message').style.display = 'block';
   }
   
-  // Social proof test
-  if (getTestVariant('socialProof') === 'variant') {
-    next.fomo({ initialDelay: 3000 });
-  }
-  
   // Track conversions
   next.on('cart:item-added', (data) => {
     // Send test data to analytics
     trackABTestConversion({
       buttonText: buttonVariant,
       urgency: getTestVariant('urgency'),
-      socialProof: getTestVariant('socialProof'),
       value: data.item.price
     });
   });

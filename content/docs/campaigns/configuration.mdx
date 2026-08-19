@@ -51,8 +51,12 @@ window.nextConfig = {
   paymentConfig: {
     expressCheckout: {
       enabled: true, // Enable/disable express checkout methods
-      requireValidation: true, // Require form validation before express checkout (radio option only, not express buttons)
-      requiredFields: ['email', 'fname', 'lname'], // Fields required for express checkout radio option
+      // requireValidation and requiredFields apply ONLY to the paypal, apple_pay,
+      // and google_pay RADIO options. Express buttons never validate the form, and
+      // redirect methods (Klarna, Affirm, iDEAL, Bancontact, SEPA, TWINT, Swish,
+      // Link radio, ...) ignore both settings and always run full form validation.
+      requireValidation: true, // Validate the form before an express radio submits
+      requiredFields: ['email', 'fname', 'lname'], // With requireValidation, only these fields are checked (one shared list, not per method)
       methodOrder: ['paypal', 'apple_pay', 'google_pay'] // Display order of express payment method buttons
     }
   },

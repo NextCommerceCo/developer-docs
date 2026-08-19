@@ -4,7 +4,7 @@ sidebar_position: 3
 ---
 import { Callout } from 'fumadocs-ui/components/callout';
 
-The Next Commerce JS SDK emits events that you can listen to for tracking and custom functionality. The SDK has 35 internal events that can be listened to via `next.on()`.
+The Next Commerce JS SDK emits events that you can listen to for tracking and custom functionality. The SDK has 34 internal events that can be listened to via `next.on()`.
 
 ## Event Categories
 
@@ -16,7 +16,7 @@ The Next Commerce JS SDK emits events that you can listen to for tracking and cu
 - **Coupon Events** - Discount code usage
 - **Upsell Events** - Post-purchase upsell tracking
 - **User Events** - User authentication
-- **Behavioral Events** - FOMO, exit intent
+- **Behavioral Events** - Exit intent
 - **Profile Events** - Profile management and switching
 - **System Events** - SDK state, errors, routing
 
@@ -89,7 +89,7 @@ Fired whenever cart contents change (most common event):
 ```javascript
 next.on('cart:updated', (cartState) => {
   console.log('Cart updated:', cartState);
-  // cartState includes: items, totals, enrichedItems, etc.
+  // cartState includes: items, totals, etc.
   console.log('Total items:', cartState.totalQuantity);
   console.log('Cart total:', cartState.totals.total.formatted);
 });
@@ -344,17 +344,6 @@ next.on('user:logged-out', (data) => {
 
 ## Behavioral Events
 
-### `fomo:shown`
-
-Fired when FOMO notification appears:
-
-```javascript
-next.on('fomo:shown', (data) => {
-  console.log('FOMO shown:', data);
-  // data includes: customer name, product, location
-});
-```
-
 ### `exit-intent:clicked`
 
 Fired when user clicks on exit intent popup:
@@ -492,7 +481,7 @@ next.on('error:occurred', (error) => {
 
 ## Complete Event List
 
-Here are all 35 available events organized by category:
+Here are all 34 available events organized by category:
 
 ### Cart (5 events)
 - `cart:updated` - Cart state changed
@@ -530,8 +519,7 @@ Here are all 35 available events organized by category:
 - `user:logged-in` - User authenticated
 - `user:logged-out` - User logged out
 
-### Behavioral (5 events)
-- `fomo:shown` - FOMO popup displayed
+### Behavioral (4 events)
 - `exit-intent:clicked` - Exit intent popup clicked
 - `exit-intent:dismissed` - Exit intent popup dismissed
 - `exit-intent:closed` - Exit intent popup closed
@@ -685,7 +673,7 @@ if (window.location.search.includes('debug=true')) {
     // User
     'user:logged-in', 'user:logged-out',
     // Behavioral
-    'fomo:shown', 'exit-intent:clicked', 'exit-intent:dismissed', 'exit-intent:closed', 'exit-intent:action',
+    'exit-intent:clicked', 'exit-intent:dismissed', 'exit-intent:closed', 'exit-intent:action',
     // Profile
     'profile:applied', 'profile:reverted', 'profile:switched', 'profile:registered',
     // System

@@ -45,6 +45,18 @@ Card field names are covered in [Payment](./payment).
 
 Validation runs on submit and on field blur. If a field is invalid, the SDK marks it and shows a message; on submit it focuses and scrolls to the first error.
 
+### Required fields
+
+Full form validation always requires `fname`, `lname`, `email`, `address1`, `city`, `postal`, and `country`, plus `province` when the selected country requires a state.
+
+**Phone is required only if the phone input carries the `required` attribute or `data-next-required="true"`.** These attributes are re-read at submit time, so you can toggle them dynamically — for example, marking phone required only when a payment method that needs it (such as Affirm) is selected, instead of requiring it for every method.
+
+<Callout type="warn">
+Which validation runs depends on the selected payment method. Card and redirect methods (Klarna, Affirm, iDEAL, Bancontact, giropay, SEPA, Sofort, TWINT, Swish, and the Link radio) **always** run full form validation — `paymentConfig.expressCheckout.requireValidation` and `requiredFields` do not affect them. Those two settings apply only to the PayPal, Apple Pay, and Google Pay radio options; express **buttons** skip form validation entirely. See [Payment](./payment#validation-by-payment-method).
+</Callout>
+
+### Field rules
+
 | Field | Rule |
 |---|---|
 | `email` | Valid email format |

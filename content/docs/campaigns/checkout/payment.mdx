@@ -5,7 +5,7 @@ sidebar_label: Payment
 
 import { Callout } from 'fumadocs-ui/components/callout';
 
-Checkout supports credit cards (tokenized with Spreedly) and express wallets (PayPal, Apple Pay, Google Pay). This page covers the card form and payment-method selection; wallet buttons are in [Express Checkout](./express-checkout).
+Checkout supports credit cards (tokenized with Spreedly), express wallets (PayPal, Apple Pay, Google Pay), and redirect methods such as Klarna, Affirm, and iDEAL. This page covers the card form and payment-method selection; wallet buttons are in [Express Checkout](./express-checkout).
 
 ---
 
@@ -67,15 +67,50 @@ The SDK reads the selected method and shows or hides the matching form section. 
 
 ### Supported values
 
-| UI value | Sent to API as |
-|---|---|
-| `credit` | `card_token` |
-| `paypal` | `paypal` |
-| `apple-pay` | `apple_pay` |
-| `google-pay` | `google_pay` |
+| UI value | Sent to API as | Validation path |
+|---|---|---|
+| `credit` | `card_token` | Full form + card fields |
+| `paypal` | `paypal` | Express radio (configurable) |
+| `apple_pay` | `apple_pay` | Express radio (configurable) |
+| `google_pay` | `google_pay` | Express radio (configurable) |
+| `klarna` | `klarna` | Always full form |
+| `affirm` | `affirm` | Always full form |
+| `ideal` | `ideal` | Always full form |
+| `bancontact` | `bancontact` | Always full form |
+| `giropay` | `giropay` | Always full form |
+| `sepa_debit` | `sepa_debit` | Always full form |
+| `sofort` | `sofort` | Always full form |
+| `swish` | `swish` | Always full form |
+| `twint` | `twint` | Always full form |
+| `link` | `link` | Always full form |
+
+Values are case-insensitive and separators are interchangeable (`apple-pay` = `apple_pay`). A value not in this table is passed through to the orders API unchanged, so the API decides whether it can be charged.
+
+<Callout type="warn">
+SEPA Direct Debit's value is `sepa_debit` — the name the orders API uses — not `sepa_direct` as some platform guides call the same method.
+</Callout>
 
 <Callout>
 The selected payment method element gets the `next-selected` class. Payment form sections animate open and closed using the `payment-method__form--expanded` / `--collapsed` classes.
+</Callout>
+
+---
+
+## Validation by Payment Method
+
+Which validation runs on submit is decided by the selected method, in this order:
+
+1. **Express buttons** (the [Express Checkout](./express-checkout) container, including the Link button) — one click, no form validation.
+2. **PayPal / Apple Pay / Google Pay radios** — controlled by `paymentConfig.expressCheckout`: with `requireValidation: false` the submit is handed straight to the express checkout processor — the same path as the buttons — and no form validation runs; with `requireValidation: true` only the fields in `requiredFields` are checked.
+3. **Card** — always full form validation plus card fields.
+4. **Everything else** (Klarna, Affirm, iDEAL, Bancontact, giropay, SEPA `sepa_debit`, Sofort, Swish, TWINT, and the Link radio) — always full form validation. `requireValidation` and `requiredFields` have no effect on these methods.
+
+Link appears in both paths: as an express **button** it skips the form entirely, but as a `payment_method` **radio** it always runs full form validation, like the other redirect methods.
+
+`requiredFields` is a single shared list — there is no per-method configuration. To require an extra field for one method only (for example, phone for Affirm), toggle `data-next-required="true"` on that input when the method is selected; the attribute is re-read at submit. See [required fields](./form#required-fields).
+
+<Callout>
+The form's validation is separate from what the payment gateway needs to authorize the payment. For example, Affirm requires a phone number in addition to the name, email, and address every redirect method submits, while Klarna does not — a missing gateway field surfaces as an error from the orders API, not as a form validation error.
 </Callout>
 
 ---

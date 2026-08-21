@@ -116,6 +116,36 @@ You can customize this flow to fit your campaign — add/remove pages, change th
 
 ---
 
+## Cart SDK
+
+The pages above are wired up by the **Campaign Cart SDK**. Its documentation is generated from the SDK source and versioned with each release, so it lives on its own site rather than here.
+
+**[cart-sdk.nextcommerce.com →](https://cart-sdk.nextcommerce.com/latest/)**
+
+| Reference | What it covers |
+| --- | --- |
+| [Getting started](https://cart-sdk.nextcommerce.com/latest/documents/Start_Here_Getting_Started) | Loading the SDK and configuring it |
+| [How it works](https://cart-sdk.nextcommerce.com/latest/documents/Start_Here_How_It_Works) | Boot sequence and progressive enhancement |
+| [Data attributes](https://cart-sdk.nextcommerce.com/latest/documents/Reference_Data_Attributes) | Every `data-next-*` attribute |
+| [JavaScript API](https://cart-sdk.nextcommerce.com/latest/documents/Reference_JavaScript_API) | The `window.next` methods |
+| [Analytics events](https://cart-sdk.nextcommerce.com/latest/documents/Reference_Analytics_Events) | Every `dl_*` event and its payload |
+| [URL parameters](https://cart-sdk.nextcommerce.com/latest/documents/Reference_URL_Parameters) | Parameters the SDK reads at boot |
+| [Window globals](https://cart-sdk.nextcommerce.com/latest/documents/Reference_Window_Globals) | Configuration on `window` |
+| [Debugger](https://cart-sdk.nextcommerce.com/latest/documents/Reference_Debugger) | The on-page debug overlay |
+
+Building a specific funnel page:
+
+| Page | What it covers |
+| --- | --- |
+| [Landing and presell](https://cart-sdk.nextcommerce.com/latest/documents/Building_Pages_Landing_and_Presell) | Selectors, bundles, add to cart |
+| [Checkout page](https://cart-sdk.nextcommerce.com/latest/documents/Building_Pages_Checkout_Page) | Form fields, payment, express checkout |
+| [Upsell page](https://cart-sdk.nextcommerce.com/latest/documents/Building_Pages_Upsell_Page) | Accept and decline flows |
+| [Receipt page](https://cart-sdk.nextcommerce.com/latest/documents/Building_Pages_Receipt_Page) | Order data rendering |
+
+Use the version selector on that site to read the docs for the SDK version your campaign loads.
+
+---
+
 ## Concepts
 
 ### Campaigns
@@ -210,12 +240,9 @@ Two mechanisms skip tracking entirely — including the always-on internal `next
 </Callout>
 
 
-### Provider guides & Event reference
+### Event reference
 
-- [**Analytics overview**](/docs/campaigns/analytics) — how the tracking system works end to end
-- [**Google Tag Manager**](/docs/campaigns/analytics/examples/google-tag-manager) — container setup, GA4 wiring, variable mapping
-- [**Facebook Pixel**](/docs/campaigns/analytics/examples/facebook-pixel) — event mapping, server-side deduplication, `storeName`
-- [**Event reference**](/docs/campaigns/analytics/events) — every `dl_*` event the SDK emits, with schemas
+- [**Analytics events**](https://cart-sdk.nextcommerce.com/latest/documents/Reference_Analytics_Events) — every `dl_*` event the SDK emits, which ones fire automatically, and what each provider receives
 
 ---
 

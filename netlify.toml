@@ -145,3 +145,215 @@
   from = "/docs/admin-api/guides/payment-methods/iframe-payment-form"
   to = "/docs/admin-api/guides/payment-methods/bankcard"
   status = 301
+
+# Campaigns SDK reference moved to cart-sdk.nextcommerce.com
+
+[[redirects]]
+  from = "/docs/campaigns/utilities/fomo"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/utilities/fomo/*"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/utilities/debugger"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/utilities/debugger/*"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/utilities/exit-intent"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/utilities/exit-intent/*"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/utilities/loading-states"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/utilities/loading-states/*"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/javascript-api/url-parameters"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/javascript-api/url-parameters/*"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/javascript-api/attribution"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/javascript-api/attribution/*"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/javascript-api/events"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/javascript-api/events/*"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/data-attributes/url-parameters"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/data-attributes/url-parameters/*"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/data-attributes/css-classes"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/data-attributes/css-classes/*"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/data-attributes"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/data-attributes/*"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/javascript-api"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/javascript-api/*"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/analytics"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/analytics/*"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/configuration"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/configuration/*"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/bundle-selector"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/bundle-selector/*"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/package-toggle"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/package-toggle/*"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/cart-summary"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/cart-summary/*"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/cart-system"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/cart-system/*"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/checkout"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/checkout/*"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/upsells"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/upsells/*"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/utilities"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/utilities/*"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/guides"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/campaigns/guides/*"
+  to = "https://cart-sdk.nextcommerce.com/latest/"
+  status = 301

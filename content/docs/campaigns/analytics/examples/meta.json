@@ -1,4 +1,0 @@
-{
-  "title": "Examples",
-  "pages": ["index", "event-transformers", "facebook-pixel", "google-tag-manager", "direct-ga4", "rudderstack", "custom-analytics-triggers", "custom-webhook"]
-}

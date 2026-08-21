@@ -83,7 +83,7 @@ const resources = [
   {
     title: 'Campaign Cart SDK',
     description: 'Build custom campaign funnels and checkout flows',
-    href: '/docs/campaigns/cart-system',
+    href: '/docs/campaigns',
     icon: <Megaphone size={16} />,
   },
   {

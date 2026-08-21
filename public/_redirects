@@ -33,6 +33,46 @@
 # Bankcard guide slug renamed from iframe-payment-form
 /docs/admin-api/guides/payment-methods/iframe-payment-form /docs/admin-api/guides/payment-methods/bankcard 301
 
-# FOMO removed from the SDK in v0.4.37 — docs section deleted
-/docs/campaigns/utilities/fomo /docs/campaigns/utilities 301
-/docs/campaigns/utilities/fomo/:path /docs/campaigns/utilities 301
+# Campaigns SDK reference moved to cart-sdk.nextcommerce.com
+/docs/campaigns/utilities/fomo https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/utilities/fomo/* https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/utilities/debugger https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/utilities/debugger/* https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/utilities/exit-intent https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/utilities/exit-intent/* https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/utilities/loading-states https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/utilities/loading-states/* https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/javascript-api/url-parameters https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/javascript-api/url-parameters/* https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/javascript-api/attribution https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/javascript-api/attribution/* https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/javascript-api/events https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/javascript-api/events/* https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/data-attributes/url-parameters https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/data-attributes/url-parameters/* https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/data-attributes/css-classes https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/data-attributes/css-classes/* https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/data-attributes https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/data-attributes/* https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/javascript-api https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/javascript-api/* https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/analytics https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/analytics/* https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/configuration https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/configuration/* https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/bundle-selector https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/bundle-selector/* https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/package-toggle https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/package-toggle/* https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/cart-summary https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/cart-summary/* https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/cart-system https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/cart-system/* https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/checkout https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/checkout/* https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/upsells https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/upsells/* https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/utilities https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/utilities/* https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/guides https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/campaigns/guides/* https://cart-sdk.nextcommerce.com/latest/ 301

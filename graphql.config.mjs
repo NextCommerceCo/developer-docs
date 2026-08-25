@@ -25,7 +25,7 @@ export default {
       printTypeOptions: {
         typeBadges: true,
       },
-      mdxParser: `${__dirname}/lib/graphql-mdx-formatter.cjs`,
+      formatter: `${__dirname}/lib/graphql-mdx-formatter.cjs`,
     },
   },
 };

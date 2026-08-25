@@ -26,7 +26,7 @@ import { createOpenAPI } from 'fumadocs-openapi/server';
 import { readdirSync, writeFileSync, mkdirSync, readFileSync, rmSync, existsSync } from 'fs';
 import { join, resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import yaml from 'js-yaml';
+import { load as loadYaml, dump as dumpYaml } from 'js-yaml';
 
 // ── Paths anchored to project root ──────────────────────────────────────────
 
@@ -48,7 +48,7 @@ function rootPath(...segments) {
  */
 function fixWebhookSchemas(specPath) {
   const raw = readFileSync(specPath, 'utf8');
-  const spec = yaml.load(raw);
+  const spec = loadYaml(raw);
   if (!spec.webhooks) return;
   const version = spec.info?.version ?? '';
 
@@ -93,7 +93,7 @@ function fixWebhookSchemas(specPath) {
     }
   }
 
-  writeFileSync(specPath, yaml.dump(spec, { lineWidth: -1 }));
+  writeFileSync(specPath, dumpYaml(spec, { lineWidth: -1 }));
 }
 
 /**
@@ -133,7 +133,7 @@ function generateExample(schema, depth) {
  */
 function ensureTopLevelTags(specPath) {
   const raw = readFileSync(specPath, 'utf8');
-  const spec = yaml.load(raw);
+  const spec = loadYaml(raw);
   const seen = new Set();
   const collect = (container) => {
     for (const methods of Object.values(container ?? {})) {
@@ -148,7 +148,7 @@ function ensureTopLevelTags(specPath) {
   const existing = new Map((spec.tags ?? []).map(t => [t.name, t]));
   for (const name of seen) if (!existing.has(name)) existing.set(name, { name });
   spec.tags = [...existing.values()];
-  writeFileSync(specPath, yaml.dump(spec, { lineWidth: -1 }));
+  writeFileSync(specPath, dumpYaml(spec, { lineWidth: -1 }));
 }
 
 /** Recursively fix array-style types to plain strings. Returns true if any changes were made. */
@@ -200,7 +200,7 @@ function isWebhookFile(filename) {
  */
 function getTagOrder(specPath) {
   const raw = readFileSync(specPath, 'utf8');
-  const spec = yaml.load(raw);
+  const spec = loadYaml(raw);
   if (spec.tags?.length) return spec.tags.map(t => t.name);
   const seen = [];
   for (const methods of Object.values(spec.paths ?? {})) {
@@ -518,7 +518,7 @@ function collectEndpointData(spec, urlBase) {
 
 const allEndpoints = [];
 for (const spec of specs.filter(s => !s.hidden)) {
-  const specData = yaml.load(readFileSync(spec.input[0], 'utf8'));
+  const specData = loadYaml(readFileSync(spec.input[0], 'utf8'));
   allEndpoints.push(...collectEndpointData(specData, spec.urlBase));
 }
 writeFileSync(join(generatedDir, 'api-endpoints.json'), JSON.stringify(allEndpoints, null, 2));

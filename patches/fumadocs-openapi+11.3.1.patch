@@ -1,0 +1,12 @@
+diff --git a/node_modules/fumadocs-openapi/dist/ui/operation/request-tabs.js b/node_modules/fumadocs-openapi/dist/ui/operation/request-tabs.js
+index d9162d0..fa91c66 100644
+--- a/node_modules/fumadocs-openapi/dist/ui/operation/request-tabs.js
++++ b/node_modules/fumadocs-openapi/dist/ui/operation/request-tabs.js
+@@ -78,6 +78,7 @@ function RequestTabsItem({ item, options }) {
+ 		}),
+ 		/* @__PURE__ */ jsx(Accordions, {
+ 			type: "multiple",
++			defaultValue: ["body"],
+ 			className: "mt-2",
+ 			children: Object.entries(displayNames).map(([k, v]) => {
+ 				const data = requestData[k];

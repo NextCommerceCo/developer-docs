@@ -1224,6 +1224,7 @@ components:
             * `external` - External
             * `paypal` - PayPal
             * `affirm` - Affirm
+            * `afterpay` - Afterpay
             * `bancontact` - Bancontact
             * `giropay` - Giropay
             * `ideal` - iDEAL
@@ -1241,6 +1242,7 @@ components:
             - external
             - paypal
             - affirm
+            - afterpay
             - bancontact
             - giropay
             - ideal
@@ -1254,7 +1256,7 @@ components:
           type:
             - string
             - 'null'
-          x-spec-enum-id: 4ca5ccad821eb2f9
+          x-spec-enum-id: 7cba57fc47c4da29
         send_receipt:
           default: true
           type: boolean
@@ -5948,6 +5950,7 @@ components:
           readOnly: true
           type: integer
         name:
+          description: A label to identify this webhook in the list. Maximum 50 characters.
           title: Webhook Name
           type:
             - string
@@ -10154,6 +10157,7 @@ components:
           readOnly: true
           type: integer
         name:
+          description: A label to identify this webhook in the list. Maximum 50 characters.
           title: Webhook Name
           type:
             - string

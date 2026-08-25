@@ -1564,6 +1564,7 @@ components:
             * `external` - External
             * `paypal` - PayPal
             * `affirm` - Affirm
+            * `afterpay` - Afterpay
             * `bancontact` - Bancontact
             * `giropay` - Giropay
             * `ideal` - iDEAL
@@ -1581,6 +1582,7 @@ components:
             - external
             - paypal
             - affirm
+            - afterpay
             - bancontact
             - giropay
             - ideal
@@ -1594,7 +1596,7 @@ components:
           type:
             - string
             - 'null'
-          x-spec-enum-id: 4ca5ccad821eb2f9
+          x-spec-enum-id: 7cba57fc47c4da29
         send_receipt:
           default: true
           type: boolean
@@ -6414,6 +6416,7 @@ components:
           readOnly: true
           type: integer
         name:
+          description: A label to identify this webhook in the list. Maximum 50 characters.
           title: Webhook Name
           type:
             - string
@@ -10722,6 +10725,7 @@ components:
           readOnly: true
           type: integer
         name:
+          description: A label to identify this webhook in the list. Maximum 50 characters.
           title: Webhook Name
           type:
             - string
@@ -11227,7 +11231,364 @@ paths:
             - campaigns:read
       tags:
         - campaigns
+    post:
+      description: Create a campaign's settings.
+      operationId: campaignsCreate
+      parameters:
+        - description: Campaign ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: '2024-04-01'
+            enum:
+              - '2024-04-01'
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                additional_currencies:
+                  description: Currencies supported in addition to the default currency.
+                  items:
+                    maxLength: 3
+                    nullable: true
+                    type: string
+                  nullable: true
+                  type: array
+                available_express_payment_methods:
+                  description: Express payment method codes to enable, drawn from the resolved payment gateway group.
+                  items:
+                    type: string
+                  type: array
+                available_payment_methods:
+                  description: Payment method codes to enable, drawn from the resolved payment gateway group.
+                  items:
+                    type: string
+                  type: array
+                available_shipping_countries:
+                  description: ISO 3166-1 alpha-2 country codes the campaign can ship to.
+                  items:
+                    type: string
+                  type: array
+                currency:
+                  description: Default currency for orders created through this campaign.
+                  maxLength: 3
+                  title: Default Currency
+                  type: string
+                language:
+                  description: Preferred language for customers of this campaign.
+                  maxLength: 3
+                  type: string
+                name:
+                  description: Campaign name used internally for reference.
+                  maxLength: 200
+                  type: string
+                payment_gateway_group_id:
+                  description: Payment gateway group used instead of the store default.
+                  maximum: 2147483647
+                  minimum: 0
+                  type: integer
+                paypal_account_id:
+                  description: PayPal account used instead of the store default.
+                  nullable: true
+                  type: integer
+                statement_descriptor:
+                  description: Descriptor shown on the customer's card statement.
+                  maxLength: 255
+                  nullable: true
+                  type: string
+              required:
+                - currency
+                - language
+                - name
+                - payment_gateway_group_id
+              type: object
+          application/x-www-form-urlencoded:
+            schema:
+              properties:
+                additional_currencies:
+                  description: Currencies supported in addition to the default currency.
+                  items:
+                    maxLength: 3
+                    nullable: true
+                    type: string
+                  nullable: true
+                  type: array
+                available_express_payment_methods:
+                  description: Express payment method codes to enable, drawn from the resolved payment gateway group.
+                  items:
+                    type: string
+                  type: array
+                available_payment_methods:
+                  description: Payment method codes to enable, drawn from the resolved payment gateway group.
+                  items:
+                    type: string
+                  type: array
+                available_shipping_countries:
+                  description: ISO 3166-1 alpha-2 country codes the campaign can ship to.
+                  items:
+                    type: string
+                  type: array
+                currency:
+                  description: Default currency for orders created through this campaign.
+                  maxLength: 3
+                  title: Default Currency
+                  type: string
+                language:
+                  description: Preferred language for customers of this campaign.
+                  maxLength: 3
+                  type: string
+                name:
+                  description: Campaign name used internally for reference.
+                  maxLength: 200
+                  type: string
+                payment_gateway_group_id:
+                  description: Payment gateway group used instead of the store default.
+                  maximum: 2147483647
+                  minimum: 0
+                  type: integer
+                paypal_account_id:
+                  description: PayPal account used instead of the store default.
+                  nullable: true
+                  type: integer
+                statement_descriptor:
+                  description: Descriptor shown on the customer's card statement.
+                  maxLength: 255
+                  nullable: true
+                  type: string
+              required:
+                - currency
+                - language
+                - name
+                - payment_gateway_group_id
+              type: object
+          multipart/form-data:
+            schema:
+              properties:
+                additional_currencies:
+                  description: Currencies supported in addition to the default currency.
+                  items:
+                    maxLength: 3
+                    nullable: true
+                    type: string
+                  nullable: true
+                  type: array
+                available_express_payment_methods:
+                  description: Express payment method codes to enable, drawn from the resolved payment gateway group.
+                  items:
+                    type: string
+                  type: array
+                available_payment_methods:
+                  description: Payment method codes to enable, drawn from the resolved payment gateway group.
+                  items:
+                    type: string
+                  type: array
+                available_shipping_countries:
+                  description: ISO 3166-1 alpha-2 country codes the campaign can ship to.
+                  items:
+                    type: string
+                  type: array
+                currency:
+                  description: Default currency for orders created through this campaign.
+                  maxLength: 3
+                  title: Default Currency
+                  type: string
+                language:
+                  description: Preferred language for customers of this campaign.
+                  maxLength: 3
+                  type: string
+                name:
+                  description: Campaign name used internally for reference.
+                  maxLength: 200
+                  type: string
+                payment_gateway_group_id:
+                  description: Payment gateway group used instead of the store default.
+                  maximum: 2147483647
+                  minimum: 0
+                  type: integer
+                paypal_account_id:
+                  description: PayPal account used instead of the store default.
+                  nullable: true
+                  type: integer
+                statement_descriptor:
+                  description: Descriptor shown on the customer's card statement.
+                  maxLength: 255
+                  nullable: true
+                  type: string
+              required:
+                - currency
+                - language
+                - name
+                - payment_gateway_group_id
+              type: object
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                properties:
+                  additional_currencies:
+                    description: Currencies supported in addition to the default currency.
+                    items:
+                      maxLength: 3
+                      nullable: true
+                      type: string
+                    nullable: true
+                    type: array
+                  api_key:
+                    description: Key the storefront authenticates against the campaigns API with.
+                    readOnly: true
+                    type: string
+                  available_express_payment_methods:
+                    description: Express payment methods enabled on the campaign.
+                    items:
+                      properties:
+                        code:
+                          description: Express payment method code.
+                          maxLength: 255
+                          nullable: true
+                          type: string
+                        name:
+                          description: Human-readable express payment method name.
+                          maxLength: 128
+                          nullable: true
+                          type: string
+                      type: object
+                    readOnly: true
+                    type: array
+                  available_payment_methods:
+                    description: Payment methods enabled on the campaign.
+                    items:
+                      properties:
+                        code:
+                          description: Payment method code.
+                          maxLength: 255
+                          nullable: true
+                          type: string
+                        name:
+                          description: Human-readable payment method name.
+                          maxLength: 128
+                          nullable: true
+                          type: string
+                      type: object
+                    readOnly: true
+                    type: array
+                  available_shipping_countries:
+                    description: Countries the campaign can ship to.
+                    items:
+                      properties:
+                        code:
+                          description: ISO 3166-1 alpha-2 country code.
+                          type: string
+                        name:
+                          description: Country name.
+                          type: string
+                      required:
+                        - code
+                        - name
+                      type: object
+                    readOnly: true
+                    type: array
+                  created_at:
+                    description: When the campaign was created.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                  currency:
+                    description: Default currency for orders created through this campaign.
+                    maxLength: 3
+                    title: Default Currency
+                    type: string
+                  id:
+                    description: Campaign ID, the path parameter on this endpoint.
+                    readOnly: true
+                    type: integer
+                  language:
+                    description: Preferred language for customers of this campaign.
+                    maxLength: 3
+                    type: string
+                  name:
+                    description: Campaign name used internally for reference.
+                    maxLength: 200
+                    type: string
+                  payment_gateway_group_id:
+                    description: Payment gateway group used instead of the store default.
+                    maximum: 2147483647
+                    minimum: 0
+                    type: integer
+                  payment_gateway_group_name:
+                    description: Name of the payment gateway group.
+                    maxLength: 200
+                    nullable: true
+                    type: string
+                  paypal_account_id:
+                    description: PayPal account used instead of the store default.
+                    nullable: true
+                    type: integer
+                  statement_descriptor:
+                    description: Descriptor shown on the customer's card statement.
+                    maxLength: 255
+                    nullable: true
+                    type: string
+                  updated_at:
+                    description: When the campaign was last updated.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                required:
+                  - api_key
+                  - available_express_payment_methods
+                  - available_payment_methods
+                  - available_shipping_countries
+                  - created_at
+                  - currency
+                  - id
+                  - language
+                  - name
+                  - payment_gateway_group_id
+                  - updated_at
+                type: object
+          description: ''
+      security:
+        - oauth2:
+            - campaigns:write
+      tags:
+        - campaigns
   /campaigns/{id}/:
+    delete:
+      description: Delete a campaign's settings.
+      operationId: campaignsDestroy
+      parameters:
+        - description: Campaign ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: '2024-04-01'
+            enum:
+              - '2024-04-01'
+            type: string
+      responses:
+        '204':
+          description: No response body
+      security:
+        - oauth2:
+            - campaigns:write
+      tags:
+        - campaigns
     get:
       description: Retrieve a campaign's settings.
       operationId: campaignsRetrieve
@@ -11251,14 +11612,6 @@ paths:
           content:
             application/json:
               schema:
-                description: |-
-                  `campaigns.campaigns.forms.CampaignConfigForm` plus identifiers and timestamps, minus
-                  `enable_retail_price_and_quantity` (a legacy internal toggle) and `store` (already named
-                  in the request header, and its model carries `api_key`, the outbound OAuth token this app
-                  calls prime with).
-
-                  `test_fields_match_the_campaign_settings_form` asserts the payload against the form's own
-                  field list, so adding a form field surfaces as a failing test rather than silent drift.
                 properties:
                   additional_currencies:
                     description: Currencies supported in addition to the default currency.
@@ -11385,6 +11738,1529 @@ paths:
       security:
         - oauth2:
             - campaigns:read
+      tags:
+        - campaigns
+    patch:
+      description: Partial update a campaign's settings.
+      operationId: campaignsPartialUpdate
+      parameters:
+        - description: Campaign ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: '2024-04-01'
+            enum:
+              - '2024-04-01'
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                additional_currencies:
+                  description: Currencies supported in addition to the default currency.
+                  items:
+                    maxLength: 3
+                    nullable: true
+                    type: string
+                  nullable: true
+                  type: array
+                available_express_payment_methods:
+                  description: Express payment method codes to enable, drawn from the resolved payment gateway group.
+                  items:
+                    type: string
+                  type: array
+                available_payment_methods:
+                  description: Payment method codes to enable, drawn from the resolved payment gateway group.
+                  items:
+                    type: string
+                  type: array
+                available_shipping_countries:
+                  description: ISO 3166-1 alpha-2 country codes the campaign can ship to.
+                  items:
+                    type: string
+                  type: array
+                language:
+                  description: Preferred language for customers of this campaign.
+                  maxLength: 3
+                  type: string
+                name:
+                  description: Campaign name used internally for reference.
+                  maxLength: 200
+                  type: string
+                payment_gateway_group_id:
+                  description: Payment gateway group used instead of the store default.
+                  maximum: 2147483647
+                  minimum: 0
+                  type: integer
+                paypal_account_id:
+                  description: PayPal account used instead of the store default.
+                  nullable: true
+                  type: integer
+                statement_descriptor:
+                  description: Descriptor shown on the customer's card statement.
+                  maxLength: 255
+                  nullable: true
+                  type: string
+              type: object
+          application/x-www-form-urlencoded:
+            schema:
+              properties:
+                additional_currencies:
+                  description: Currencies supported in addition to the default currency.
+                  items:
+                    maxLength: 3
+                    nullable: true
+                    type: string
+                  nullable: true
+                  type: array
+                available_express_payment_methods:
+                  description: Express payment method codes to enable, drawn from the resolved payment gateway group.
+                  items:
+                    type: string
+                  type: array
+                available_payment_methods:
+                  description: Payment method codes to enable, drawn from the resolved payment gateway group.
+                  items:
+                    type: string
+                  type: array
+                available_shipping_countries:
+                  description: ISO 3166-1 alpha-2 country codes the campaign can ship to.
+                  items:
+                    type: string
+                  type: array
+                language:
+                  description: Preferred language for customers of this campaign.
+                  maxLength: 3
+                  type: string
+                name:
+                  description: Campaign name used internally for reference.
+                  maxLength: 200
+                  type: string
+                payment_gateway_group_id:
+                  description: Payment gateway group used instead of the store default.
+                  maximum: 2147483647
+                  minimum: 0
+                  type: integer
+                paypal_account_id:
+                  description: PayPal account used instead of the store default.
+                  nullable: true
+                  type: integer
+                statement_descriptor:
+                  description: Descriptor shown on the customer's card statement.
+                  maxLength: 255
+                  nullable: true
+                  type: string
+              type: object
+          multipart/form-data:
+            schema:
+              properties:
+                additional_currencies:
+                  description: Currencies supported in addition to the default currency.
+                  items:
+                    maxLength: 3
+                    nullable: true
+                    type: string
+                  nullable: true
+                  type: array
+                available_express_payment_methods:
+                  description: Express payment method codes to enable, drawn from the resolved payment gateway group.
+                  items:
+                    type: string
+                  type: array
+                available_payment_methods:
+                  description: Payment method codes to enable, drawn from the resolved payment gateway group.
+                  items:
+                    type: string
+                  type: array
+                available_shipping_countries:
+                  description: ISO 3166-1 alpha-2 country codes the campaign can ship to.
+                  items:
+                    type: string
+                  type: array
+                language:
+                  description: Preferred language for customers of this campaign.
+                  maxLength: 3
+                  type: string
+                name:
+                  description: Campaign name used internally for reference.
+                  maxLength: 200
+                  type: string
+                payment_gateway_group_id:
+                  description: Payment gateway group used instead of the store default.
+                  maximum: 2147483647
+                  minimum: 0
+                  type: integer
+                paypal_account_id:
+                  description: PayPal account used instead of the store default.
+                  nullable: true
+                  type: integer
+                statement_descriptor:
+                  description: Descriptor shown on the customer's card statement.
+                  maxLength: 255
+                  nullable: true
+                  type: string
+              type: object
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  additional_currencies:
+                    description: Currencies supported in addition to the default currency.
+                    items:
+                      maxLength: 3
+                      nullable: true
+                      type: string
+                    nullable: true
+                    type: array
+                  api_key:
+                    description: Key the storefront authenticates against the campaigns API with.
+                    readOnly: true
+                    type: string
+                  available_express_payment_methods:
+                    description: Express payment methods enabled on the campaign.
+                    items:
+                      properties:
+                        code:
+                          description: Express payment method code.
+                          maxLength: 255
+                          nullable: true
+                          type: string
+                        name:
+                          description: Human-readable express payment method name.
+                          maxLength: 128
+                          nullable: true
+                          type: string
+                      type: object
+                    readOnly: true
+                    type: array
+                  available_payment_methods:
+                    description: Payment methods enabled on the campaign.
+                    items:
+                      properties:
+                        code:
+                          description: Payment method code.
+                          maxLength: 255
+                          nullable: true
+                          type: string
+                        name:
+                          description: Human-readable payment method name.
+                          maxLength: 128
+                          nullable: true
+                          type: string
+                      type: object
+                    readOnly: true
+                    type: array
+                  available_shipping_countries:
+                    description: Countries the campaign can ship to.
+                    items:
+                      properties:
+                        code:
+                          description: ISO 3166-1 alpha-2 country code.
+                          type: string
+                        name:
+                          description: Country name.
+                          type: string
+                      required:
+                        - code
+                        - name
+                      type: object
+                    readOnly: true
+                    type: array
+                  created_at:
+                    description: When the campaign was created.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                  currency:
+                    description: Default currency for orders created through this campaign.
+                    maxLength: 3
+                    title: Default Currency
+                    type: string
+                  id:
+                    description: Campaign ID, the path parameter on this endpoint.
+                    readOnly: true
+                    type: integer
+                  language:
+                    description: Preferred language for customers of this campaign.
+                    maxLength: 3
+                    type: string
+                  name:
+                    description: Campaign name used internally for reference.
+                    maxLength: 200
+                    type: string
+                  payment_gateway_group_id:
+                    description: Payment gateway group used instead of the store default.
+                    maximum: 2147483647
+                    minimum: 0
+                    type: integer
+                  payment_gateway_group_name:
+                    description: Name of the payment gateway group.
+                    maxLength: 200
+                    nullable: true
+                    type: string
+                  paypal_account_id:
+                    description: PayPal account used instead of the store default.
+                    nullable: true
+                    type: integer
+                  statement_descriptor:
+                    description: Descriptor shown on the customer's card statement.
+                    maxLength: 255
+                    nullable: true
+                    type: string
+                  updated_at:
+                    description: When the campaign was last updated.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                required:
+                  - api_key
+                  - available_express_payment_methods
+                  - available_payment_methods
+                  - available_shipping_countries
+                  - created_at
+                  - currency
+                  - id
+                  - language
+                  - name
+                  - payment_gateway_group_id
+                  - updated_at
+                type: object
+          description: ''
+      security:
+        - oauth2:
+            - campaigns:write
+      tags:
+        - campaigns
+  /campaigns/{id}/packages/:
+    get:
+      description: List every packages on the campaign.
+      operationId: campaignsPackagesList
+      parameters:
+        - description: Campaign ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - description: Package name contains this text, case-insensitive.
+          in: query
+          name: name
+          schema:
+            type: string
+        - description: Product name contains this text, case-insensitive.
+          in: query
+          name: product_name
+          schema:
+            type: string
+        - description: Product sku contains this text, case-insensitive.
+          in: query
+          name: product_sku
+          schema:
+            type: string
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: '2024-04-01'
+            enum:
+              - '2024-04-01'
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  properties:
+                    created_at:
+                      description: When the package was created.
+                      format: date-time
+                      readOnly: true
+                      type: string
+                    id:
+                      description: Package reference ID
+                      type: integer
+                    image:
+                      description: URL of the package image.
+                      format: uri
+                      nullable: true
+                      readOnly: true
+                      type: string
+                    interval:
+                      description: |-
+                        Recurring interval for subscription products.
+
+                        * `day` - Day
+                        * `month` - Month
+                      nullable: true
+                      oneOf:
+                        - description: |-
+                            * `day` - Day
+                            * `month` - Month
+                          enum:
+                            - day
+                            - month
+                          type: string
+                        - enum:
+                            - ''
+                        - enum:
+                            - null
+                      title: Recurring Interval
+                    interval_count:
+                      description: Number of intervals for the subscription.
+                      maximum: 2147483647
+                      minimum: 0
+                      nullable: true
+                      title: Subscription Interval Count
+                      type: integer
+                    is_recurring:
+                      title: Package is a recurring product subscription.
+                      type: boolean
+                    name:
+                      maxLength: 200
+                      title: Package name
+                      type: string
+                    prices:
+                      description: Price of the package in every currency the campaign supports.
+                      items:
+                        properties:
+                          currency:
+                            description: Currency for the package price.
+                            maxLength: 3
+                            type: string
+                          price:
+                            description: Price per product unit in the package.
+                            format: decimal
+                            pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                            type: string
+                          price_recurring:
+                            description: Recurring subscription price per unit of product in the package.
+                            format: decimal
+                            pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                            type: string
+                        required:
+                          - currency
+                          - price
+                          - price_recurring
+                        type: object
+                      readOnly: true
+                      type: array
+                    product_id:
+                      description: ID of the product linked to the package.
+                      type: integer
+                    product_inventory_availability:
+                      description: |-
+                        Inventory availability at fulfillment locations
+
+                        * `in_stock` - In Stock
+                        * `low_stock` - Low Stock
+                        * `out_of_stock` - Out of Stock
+                        * `untracked` - Untracked
+                      nullable: true
+                      oneOf:
+                        - description: |-
+                            * `in_stock` - In Stock
+                            * `low_stock` - Low Stock
+                            * `out_of_stock` - Out of Stock
+                            * `untracked` - Untracked
+                          enum:
+                            - in_stock
+                            - low_stock
+                            - out_of_stock
+                            - untracked
+                          type: string
+                        - enum:
+                            - ''
+                        - enum:
+                            - null
+                      title: Inventory Availability
+                    product_name:
+                      description: Product name.
+                      type: string
+                    product_purchase_availability:
+                      description: |-
+                        Product's availability to purchase in new orders
+
+                        * `available` - Available
+                        * `unavailable` - Unavailable
+                      nullable: true
+                      oneOf:
+                        - description: |-
+                            * `available` - Available
+                            * `unavailable` - Unavailable
+                          enum:
+                            - available
+                            - unavailable
+                          type: string
+                        - enum:
+                            - ''
+                        - enum:
+                            - null
+                      title: Purchase Availability
+                    product_sku:
+                      description: SKU of the product linked to the package
+                      maxLength: 128
+                      nullable: true
+                      type: string
+                    product_variant_id:
+                      description: ID of the product variant linked to the package.
+                      type: integer
+                    product_variant_name:
+                      description: Product variant name.
+                      type: string
+                    updated_at:
+                      description: When the package was last updated.
+                      format: date-time
+                      readOnly: true
+                      type: string
+                  required:
+                    - created_at
+                    - id
+                    - image
+                    - name
+                    - prices
+                    - product_id
+                    - product_name
+                    - product_variant_id
+                    - product_variant_name
+                    - updated_at
+                  type: object
+                type: array
+          description: ''
+      security:
+        - oauth2:
+            - campaigns:read
+      tags:
+        - campaigns
+    post:
+      description: Create a package on the campaign.
+      operationId: campaignsPackagesCreate
+      parameters:
+        - description: Campaign ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: '2024-04-01'
+            enum:
+              - '2024-04-01'
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                interval:
+                  description: |-
+                    Recurring subscription interval type.
+
+                    * `day` - Day
+                    * `month` - Month
+                  nullable: true
+                  oneOf:
+                    - description: |-
+                        * `day` - Day
+                        * `month` - Month
+                      enum:
+                        - day
+                        - month
+                      type: string
+                    - enum:
+                        - ''
+                    - enum:
+                        - null
+                  title: Recurring Interval
+                interval_count:
+                  description: Recurring subscription interval count.
+                  maximum: 2147483647
+                  minimum: 0
+                  nullable: true
+                  title: Subscription Interval Count
+                  type: integer
+                name:
+                  description: Package name.
+                  maxLength: 200
+                  title: Package name
+                  type: string
+                price:
+                  description: Price per product variant unit in the package.
+                  format: decimal
+                  nullable: true
+                  pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                  type: string
+                  writeOnly: true
+                price_recurring:
+                  description: Recurring subscription price per unit of product in the package.
+                  format: decimal
+                  nullable: true
+                  pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                  type: string
+                  writeOnly: true
+                product_id:
+                  description: ID of the product linked to the package.
+                  type: integer
+                  writeOnly: true
+                product_variant_ids:
+                  description: IDs of the product variants linked to the package.
+                  items:
+                    type: integer
+                  type: array
+                  writeOnly: true
+              required:
+                - name
+                - product_id
+              type: object
+          application/x-www-form-urlencoded:
+            schema:
+              properties:
+                interval:
+                  description: |-
+                    Recurring subscription interval type.
+
+                    * `day` - Day
+                    * `month` - Month
+                  nullable: true
+                  oneOf:
+                    - description: |-
+                        * `day` - Day
+                        * `month` - Month
+                      enum:
+                        - day
+                        - month
+                      type: string
+                    - enum:
+                        - ''
+                    - enum:
+                        - null
+                  title: Recurring Interval
+                interval_count:
+                  description: Recurring subscription interval count.
+                  maximum: 2147483647
+                  minimum: 0
+                  nullable: true
+                  title: Subscription Interval Count
+                  type: integer
+                name:
+                  description: Package name.
+                  maxLength: 200
+                  title: Package name
+                  type: string
+                price:
+                  description: Price per product variant unit in the package.
+                  format: decimal
+                  nullable: true
+                  pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                  type: string
+                  writeOnly: true
+                price_recurring:
+                  description: Recurring subscription price per unit of product in the package.
+                  format: decimal
+                  nullable: true
+                  pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                  type: string
+                  writeOnly: true
+                product_id:
+                  description: ID of the product linked to the package.
+                  type: integer
+                  writeOnly: true
+                product_variant_ids:
+                  description: IDs of the product variants linked to the package.
+                  items:
+                    type: integer
+                  type: array
+                  writeOnly: true
+              required:
+                - name
+                - product_id
+              type: object
+          multipart/form-data:
+            schema:
+              properties:
+                interval:
+                  description: |-
+                    Recurring subscription interval type.
+
+                    * `day` - Day
+                    * `month` - Month
+                  nullable: true
+                  oneOf:
+                    - description: |-
+                        * `day` - Day
+                        * `month` - Month
+                      enum:
+                        - day
+                        - month
+                      type: string
+                    - enum:
+                        - ''
+                    - enum:
+                        - null
+                  title: Recurring Interval
+                interval_count:
+                  description: Recurring subscription interval count.
+                  maximum: 2147483647
+                  minimum: 0
+                  nullable: true
+                  title: Subscription Interval Count
+                  type: integer
+                name:
+                  description: Package name.
+                  maxLength: 200
+                  title: Package name
+                  type: string
+                price:
+                  description: Price per product variant unit in the package.
+                  format: decimal
+                  nullable: true
+                  pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                  type: string
+                  writeOnly: true
+                price_recurring:
+                  description: Recurring subscription price per unit of product in the package.
+                  format: decimal
+                  nullable: true
+                  pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                  type: string
+                  writeOnly: true
+                product_id:
+                  description: ID of the product linked to the package.
+                  type: integer
+                  writeOnly: true
+                product_variant_ids:
+                  description: IDs of the product variants linked to the package.
+                  items:
+                    type: integer
+                  type: array
+                  writeOnly: true
+              required:
+                - name
+                - product_id
+              type: object
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                properties:
+                  created_at:
+                    description: When the package was created.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                  id:
+                    description: Package reference ID
+                    type: integer
+                  image:
+                    description: URL of the package image.
+                    format: uri
+                    nullable: true
+                    readOnly: true
+                    type: string
+                  interval:
+                    description: |-
+                      Recurring interval for subscription products.
+
+                      * `day` - Day
+                      * `month` - Month
+                    nullable: true
+                    oneOf:
+                      - description: |-
+                          * `day` - Day
+                          * `month` - Month
+                        enum:
+                          - day
+                          - month
+                        type: string
+                      - enum:
+                          - ''
+                      - enum:
+                          - null
+                    title: Recurring Interval
+                  interval_count:
+                    description: Number of intervals for the subscription.
+                    maximum: 2147483647
+                    minimum: 0
+                    nullable: true
+                    title: Subscription Interval Count
+                    type: integer
+                  is_recurring:
+                    title: Package is a recurring product subscription.
+                    type: boolean
+                  name:
+                    maxLength: 200
+                    title: Package name
+                    type: string
+                  prices:
+                    description: Price of the package in every currency the campaign supports.
+                    items:
+                      properties:
+                        currency:
+                          description: Currency for the package price.
+                          maxLength: 3
+                          type: string
+                        price:
+                          description: Price per product unit in the package.
+                          format: decimal
+                          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                          type: string
+                        price_recurring:
+                          description: Recurring subscription price per unit of product in the package.
+                          format: decimal
+                          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                          type: string
+                      required:
+                        - currency
+                        - price
+                        - price_recurring
+                      type: object
+                    readOnly: true
+                    type: array
+                  product_id:
+                    description: ID of the product linked to the package.
+                    type: integer
+                  product_inventory_availability:
+                    description: |-
+                      Inventory availability at fulfillment locations
+
+                      * `in_stock` - In Stock
+                      * `low_stock` - Low Stock
+                      * `out_of_stock` - Out of Stock
+                      * `untracked` - Untracked
+                    nullable: true
+                    oneOf:
+                      - description: |-
+                          * `in_stock` - In Stock
+                          * `low_stock` - Low Stock
+                          * `out_of_stock` - Out of Stock
+                          * `untracked` - Untracked
+                        enum:
+                          - in_stock
+                          - low_stock
+                          - out_of_stock
+                          - untracked
+                        type: string
+                      - enum:
+                          - ''
+                      - enum:
+                          - null
+                    title: Inventory Availability
+                  product_name:
+                    description: Product name.
+                    type: string
+                  product_purchase_availability:
+                    description: |-
+                      Product's availability to purchase in new orders
+
+                      * `available` - Available
+                      * `unavailable` - Unavailable
+                    nullable: true
+                    oneOf:
+                      - description: |-
+                          * `available` - Available
+                          * `unavailable` - Unavailable
+                        enum:
+                          - available
+                          - unavailable
+                        type: string
+                      - enum:
+                          - ''
+                      - enum:
+                          - null
+                    title: Purchase Availability
+                  product_sku:
+                    description: SKU of the product linked to the package
+                    maxLength: 128
+                    nullable: true
+                    type: string
+                  product_variant_id:
+                    description: ID of the product variant linked to the package.
+                    type: integer
+                  product_variant_name:
+                    description: Product variant name.
+                    type: string
+                  updated_at:
+                    description: When the package was last updated.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                required:
+                  - created_at
+                  - id
+                  - image
+                  - name
+                  - prices
+                  - product_id
+                  - product_name
+                  - product_variant_id
+                  - product_variant_name
+                  - updated_at
+                type: object
+          description: ''
+      security:
+        - oauth2:
+            - campaigns:write
+      tags:
+        - campaigns
+  /campaigns/{id}/packages/{packageId}/:
+    delete:
+      description: Delete a package on the campaign.
+      operationId: campaignsPackagesDestroy
+      parameters:
+        - description: Campaign ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - description: Package ID.
+          in: path
+          name: packageId
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: '2024-04-01'
+            enum:
+              - '2024-04-01'
+            type: string
+      responses:
+        '204':
+          description: No response body
+      security:
+        - oauth2:
+            - campaigns:write
+      tags:
+        - campaigns
+    get:
+      description: Retrieve a package on the campaign.
+      operationId: campaignsPackagesRetrieve
+      parameters:
+        - description: Campaign ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - description: Package ID.
+          in: path
+          name: packageId
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: '2024-04-01'
+            enum:
+              - '2024-04-01'
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  created_at:
+                    description: When the package was created.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                  id:
+                    description: Package reference ID
+                    type: integer
+                  image:
+                    description: URL of the package image.
+                    format: uri
+                    nullable: true
+                    readOnly: true
+                    type: string
+                  interval:
+                    description: |-
+                      Recurring interval for subscription products.
+
+                      * `day` - Day
+                      * `month` - Month
+                    nullable: true
+                    oneOf:
+                      - description: |-
+                          * `day` - Day
+                          * `month` - Month
+                        enum:
+                          - day
+                          - month
+                        type: string
+                      - enum:
+                          - ''
+                      - enum:
+                          - null
+                    title: Recurring Interval
+                  interval_count:
+                    description: Number of intervals for the subscription.
+                    maximum: 2147483647
+                    minimum: 0
+                    nullable: true
+                    title: Subscription Interval Count
+                    type: integer
+                  is_recurring:
+                    title: Package is a recurring product subscription.
+                    type: boolean
+                  name:
+                    maxLength: 200
+                    title: Package name
+                    type: string
+                  prices:
+                    description: Price of the package in every currency the campaign supports.
+                    items:
+                      properties:
+                        currency:
+                          description: Currency for the package price.
+                          maxLength: 3
+                          type: string
+                        price:
+                          description: Price per product unit in the package.
+                          format: decimal
+                          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                          type: string
+                        price_recurring:
+                          description: Recurring subscription price per unit of product in the package.
+                          format: decimal
+                          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                          type: string
+                      required:
+                        - currency
+                        - price
+                        - price_recurring
+                      type: object
+                    readOnly: true
+                    type: array
+                  product_id:
+                    description: ID of the product linked to the package.
+                    type: integer
+                  product_inventory_availability:
+                    description: |-
+                      Inventory availability at fulfillment locations
+
+                      * `in_stock` - In Stock
+                      * `low_stock` - Low Stock
+                      * `out_of_stock` - Out of Stock
+                      * `untracked` - Untracked
+                    nullable: true
+                    oneOf:
+                      - description: |-
+                          * `in_stock` - In Stock
+                          * `low_stock` - Low Stock
+                          * `out_of_stock` - Out of Stock
+                          * `untracked` - Untracked
+                        enum:
+                          - in_stock
+                          - low_stock
+                          - out_of_stock
+                          - untracked
+                        type: string
+                      - enum:
+                          - ''
+                      - enum:
+                          - null
+                    title: Inventory Availability
+                  product_name:
+                    description: Product name.
+                    type: string
+                  product_purchase_availability:
+                    description: |-
+                      Product's availability to purchase in new orders
+
+                      * `available` - Available
+                      * `unavailable` - Unavailable
+                    nullable: true
+                    oneOf:
+                      - description: |-
+                          * `available` - Available
+                          * `unavailable` - Unavailable
+                        enum:
+                          - available
+                          - unavailable
+                        type: string
+                      - enum:
+                          - ''
+                      - enum:
+                          - null
+                    title: Purchase Availability
+                  product_sku:
+                    description: SKU of the product linked to the package
+                    maxLength: 128
+                    nullable: true
+                    type: string
+                  product_variant_attribute_values:
+                    description: Product variant atrribute values.
+                  product_variant_id:
+                    description: ID of the product variant linked to the package.
+                    type: integer
+                  product_variant_name:
+                    description: Product variant name.
+                    type: string
+                  updated_at:
+                    description: When the package was last updated.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                required:
+                  - created_at
+                  - id
+                  - image
+                  - name
+                  - prices
+                  - product_id
+                  - product_name
+                  - product_variant_attribute_values
+                  - product_variant_id
+                  - product_variant_name
+                  - updated_at
+                type: object
+          description: ''
+      security:
+        - oauth2:
+            - campaigns:read
+      tags:
+        - campaigns
+    patch:
+      description: Partially update a package on the campaign.
+      operationId: campaignsPackagesPartialUpdate
+      parameters:
+        - description: Campaign ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - description: Package ID.
+          in: path
+          name: packageId
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: '2024-04-01'
+            enum:
+              - '2024-04-01'
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                interval:
+                  description: |-
+                    Recurring subscription interval type.
+
+                    * `day` - Day
+                    * `month` - Month
+                  nullable: true
+                  oneOf:
+                    - description: |-
+                        * `day` - Day
+                        * `month` - Month
+                      enum:
+                        - day
+                        - month
+                      type: string
+                    - enum:
+                        - ''
+                    - enum:
+                        - null
+                  title: Recurring Interval
+                interval_count:
+                  description: Recurring subscription interval count.
+                  maximum: 2147483647
+                  minimum: 0
+                  nullable: true
+                  title: Subscription Interval Count
+                  type: integer
+                name:
+                  description: Package name.
+                  maxLength: 200
+                  title: Package name
+                  type: string
+                prices:
+                  description: Per-currency prices to update for the package. Currencies not included are left unchanged.
+                  items:
+                    properties:
+                      currency:
+                        description: Currency this price entry applies to.
+                        type: string
+                      price:
+                        description: Price per product unit in the package.
+                        format: decimal
+                        pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                        type: string
+                      price_recurring:
+                        description: Recurring subscription price per unit of product in the package.
+                        format: decimal
+                        nullable: true
+                        pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                        type: string
+                    required:
+                      - currency
+                      - price
+                    type: object
+                  type: array
+                  writeOnly: true
+                product_id:
+                  description: ID of the product linked to the package.
+                  nullable: true
+                  type: integer
+                  writeOnly: true
+                product_variant_id:
+                  description: ID of the product variant linked to the package.
+                  nullable: true
+                  type: integer
+                  writeOnly: true
+                recalculate_prices:
+                  default: false
+                  description: Whether to recalculate prices for currencies not included in `prices`, based on the campaign's default currency price.
+                  nullable: true
+                  type: boolean
+                  writeOnly: true
+              type: object
+          application/x-www-form-urlencoded:
+            schema:
+              properties:
+                interval:
+                  description: |-
+                    Recurring subscription interval type.
+
+                    * `day` - Day
+                    * `month` - Month
+                  nullable: true
+                  oneOf:
+                    - description: |-
+                        * `day` - Day
+                        * `month` - Month
+                      enum:
+                        - day
+                        - month
+                      type: string
+                    - enum:
+                        - ''
+                    - enum:
+                        - null
+                  title: Recurring Interval
+                interval_count:
+                  description: Recurring subscription interval count.
+                  maximum: 2147483647
+                  minimum: 0
+                  nullable: true
+                  title: Subscription Interval Count
+                  type: integer
+                name:
+                  description: Package name.
+                  maxLength: 200
+                  title: Package name
+                  type: string
+                prices:
+                  description: Per-currency prices to update for the package. Currencies not included are left unchanged.
+                  items:
+                    properties:
+                      currency:
+                        description: Currency this price entry applies to.
+                        type: string
+                      price:
+                        description: Price per product unit in the package.
+                        format: decimal
+                        pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                        type: string
+                      price_recurring:
+                        description: Recurring subscription price per unit of product in the package.
+                        format: decimal
+                        nullable: true
+                        pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                        type: string
+                    required:
+                      - currency
+                      - price
+                    type: object
+                  type: array
+                  writeOnly: true
+                product_id:
+                  description: ID of the product linked to the package.
+                  nullable: true
+                  type: integer
+                  writeOnly: true
+                product_variant_id:
+                  description: ID of the product variant linked to the package.
+                  nullable: true
+                  type: integer
+                  writeOnly: true
+                recalculate_prices:
+                  default: false
+                  description: Whether to recalculate prices for currencies not included in `prices`, based on the campaign's default currency price.
+                  nullable: true
+                  type: boolean
+                  writeOnly: true
+              type: object
+          multipart/form-data:
+            schema:
+              properties:
+                interval:
+                  description: |-
+                    Recurring subscription interval type.
+
+                    * `day` - Day
+                    * `month` - Month
+                  nullable: true
+                  oneOf:
+                    - description: |-
+                        * `day` - Day
+                        * `month` - Month
+                      enum:
+                        - day
+                        - month
+                      type: string
+                    - enum:
+                        - ''
+                    - enum:
+                        - null
+                  title: Recurring Interval
+                interval_count:
+                  description: Recurring subscription interval count.
+                  maximum: 2147483647
+                  minimum: 0
+                  nullable: true
+                  title: Subscription Interval Count
+                  type: integer
+                name:
+                  description: Package name.
+                  maxLength: 200
+                  title: Package name
+                  type: string
+                prices:
+                  description: Per-currency prices to update for the package. Currencies not included are left unchanged.
+                  items:
+                    properties:
+                      currency:
+                        description: Currency this price entry applies to.
+                        type: string
+                      price:
+                        description: Price per product unit in the package.
+                        format: decimal
+                        pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                        type: string
+                      price_recurring:
+                        description: Recurring subscription price per unit of product in the package.
+                        format: decimal
+                        nullable: true
+                        pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                        type: string
+                    required:
+                      - currency
+                      - price
+                    type: object
+                  type: array
+                  writeOnly: true
+                product_id:
+                  description: ID of the product linked to the package.
+                  nullable: true
+                  type: integer
+                  writeOnly: true
+                product_variant_id:
+                  description: ID of the product variant linked to the package.
+                  nullable: true
+                  type: integer
+                  writeOnly: true
+                recalculate_prices:
+                  default: false
+                  description: Whether to recalculate prices for currencies not included in `prices`, based on the campaign's default currency price.
+                  nullable: true
+                  type: boolean
+                  writeOnly: true
+              type: object
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  created_at:
+                    description: When the package was created.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                  id:
+                    description: Package reference ID
+                    type: integer
+                  image:
+                    description: URL of the package image.
+                    format: uri
+                    nullable: true
+                    readOnly: true
+                    type: string
+                  interval:
+                    description: |-
+                      Recurring interval for subscription products.
+
+                      * `day` - Day
+                      * `month` - Month
+                    nullable: true
+                    oneOf:
+                      - description: |-
+                          * `day` - Day
+                          * `month` - Month
+                        enum:
+                          - day
+                          - month
+                        type: string
+                      - enum:
+                          - ''
+                      - enum:
+                          - null
+                    title: Recurring Interval
+                  interval_count:
+                    description: Number of intervals for the subscription.
+                    maximum: 2147483647
+                    minimum: 0
+                    nullable: true
+                    title: Subscription Interval Count
+                    type: integer
+                  is_recurring:
+                    title: Package is a recurring product subscription.
+                    type: boolean
+                  name:
+                    maxLength: 200
+                    title: Package name
+                    type: string
+                  prices:
+                    description: Price of the package in every currency the campaign supports.
+                    items:
+                      properties:
+                        currency:
+                          description: Currency for the package price.
+                          maxLength: 3
+                          type: string
+                        price:
+                          description: Price per product unit in the package.
+                          format: decimal
+                          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                          type: string
+                        price_recurring:
+                          description: Recurring subscription price per unit of product in the package.
+                          format: decimal
+                          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                          type: string
+                      required:
+                        - currency
+                        - price
+                        - price_recurring
+                      type: object
+                    readOnly: true
+                    type: array
+                  product_id:
+                    description: ID of the product linked to the package.
+                    type: integer
+                  product_inventory_availability:
+                    description: |-
+                      Inventory availability at fulfillment locations
+
+                      * `in_stock` - In Stock
+                      * `low_stock` - Low Stock
+                      * `out_of_stock` - Out of Stock
+                      * `untracked` - Untracked
+                    nullable: true
+                    oneOf:
+                      - description: |-
+                          * `in_stock` - In Stock
+                          * `low_stock` - Low Stock
+                          * `out_of_stock` - Out of Stock
+                          * `untracked` - Untracked
+                        enum:
+                          - in_stock
+                          - low_stock
+                          - out_of_stock
+                          - untracked
+                        type: string
+                      - enum:
+                          - ''
+                      - enum:
+                          - null
+                    title: Inventory Availability
+                  product_name:
+                    description: Product name.
+                    type: string
+                  product_purchase_availability:
+                    description: |-
+                      Product's availability to purchase in new orders
+
+                      * `available` - Available
+                      * `unavailable` - Unavailable
+                    nullable: true
+                    oneOf:
+                      - description: |-
+                          * `available` - Available
+                          * `unavailable` - Unavailable
+                        enum:
+                          - available
+                          - unavailable
+                        type: string
+                      - enum:
+                          - ''
+                      - enum:
+                          - null
+                    title: Purchase Availability
+                  product_sku:
+                    description: SKU of the product linked to the package
+                    maxLength: 128
+                    nullable: true
+                    type: string
+                  product_variant_attribute_values:
+                    description: Product variant atrribute values.
+                  product_variant_id:
+                    description: ID of the product variant linked to the package.
+                    type: integer
+                  product_variant_name:
+                    description: Product variant name.
+                    type: string
+                  updated_at:
+                    description: When the package was last updated.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                required:
+                  - created_at
+                  - id
+                  - image
+                  - name
+                  - prices
+                  - product_id
+                  - product_name
+                  - product_variant_attribute_values
+                  - product_variant_id
+                  - product_variant_name
+                  - updated_at
+                type: object
+          description: ''
+      security:
+        - oauth2:
+            - campaigns:write
       tags:
         - campaigns
   /carts/:

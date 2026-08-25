@@ -57,12 +57,6 @@ CAMPAIGNS_ADMIN_PATH_PREFIX = "/api/admin"
 # the merchant, and the version header is replaced with the admin spec's own casing.
 CAMPAIGNS_ADMIN_DROP_PARAMETERS = ["X-29Next-Store", "X-29Next-Api-Version"]
 
-# Match the admin spec's operationId convention, which sets the docs page filename and title.
-CAMPAIGNS_ADMIN_OPERATION_IDS = {
-    "adminCampaignList": "campaignsList",
-    "adminCampaignRetrieve": "campaignsRetrieve",
-}
-
 ADMIN_API_SPEC_ADDITIONS = {
     "servers": [
         {

@@ -442,7 +442,7 @@ const campaignsTagFolders = sortBySpecOrder(
 );
 writeFileSync(
   join(campaignsApiDir, 'meta.json'),
-  JSON.stringify({ title: 'API Reference', pages: campaignsTagFolders }, null, 2),
+  JSON.stringify({ title: 'Campaign Cart API', pages: campaignsTagFolders }, null, 2),
 );
 console.log(`Wrote campaigns/api/meta.json with tag folders: ${campaignsTagFolders.join(', ')}`);
 

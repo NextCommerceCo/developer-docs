@@ -1,0 +1,10 @@
+{
+  "title": "Campaigns",
+  "pages": [
+    "[Campaigns List](/docs/admin-api/reference/campaigns/campaignsList)",
+    "[Campaigns Create](/docs/admin-api/reference/campaigns/campaignsCreate)",
+    "[Campaigns Retrieve](/docs/admin-api/reference/campaigns/campaignsRetrieve)",
+    "[Campaigns Partial Update](/docs/admin-api/reference/campaigns/campaignsPartialUpdate)",
+    "[Campaigns Destroy](/docs/admin-api/reference/campaigns/campaignsDestroy)"
+  ]
+}

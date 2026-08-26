@@ -1,0 +1,194 @@
+---
+title: Campaigns Admin API
+description: Provision campaigns and packages programmatically instead of clicking through the dashboard.
+tags:
+ - Guide
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+
+The Admin API creates and updates campaigns and packages without going through the dashboard. The main benefit is the full creation flow for a fresh campaign: create the campaign, add its packages, and read back the API key your funnel pages need. That removes the manual setup steps, so an AI agent can drive the entire campaign creation flow for you.
+
+It also pays off once you run more than a handful of campaigns:
+
+- Stand up a campaign per market or per test, each with its own currency and payment methods
+- Update every campaign that sells a product after you reprice or discontinue it
+- Push a new price to one currency and let the rest recalculate from your default
+
+<Callout type="warn" title="Never Call the Admin API From a Campaign Page">
+Admin API tokens have full access to your store, so they belong on a server. Your funnel pages call the [Campaign Cart API](/docs/campaigns/api) instead, on a different host with a per-campaign key. That key is the only credential safe to ship in browser code.
+</Callout>
+
+## Permissions
+
+Campaign endpoints are authorized by OAuth scope on the app making the request.
+
+| Scope | Grants |
+| --- | --- |
+| `campaigns:read` | List and view campaigns and their packages |
+| `campaigns:write` | Create, update, and delete campaigns and packages |
+
+Additional scopes required:
+
+| Scope | Needed to |
+| --- | --- |
+| `catalogue:read` | Find the `product_id` and `product_variant_ids` a package links to, using [productsList](/docs/admin-api/reference/products/productsList) and [productsVariantList](/docs/admin-api/reference/products/productsVariantList) |
+| `gateways:read` | Read gateway groups and the payment method codes a campaign can enable, using [gatewayGroupsList](/docs/admin-api/reference/payments/gatewayGroupsList) |
+
+See [Admin API permissions](/docs/admin-api/permissions) for the full scope list and [Admin API → Getting Started](/docs/admin-api) for creating an OAuth app.
+
+<Callout type="info" title="Only Available on 2024-04-01 API Version">
+Campaign endpoints exist on the `2024-04-01` API version and above. They are not available on `2023-02-10`.
+</Callout>
+
+## Campaign Provisioning Flow
+
+Standing up a campaign end to end is a 4 step process:
+
+1. Retrieve the payment gateway group using the [gatewayGroupsList](/docs/admin-api/reference/payments/gatewayGroupsList) endpoint to get its `id` and the payment methods it supports.
+2. Create the campaign using the [campaignsCreate](/docs/admin-api/reference/campaigns/campaignsCreate) endpoint.
+3. Add a package for each sellable item using the [campaignsPackagesCreate](/docs/admin-api/reference/campaigns/campaignsPackagesCreate) endpoint.
+4. Read the campaign's `api_key` from the create response and configure your funnel pages with it.
+
+### Create a Campaign
+
+Below is an example API call to create a campaign for a US English funnel that also accepts CAD. `name`, `currency`, `language`, and `payment_gateway_group_id` are required, everything else is optional.
+
+```json title="Create Campaign" http-method="POST" http-target="https://{store}.29next.store/api/admin/campaigns/"
+{
+  "name": "Spring Widget Launch US", // internal reference name
+  "currency": "USD", // default currency for orders on this campaign
+  "language": "en", // preferred customer language
+  "payment_gateway_group_id": 4, // from gatewayGroupsList
+  "additional_currencies": ["CAD"], // currencies supported beyond the default
+  "available_payment_methods": ["card_token", "paypal"], // codes from gatewayGroupsList
+  "available_express_payment_methods": ["apple_pay"], // express codes from gatewayGroupsList
+  "available_shipping_countries": ["US", "CA"], // ISO 3166-1 alpha-2 codes
+  "statement_descriptor": "WIDGETCO" // shown on the customer's card statement
+}
+```
+
+The response returns the campaign `id` you use for every package call, and the `api_key` your funnel pages authenticate with.
+
+The payment methods you enable have to be ones the gateway group supports. [gatewayGroupsList](/docs/admin-api/reference/payments/gatewayGroupsList) returns each group on the store with its `id`, `available_payment_methods`, `available_express_payment_methods`, and `available_currencies`.
+
+### Add Packages to a Campaign
+
+A package is the campaign's sellable reference to a product or variant, and its `id` is what your funnel markup passes as `data-next-package-id`. Only `name` and `product_id` are required.
+
+```json title="Create Package" http-method="POST" http-target="https://{store}.29next.store/api/admin/campaigns/{id}/packages/"
+{
+  "name": "Widget Single", // package name
+  "product_id": 184, // product linked to the package
+  "product_variant_ids": [512], // product variants linked to the package
+  "price": "49.95" // price per product variant unit
+}
+```
+
+<Callout type="idea" title="Use Offers for Quantity Tiers">
+Avoid creating `1x`, `2x`, and `3x` package records. Create one package for the product identity and base price, then discount quantity tiers with offers in the dashboard. The cart and order APIs return before and after totals, so your pages render savings without doing math. See [Concepts → Offers](/docs/campaigns#offers).
+</Callout>
+
+### Create a Subscription Package
+
+Subscription packages carry a recurring interval and a separate recurring price. `interval` accepts `day` or `month`.
+
+```json title="Create Recurring Package" http-method="POST" http-target="https://{store}.29next.store/api/admin/campaigns/{id}/packages/"
+{
+  "name": "Widget Monthly Refill",
+  "product_id": 184,
+  "product_variant_ids": [512],
+  "price": "49.95", // charged on the initial order
+  "price_recurring": "39.95", // charged on each renewal
+  "interval": "month", // day or month
+  "interval_count": 1 // renew every 1 month
+}
+```
+
+### Repricing Across Currencies
+
+[campaignsPackagesCreate](/docs/admin-api/reference/campaigns/campaignsPackagesCreate) takes a single `price` and `price_recurring`. [campaignsPackagesPartialUpdate](/docs/admin-api/reference/campaigns/campaignsPackagesPartialUpdate) takes a `prices` array with one entry per currency, and currencies you leave out are not changed.
+
+```json title="Update Price for Selected Currencies" http-method="PATCH" http-target="https://{store}.29next.store/api/admin/campaigns/{id}/packages/{packageId}/"
+{
+  "prices": [
+    {
+      "currency": "USD",
+      "price": "44.95",
+      "price_recurring": "34.95"
+    }
+  ],
+  "recalculate_prices": true // derive the other currencies from the default currency price
+}
+```
+
+With `recalculate_prices` set to `true`, every currency you did not list is recalculated from the campaign's default currency price. Left `false` (the default), only the currencies you passed change.
+
+<Callout type="info" title="Read Prices Back From the Response">
+`price` and `price_recurring` are write-only and do not appear in the response. Read the resolved figures from the response's `prices` array, which returns `currency`, `price`, and `price_recurring` for each. You also send `product_variant_ids` as an array and read back a single `product_variant_id`.
+</Callout>
+
+### Find Campaigns to Act On
+
+[campaignsList](/docs/admin-api/reference/campaigns/campaignsList) is cursor paginated and filterable. Follow `next` in the response until it is `null`.
+
+| Filter | Matches |
+| --- | --- |
+| `name` | Campaign name contains this text, case-insensitive |
+| `currency` | Default currency, as an ISO 4217 code |
+| `language` | Campaign language, as an ISO 639-1 code |
+| `created_date_from` / `created_date_to` | Created within a date range (`YYYY-MM-DD`, UTC) |
+| `updated_date_from` / `updated_date_to` | Last updated within a date range (`YYYY-MM-DD`, UTC) |
+
+```json title="List EUR Campaigns Updated Since a Date" http-method="GET" http-target="https://{store}.29next.store/api/admin/campaigns/?currency=EUR&updated_date_from=2026-08-01&page_size=50"
+{}
+```
+
+### Audit Packages Against Your Catalogue
+
+[campaignsPackagesList](/docs/admin-api/reference/campaigns/campaignsPackagesList) filters on `name`, `product_name`, and `product_sku`, so you can find every package on a campaign that sells a discontinued SKU.
+
+```json title="Find Packages by SKU" http-method="GET" http-target="https://{store}.29next.store/api/admin/campaigns/{id}/packages/?product_sku=WIDGET-BLU"
+{}
+```
+
+Each package returns `product_purchase_availability` (`available` or `unavailable`) and `product_inventory_availability` (`in_stock`, `low_stock`, `out_of_stock`, or `untracked`). Check these to catch packages pointing at products customers can no longer buy.
+
+<Callout type="warn" title="Packages List Is Not Paginated">
+Unlike [campaignsList](/docs/admin-api/reference/campaigns/campaignsList), [campaignsPackagesList](/docs/admin-api/reference/campaigns/campaignsPackagesList) returns a plain array with no `cursor` or `page_size`. It returns every package on the campaign in one response.
+</Callout>
+
+### Retire a Campaign or Package
+
+[campaignsDestroy](/docs/admin-api/reference/campaigns/campaignsDestroy) deletes a campaign's settings and [campaignsPackagesDestroy](/docs/admin-api/reference/campaigns/campaignsPackagesDestroy) removes a single package.
+
+<Callout type="warn" title="Check What Still Points at the Campaign First">
+A live funnel is configured with its campaign's `api_key` and its package IDs. Deleting either removes what those pages depend on, so take the pages down or repoint them at a replacement first.
+</Callout>
+
+<Callout type="info" title="Offers and Shipping Methods Are Coming Soon">
+Campaign offers and shipping method pricing are being added to this API. Until they ship, configure them in the dashboard. See [Concepts → Offers](/docs/campaigns#offers) and [Concepts → Shipping methods](/docs/campaigns#shipping-methods). Authorized domains are configured in your store's Campaign Settings, see [Concepts → Domains](/docs/campaigns#domains).
+</Callout>
+
+## Endpoints
+
+Full request and response detail lives in the Admin API reference.
+
+### Campaigns
+
+| Operation | Endpoint |
+| --- | --- |
+| [Campaigns List](/docs/admin-api/reference/campaigns/campaignsList) | `GET /api/admin/campaigns/` |
+| [Campaigns Create](/docs/admin-api/reference/campaigns/campaignsCreate) | `POST /api/admin/campaigns/` |
+| [Campaigns Retrieve](/docs/admin-api/reference/campaigns/campaignsRetrieve) | `GET /api/admin/campaigns/{id}/` |
+| [Campaigns Partial Update](/docs/admin-api/reference/campaigns/campaignsPartialUpdate) | `PATCH /api/admin/campaigns/{id}/` |
+| [Campaigns Destroy](/docs/admin-api/reference/campaigns/campaignsDestroy) | `DELETE /api/admin/campaigns/{id}/` |
+
+### Packages
+
+| Operation | Endpoint |
+| --- | --- |
+| [Campaigns Packages List](/docs/admin-api/reference/campaigns/campaignsPackagesList) | `GET /api/admin/campaigns/{id}/packages/` |
+| [Campaigns Packages Create](/docs/admin-api/reference/campaigns/campaignsPackagesCreate) | `POST /api/admin/campaigns/{id}/packages/` |
+| [Campaigns Packages Retrieve](/docs/admin-api/reference/campaigns/campaignsPackagesRetrieve) | `GET /api/admin/campaigns/{id}/packages/{packageId}/` |
+| [Campaigns Packages Partial Update](/docs/admin-api/reference/campaigns/campaignsPackagesPartialUpdate) | `PATCH /api/admin/campaigns/{id}/packages/{packageId}/` |
+| [Campaigns Packages Destroy](/docs/admin-api/reference/campaigns/campaignsPackagesDestroy) | `DELETE /api/admin/campaigns/{id}/packages/{packageId}/` |

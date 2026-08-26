@@ -1,6 +1,6 @@
 ---
-title: Campaigns API
-sidebar_label: Campaigns API
+title: Campaign Cart API
+sidebar_label: Campaign Cart API
 sidebar_position: 1
 ---
 import { Callout } from 'fumadocs-ui/components/callout';
@@ -13,6 +13,10 @@ The Campaigns App provides an easy-to-use CORS-enabled API that follows the best
 For most projects, start with the **[Campaigns Getting Started guide](/docs/campaigns)** — it walks you through scaffolding a working funnel with Page Kit and the Campaign Cart SDK, which wraps every endpoint on this page behind data-attribute driven add-to-cart, live cart state, coupon handling, checkout forms, and upsell flows. You write HTML, not fetch calls. The [Campaign Cart SDK documentation](https://cart-sdk.nextcommerce.com/latest/) covers the SDK in depth.
 
 Use the raw API on this page only for custom server-side flows or backend integrations the SDK doesn't cover.
+</Callout>
+
+<Callout type="info" title="Looking to create campaigns, not sell through them?">
+This page covers the browser-facing API your funnel pages call at runtime, authenticated with a **Campaign API key**. To create campaigns and manage packages from a backend, use the [Campaigns Admin API](/docs/campaigns/admin-api) — a different host, authenticated with an OAuth token.
 </Callout>
 
 ## Campaigns Overview
@@ -58,7 +62,7 @@ See [Concepts → Offers](/docs/campaigns#offers) for the full model.
 
 ## Getting Started
 
-To get started, create a new campaign with a package mapped to a product in your store. Use the examples below with your **Campaign API Key** to get started using the Campaigns API.
+To get started, create a new campaign with a package mapped to a product in your store. Use the examples below with your **Campaign API Key** to get started using the Campaign Cart API.
 
 ### Add Session Tracking
 

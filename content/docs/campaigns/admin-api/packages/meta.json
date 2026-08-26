@@ -1,0 +1,10 @@
+{
+  "title": "Packages",
+  "pages": [
+    "[Campaigns Packages List](/docs/admin-api/reference/campaigns/campaignsPackagesList)",
+    "[Campaigns Packages Create](/docs/admin-api/reference/campaigns/campaignsPackagesCreate)",
+    "[Campaigns Packages Retrieve](/docs/admin-api/reference/campaigns/campaignsPackagesRetrieve)",
+    "[Campaigns Packages Partial Update](/docs/admin-api/reference/campaigns/campaignsPackagesPartialUpdate)",
+    "[Campaigns Packages Destroy](/docs/admin-api/reference/campaigns/campaignsPackagesDestroy)"
+  ]
+}

@@ -127,6 +127,34 @@ With `recalculate_prices` set to `true`, every currency you did not list is reca
 `price` and `price_recurring` are write-only and do not appear in the response. Read the resolved figures from the response's `prices` array, which returns `currency`, `price`, and `price_recurring` for each. You also send `product_variant_ids` as an array and read back a single `product_variant_id`.
 </Callout>
 
+### Add Shipping Methods to a Campaign
+
+A campaign shipping method links a shipping method already configured on the store to this campaign at a campaign specific price. Both `shipping_method` and `price` are required. `name` is populated automatically from the code you pass.
+
+```json title="Create Shipping Method" http-method="POST" http-target="https://{store}.29next.store/api/admin/campaigns/{id}/shipping-methods/"
+{
+  "shipping_method": "default-shipping", // code from the store's configured shipping methods
+  "price": "4.95" // price in the campaign's default currency
+}
+```
+
+Every other currency configured on the campaign is populated automatically through forex conversion.
+
+To change prices later, [campaignsShippingMethodsPartialUpdate](/docs/admin-api/reference/campaigns/campaignsShippingMethodsPartialUpdate) takes the same `prices` array and `recalculate_prices` flag as packages, and currencies you leave out are not changed.
+
+```json title="Update Shipping Prices" http-method="PATCH" http-target="https://{store}.29next.store/api/admin/campaigns/{id}/shipping-methods/{shippingMethodId}/"
+{
+  "prices": [
+    { "currency": "USD", "price": "5.95" }
+  ],
+  "recalculate_prices": true // convert the other currencies from the price above
+}
+```
+
+<Callout type="warn" title="Name the Source Currency When Recalculating">
+With `recalculate_prices` set to `true`, the source is the campaign's default currency when you include it in `prices`, otherwise the first currency listed. Include the default currency or submit a single price so the source is unambiguous.
+</Callout>
+
 ### Find Campaigns to Act On
 
 [campaignsList](/docs/admin-api/reference/campaigns/campaignsList) is cursor paginated and filterable. Follow `next` in the response until it is `null`.
@@ -153,8 +181,8 @@ With `recalculate_prices` set to `true`, every currency you did not list is reca
 
 Each package returns `product_purchase_availability` (`available` or `unavailable`) and `product_inventory_availability` (`in_stock`, `low_stock`, `out_of_stock`, or `untracked`). Check these to catch packages pointing at products customers can no longer buy.
 
-<Callout type="warn" title="Packages List Is Not Paginated">
-Unlike [campaignsList](/docs/admin-api/reference/campaigns/campaignsList), [campaignsPackagesList](/docs/admin-api/reference/campaigns/campaignsPackagesList) returns a plain array with no `cursor` or `page_size`. It returns every package on the campaign in one response.
+<Callout type="warn" title="Sub-Resource Lists Are Not Paginated">
+Unlike [campaignsList](/docs/admin-api/reference/campaigns/campaignsList), [campaignsPackagesList](/docs/admin-api/reference/campaigns/campaignsPackagesList) and [campaignsShippingMethodsList](/docs/admin-api/reference/campaigns/campaignsShippingMethodsList) return plain arrays with no `cursor` or `page_size`. Each returns everything on the campaign in one response.
 </Callout>
 
 ### Retire a Campaign or Package
@@ -165,8 +193,8 @@ Unlike [campaignsList](/docs/admin-api/reference/campaigns/campaignsList), [camp
 A live funnel is configured with its campaign's `api_key` and its package IDs. Deleting either removes what those pages depend on, so take the pages down or repoint them at a replacement first.
 </Callout>
 
-<Callout type="info" title="Offers and Shipping Methods Are Coming Soon">
-Campaign offers and shipping method pricing are being added to this API. Until they ship, configure them in the dashboard. See [Concepts → Offers](/docs/campaigns#offers) and [Concepts → Shipping methods](/docs/campaigns#shipping-methods). Authorized domains are configured in your store's Campaign Settings, see [Concepts → Domains](/docs/campaigns#domains).
+<Callout type="info" title="Offers Are Coming Soon">
+Campaign offers are being added to this API. Until they ship, configure them in the dashboard, see [Concepts → Offers](/docs/campaigns#offers). Authorized domains are configured in your store's Campaign Settings, see [Concepts → Domains](/docs/campaigns#domains).
 </Callout>
 
 ## Endpoints
@@ -192,3 +220,13 @@ Full request and response detail lives in the Admin API reference.
 | [Campaigns Packages Retrieve](/docs/admin-api/reference/campaigns/campaignsPackagesRetrieve) | `GET /api/admin/campaigns/{id}/packages/{packageId}/` |
 | [Campaigns Packages Partial Update](/docs/admin-api/reference/campaigns/campaignsPackagesPartialUpdate) | `PATCH /api/admin/campaigns/{id}/packages/{packageId}/` |
 | [Campaigns Packages Destroy](/docs/admin-api/reference/campaigns/campaignsPackagesDestroy) | `DELETE /api/admin/campaigns/{id}/packages/{packageId}/` |
+
+### Shipping Methods
+
+| Operation | Endpoint |
+| --- | --- |
+| [Campaigns Shipping Methods List](/docs/admin-api/reference/campaigns/campaignsShippingMethodsList) | `GET /api/admin/campaigns/{id}/shipping-methods/` |
+| [Campaigns Shipping Methods Create](/docs/admin-api/reference/campaigns/campaignsShippingMethodsCreate) | `POST /api/admin/campaigns/{id}/shipping-methods/` |
+| [Campaigns Shipping Methods Retrieve](/docs/admin-api/reference/campaigns/campaignsShippingMethodsRetrieve) | `GET /api/admin/campaigns/{id}/shipping-methods/{shippingMethodId}/` |
+| [Campaigns Shipping Methods Partial Update](/docs/admin-api/reference/campaigns/campaignsShippingMethodsPartialUpdate) | `PATCH /api/admin/campaigns/{id}/shipping-methods/{shippingMethodId}/` |
+| [Campaigns Shipping Methods Destroy](/docs/admin-api/reference/campaigns/campaignsShippingMethodsDestroy) | `DELETE /api/admin/campaigns/{id}/shipping-methods/{shippingMethodId}/` |

@@ -12938,7 +12938,7 @@ paths:
                   writeOnly: true
                 recalculate_prices:
                   default: false
-                  description: Whether to recalculate prices for currencies not included in `prices`, based on the campaign's default currency price.
+                  description: Whether to recalculate prices for currencies not included in `prices`, via forex conversion. Source is the campaign's default currency if included in `prices`, else the first currency listed — include the default currency or submit only one to avoid ambiguity.
                   nullable: true
                   type: boolean
                   writeOnly: true
@@ -13014,7 +13014,7 @@ paths:
                   writeOnly: true
                 recalculate_prices:
                   default: false
-                  description: Whether to recalculate prices for currencies not included in `prices`, based on the campaign's default currency price.
+                  description: Whether to recalculate prices for currencies not included in `prices`, via forex conversion. Source is the campaign's default currency if included in `prices`, else the first currency listed — include the default currency or submit only one to avoid ambiguity.
                   nullable: true
                   type: boolean
                   writeOnly: true
@@ -13090,7 +13090,7 @@ paths:
                   writeOnly: true
                 recalculate_prices:
                   default: false
-                  description: Whether to recalculate prices for currencies not included in `prices`, based on the campaign's default currency price.
+                  description: Whether to recalculate prices for currencies not included in `prices`, via forex conversion. Source is the campaign's default currency if included in `prices`, else the first currency listed — include the default currency or submit only one to avoid ambiguity.
                   nullable: true
                   type: boolean
                   writeOnly: true
@@ -13256,6 +13256,467 @@ paths:
                   - product_variant_id
                   - product_variant_name
                   - updated_at
+                type: object
+          description: ''
+      security:
+        - oauth2:
+            - campaigns:write
+      tags:
+        - campaigns
+  /campaigns/{id}/shipping-methods/:
+    get:
+      description: List every shipping method on the campaign.
+      operationId: campaignsShippingMethodsList
+      parameters:
+        - description: Campaign ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: '2024-04-01'
+            enum:
+              - '2024-04-01'
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  properties:
+                    id:
+                      description: Shipping method reference ID.
+                      type: integer
+                    name:
+                      description: Shipping method name used internally for reference.
+                      maxLength: 128
+                      type: string
+                    prices:
+                      description: Price of the shipping method in every currency the campaign supports.
+                      items:
+                        properties:
+                          currency:
+                            maxLength: 3
+                            type: string
+                          price:
+                            description: Shipping price in this currency.
+                            format: decimal
+                            pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                            type: string
+                        required:
+                          - currency
+                          - price
+                        type: object
+                      readOnly: true
+                      type: array
+                    shipping_method:
+                      description: Shipping method code / carrier.
+                      maxLength: 128
+                      type: string
+                  required:
+                    - id
+                    - prices
+                  type: object
+                type: array
+          description: ''
+      security:
+        - oauth2:
+            - campaigns:read
+      tags:
+        - campaigns
+    post:
+      description: Create a shipping method on the campaign. `price` is set for the campaign's default currency; every other currency configured on the campaign is populated automatically through forex conversion.
+      operationId: campaignsShippingMethodsCreate
+      parameters:
+        - description: Campaign ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: '2024-04-01'
+            enum:
+              - '2024-04-01'
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                price:
+                  description: Shipping price in the campaign's default currency. Every other currency configured on the campaign is populated automatically through forex conversion.
+                  format: decimal
+                  pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                  type: string
+                  writeOnly: true
+                shipping_method:
+                  description: Shipping method code from the store's configured shipping methods. `name` is populated automatically from this.
+                  maxLength: 128
+                  type: string
+              required:
+                - price
+                - shipping_method
+              type: object
+          application/x-www-form-urlencoded:
+            schema:
+              properties:
+                price:
+                  description: Shipping price in the campaign's default currency. Every other currency configured on the campaign is populated automatically through forex conversion.
+                  format: decimal
+                  pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                  type: string
+                  writeOnly: true
+                shipping_method:
+                  description: Shipping method code from the store's configured shipping methods. `name` is populated automatically from this.
+                  maxLength: 128
+                  type: string
+              required:
+                - price
+                - shipping_method
+              type: object
+          multipart/form-data:
+            schema:
+              properties:
+                price:
+                  description: Shipping price in the campaign's default currency. Every other currency configured on the campaign is populated automatically through forex conversion.
+                  format: decimal
+                  pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                  type: string
+                  writeOnly: true
+                shipping_method:
+                  description: Shipping method code from the store's configured shipping methods. `name` is populated automatically from this.
+                  maxLength: 128
+                  type: string
+              required:
+                - price
+                - shipping_method
+              type: object
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                description: |-
+                  Identical to the list row today; kept distinct so detail can grow fields later
+                  without also changing every list row, mirroring `PackageListSerializer`/`PackageDetailSerializer`.
+                properties:
+                  id:
+                    description: Shipping method reference ID.
+                    type: integer
+                  name:
+                    description: Shipping method name used internally for reference.
+                    maxLength: 128
+                    type: string
+                  prices:
+                    description: Price of the shipping method in every currency the campaign supports.
+                    items:
+                      properties:
+                        currency:
+                          maxLength: 3
+                          type: string
+                        price:
+                          description: Shipping price in this currency.
+                          format: decimal
+                          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                          type: string
+                      required:
+                        - currency
+                        - price
+                      type: object
+                    readOnly: true
+                    type: array
+                  shipping_method:
+                    description: Shipping method code / carrier.
+                    maxLength: 128
+                    type: string
+                required:
+                  - id
+                  - prices
+                type: object
+          description: ''
+      security:
+        - oauth2:
+            - campaigns:write
+      tags:
+        - campaigns
+  /campaigns/{id}/shipping-methods/{shippingMethodId}/:
+    delete:
+      description: Delete a shipping method on the campaign.
+      operationId: campaignsShippingMethodsDestroy
+      parameters:
+        - description: Campaign ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - description: Shipping method reference ID, unique within the campaign.
+          in: path
+          name: shippingMethodId
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: '2024-04-01'
+            enum:
+              - '2024-04-01'
+            type: string
+      responses:
+        '204':
+          description: No response body
+      security:
+        - oauth2:
+            - campaigns:write
+      tags:
+        - campaigns
+    get:
+      description: Retrieve a shipping method on the campaign.
+      operationId: campaignsShippingMethodsRetrieve
+      parameters:
+        - description: Campaign ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - description: Shipping method reference ID, unique within the campaign.
+          in: path
+          name: shippingMethodId
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: '2024-04-01'
+            enum:
+              - '2024-04-01'
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                description: |-
+                  Identical to the list row today; kept distinct so detail can grow fields later
+                  without also changing every list row, mirroring `PackageListSerializer`/`PackageDetailSerializer`.
+                properties:
+                  id:
+                    description: Shipping method reference ID.
+                    type: integer
+                  name:
+                    description: Shipping method name used internally for reference.
+                    maxLength: 128
+                    type: string
+                  prices:
+                    description: Price of the shipping method in every currency the campaign supports.
+                    items:
+                      properties:
+                        currency:
+                          maxLength: 3
+                          type: string
+                        price:
+                          description: Shipping price in this currency.
+                          format: decimal
+                          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                          type: string
+                      required:
+                        - currency
+                        - price
+                      type: object
+                    readOnly: true
+                    type: array
+                  shipping_method:
+                    description: Shipping method code / carrier.
+                    maxLength: 128
+                    type: string
+                required:
+                  - id
+                  - prices
+                type: object
+          description: ''
+      security:
+        - oauth2:
+            - campaigns:read
+      tags:
+        - campaigns
+    patch:
+      description: Partially update a shipping method on the campaign.
+      operationId: campaignsShippingMethodsPartialUpdate
+      parameters:
+        - description: Campaign ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - description: Shipping method reference ID, unique within the campaign.
+          in: path
+          name: shippingMethodId
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: '2024-04-01'
+            enum:
+              - '2024-04-01'
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                prices:
+                  description: Per-currency prices to update for the shipping method. Currencies not included are left unchanged.
+                  items:
+                    properties:
+                      currency:
+                        description: Currency this price entry applies to.
+                        type: string
+                      price:
+                        description: Shipping price in this currency.
+                        format: decimal
+                        pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                        type: string
+                    required:
+                      - currency
+                      - price
+                    type: object
+                  type: array
+                  writeOnly: true
+                recalculate_prices:
+                  default: false
+                  description: Whether to recalculate prices for currencies not included in `prices`, via forex conversion. Source is the campaign's default currency if included in `prices`, else the first currency listed — include the default currency or submit only one to avoid ambiguity.
+                  nullable: true
+                  type: boolean
+                  writeOnly: true
+                shipping_method:
+                  description: Shipping method code from the store's configured shipping methods. `name` is re-populated automatically from this when provided.
+                  maxLength: 128
+                  type: string
+              type: object
+          application/x-www-form-urlencoded:
+            schema:
+              properties:
+                prices:
+                  description: Per-currency prices to update for the shipping method. Currencies not included are left unchanged.
+                  items:
+                    properties:
+                      currency:
+                        description: Currency this price entry applies to.
+                        type: string
+                      price:
+                        description: Shipping price in this currency.
+                        format: decimal
+                        pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                        type: string
+                    required:
+                      - currency
+                      - price
+                    type: object
+                  type: array
+                  writeOnly: true
+                recalculate_prices:
+                  default: false
+                  description: Whether to recalculate prices for currencies not included in `prices`, via forex conversion. Source is the campaign's default currency if included in `prices`, else the first currency listed — include the default currency or submit only one to avoid ambiguity.
+                  nullable: true
+                  type: boolean
+                  writeOnly: true
+                shipping_method:
+                  description: Shipping method code from the store's configured shipping methods. `name` is re-populated automatically from this when provided.
+                  maxLength: 128
+                  type: string
+              type: object
+          multipart/form-data:
+            schema:
+              properties:
+                prices:
+                  description: Per-currency prices to update for the shipping method. Currencies not included are left unchanged.
+                  items:
+                    properties:
+                      currency:
+                        description: Currency this price entry applies to.
+                        type: string
+                      price:
+                        description: Shipping price in this currency.
+                        format: decimal
+                        pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                        type: string
+                    required:
+                      - currency
+                      - price
+                    type: object
+                  type: array
+                  writeOnly: true
+                recalculate_prices:
+                  default: false
+                  description: Whether to recalculate prices for currencies not included in `prices`, via forex conversion. Source is the campaign's default currency if included in `prices`, else the first currency listed — include the default currency or submit only one to avoid ambiguity.
+                  nullable: true
+                  type: boolean
+                  writeOnly: true
+                shipping_method:
+                  description: Shipping method code from the store's configured shipping methods. `name` is re-populated automatically from this when provided.
+                  maxLength: 128
+                  type: string
+              type: object
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                description: |-
+                  Identical to the list row today; kept distinct so detail can grow fields later
+                  without also changing every list row, mirroring `PackageListSerializer`/`PackageDetailSerializer`.
+                properties:
+                  id:
+                    description: Shipping method reference ID.
+                    type: integer
+                  name:
+                    description: Shipping method name used internally for reference.
+                    maxLength: 128
+                    type: string
+                  prices:
+                    description: Price of the shipping method in every currency the campaign supports.
+                    items:
+                      properties:
+                        currency:
+                          maxLength: 3
+                          type: string
+                        price:
+                          description: Shipping price in this currency.
+                          format: decimal
+                          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                          type: string
+                      required:
+                        - currency
+                        - price
+                      type: object
+                    readOnly: true
+                    type: array
+                  shipping_method:
+                    description: Shipping method code / carrier.
+                    maxLength: 128
+                    type: string
+                required:
+                  - id
+                  - prices
                 type: object
           description: ''
       security:

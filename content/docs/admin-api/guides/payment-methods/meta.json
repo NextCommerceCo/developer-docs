@@ -10,6 +10,7 @@
     "twint",
     "swish",
     "affirm",
+    "afterpay",
     "bancontact",
     "ideal",
     "sepa-debit"

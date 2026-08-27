@@ -20,7 +20,9 @@ const dsProps: DocSearchAIProps = {
   appId: appId!,
   indices: [index!],
   apiKey: apiKey!,
-  // askAi: 'yP4tu24PWhOU',
+  // Agent Studio agent UUID ("Documentation assistant"). The old DocSearch
+  // assistant id was not a UUID, so Agent Studio rejected it with a 422.
+  askAi: { agentId: 'ec5f9a67-1eca-4b55-a7d3-6b5fa60f396a' },
   // DocSearch defaults this to false, which is the one value that opts out of
   // Algolia's automatic events collection. Set it so view/click events are sent.
   insights: true,

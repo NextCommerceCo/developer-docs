@@ -236,45 +236,8 @@ div[style*="--callout-color"] {
   font-size: 0.75rem !important;
 }
 
-/* DocSearch modal: dark mode
-   DocSearch checks html[data-theme=dark] but fumadocs uses class="dark".
-   Target the container directly since it's portaled to body. */
-.dark .DocSearch-Container,
-.dark .DocSearch-Modal {
-  --docsearch-text-color: #e5e5e5 !important;
-  --docsearch-secondary-text-color: #a3a3a3 !important;
-  --docsearch-subtle-color: #333 !important;
-  --docsearch-highlight-color: #3C7DFF !important;
-  --docsearch-focus-color: #3C7DFF !important;
-  --docsearch-icon-color: #a3a3a3 !important;
-  --docsearch-container-background: rgba(0, 0, 0, 0.6) !important;
-  --docsearch-modal-background: #0a0a0a !important;
-  --docsearch-modal-shadow: 0 4px 24px rgba(0, 0, 0, 0.7) !important;
-  --docsearch-searchbox-background: #141414 !important;
-  --docsearch-searchbox-focus-background: #141414 !important;
-  --docsearch-searchbox-shadow: inset 0 0 0 1px #2a2a2a !important;
-  --docsearch-hit-color: #e5e5e5 !important;
-  --docsearch-hit-shadow: none !important;
-  --docsearch-hit-background: #141414 !important;
-  --docsearch-hit-active-color: #fff !important;
-  --docsearch-key-background: #333 !important;
-  --docsearch-key-color: #a3a3a3 !important;
-  --docsearch-key-pressed-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
-  --docsearch-footer-background: #0a0a0a !important;
-  --docsearch-footer-shadow: 0 -1px 0 0 #1a1a1a !important;
-  --docsearch-logo-color: #a3a3a3 !important;
-  --docsearch-muted-color: #737373 !important;
-}
-
-.dark .DocSearch-Container {
-  background: rgba(0, 0, 0, 0.6) !important;
-}
-
-.dark .DocSearch-Modal {
-  background: #0a0a0a !important;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.7) !important;
-  border: 1px solid #1a1a1a !important;
-}
+/* Dark mode comes from @docsearch/css's own [data-theme=dark] block — the
+   RootProvider in app/layout.tsx sets that attribute alongside `.dark`. */
 
 .DocSearch-Modal {
   max-height: 90vh !important;
@@ -282,49 +245,6 @@ div[style*="--callout-color"] {
 
 .DocSearch-Dropdown {
   max-height: none !important;
-}
-
-.dark .DocSearch-SearchBar .DocSearch-Form {
-  background: #141414 !important;
-  box-shadow: inset 0 0 0 1px #2a2a2a !important;
-}
-
-.dark .DocSearch-Input {
-  color: #e5e5e5 !important;
-}
-
-.dark .DocSearch-Hit a {
-  background: #141414 !important;
-  box-shadow: none !important;
-}
-
-.dark .DocSearch-Hit[aria-selected="true"] a {
-  background: #1a1a1a !important;
-  border-left: 2px solid #3C7DFF !important;
-}
-
-.dark .DocSearch-Footer {
-  background: #0a0a0a !important;
-  box-shadow: 0 -1px 0 0 #1a1a1a !important;
-}
-
-.dark .DocSearch-Hit-source {
-  color: #e5e5e5 !important;
-}
-
-.dark .DocSearch-StartScreen .DocSearch-Help {
-  color: #737373 !important;
-}
-
-.dark .DocSearch-Commands-Key {
-  background: #141414 !important;
-  border: 1px solid #2a2a2a !important;
-  box-shadow: none !important;
-  color: #737373 !important;
-}
-
-.dark .DocSearch-Label {
-  color: #737373 !important;
 }
 
 td:first-child {

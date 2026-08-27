@@ -24,7 +24,9 @@ export default function Layout({ children }: { children: ReactNode }) {
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       {gtmId && <GoogleTagManager gtmId={gtmId} />}
       <body className="flex min-h-screen flex-col font-sans">
-        <RootProvider search={{ enabled: false }}>
+        {/* data-theme alongside class: fumadocs styles key off `.dark`, but
+            @docsearch/css scopes its whole dark theme to [data-theme=dark]. */}
+        <RootProvider search={{ enabled: false }} theme={{ attribute: ['class', 'data-theme'] }}>
           {children}
         </RootProvider>
       </body>

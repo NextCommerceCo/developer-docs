@@ -21,6 +21,9 @@ const dsProps: DocSearchAIProps = {
   indices: [index!],
   apiKey: apiKey!,
   askAi: 'yP4tu24PWhOU',
+  // DocSearch defaults this to false, which is the one value that opts out of
+  // Algolia's automatic events collection. Set it so view/click events are sent.
+  insights: true,
 };
 
 /** Full search bar for the desktop sidebar. */

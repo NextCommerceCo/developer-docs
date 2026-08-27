@@ -97,7 +97,7 @@ button {
 @media (min-width: 1024px) {
   #nd-docs-layout {
     --fd-layout-width: 1760px !important;
-    --fd-sidebar-width: 400px !important;
+    --fd-sidebar-width: 370px !important;
     --fd-toc-width: 320px !important;
   }
 }

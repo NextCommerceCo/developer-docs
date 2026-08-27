@@ -1,0 +1,8 @@
+{
+  "title": "Campaigns Admin API",
+  "pages": [
+    "campaigns",
+    "packages",
+    "shipping-methods"
+  ]
+}

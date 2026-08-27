@@ -7,20 +7,31 @@ import { DocSearchAI, type DocSearchAIProps } from '@docsearch/react';
 import '@docsearch/css/dist/style.css';
 import { Search } from 'lucide-react';
 
+const appId = process.env.NEXT_PUBLIC_ALGOLIA_APP_ID;
+const apiKey = process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY;
+const index = process.env.NEXT_PUBLIC_ALGOLIA_INDEX;
+
+// NEXT_PUBLIC_* values are inlined at build time. They're set in the deploy
+// environment but not in a local checkout, and DocSearchAI throws without them.
+// Render nothing when unconfigured so `npm run dev` works with no secrets.
+const isConfigured = Boolean(appId && apiKey && index);
+
 const dsProps: DocSearchAIProps = {
-  appId: process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
-  indices: [process.env.NEXT_PUBLIC_ALGOLIA_INDEX!],
-  apiKey: process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY!,
+  appId: appId!,
+  indices: [index!],
+  apiKey: apiKey!,
   askAi: 'yP4tu24PWhOU',
 };
 
 /** Full search bar for the desktop sidebar. */
 export function AlgoliaDocSearch() {
+  if (!isConfigured) return null;
   return <DocSearchAI {...dsProps} />;
 }
 
 /** Icon-only search button for the mobile header — clicks the hidden DocSearch button. */
 export function AlgoliaDocSearchMobile() {
+  if (!isConfigured) return null;
   return (
     <>
       <div className="hidden"><DocSearchAI {...dsProps} /></div>

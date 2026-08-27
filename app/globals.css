@@ -96,8 +96,8 @@ button {
 
 @media (min-width: 1024px) {
   #nd-docs-layout {
-    --fd-layout-width: 1600px !important;
-    --fd-sidebar-width: 320px !important;
+    --fd-layout-width: 1760px !important;
+    --fd-sidebar-width: 400px !important;
     --fd-toc-width: 320px !important;
   }
 }
@@ -111,6 +111,12 @@ button {
 
 #nd-docs-layout article[data-full="true"] {
   max-width: 1400px !important;
+}
+
+/* Standard pages: fill the content column instead of capping at fumadocs' 900px,
+   which would otherwise leave the extra layout width as empty gutter. */
+#nd-docs-layout article[data-full="false"] {
+  max-width: 1040px !important;
 }
 
 /* Section switcher: green checkmark on active item */

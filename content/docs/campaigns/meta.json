@@ -20,6 +20,7 @@
         "external:[Window globals](https://cart-sdk.nextcommerce.com/latest/documents/Reference_Window_Globals)",
         "external:[Debugger](https://cart-sdk.nextcommerce.com/latest/documents/Reference_Debugger)",
         "---API References---",
-        "api"
+        "api",
+        "admin-api"
     ]
 }

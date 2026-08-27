@@ -38,6 +38,19 @@ npm run dev
 
 `dev` runs the doc generators first, then starts Next.js with Turbopack.
 
+### Environment variables
+
+Site search needs three Algolia values. They are optional locally — the search bar
+is hidden when they are unset, and everything else works. Set them in the deploy
+environment so search renders in production. To enable search locally, add them to
+`.env.local`:
+
+```bash
+NEXT_PUBLIC_ALGOLIA_APP_ID=
+NEXT_PUBLIC_ALGOLIA_SEARCH_KEY=
+NEXT_PUBLIC_ALGOLIA_INDEX=
+```
+
 Preview a production build locally by serving the `out/` directory with any static file server after `npm run build`.
 
 ## Content Workflow

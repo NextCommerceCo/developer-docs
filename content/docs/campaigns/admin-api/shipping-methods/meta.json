@@ -1,0 +1,10 @@
+{
+  "title": "Shipping Methods",
+  "pages": [
+    "[Campaigns Shipping Methods List](/docs/admin-api/reference/campaigns/campaignsShippingMethodsList)",
+    "[Campaigns Shipping Methods Create](/docs/admin-api/reference/campaigns/campaignsShippingMethodsCreate)",
+    "[Campaigns Shipping Methods Retrieve](/docs/admin-api/reference/campaigns/campaignsShippingMethodsRetrieve)",
+    "[Campaigns Shipping Methods Partial Update](/docs/admin-api/reference/campaigns/campaignsShippingMethodsPartialUpdate)",
+    "[Campaigns Shipping Methods Destroy](/docs/admin-api/reference/campaigns/campaignsShippingMethodsDestroy)"
+  ]
+}

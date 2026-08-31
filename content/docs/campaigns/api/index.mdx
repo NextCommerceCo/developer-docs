@@ -184,8 +184,8 @@ var payload = {
         "card_token": "test_card" // See iFrame Payment Form Guide
     },
     "shipping_method": 1,
-    "success_url": "https://your-campaign.com/next-page/" // Next Page in Flow
-    "payment_failed_url": "https://your-campaign.com/decline-flow/" // Optional Decline Page
+    "success_url": "https://your-campaign.com/next-page/", // Next Page in Flow
+    "payment_failed_url": "https://your-campaign.com/decline-flow/", // Required without an HTTP Referer
     "attribution": {
         "utm_source": "Example Campaign"
     }
@@ -201,6 +201,9 @@ const response = await fetch('https://campaigns.apps.29next.com/api/v1/orders/',
 const result = await response.json();
 console.log(result); // Show result in console
 ```
+<Callout type="warn" title="Send a Payment Failure URL">
+Always send `payment_failed_url` when creating an order. The API accepts an omitted value only when the request includes an HTTP `Referer` header. Some mobile and in-app browsers, referrer policies, and affiliate redirect chains omit that header, which causes the order request to fail when no explicit failure URL is present.
+</Callout>
 <Callout type="info" title="iFrame Payment Form">
 Bankcard payments require using the [iFrame Payment Form](/docs/admin-api/guides/payment-methods/bankcard) and passing the generated `card_token` for secure transfer of the payment method details. View a fully functional [Demo](https://nextcommerceco.github.io/demo-iframe-payment-form/).
 </Callout>
@@ -209,9 +212,9 @@ Bankcard payments require using the [iFrame Payment Form](/docs/admin-api/guides
 - If response data has a `payment_complete_url`, redirect the user to this page. After payment, user will come back to your `success_url` or `payment_failed_url`.
 </Callout>
 <Callout type="idea" title="Handle APM Redirect Flow Declines">
-If an APM redirect flow declines or is canceled, by default the user is redirected back to the HTTP referrer with contexual querystings, ie `?payment_failed=true&payment_method=paypal`.
+If an APM redirect flow declines or is canceled, the user returns to `payment_failed_url`. When that field is omitted and the request includes an HTTP `Referer`, the referrer is used instead with contextual query strings, such as `?payment_failed=true&payment_method=paypal`.
 
-Pass `payment_failed_url` to more explicitly control the decline handling for APM redirect flows.
+Pass `payment_failed_url` to keep decline handling consistent when the `Referer` header is unavailable.
 </Callout>
 ### Adding Upsells
 To add an upsell to an existing order, first you should check to see if the order payment method `supports_post_purchase_upsells` is `True` in the `orderRetrieve` response.

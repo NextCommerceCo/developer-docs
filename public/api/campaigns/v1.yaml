@@ -529,7 +529,7 @@ components:
         payment_detail:
           $ref: '#/components/schemas/Payment'
         payment_failed_url:
-          description: Redirect user to this url if payment is unsuccessful
+          description: Fully qualified URL for an unsuccessful payment redirect. Required when the request does not include an HTTP Referer header.
           type: string
         shipping_address:
           $ref: '#/components/schemas/UserAddress'

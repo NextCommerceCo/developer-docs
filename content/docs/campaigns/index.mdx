@@ -176,6 +176,31 @@ Packages can also be **recurring** for subscription products. When you reference
 
 The API returns adjusted before/after pricing so you can show savings. In modern Campaigns App setup, this replaces package-level compare-at pricing for most campaigns.
 
+Every offer has a **condition** that decides when it applies and a **benefit** that decides what it discounts.
+
+#### Condition types
+
+| Type | Applies when | Example |
+| --- | --- | --- |
+| `any` | Always. No quantity requirement. | A code that takes 10% off any cart |
+| `count` | The quantity of a matching package is at or above `value` | Buy 2 or more Widgets |
+
+A condition targets either every package on the campaign (`all_packages: true`, which also covers packages added later) or a specific list of `package_ids`.
+
+#### Benefit types
+
+All benefits are percentage based. `value` is the percentage off.
+
+| Type | Discounts | Example |
+| --- | --- | --- |
+| `package_percentage` | The unit price of the packages matched by the condition | 30% off each Widget when buying 2 or more |
+| `shipping_percentage` | The shipping price | 50% off shipping when buying 3 or more |
+| `order_percentage` | The entire order | 10% off everything with a welcome code |
+
+A benefit can also set `price_rounding` so each discounted unit price ends in `.00`, `.95`, `.97`, or `.99`. Without it, the discounted price is not rounded.
+
+Create and manage offers with the [Campaigns Admin API](/docs/campaigns/admin-api#add-offers-to-a-campaign). The Cart API returns the same condition and benefit fields on each offer from [campaignRetrieve](/docs/campaigns/api/campaigns/campaignRetrieve).
+
 **Example — quantity-based bundle pricing:**
 
 A single Widget package priced at $49.95/unit. Create one offer per quantity tier — including 1x — to control the discounted price the customer pays at each quantity:
@@ -186,7 +211,7 @@ A single Widget package priced at $49.95/unit. Create one offer per quantity tie
 | **2x** | $99.90 | Buy 2 → $34.95 each (Save 30%) | $69.90 | $30.00 |
 | **3x** | $149.85 | Buy 3 → $29.95 each (Save 40%) | $89.85 | $60.00 |
 
-The package's list price stays at $49.95/unit. Each offer matches its quantity rule and the API returns the adjusted total so the cart can render before/after pricing automatically.
+The package's list price stays at $49.95/unit. Each tier is a `count` condition on the Widget package with a `package_percentage` benefit. The API returns the adjusted total so the cart can render before/after pricing automatically.
 
 ### Shipping methods
 

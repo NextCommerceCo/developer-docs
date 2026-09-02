@@ -529,7 +529,7 @@ components:
         payment_detail:
           $ref: '#/components/schemas/Payment'
         payment_failed_url:
-          description: Fully qualified URL for an unsuccessful payment redirect. Required when the request does not include an HTTP Referer header.
+          description: Redirect user to this url if payment is unsuccessful
           type: string
         shipping_address:
           $ref: '#/components/schemas/UserAddress'
@@ -947,20 +947,21 @@ components:
           description: |-
             Payment method used for the order
 
+            * `affirm` - Affirm
+            * `afterpay` - Afterpay
             * `apple_pay` - Apple Pay
-            * `card_token` - Card Token
-            * `paypal` - Paypal
-            * `klarna` - Klarna
-            * `ideal` - iDEAL
             * `bancontact` - Bancontact
+            * `card_token` - Card Token
+            * `external` - External
             * `giropay` - Giropay
             * `google_pay` - Google Pay
-            * `sofort` - Sofort
-            * `sepa_debit` - SEPA Direct Debit
-            * `twint` - Twint
+            * `ideal` - iDEAL
+            * `klarna` - Klarna
             * `link` - Link
-            * `affirm` - Affirm
-            * `external` - External
+            * `paypal` - Paypal
+            * `sepa_debit` - SEPA Direct Debit
+            * `sofort` - Sofort
+            * `twint` - Twint
           nullable: true
           oneOf:
             - $ref: '#/components/schemas/PaymentMethodEnum'
@@ -1354,20 +1355,21 @@ components:
           description: |-
             Payment method
 
+            * `affirm` - Affirm
+            * `afterpay` - Afterpay
             * `apple_pay` - Apple Pay
-            * `card_token` - Card Token
-            * `paypal` - Paypal
-            * `klarna` - Klarna
-            * `ideal` - iDEAL
             * `bancontact` - Bancontact
+            * `card_token` - Card Token
+            * `external` - External
             * `giropay` - Giropay
             * `google_pay` - Google Pay
-            * `sofort` - Sofort
-            * `sepa_debit` - SEPA Direct Debit
-            * `twint` - Twint
+            * `ideal` - iDEAL
+            * `klarna` - Klarna
             * `link` - Link
-            * `affirm` - Affirm
-            * `external` - External
+            * `paypal` - Paypal
+            * `sepa_debit` - SEPA Direct Debit
+            * `sofort` - Sofort
+            * `twint` - Twint
       required:
         - payment_method
       type: object
@@ -1394,35 +1396,37 @@ components:
       type: object
     PaymentMethodEnum:
       description: |-
+        * `affirm` - Affirm
+        * `afterpay` - Afterpay
         * `apple_pay` - Apple Pay
-        * `card_token` - Card Token
-        * `paypal` - Paypal
-        * `klarna` - Klarna
-        * `ideal` - iDEAL
         * `bancontact` - Bancontact
+        * `card_token` - Card Token
+        * `external` - External
         * `giropay` - Giropay
         * `google_pay` - Google Pay
-        * `sofort` - Sofort
-        * `sepa_debit` - SEPA Direct Debit
-        * `twint` - Twint
+        * `ideal` - iDEAL
+        * `klarna` - Klarna
         * `link` - Link
-        * `affirm` - Affirm
-        * `external` - External
+        * `paypal` - Paypal
+        * `sepa_debit` - SEPA Direct Debit
+        * `sofort` - Sofort
+        * `twint` - Twint
       enum:
+        - affirm
+        - afterpay
         - apple_pay
-        - card_token
-        - paypal
-        - klarna
-        - ideal
         - bancontact
+        - card_token
+        - external
         - giropay
         - google_pay
-        - sofort
-        - sepa_debit
-        - twint
+        - ideal
+        - klarna
         - link
-        - affirm
-        - external
+        - paypal
+        - sepa_debit
+        - sofort
+        - twint
       type: string
     ProductInventoryAvailabilityEnum:
       description: |-

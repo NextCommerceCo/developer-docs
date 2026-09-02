@@ -2,6 +2,7 @@
   "title": "Campaigns Admin API",
   "pages": [
     "campaigns",
+    "offers",
     "packages",
     "shipping-methods"
   ]

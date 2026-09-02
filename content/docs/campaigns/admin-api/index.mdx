@@ -1,12 +1,12 @@
 ---
 title: Campaigns Admin API
-description: Provision campaigns and packages programmatically instead of clicking through the dashboard.
+description: Set up and manage campaigns programmatically instead of clicking through the dashboard.
 tags:
  - Guide
 ---
 import { Callout } from 'fumadocs-ui/components/callout';
 
-The Admin API creates and updates campaigns and packages without going through the dashboard. The main benefit is the full creation flow for a fresh campaign: create the campaign, add its packages, and read back the API key your funnel pages need. That removes the manual setup steps, so an AI agent can drive the entire campaign creation flow for you.
+The Admin API gives you full setup and management of campaigns without going through the dashboard. Create a campaign, add its packages, offers, and shipping methods, read back the API key your funnel pages need, and update any of it later as your catalogue and pricing change. Everything is available over the API, so an AI agent can drive the entire campaign lifecycle for you.
 
 It also pays off once you run more than a handful of campaigns:
 
@@ -85,7 +85,7 @@ A package is the campaign's sellable reference to a product or variant, and its 
 ```
 
 <Callout type="idea" title="Use Offers for Quantity Tiers">
-Avoid creating `1x`, `2x`, and `3x` package records. Create one package for the product identity and base price, then discount quantity tiers with offers in the dashboard. The cart and order APIs return before and after totals, so your pages render savings without doing math. See [Concepts → Offers](/docs/campaigns#offers).
+Avoid creating `1x`, `2x`, and `3x` package records. Create one package for the product identity and base price, then discount quantity tiers with offers using the [campaignsOffersCreate](/docs/admin-api/reference/campaigns/campaignsOffersCreate) endpoint. The cart and order APIs return before and after totals, so your pages render savings without doing math. See [Concepts → Offers](/docs/campaigns#offers).
 </Callout>
 
 ### Create a Subscription Package
@@ -125,6 +125,50 @@ With `recalculate_prices` set to `true`, every currency you did not list is reca
 
 <Callout type="info" title="Read Prices Back From the Response">
 `price` and `price_recurring` are write-only and do not appear in the response. Read the resolved figures from the response's `prices` array, which returns `currency`, `price`, and `price_recurring` for each. You also send `product_variant_ids` as an array and read back a single `product_variant_id`.
+</Callout>
+
+### Add Offers to a Campaign
+
+An offer discounts the order once its condition is met. `name`, `condition`, and `benefit` are required. The condition decides which packages and what quantity trigger the offer, and the benefit sets the percentage off. An offer applies automatically at checkout unless `offer_type` is `voucher`.
+
+```json title="Create Offer" http-method="POST" http-target="https://{store}.29next.store/api/admin/campaigns/{id}/offers/"
+{
+  "name": "Buy 2 Save 30%", // unique within the campaign
+  "condition": {
+    "type": "count", // any, or count for a minimum quantity
+    "value": 2, // minimum package quantity, required when type is count
+    "package_ids": [2231] // package ids from campaignsPackagesCreate, or send all_packages: true
+  },
+  "benefit": {
+    "type": "package_percentage", // package_percentage, shipping_percentage, or order_percentage
+    "value": "30.00", // percentage off
+    "price_rounding": "0.95" // round each discounted unit price to XX.95, omit for no rounding
+  }
+}
+```
+
+Create one offer per quantity tier to control the price the customer pays at each quantity. See [Concepts → Offers](/docs/campaigns#offers) for a worked example.
+
+A voucher offer applies only when the customer enters its `code`. Set `all_packages` to `true` with an `any` condition to make it valid on anything in the cart.
+
+```json title="Create Voucher Code" http-method="POST" http-target="https://{store}.29next.store/api/admin/campaigns/{id}/offers/"
+{
+  "name": "Welcome 10% Off",
+  "offer_type": "voucher", // offer (automatic) or voucher (code required)
+  "code": "WELCOME10", // required when offer_type is voucher
+  "condition": {
+    "type": "any", // no quantity requirement
+    "all_packages": true // apply to all current and future packages
+  },
+  "benefit": {
+    "type": "order_percentage",
+    "value": "10.00"
+  }
+}
+```
+
+<Callout type="info" title="Package IDs Read Back as Packages">
+`package_ids` is write-only. The response returns a `packages` array with each package's `id`, `name`, `product_id`, and `product_sku`, plus a read-only `description` on both the condition and the benefit, and an `available` flag.
 </Callout>
 
 ### Add Shipping Methods to a Campaign
@@ -193,8 +237,8 @@ Unlike [campaignsList](/docs/admin-api/reference/campaigns/campaignsList), [camp
 A live funnel is configured with its campaign's `api_key` and its package IDs. Deleting either removes what those pages depend on, so take the pages down or repoint them at a replacement first.
 </Callout>
 
-<Callout type="info" title="Offers Are Coming Soon">
-Campaign offers are being added to this API. Until they ship, configure them in the dashboard, see [Concepts → Offers](/docs/campaigns#offers). Authorized domains are configured in your store's Campaign Settings, see [Concepts → Domains](/docs/campaigns#domains).
+<Callout type="info" title="Domains Are Configured in the Dashboard">
+Authorized domains are not managed through this API. Configure them in your store's Campaign Settings, see [Concepts → Domains](/docs/campaigns#domains).
 </Callout>
 
 ## Endpoints
@@ -210,6 +254,16 @@ Full request and response detail lives in the Admin API reference.
 | [Campaigns Retrieve](/docs/admin-api/reference/campaigns/campaignsRetrieve) | `GET /api/admin/campaigns/{id}/` |
 | [Campaigns Partial Update](/docs/admin-api/reference/campaigns/campaignsPartialUpdate) | `PATCH /api/admin/campaigns/{id}/` |
 | [Campaigns Destroy](/docs/admin-api/reference/campaigns/campaignsDestroy) | `DELETE /api/admin/campaigns/{id}/` |
+
+### Offers
+
+| Operation | Endpoint |
+| --- | --- |
+| [Campaigns Offers List](/docs/admin-api/reference/campaigns/campaignsOffersList) | `GET /api/admin/campaigns/{id}/offers/` |
+| [Campaigns Offers Create](/docs/admin-api/reference/campaigns/campaignsOffersCreate) | `POST /api/admin/campaigns/{id}/offers/` |
+| [Campaigns Offers Retrieve](/docs/admin-api/reference/campaigns/campaignsOffersRetrieve) | `GET /api/admin/campaigns/{id}/offers/{offerId}/` |
+| [Campaigns Offers Partial Update](/docs/admin-api/reference/campaigns/campaignsOffersPartialUpdate) | `PATCH /api/admin/campaigns/{id}/offers/{offerId}/` |
+| [Campaigns Offers Destroy](/docs/admin-api/reference/campaigns/campaignsOffersDestroy) | `DELETE /api/admin/campaigns/{id}/offers/{offerId}/` |
 
 ### Packages
 

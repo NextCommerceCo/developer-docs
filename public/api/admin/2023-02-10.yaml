@@ -6124,6 +6124,9 @@ components:
         id:
           readOnly: true
           type: integer
+        is_next_payments:
+          readOnly: true
+          type: boolean
         merchant_profile:
           allOf:
             - $ref: '#/components/schemas/MerchantProfile'
@@ -6163,6 +6166,7 @@ components:
         - gateway_groups
         - gateway_type
         - id
+        - is_next_payments
         - merchant_profile
         - name
         - re_attemp_group
@@ -8713,12 +8717,16 @@ components:
       properties:
         id:
           type: integer
+        is_next_payments:
+          readOnly: true
+          type: boolean
         name:
           type: string
         type:
           type: string
       required:
         - id
+        - is_next_payments
         - name
         - type
       type: object
@@ -15702,9 +15710,7 @@ paths:
           content:
             application/json:
               schema:
-                items:
-                  $ref: '#/components/schemas/Store'
-                type: array
+                $ref: '#/components/schemas/Store'
           description: ''
       security:
         - oauth2:
@@ -20855,6 +20861,7 @@ webhooks:
                     weight: 0
                 gateway_type: string
                 id: 0
+                is_next_payments: false
                 merchant_profile:
                   amex:
                     acquirer_bin: string
@@ -20974,6 +20981,8 @@ webhooks:
                       type: string
                     id:
                       type: integer
+                    is_next_payments:
+                      type: boolean
                     merchant_profile:
                       properties:
                         amex:
@@ -21111,6 +21120,7 @@ webhooks:
                     - gateway_groups
                     - gateway_type
                     - id
+                    - is_next_payments
                     - merchant_profile
                     - name
                     - re_attemp_group
@@ -21186,6 +21196,7 @@ webhooks:
                     weight: 0
                 gateway_type: string
                 id: 0
+                is_next_payments: false
                 merchant_profile:
                   amex:
                     acquirer_bin: string
@@ -21305,6 +21316,8 @@ webhooks:
                       type: string
                     id:
                       type: integer
+                    is_next_payments:
+                      type: boolean
                     merchant_profile:
                       properties:
                         amex:
@@ -21442,6 +21455,7 @@ webhooks:
                     - gateway_groups
                     - gateway_type
                     - id
+                    - is_next_payments
                     - merchant_profile
                     - name
                     - re_attemp_group
@@ -21736,6 +21750,7 @@ webhooks:
                       card_token: string
                       gateway:
                         id: null
+                        is_next_payments: null
                         name: null
                         type: null
                       is_3ds: false
@@ -22473,6 +22488,8 @@ webhooks:
                                       properties:
                                         id:
                                           type: integer
+                                        is_next_payments:
+                                          type: boolean
                                         name:
                                           type: string
                                         type:
@@ -22821,6 +22838,8 @@ webhooks:
                                 properties:
                                   id:
                                     type: integer
+                                  is_next_payments:
+                                    type: boolean
                                   name:
                                     type: string
                                   type:
@@ -23272,6 +23291,7 @@ webhooks:
                       card_token: string
                       gateway:
                         id: null
+                        is_next_payments: null
                         name: null
                         type: null
                       is_3ds: false
@@ -24009,6 +24029,8 @@ webhooks:
                                       properties:
                                         id:
                                           type: integer
+                                        is_next_payments:
+                                          type: boolean
                                         name:
                                           type: string
                                         type:
@@ -24357,6 +24379,8 @@ webhooks:
                                 properties:
                                   id:
                                     type: integer
+                                  is_next_payments:
+                                    type: boolean
                                   name:
                                     type: string
                                   type:
@@ -27556,6 +27580,7 @@ webhooks:
                   card_token: string
                   gateway:
                     id: 0
+                    is_next_payments: false
                     name: string
                     type: string
                   is_3ds: false
@@ -27733,6 +27758,8 @@ webhooks:
                           properties:
                             id:
                               type: integer
+                            is_next_payments:
+                              type: boolean
                             name:
                               type: string
                             type:
@@ -27925,6 +27952,7 @@ webhooks:
                   card_token: string
                   gateway:
                     id: 0
+                    is_next_payments: false
                     name: string
                     type: string
                   is_3ds: false
@@ -28102,6 +28130,8 @@ webhooks:
                           properties:
                             id:
                               type: integer
+                            is_next_payments:
+                              type: boolean
                             name:
                               type: string
                             type:

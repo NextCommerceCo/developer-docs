@@ -1,0 +1,10 @@
+{
+  "title": "Offers",
+  "pages": [
+    "[Campaigns Offers List](/docs/admin-api/reference/campaigns/campaignsOffersList)",
+    "[Campaigns Offers Create](/docs/admin-api/reference/campaigns/campaignsOffersCreate)",
+    "[Campaigns Offers Retrieve](/docs/admin-api/reference/campaigns/campaignsOffersRetrieve)",
+    "[Campaigns Offers Partial Update](/docs/admin-api/reference/campaigns/campaignsOffersPartialUpdate)",
+    "[Campaigns Offers Destroy](/docs/admin-api/reference/campaigns/campaignsOffersDestroy)"
+  ]
+}

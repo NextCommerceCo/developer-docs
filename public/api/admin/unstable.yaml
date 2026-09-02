@@ -6559,6 +6559,9 @@ components:
         id:
           readOnly: true
           type: integer
+        is_next_payments:
+          readOnly: true
+          type: boolean
         merchant_profile:
           allOf:
             - $ref: '#/components/schemas/MerchantProfile'
@@ -6598,6 +6601,7 @@ components:
         - gateway_groups
         - gateway_type
         - id
+        - is_next_payments
         - merchant_profile
         - name
         - re_attemp_group
@@ -9226,12 +9230,16 @@ components:
       properties:
         id:
           type: integer
+        is_next_payments:
+          readOnly: true
+          type: boolean
         name:
           type: string
         type:
           type: string
       required:
         - id
+        - is_next_payments
         - name
         - type
       type: object
@@ -12000,11 +12008,1622 @@ paths:
             - campaigns:write
       tags:
         - campaigns
+  /campaigns/{id}/offers/:
+    get:
+      description: List every offer on the campaign.
+      operationId: campaignsOffersList
+      parameters:
+        - description: |-
+            Indicates whether the offer is available for use.
+
+            * `true` - The offer is available
+            * `false` - The offer is not available
+          in: query
+          name: available
+          schema:
+            type: boolean
+        - description: The pagination cursor value.
+          in: query
+          name: cursor
+          required: false
+          schema:
+            type: string
+        - description: Campaign ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - description: Offer name contains this text, case-insensitive.
+          in: query
+          name: name
+          schema:
+            type: string
+        - description: |-
+            How the offer is applied.
+
+            * `offer` - Automatically applies when the offer condition is met.
+            * `voucher` - Applies only when the customer enters the specified voucher code.
+          in: query
+          name: offer_type
+          schema:
+            enum:
+              - offer
+              - voucher
+            title: Type
+            type: string
+        - description: Number of results to return per page.
+          in: query
+          name: page_size
+          required: false
+          schema:
+            type: integer
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: unstable
+            enum:
+              - unstable
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  next:
+                    example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    format: uri
+                    nullable: true
+                    type: string
+                  previous:
+                    example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    format: uri
+                    nullable: true
+                    type: string
+                  results:
+                    items:
+                      properties:
+                        available:
+                          description: |-
+                            Indicates whether the offer is available for use.
+
+                            * `true` - The offer is available
+                            * `false` - The offer is not available
+                          readOnly: true
+                          type: boolean
+                        benefit:
+                          allOf:
+                            - properties:
+                                description:
+                                  description: Summary of the benefit.
+                                  readOnly: true
+                                  type: string
+                                price_rounding:
+                                  description: |-
+                                    Cents rounding applied to each discounted unit price. Null when not set.
+
+                                    * `0.00` - XX.00
+                                    * `0.95` - XX.95
+                                    * `0.97` - XX.97
+                                    * `0.99` - XX.99
+                                  nullable: true
+                                  oneOf:
+                                    - description: |-
+                                        * `0.00` - XX.00
+                                        * `0.95` - XX.95
+                                        * `0.97` - XX.97
+                                        * `0.99` - XX.99
+                                      enum:
+                                        - '0.00'
+                                        - '0.95'
+                                        - '0.97'
+                                        - '0.99'
+                                      type: string
+                                    - enum:
+                                        - null
+                                  readOnly: true
+                                type:
+                                  allOf:
+                                    - description: |-
+                                        * `package_percentage` - Apply a percentage off the packages that meet the criteria.
+                                        * `shipping_percentage` - Apply a percentage off shipping price.
+                                        * `order_percentage` - Apply a percentage off the entire order.
+                                      enum:
+                                        - package_percentage
+                                        - shipping_percentage
+                                        - order_percentage
+                                      type: string
+                                  description: |-
+                                    How the discount is applied to the order.
+
+                                    * `package_percentage` - Apply a percentage off the packages that meet the criteria.
+                                    * `shipping_percentage` - Apply a percentage off shipping price.
+                                    * `order_percentage` - Apply a percentage off the entire order.
+                                  readOnly: true
+                                value:
+                                  description: Percentage discount to apply.
+                                  format: decimal
+                                  nullable: true
+                                  pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                                  title: Discount Amount
+                                  type: string
+                              required:
+                                - description
+                                - price_rounding
+                                - type
+                              type: object
+                          description: Discount applied once the condition is met.
+                          readOnly: true
+                        code:
+                          description: Voucher code used to apply the offer. Required when `offer_type` is voucher.
+                          maxLength: 64
+                          nullable: true
+                          title: Discount code
+                          type: string
+                        condition:
+                          allOf:
+                            - properties:
+                                description:
+                                  description: Summary of the condition.
+                                  readOnly: true
+                                  type: string
+                                type:
+                                  allOf:
+                                    - description: |-
+                                        * `any` - Applies the condition without criteria.
+                                        * `count` - Applies the condition when the package quantity is greater than or equal to the `value`.
+                                      enum:
+                                        - any
+                                        - count
+                                      type: string
+                                  description: |-
+                                    How the condition is evaluated.
+
+                                    * `any` - Applies the condition without criteria.
+                                    * `count` - Applies the condition when the package quantity is greater than or equal to the `value`.
+                                value:
+                                  description: Minimum package quantity required to meet the condition. Required when `type` is count.
+                                  format: decimal
+                                  nullable: true
+                                  pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                                  type: string
+                              required:
+                                - description
+                                - type
+                              type: object
+                          description: Condition that must be met for the offer to apply.
+                          readOnly: true
+                        id:
+                          description: Offer reference ID.
+                          type: integer
+                        name:
+                          description: Offer name, unique within the campaign.
+                          maxLength: 128
+                          type: string
+                        offer_type:
+                          allOf:
+                            - description: |-
+                                * `offer` - Automatically applies when the offer condition is met.
+                                * `voucher` - Applies only when the customer enters the specified voucher code.
+                              enum:
+                                - offer
+                                - voucher
+                              type: string
+                          description: |-
+                            How the offer is applied.
+
+                            * `offer` - Automatically applies when the offer condition is met.
+                            * `voucher` - Applies only when the customer enters the specified voucher code.
+                      required:
+                        - available
+                        - benefit
+                        - condition
+                        - id
+                        - name
+                        - offer_type
+                      type: object
+                    type: array
+                required:
+                  - results
+                type: object
+          description: ''
+      security:
+        - oauth2:
+            - campaigns:read
+      tags:
+        - campaigns
+    post:
+      description: Create an offer on the campaign, with its condition and benefit.
+      operationId: campaignsOffersCreate
+      parameters:
+        - description: Campaign ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: unstable
+            enum:
+              - unstable
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                benefit:
+                  allOf:
+                    - properties:
+                        price_rounding:
+                          description: |-
+                            Cents rounding applied to each discounted unit price. No rounding when not set.
+
+                            * `0.00` - XX.00
+                            * `0.95` - XX.95
+                            * `0.97` - XX.97
+                            * `0.99` - XX.99
+                          nullable: true
+                          oneOf:
+                            - description: |-
+                                * `0.00` - XX.00
+                                * `0.95` - XX.95
+                                * `0.97` - XX.97
+                                * `0.99` - XX.99
+                              enum:
+                                - '0.00'
+                                - '0.95'
+                                - '0.97'
+                                - '0.99'
+                              type: string
+                            - enum:
+                                - null
+                        type:
+                          allOf:
+                            - description: |-
+                                * `package_percentage` - Apply a percentage off the packages that meet the criteria.
+                                * `shipping_percentage` - Apply a percentage off shipping price.
+                                * `order_percentage` - Apply a percentage off the entire order.
+                              enum:
+                                - package_percentage
+                                - shipping_percentage
+                                - order_percentage
+                              type: string
+                          description: |-
+                            How the discount is applied to the order.
+
+                            * `package_percentage` - Apply a percentage off the packages that meet the criteria.
+                            * `shipping_percentage` - Apply a percentage off shipping price.
+                            * `order_percentage` - Apply a percentage off the entire order.
+                        value:
+                          description: Percentage discount to apply.
+                          format: decimal
+                          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                          type: string
+                      required:
+                        - type
+                        - value
+                      type: object
+                  description: Discount applied once the condition is met.
+                code:
+                  description: Voucher code used to apply the offer. Required when `offer_type` is voucher.
+                  maxLength: 64
+                  nullable: true
+                  title: Discount code
+                  type: string
+                condition:
+                  allOf:
+                    - properties:
+                        all_packages:
+                          default: false
+                          description: Determines which packages the condition applies to. Set to true to apply the condition to all current and future packages. Otherwise, send `package_ids` to restrict the condition to specific packages.
+                          type: boolean
+                        package_ids:
+                          description: IDs of the campaign packages that this condition applies to. Required when `all_packages` is false. Use the package `id` returned by the Packages API.
+                          items:
+                            type: integer
+                          type: array
+                          writeOnly: true
+                        type:
+                          allOf:
+                            - description: |-
+                                * `any` - Applies the condition without criteria.
+                                * `count` - Applies the condition when the package quantity is greater than or equal to the `value`.
+                              enum:
+                                - any
+                                - count
+                              type: string
+                          description: |-
+                            How the condition is evaluated.
+
+                            * `any` - Applies the condition without criteria.
+                            * `count` - Applies the condition when the package quantity is greater than or equal to the `value`.
+                        value:
+                          description: Minimum package quantity required to meet the condition, must be greater than 0. Required when `type` is count, ignored otherwise.
+                          minimum: 1
+                          nullable: true
+                          type: integer
+                      required:
+                        - type
+                      type: object
+                  description: Condition that must be met for the offer to apply.
+                name:
+                  description: Offer name, unique within the campaign.
+                  maxLength: 128
+                  type: string
+                offer_type:
+                  allOf:
+                    - description: |-
+                        * `offer` - Automatically applies when the offer condition is met.
+                        * `voucher` - Applies only when the customer enters the specified voucher code.
+                      enum:
+                        - offer
+                        - voucher
+                      type: string
+                  description: |-
+                    How the offer is applied.
+
+                    * `offer` - Automatically applies when the offer condition is met.
+                    * `voucher` - Applies only when the customer enters the specified voucher code.
+              required:
+                - benefit
+                - condition
+                - name
+              type: object
+          application/x-www-form-urlencoded:
+            schema:
+              properties:
+                benefit:
+                  allOf:
+                    - properties:
+                        price_rounding:
+                          description: |-
+                            Cents rounding applied to each discounted unit price. No rounding when not set.
+
+                            * `0.00` - XX.00
+                            * `0.95` - XX.95
+                            * `0.97` - XX.97
+                            * `0.99` - XX.99
+                          nullable: true
+                          oneOf:
+                            - description: |-
+                                * `0.00` - XX.00
+                                * `0.95` - XX.95
+                                * `0.97` - XX.97
+                                * `0.99` - XX.99
+                              enum:
+                                - '0.00'
+                                - '0.95'
+                                - '0.97'
+                                - '0.99'
+                              type: string
+                            - enum:
+                                - null
+                        type:
+                          allOf:
+                            - description: |-
+                                * `package_percentage` - Apply a percentage off the packages that meet the criteria.
+                                * `shipping_percentage` - Apply a percentage off shipping price.
+                                * `order_percentage` - Apply a percentage off the entire order.
+                              enum:
+                                - package_percentage
+                                - shipping_percentage
+                                - order_percentage
+                              type: string
+                          description: |-
+                            How the discount is applied to the order.
+
+                            * `package_percentage` - Apply a percentage off the packages that meet the criteria.
+                            * `shipping_percentage` - Apply a percentage off shipping price.
+                            * `order_percentage` - Apply a percentage off the entire order.
+                        value:
+                          description: Percentage discount to apply.
+                          format: decimal
+                          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                          type: string
+                      required:
+                        - type
+                        - value
+                      type: object
+                  description: Discount applied once the condition is met.
+                code:
+                  description: Voucher code used to apply the offer. Required when `offer_type` is voucher.
+                  maxLength: 64
+                  nullable: true
+                  title: Discount code
+                  type: string
+                condition:
+                  allOf:
+                    - properties:
+                        all_packages:
+                          default: false
+                          description: Determines which packages the condition applies to. Set to true to apply the condition to all current and future packages. Otherwise, send `package_ids` to restrict the condition to specific packages.
+                          type: boolean
+                        package_ids:
+                          description: IDs of the campaign packages that this condition applies to. Required when `all_packages` is false. Use the package `id` returned by the Packages API.
+                          items:
+                            type: integer
+                          type: array
+                          writeOnly: true
+                        type:
+                          allOf:
+                            - description: |-
+                                * `any` - Applies the condition without criteria.
+                                * `count` - Applies the condition when the package quantity is greater than or equal to the `value`.
+                              enum:
+                                - any
+                                - count
+                              type: string
+                          description: |-
+                            How the condition is evaluated.
+
+                            * `any` - Applies the condition without criteria.
+                            * `count` - Applies the condition when the package quantity is greater than or equal to the `value`.
+                        value:
+                          description: Minimum package quantity required to meet the condition, must be greater than 0. Required when `type` is count, ignored otherwise.
+                          minimum: 1
+                          nullable: true
+                          type: integer
+                      required:
+                        - type
+                      type: object
+                  description: Condition that must be met for the offer to apply.
+                name:
+                  description: Offer name, unique within the campaign.
+                  maxLength: 128
+                  type: string
+                offer_type:
+                  allOf:
+                    - description: |-
+                        * `offer` - Automatically applies when the offer condition is met.
+                        * `voucher` - Applies only when the customer enters the specified voucher code.
+                      enum:
+                        - offer
+                        - voucher
+                      type: string
+                  description: |-
+                    How the offer is applied.
+
+                    * `offer` - Automatically applies when the offer condition is met.
+                    * `voucher` - Applies only when the customer enters the specified voucher code.
+              required:
+                - benefit
+                - condition
+                - name
+              type: object
+          multipart/form-data:
+            schema:
+              properties:
+                benefit:
+                  allOf:
+                    - properties:
+                        price_rounding:
+                          description: |-
+                            Cents rounding applied to each discounted unit price. No rounding when not set.
+
+                            * `0.00` - XX.00
+                            * `0.95` - XX.95
+                            * `0.97` - XX.97
+                            * `0.99` - XX.99
+                          nullable: true
+                          oneOf:
+                            - description: |-
+                                * `0.00` - XX.00
+                                * `0.95` - XX.95
+                                * `0.97` - XX.97
+                                * `0.99` - XX.99
+                              enum:
+                                - '0.00'
+                                - '0.95'
+                                - '0.97'
+                                - '0.99'
+                              type: string
+                            - enum:
+                                - null
+                        type:
+                          allOf:
+                            - description: |-
+                                * `package_percentage` - Apply a percentage off the packages that meet the criteria.
+                                * `shipping_percentage` - Apply a percentage off shipping price.
+                                * `order_percentage` - Apply a percentage off the entire order.
+                              enum:
+                                - package_percentage
+                                - shipping_percentage
+                                - order_percentage
+                              type: string
+                          description: |-
+                            How the discount is applied to the order.
+
+                            * `package_percentage` - Apply a percentage off the packages that meet the criteria.
+                            * `shipping_percentage` - Apply a percentage off shipping price.
+                            * `order_percentage` - Apply a percentage off the entire order.
+                        value:
+                          description: Percentage discount to apply.
+                          format: decimal
+                          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                          type: string
+                      required:
+                        - type
+                        - value
+                      type: object
+                  description: Discount applied once the condition is met.
+                code:
+                  description: Voucher code used to apply the offer. Required when `offer_type` is voucher.
+                  maxLength: 64
+                  nullable: true
+                  title: Discount code
+                  type: string
+                condition:
+                  allOf:
+                    - properties:
+                        all_packages:
+                          default: false
+                          description: Determines which packages the condition applies to. Set to true to apply the condition to all current and future packages. Otherwise, send `package_ids` to restrict the condition to specific packages.
+                          type: boolean
+                        package_ids:
+                          description: IDs of the campaign packages that this condition applies to. Required when `all_packages` is false. Use the package `id` returned by the Packages API.
+                          items:
+                            type: integer
+                          type: array
+                          writeOnly: true
+                        type:
+                          allOf:
+                            - description: |-
+                                * `any` - Applies the condition without criteria.
+                                * `count` - Applies the condition when the package quantity is greater than or equal to the `value`.
+                              enum:
+                                - any
+                                - count
+                              type: string
+                          description: |-
+                            How the condition is evaluated.
+
+                            * `any` - Applies the condition without criteria.
+                            * `count` - Applies the condition when the package quantity is greater than or equal to the `value`.
+                        value:
+                          description: Minimum package quantity required to meet the condition, must be greater than 0. Required when `type` is count, ignored otherwise.
+                          minimum: 1
+                          nullable: true
+                          type: integer
+                      required:
+                        - type
+                      type: object
+                  description: Condition that must be met for the offer to apply.
+                name:
+                  description: Offer name, unique within the campaign.
+                  maxLength: 128
+                  type: string
+                offer_type:
+                  allOf:
+                    - description: |-
+                        * `offer` - Automatically applies when the offer condition is met.
+                        * `voucher` - Applies only when the customer enters the specified voucher code.
+                      enum:
+                        - offer
+                        - voucher
+                      type: string
+                  description: |-
+                    How the offer is applied.
+
+                    * `offer` - Automatically applies when the offer condition is met.
+                    * `voucher` - Applies only when the customer enters the specified voucher code.
+              required:
+                - benefit
+                - condition
+                - name
+              type: object
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                properties:
+                  available:
+                    description: |-
+                      Indicates whether the offer is available for use.
+
+                      * `true` - The offer is available
+                      * `false` - The offer is not available
+                    readOnly: true
+                    type: boolean
+                  benefit:
+                    allOf:
+                      - properties:
+                          description:
+                            description: Summary of the benefit.
+                            readOnly: true
+                            type: string
+                          price_rounding:
+                            description: |-
+                              Cents rounding applied to each discounted unit price. Null when not set.
+
+                              * `0.00` - XX.00
+                              * `0.95` - XX.95
+                              * `0.97` - XX.97
+                              * `0.99` - XX.99
+                            nullable: true
+                            oneOf:
+                              - description: |-
+                                  * `0.00` - XX.00
+                                  * `0.95` - XX.95
+                                  * `0.97` - XX.97
+                                  * `0.99` - XX.99
+                                enum:
+                                  - '0.00'
+                                  - '0.95'
+                                  - '0.97'
+                                  - '0.99'
+                                type: string
+                              - enum:
+                                  - null
+                            readOnly: true
+                          type:
+                            allOf:
+                              - description: |-
+                                  * `package_percentage` - Apply a percentage off the packages that meet the criteria.
+                                  * `shipping_percentage` - Apply a percentage off shipping price.
+                                  * `order_percentage` - Apply a percentage off the entire order.
+                                enum:
+                                  - package_percentage
+                                  - shipping_percentage
+                                  - order_percentage
+                                type: string
+                            description: |-
+                              How the discount is applied to the order.
+
+                              * `package_percentage` - Apply a percentage off the packages that meet the criteria.
+                              * `shipping_percentage` - Apply a percentage off shipping price.
+                              * `order_percentage` - Apply a percentage off the entire order.
+                            readOnly: true
+                          value:
+                            description: Percentage discount to apply.
+                            format: decimal
+                            nullable: true
+                            pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                            title: Discount Amount
+                            type: string
+                        required:
+                          - description
+                          - price_rounding
+                          - type
+                        type: object
+                    description: Discount applied once the condition is met.
+                    readOnly: true
+                  code:
+                    description: Voucher code used to apply the offer. Required when `offer_type` is voucher.
+                    maxLength: 64
+                    nullable: true
+                    title: Discount code
+                    type: string
+                  condition:
+                    allOf:
+                      - properties:
+                          all_packages:
+                            description: Determines which packages the condition applies to. Set to true to apply the condition to all current and future packages. Otherwise, send `package_ids` to restrict the condition to specific packages.
+                            type: boolean
+                          description:
+                            description: Summary of the condition.
+                            readOnly: true
+                            type: string
+                          packages:
+                            description: Packages the condition applies to.
+                            items:
+                              properties:
+                                id:
+                                  description: Package reference ID.
+                                  type: integer
+                                name:
+                                  description: Package name.
+                                  type: string
+                                product_id:
+                                  description: ID of the product linked to the package.
+                                  type: integer
+                                product_sku:
+                                  description: SKU of the product variant linked to the package.
+                                  type: string
+                              required:
+                                - id
+                                - name
+                                - product_id
+                                - product_sku
+                              type: object
+                            readOnly: true
+                            type: array
+                          type:
+                            allOf:
+                              - description: |-
+                                  * `any` - Applies the condition without criteria.
+                                  * `count` - Applies the condition when the package quantity is greater than or equal to the `value`.
+                                enum:
+                                  - any
+                                  - count
+                                type: string
+                            description: |-
+                              How the condition is evaluated.
+
+                              * `any` - Applies the condition without criteria.
+                              * `count` - Applies the condition when the package quantity is greater than or equal to the `value`.
+                          value:
+                            description: Minimum package quantity required to meet the condition. Required when `type` is count.
+                            format: decimal
+                            nullable: true
+                            pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                            type: string
+                        required:
+                          - description
+                          - packages
+                          - type
+                        type: object
+                    description: Condition that must be met for the offer to apply.
+                    readOnly: true
+                  id:
+                    description: Offer reference ID.
+                    type: integer
+                  name:
+                    description: Offer name, unique within the campaign.
+                    maxLength: 128
+                    type: string
+                  offer_type:
+                    allOf:
+                      - description: |-
+                          * `offer` - Automatically applies when the offer condition is met.
+                          * `voucher` - Applies only when the customer enters the specified voucher code.
+                        enum:
+                          - offer
+                          - voucher
+                        type: string
+                    description: |-
+                      How the offer is applied.
+
+                      * `offer` - Automatically applies when the offer condition is met.
+                      * `voucher` - Applies only when the customer enters the specified voucher code.
+                required:
+                  - available
+                  - benefit
+                  - condition
+                  - id
+                  - name
+                  - offer_type
+                type: object
+          description: ''
+      security:
+        - oauth2:
+            - campaigns:write
+      tags:
+        - campaigns
+  /campaigns/{id}/offers/{offerId}/:
+    delete:
+      description: Delete an offer on the campaign.
+      operationId: campaignsOffersDestroy
+      parameters:
+        - description: Campaign ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - description: Offer reference ID, unique within the campaign.
+          in: path
+          name: offerId
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: unstable
+            enum:
+              - unstable
+            type: string
+      responses:
+        '204':
+          description: No response body
+      security:
+        - oauth2:
+            - campaigns:write
+      tags:
+        - campaigns
+    get:
+      description: Retrieve an offer on the campaign.
+      operationId: campaignsOffersRetrieve
+      parameters:
+        - description: Campaign ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - description: Offer reference ID, unique within the campaign.
+          in: path
+          name: offerId
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: unstable
+            enum:
+              - unstable
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  available:
+                    description: |-
+                      Indicates whether the offer is available for use.
+
+                      * `true` - The offer is available
+                      * `false` - The offer is not available
+                    readOnly: true
+                    type: boolean
+                  benefit:
+                    allOf:
+                      - properties:
+                          description:
+                            description: Summary of the benefit.
+                            readOnly: true
+                            type: string
+                          price_rounding:
+                            description: |-
+                              Cents rounding applied to each discounted unit price. Null when not set.
+
+                              * `0.00` - XX.00
+                              * `0.95` - XX.95
+                              * `0.97` - XX.97
+                              * `0.99` - XX.99
+                            nullable: true
+                            oneOf:
+                              - description: |-
+                                  * `0.00` - XX.00
+                                  * `0.95` - XX.95
+                                  * `0.97` - XX.97
+                                  * `0.99` - XX.99
+                                enum:
+                                  - '0.00'
+                                  - '0.95'
+                                  - '0.97'
+                                  - '0.99'
+                                type: string
+                              - enum:
+                                  - null
+                            readOnly: true
+                          type:
+                            allOf:
+                              - description: |-
+                                  * `package_percentage` - Apply a percentage off the packages that meet the criteria.
+                                  * `shipping_percentage` - Apply a percentage off shipping price.
+                                  * `order_percentage` - Apply a percentage off the entire order.
+                                enum:
+                                  - package_percentage
+                                  - shipping_percentage
+                                  - order_percentage
+                                type: string
+                            description: |-
+                              How the discount is applied to the order.
+
+                              * `package_percentage` - Apply a percentage off the packages that meet the criteria.
+                              * `shipping_percentage` - Apply a percentage off shipping price.
+                              * `order_percentage` - Apply a percentage off the entire order.
+                            readOnly: true
+                          value:
+                            description: Percentage discount to apply.
+                            format: decimal
+                            nullable: true
+                            pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                            title: Discount Amount
+                            type: string
+                        required:
+                          - description
+                          - price_rounding
+                          - type
+                        type: object
+                    description: Discount applied once the condition is met.
+                    readOnly: true
+                  code:
+                    description: Voucher code used to apply the offer. Required when `offer_type` is voucher.
+                    maxLength: 64
+                    nullable: true
+                    title: Discount code
+                    type: string
+                  condition:
+                    allOf:
+                      - properties:
+                          all_packages:
+                            description: Determines which packages the condition applies to. Set to true to apply the condition to all current and future packages. Otherwise, send `package_ids` to restrict the condition to specific packages.
+                            type: boolean
+                          description:
+                            description: Summary of the condition.
+                            readOnly: true
+                            type: string
+                          packages:
+                            description: Packages the condition applies to.
+                            items:
+                              properties:
+                                id:
+                                  description: Package reference ID.
+                                  type: integer
+                                name:
+                                  description: Package name.
+                                  type: string
+                                product_id:
+                                  description: ID of the product linked to the package.
+                                  type: integer
+                                product_sku:
+                                  description: SKU of the product variant linked to the package.
+                                  type: string
+                              required:
+                                - id
+                                - name
+                                - product_id
+                                - product_sku
+                              type: object
+                            readOnly: true
+                            type: array
+                          type:
+                            allOf:
+                              - description: |-
+                                  * `any` - Applies the condition without criteria.
+                                  * `count` - Applies the condition when the package quantity is greater than or equal to the `value`.
+                                enum:
+                                  - any
+                                  - count
+                                type: string
+                            description: |-
+                              How the condition is evaluated.
+
+                              * `any` - Applies the condition without criteria.
+                              * `count` - Applies the condition when the package quantity is greater than or equal to the `value`.
+                          value:
+                            description: Minimum package quantity required to meet the condition. Required when `type` is count.
+                            format: decimal
+                            nullable: true
+                            pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                            type: string
+                        required:
+                          - description
+                          - packages
+                          - type
+                        type: object
+                    description: Condition that must be met for the offer to apply.
+                    readOnly: true
+                  id:
+                    description: Offer reference ID.
+                    type: integer
+                  name:
+                    description: Offer name, unique within the campaign.
+                    maxLength: 128
+                    type: string
+                  offer_type:
+                    allOf:
+                      - description: |-
+                          * `offer` - Automatically applies when the offer condition is met.
+                          * `voucher` - Applies only when the customer enters the specified voucher code.
+                        enum:
+                          - offer
+                          - voucher
+                        type: string
+                    description: |-
+                      How the offer is applied.
+
+                      * `offer` - Automatically applies when the offer condition is met.
+                      * `voucher` - Applies only when the customer enters the specified voucher code.
+                required:
+                  - available
+                  - benefit
+                  - condition
+                  - id
+                  - name
+                  - offer_type
+                type: object
+          description: ''
+      security:
+        - oauth2:
+            - campaigns:read
+      tags:
+        - campaigns
+    patch:
+      description: Partially update an offer on the campaign. Providing `condition` or `benefit` replaces it entirely -- these are not merged field by field.
+      operationId: campaignsOffersPartialUpdate
+      parameters:
+        - description: Campaign ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - description: Offer reference ID, unique within the campaign.
+          in: path
+          name: offerId
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: unstable
+            enum:
+              - unstable
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                available:
+                  description: |-
+                    Indicates whether the offer is available for use.
+
+                    * `true` - The offer is available
+                    * `false` - The offer is not available
+                  type: boolean
+                  writeOnly: true
+                benefit:
+                  allOf:
+                    - properties:
+                        price_rounding:
+                          description: |-
+                            Cents rounding applied to each discounted unit price. No rounding when not set.
+
+                            * `0.00` - XX.00
+                            * `0.95` - XX.95
+                            * `0.97` - XX.97
+                            * `0.99` - XX.99
+                          nullable: true
+                          oneOf:
+                            - description: |-
+                                * `0.00` - XX.00
+                                * `0.95` - XX.95
+                                * `0.97` - XX.97
+                                * `0.99` - XX.99
+                              enum:
+                                - '0.00'
+                                - '0.95'
+                                - '0.97'
+                                - '0.99'
+                              type: string
+                            - enum:
+                                - null
+                        type:
+                          allOf:
+                            - description: |-
+                                * `package_percentage` - Apply a percentage off the packages that meet the criteria.
+                                * `shipping_percentage` - Apply a percentage off shipping price.
+                                * `order_percentage` - Apply a percentage off the entire order.
+                              enum:
+                                - package_percentage
+                                - shipping_percentage
+                                - order_percentage
+                              type: string
+                          description: |-
+                            How the discount is applied to the order.
+
+                            * `package_percentage` - Apply a percentage off the packages that meet the criteria.
+                            * `shipping_percentage` - Apply a percentage off shipping price.
+                            * `order_percentage` - Apply a percentage off the entire order.
+                        value:
+                          description: Percentage discount to apply.
+                          format: decimal
+                          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                          type: string
+                      required:
+                        - type
+                        - value
+                      type: object
+                  description: Discount applied once the condition is met. Replaces the existing benefit entirely when provided.
+                code:
+                  description: Voucher code used to apply the offer. Required when `offer_type` is voucher.
+                  maxLength: 64
+                  nullable: true
+                  title: Discount code
+                  type: string
+                condition:
+                  allOf:
+                    - properties:
+                        all_packages:
+                          default: false
+                          description: Determines which packages the condition applies to. Set to true to apply the condition to all current and future packages. Otherwise, send `package_ids` to restrict the condition to specific packages.
+                          type: boolean
+                        package_ids:
+                          description: IDs of the campaign packages that this condition applies to. Required when `all_packages` is false. Use the package `id` returned by the Packages API.
+                          items:
+                            type: integer
+                          type: array
+                          writeOnly: true
+                        type:
+                          allOf:
+                            - description: |-
+                                * `any` - Applies the condition without criteria.
+                                * `count` - Applies the condition when the package quantity is greater than or equal to the `value`.
+                              enum:
+                                - any
+                                - count
+                              type: string
+                          description: |-
+                            How the condition is evaluated.
+
+                            * `any` - Applies the condition without criteria.
+                            * `count` - Applies the condition when the package quantity is greater than or equal to the `value`.
+                        value:
+                          description: Minimum package quantity required to meet the condition, must be greater than 0. Required when `type` is count, ignored otherwise.
+                          minimum: 1
+                          nullable: true
+                          type: integer
+                      required:
+                        - type
+                      type: object
+                  description: Condition that must be met for the offer to apply. Replaces the existing condition (including its packages) entirely when provided.
+                name:
+                  description: Offer name, unique within the campaign.
+                  maxLength: 128
+                  type: string
+                offer_type:
+                  allOf:
+                    - description: |-
+                        * `offer` - Automatically applies when the offer condition is met.
+                        * `voucher` - Applies only when the customer enters the specified voucher code.
+                      enum:
+                        - offer
+                        - voucher
+                      type: string
+                  description: |-
+                    How the offer is applied.
+
+                    * `offer` - Automatically applies when the offer condition is met.
+                    * `voucher` - Applies only when the customer enters the specified voucher code.
+              type: object
+          application/x-www-form-urlencoded:
+            schema:
+              properties:
+                available:
+                  description: |-
+                    Indicates whether the offer is available for use.
+
+                    * `true` - The offer is available
+                    * `false` - The offer is not available
+                  type: boolean
+                  writeOnly: true
+                benefit:
+                  allOf:
+                    - properties:
+                        price_rounding:
+                          description: |-
+                            Cents rounding applied to each discounted unit price. No rounding when not set.
+
+                            * `0.00` - XX.00
+                            * `0.95` - XX.95
+                            * `0.97` - XX.97
+                            * `0.99` - XX.99
+                          nullable: true
+                          oneOf:
+                            - description: |-
+                                * `0.00` - XX.00
+                                * `0.95` - XX.95
+                                * `0.97` - XX.97
+                                * `0.99` - XX.99
+                              enum:
+                                - '0.00'
+                                - '0.95'
+                                - '0.97'
+                                - '0.99'
+                              type: string
+                            - enum:
+                                - null
+                        type:
+                          allOf:
+                            - description: |-
+                                * `package_percentage` - Apply a percentage off the packages that meet the criteria.
+                                * `shipping_percentage` - Apply a percentage off shipping price.
+                                * `order_percentage` - Apply a percentage off the entire order.
+                              enum:
+                                - package_percentage
+                                - shipping_percentage
+                                - order_percentage
+                              type: string
+                          description: |-
+                            How the discount is applied to the order.
+
+                            * `package_percentage` - Apply a percentage off the packages that meet the criteria.
+                            * `shipping_percentage` - Apply a percentage off shipping price.
+                            * `order_percentage` - Apply a percentage off the entire order.
+                        value:
+                          description: Percentage discount to apply.
+                          format: decimal
+                          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                          type: string
+                      required:
+                        - type
+                        - value
+                      type: object
+                  description: Discount applied once the condition is met. Replaces the existing benefit entirely when provided.
+                code:
+                  description: Voucher code used to apply the offer. Required when `offer_type` is voucher.
+                  maxLength: 64
+                  nullable: true
+                  title: Discount code
+                  type: string
+                condition:
+                  allOf:
+                    - properties:
+                        all_packages:
+                          default: false
+                          description: Determines which packages the condition applies to. Set to true to apply the condition to all current and future packages. Otherwise, send `package_ids` to restrict the condition to specific packages.
+                          type: boolean
+                        package_ids:
+                          description: IDs of the campaign packages that this condition applies to. Required when `all_packages` is false. Use the package `id` returned by the Packages API.
+                          items:
+                            type: integer
+                          type: array
+                          writeOnly: true
+                        type:
+                          allOf:
+                            - description: |-
+                                * `any` - Applies the condition without criteria.
+                                * `count` - Applies the condition when the package quantity is greater than or equal to the `value`.
+                              enum:
+                                - any
+                                - count
+                              type: string
+                          description: |-
+                            How the condition is evaluated.
+
+                            * `any` - Applies the condition without criteria.
+                            * `count` - Applies the condition when the package quantity is greater than or equal to the `value`.
+                        value:
+                          description: Minimum package quantity required to meet the condition, must be greater than 0. Required when `type` is count, ignored otherwise.
+                          minimum: 1
+                          nullable: true
+                          type: integer
+                      required:
+                        - type
+                      type: object
+                  description: Condition that must be met for the offer to apply. Replaces the existing condition (including its packages) entirely when provided.
+                name:
+                  description: Offer name, unique within the campaign.
+                  maxLength: 128
+                  type: string
+                offer_type:
+                  allOf:
+                    - description: |-
+                        * `offer` - Automatically applies when the offer condition is met.
+                        * `voucher` - Applies only when the customer enters the specified voucher code.
+                      enum:
+                        - offer
+                        - voucher
+                      type: string
+                  description: |-
+                    How the offer is applied.
+
+                    * `offer` - Automatically applies when the offer condition is met.
+                    * `voucher` - Applies only when the customer enters the specified voucher code.
+              type: object
+          multipart/form-data:
+            schema:
+              properties:
+                available:
+                  description: |-
+                    Indicates whether the offer is available for use.
+
+                    * `true` - The offer is available
+                    * `false` - The offer is not available
+                  type: boolean
+                  writeOnly: true
+                benefit:
+                  allOf:
+                    - properties:
+                        price_rounding:
+                          description: |-
+                            Cents rounding applied to each discounted unit price. No rounding when not set.
+
+                            * `0.00` - XX.00
+                            * `0.95` - XX.95
+                            * `0.97` - XX.97
+                            * `0.99` - XX.99
+                          nullable: true
+                          oneOf:
+                            - description: |-
+                                * `0.00` - XX.00
+                                * `0.95` - XX.95
+                                * `0.97` - XX.97
+                                * `0.99` - XX.99
+                              enum:
+                                - '0.00'
+                                - '0.95'
+                                - '0.97'
+                                - '0.99'
+                              type: string
+                            - enum:
+                                - null
+                        type:
+                          allOf:
+                            - description: |-
+                                * `package_percentage` - Apply a percentage off the packages that meet the criteria.
+                                * `shipping_percentage` - Apply a percentage off shipping price.
+                                * `order_percentage` - Apply a percentage off the entire order.
+                              enum:
+                                - package_percentage
+                                - shipping_percentage
+                                - order_percentage
+                              type: string
+                          description: |-
+                            How the discount is applied to the order.
+
+                            * `package_percentage` - Apply a percentage off the packages that meet the criteria.
+                            * `shipping_percentage` - Apply a percentage off shipping price.
+                            * `order_percentage` - Apply a percentage off the entire order.
+                        value:
+                          description: Percentage discount to apply.
+                          format: decimal
+                          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                          type: string
+                      required:
+                        - type
+                        - value
+                      type: object
+                  description: Discount applied once the condition is met. Replaces the existing benefit entirely when provided.
+                code:
+                  description: Voucher code used to apply the offer. Required when `offer_type` is voucher.
+                  maxLength: 64
+                  nullable: true
+                  title: Discount code
+                  type: string
+                condition:
+                  allOf:
+                    - properties:
+                        all_packages:
+                          default: false
+                          description: Determines which packages the condition applies to. Set to true to apply the condition to all current and future packages. Otherwise, send `package_ids` to restrict the condition to specific packages.
+                          type: boolean
+                        package_ids:
+                          description: IDs of the campaign packages that this condition applies to. Required when `all_packages` is false. Use the package `id` returned by the Packages API.
+                          items:
+                            type: integer
+                          type: array
+                          writeOnly: true
+                        type:
+                          allOf:
+                            - description: |-
+                                * `any` - Applies the condition without criteria.
+                                * `count` - Applies the condition when the package quantity is greater than or equal to the `value`.
+                              enum:
+                                - any
+                                - count
+                              type: string
+                          description: |-
+                            How the condition is evaluated.
+
+                            * `any` - Applies the condition without criteria.
+                            * `count` - Applies the condition when the package quantity is greater than or equal to the `value`.
+                        value:
+                          description: Minimum package quantity required to meet the condition, must be greater than 0. Required when `type` is count, ignored otherwise.
+                          minimum: 1
+                          nullable: true
+                          type: integer
+                      required:
+                        - type
+                      type: object
+                  description: Condition that must be met for the offer to apply. Replaces the existing condition (including its packages) entirely when provided.
+                name:
+                  description: Offer name, unique within the campaign.
+                  maxLength: 128
+                  type: string
+                offer_type:
+                  allOf:
+                    - description: |-
+                        * `offer` - Automatically applies when the offer condition is met.
+                        * `voucher` - Applies only when the customer enters the specified voucher code.
+                      enum:
+                        - offer
+                        - voucher
+                      type: string
+                  description: |-
+                    How the offer is applied.
+
+                    * `offer` - Automatically applies when the offer condition is met.
+                    * `voucher` - Applies only when the customer enters the specified voucher code.
+              type: object
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  available:
+                    description: |-
+                      Indicates whether the offer is available for use.
+
+                      * `true` - The offer is available
+                      * `false` - The offer is not available
+                    readOnly: true
+                    type: boolean
+                  benefit:
+                    allOf:
+                      - properties:
+                          description:
+                            description: Summary of the benefit.
+                            readOnly: true
+                            type: string
+                          price_rounding:
+                            description: |-
+                              Cents rounding applied to each discounted unit price. Null when not set.
+
+                              * `0.00` - XX.00
+                              * `0.95` - XX.95
+                              * `0.97` - XX.97
+                              * `0.99` - XX.99
+                            nullable: true
+                            oneOf:
+                              - description: |-
+                                  * `0.00` - XX.00
+                                  * `0.95` - XX.95
+                                  * `0.97` - XX.97
+                                  * `0.99` - XX.99
+                                enum:
+                                  - '0.00'
+                                  - '0.95'
+                                  - '0.97'
+                                  - '0.99'
+                                type: string
+                              - enum:
+                                  - null
+                            readOnly: true
+                          type:
+                            allOf:
+                              - description: |-
+                                  * `package_percentage` - Apply a percentage off the packages that meet the criteria.
+                                  * `shipping_percentage` - Apply a percentage off shipping price.
+                                  * `order_percentage` - Apply a percentage off the entire order.
+                                enum:
+                                  - package_percentage
+                                  - shipping_percentage
+                                  - order_percentage
+                                type: string
+                            description: |-
+                              How the discount is applied to the order.
+
+                              * `package_percentage` - Apply a percentage off the packages that meet the criteria.
+                              * `shipping_percentage` - Apply a percentage off shipping price.
+                              * `order_percentage` - Apply a percentage off the entire order.
+                            readOnly: true
+                          value:
+                            description: Percentage discount to apply.
+                            format: decimal
+                            nullable: true
+                            pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                            title: Discount Amount
+                            type: string
+                        required:
+                          - description
+                          - price_rounding
+                          - type
+                        type: object
+                    description: Discount applied once the condition is met.
+                    readOnly: true
+                  code:
+                    description: Voucher code used to apply the offer. Required when `offer_type` is voucher.
+                    maxLength: 64
+                    nullable: true
+                    title: Discount code
+                    type: string
+                  condition:
+                    allOf:
+                      - properties:
+                          all_packages:
+                            description: Determines which packages the condition applies to. Set to true to apply the condition to all current and future packages. Otherwise, send `package_ids` to restrict the condition to specific packages.
+                            type: boolean
+                          description:
+                            description: Summary of the condition.
+                            readOnly: true
+                            type: string
+                          packages:
+                            description: Packages the condition applies to.
+                            items:
+                              properties:
+                                id:
+                                  description: Package reference ID.
+                                  type: integer
+                                name:
+                                  description: Package name.
+                                  type: string
+                                product_id:
+                                  description: ID of the product linked to the package.
+                                  type: integer
+                                product_sku:
+                                  description: SKU of the product variant linked to the package.
+                                  type: string
+                              required:
+                                - id
+                                - name
+                                - product_id
+                                - product_sku
+                              type: object
+                            readOnly: true
+                            type: array
+                          type:
+                            allOf:
+                              - description: |-
+                                  * `any` - Applies the condition without criteria.
+                                  * `count` - Applies the condition when the package quantity is greater than or equal to the `value`.
+                                enum:
+                                  - any
+                                  - count
+                                type: string
+                            description: |-
+                              How the condition is evaluated.
+
+                              * `any` - Applies the condition without criteria.
+                              * `count` - Applies the condition when the package quantity is greater than or equal to the `value`.
+                          value:
+                            description: Minimum package quantity required to meet the condition. Required when `type` is count.
+                            format: decimal
+                            nullable: true
+                            pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                            type: string
+                        required:
+                          - description
+                          - packages
+                          - type
+                        type: object
+                    description: Condition that must be met for the offer to apply.
+                    readOnly: true
+                  id:
+                    description: Offer reference ID.
+                    type: integer
+                  name:
+                    description: Offer name, unique within the campaign.
+                    maxLength: 128
+                    type: string
+                  offer_type:
+                    allOf:
+                      - description: |-
+                          * `offer` - Automatically applies when the offer condition is met.
+                          * `voucher` - Applies only when the customer enters the specified voucher code.
+                        enum:
+                          - offer
+                          - voucher
+                        type: string
+                    description: |-
+                      How the offer is applied.
+
+                      * `offer` - Automatically applies when the offer condition is met.
+                      * `voucher` - Applies only when the customer enters the specified voucher code.
+                required:
+                  - available
+                  - benefit
+                  - condition
+                  - id
+                  - name
+                  - offer_type
+                type: object
+          description: ''
+      security:
+        - oauth2:
+            - campaigns:write
+      tags:
+        - campaigns
   /campaigns/{id}/packages/:
     get:
       description: List every packages on the campaign.
       operationId: campaignsPackagesList
       parameters:
+        - description: The pagination cursor value.
+          in: query
+          name: cursor
+          required: false
+          schema:
+            type: string
         - description: Campaign ID.
           in: path
           name: id
@@ -12016,6 +13635,12 @@ paths:
           name: name
           schema:
             type: string
+        - description: Number of results to return per page.
+          in: query
+          name: page_size
+          required: false
+          schema:
+            type: integer
         - description: Product name contains this text, case-insensitive.
           in: query
           name: product_name
@@ -12039,162 +13664,177 @@ paths:
           content:
             application/json:
               schema:
-                items:
-                  properties:
-                    created_at:
-                      description: When the package was created.
-                      format: date-time
-                      readOnly: true
-                      type: string
-                    id:
-                      description: Package reference ID
-                      type: integer
-                    image:
-                      description: URL of the package image.
-                      format: uri
-                      nullable: true
-                      readOnly: true
-                      type: string
-                    interval:
-                      description: |-
-                        Recurring interval for subscription products.
+                properties:
+                  next:
+                    example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    format: uri
+                    nullable: true
+                    type: string
+                  previous:
+                    example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    format: uri
+                    nullable: true
+                    type: string
+                  results:
+                    items:
+                      properties:
+                        created_at:
+                          description: When the package was created.
+                          format: date-time
+                          readOnly: true
+                          type: string
+                        id:
+                          description: Package reference ID
+                          type: integer
+                        image:
+                          description: URL of the package image.
+                          format: uri
+                          nullable: true
+                          readOnly: true
+                          type: string
+                        interval:
+                          description: |-
+                            Recurring interval for subscription products.
 
-                        * `day` - Day
-                        * `month` - Month
-                      nullable: true
-                      oneOf:
-                        - description: |-
                             * `day` - Day
                             * `month` - Month
-                          enum:
-                            - day
-                            - month
+                          nullable: true
+                          oneOf:
+                            - description: |-
+                                * `day` - Day
+                                * `month` - Month
+                              enum:
+                                - day
+                                - month
+                              type: string
+                            - enum:
+                                - ''
+                            - enum:
+                                - null
+                          title: Recurring Interval
+                        interval_count:
+                          description: Number of intervals for the subscription.
+                          maximum: 2147483647
+                          minimum: 0
+                          nullable: true
+                          title: Subscription Interval Count
+                          type: integer
+                        is_recurring:
+                          title: Package is a recurring product subscription.
+                          type: boolean
+                        name:
+                          maxLength: 200
+                          title: Package name
                           type: string
-                        - enum:
-                            - ''
-                        - enum:
-                            - null
-                      title: Recurring Interval
-                    interval_count:
-                      description: Number of intervals for the subscription.
-                      maximum: 2147483647
-                      minimum: 0
-                      nullable: true
-                      title: Subscription Interval Count
-                      type: integer
-                    is_recurring:
-                      title: Package is a recurring product subscription.
-                      type: boolean
-                    name:
-                      maxLength: 200
-                      title: Package name
-                      type: string
-                    prices:
-                      description: Price of the package in every currency the campaign supports.
-                      items:
-                        properties:
-                          currency:
-                            description: Currency for the package price.
-                            maxLength: 3
-                            type: string
-                          price:
-                            description: Price per product unit in the package.
-                            format: decimal
-                            pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
-                            type: string
-                          price_recurring:
-                            description: Recurring subscription price per unit of product in the package.
-                            format: decimal
-                            pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
-                            type: string
-                        required:
-                          - currency
-                          - price
-                          - price_recurring
-                        type: object
-                      readOnly: true
-                      type: array
-                    product_id:
-                      description: ID of the product linked to the package.
-                      type: integer
-                    product_inventory_availability:
-                      description: |-
-                        Inventory availability at fulfillment locations
+                        prices:
+                          description: Price of the package in every currency the campaign supports.
+                          items:
+                            properties:
+                              currency:
+                                description: Currency for the package price.
+                                maxLength: 3
+                                type: string
+                              price:
+                                description: Price per product unit in the package.
+                                format: decimal
+                                pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                                type: string
+                              price_recurring:
+                                description: Recurring subscription price per unit of product in the package.
+                                format: decimal
+                                pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+                                type: string
+                            required:
+                              - currency
+                              - price
+                              - price_recurring
+                            type: object
+                          readOnly: true
+                          type: array
+                        product_id:
+                          description: ID of the product linked to the package.
+                          type: integer
+                        product_inventory_availability:
+                          description: |-
+                            Inventory availability at fulfillment locations
 
-                        * `in_stock` - In Stock
-                        * `low_stock` - Low Stock
-                        * `out_of_stock` - Out of Stock
-                        * `untracked` - Untracked
-                      nullable: true
-                      oneOf:
-                        - description: |-
                             * `in_stock` - In Stock
                             * `low_stock` - Low Stock
                             * `out_of_stock` - Out of Stock
                             * `untracked` - Untracked
-                          enum:
-                            - in_stock
-                            - low_stock
-                            - out_of_stock
-                            - untracked
+                          nullable: true
+                          oneOf:
+                            - description: |-
+                                * `in_stock` - In Stock
+                                * `low_stock` - Low Stock
+                                * `out_of_stock` - Out of Stock
+                                * `untracked` - Untracked
+                              enum:
+                                - in_stock
+                                - low_stock
+                                - out_of_stock
+                                - untracked
+                              type: string
+                            - enum:
+                                - ''
+                            - enum:
+                                - null
+                          title: Inventory Availability
+                        product_name:
+                          description: Product name.
                           type: string
-                        - enum:
-                            - ''
-                        - enum:
-                            - null
-                      title: Inventory Availability
-                    product_name:
-                      description: Product name.
-                      type: string
-                    product_purchase_availability:
-                      description: |-
-                        Product's availability to purchase in new orders
+                        product_purchase_availability:
+                          description: |-
+                            Product's availability to purchase in new orders
 
-                        * `available` - Available
-                        * `unavailable` - Unavailable
-                      nullable: true
-                      oneOf:
-                        - description: |-
                             * `available` - Available
                             * `unavailable` - Unavailable
-                          enum:
-                            - available
-                            - unavailable
+                          nullable: true
+                          oneOf:
+                            - description: |-
+                                * `available` - Available
+                                * `unavailable` - Unavailable
+                              enum:
+                                - available
+                                - unavailable
+                              type: string
+                            - enum:
+                                - ''
+                            - enum:
+                                - null
+                          title: Purchase Availability
+                        product_sku:
+                          description: SKU of the product linked to the package
+                          maxLength: 128
+                          nullable: true
                           type: string
-                        - enum:
-                            - ''
-                        - enum:
-                            - null
-                      title: Purchase Availability
-                    product_sku:
-                      description: SKU of the product linked to the package
-                      maxLength: 128
-                      nullable: true
-                      type: string
-                    product_variant_id:
-                      description: ID of the product variant linked to the package.
-                      type: integer
-                    product_variant_name:
-                      description: Product variant name.
-                      type: string
-                    updated_at:
-                      description: When the package was last updated.
-                      format: date-time
-                      readOnly: true
-                      type: string
-                  required:
-                    - created_at
-                    - id
-                    - image
-                    - name
-                    - prices
-                    - product_id
-                    - product_name
-                    - product_variant_id
-                    - product_variant_name
-                    - updated_at
-                  type: object
-                type: array
+                        product_variant_id:
+                          description: ID of the product variant linked to the package.
+                          type: integer
+                        product_variant_name:
+                          description: Product variant name.
+                          type: string
+                        updated_at:
+                          description: When the package was last updated.
+                          format: date-time
+                          readOnly: true
+                          type: string
+                      required:
+                        - created_at
+                        - id
+                        - image
+                        - name
+                        - prices
+                        - product_id
+                        - product_name
+                        - product_variant_id
+                        - product_variant_name
+                        - updated_at
+                      type: object
+                    type: array
+                required:
+                  - results
+                type: object
           description: ''
       security:
         - oauth2:
@@ -13228,10 +14868,22 @@ paths:
       description: List every shipping method on the campaign.
       operationId: campaignsShippingMethodsList
       parameters:
+        - description: The pagination cursor value.
+          in: query
+          name: cursor
+          required: false
+          schema:
+            type: string
         - description: Campaign ID.
           in: path
           name: id
           required: true
+          schema:
+            type: integer
+        - description: Number of results to return per page.
+          in: query
+          name: page_size
+          required: false
           schema:
             type: integer
         - in: header
@@ -13247,42 +14899,57 @@ paths:
           content:
             application/json:
               schema:
-                items:
-                  properties:
-                    id:
-                      description: Shipping method reference ID.
-                      type: integer
-                    name:
-                      description: Shipping method name used internally for reference.
-                      maxLength: 128
-                      type: string
-                    prices:
-                      description: Price of the shipping method in every currency the campaign supports.
-                      items:
-                        properties:
-                          currency:
-                            maxLength: 3
-                            type: string
-                          price:
-                            description: Shipping price in this currency.
-                            format: decimal
-                            pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-                            type: string
-                        required:
-                          - currency
-                          - price
-                        type: object
-                      readOnly: true
-                      type: array
-                    shipping_method:
-                      description: Shipping method code / carrier.
-                      maxLength: 128
-                      type: string
-                  required:
-                    - id
-                    - prices
-                  type: object
-                type: array
+                properties:
+                  next:
+                    example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    format: uri
+                    nullable: true
+                    type: string
+                  previous:
+                    example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    format: uri
+                    nullable: true
+                    type: string
+                  results:
+                    items:
+                      properties:
+                        id:
+                          description: Shipping method reference ID.
+                          type: integer
+                        name:
+                          description: Shipping method name used internally for reference.
+                          maxLength: 128
+                          type: string
+                        prices:
+                          description: Price of the shipping method in every currency the campaign supports.
+                          items:
+                            properties:
+                              currency:
+                                maxLength: 3
+                                type: string
+                              price:
+                                description: Shipping price in this currency.
+                                format: decimal
+                                pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                                type: string
+                            required:
+                              - currency
+                              - price
+                            type: object
+                          readOnly: true
+                          type: array
+                        shipping_method:
+                          description: Shipping method code / carrier.
+                          maxLength: 128
+                          type: string
+                      required:
+                        - id
+                        - prices
+                      type: object
+                    type: array
+                required:
+                  - results
+                type: object
           description: ''
       security:
         - oauth2:
@@ -18889,9 +20556,7 @@ paths:
           content:
             application/json:
               schema:
-                items:
-                  $ref: '#/components/schemas/Store'
-                type: array
+                $ref: '#/components/schemas/Store'
           description: ''
       security:
         - oauth2:
@@ -24104,6 +25769,7 @@ webhooks:
                     weight: 0
                 gateway_type: string
                 id: 0
+                is_next_payments: false
                 merchant_profile:
                   amex:
                     acquirer_bin: string
@@ -24223,6 +25889,8 @@ webhooks:
                       type: string
                     id:
                       type: integer
+                    is_next_payments:
+                      type: boolean
                     merchant_profile:
                       properties:
                         amex:
@@ -24360,6 +26028,7 @@ webhooks:
                     - gateway_groups
                     - gateway_type
                     - id
+                    - is_next_payments
                     - merchant_profile
                     - name
                     - re_attemp_group
@@ -24435,6 +26104,7 @@ webhooks:
                     weight: 0
                 gateway_type: string
                 id: 0
+                is_next_payments: false
                 merchant_profile:
                   amex:
                     acquirer_bin: string
@@ -24554,6 +26224,8 @@ webhooks:
                       type: string
                     id:
                       type: integer
+                    is_next_payments:
+                      type: boolean
                     merchant_profile:
                       properties:
                         amex:
@@ -24691,6 +26363,7 @@ webhooks:
                     - gateway_groups
                     - gateway_type
                     - id
+                    - is_next_payments
                     - merchant_profile
                     - name
                     - re_attemp_group
@@ -25029,6 +26702,7 @@ webhooks:
                       card_token: string
                       gateway:
                         id: null
+                        is_next_payments: null
                         name: null
                         type: null
                       is_3ds: false
@@ -25932,6 +27606,8 @@ webhooks:
                                       properties:
                                         id:
                                           type: integer
+                                        is_next_payments:
+                                          type: boolean
                                         name:
                                           type: string
                                         type:
@@ -26295,6 +27971,8 @@ webhooks:
                                 properties:
                                   id:
                                     type: integer
+                                  is_next_payments:
+                                    type: boolean
                                   name:
                                     type: string
                                   type:
@@ -26793,6 +28471,7 @@ webhooks:
                       card_token: string
                       gateway:
                         id: null
+                        is_next_payments: null
                         name: null
                         type: null
                       is_3ds: false
@@ -27696,6 +29375,8 @@ webhooks:
                                       properties:
                                         id:
                                           type: integer
+                                        is_next_payments:
+                                          type: boolean
                                         name:
                                           type: string
                                         type:
@@ -28059,6 +29740,8 @@ webhooks:
                                 properties:
                                   id:
                                     type: integer
+                                  is_next_payments:
+                                    type: boolean
                                   name:
                                     type: string
                                   type:
@@ -31017,6 +32700,7 @@ webhooks:
                   card_token: string
                   gateway:
                     id: 0
+                    is_next_payments: false
                     name: string
                     type: string
                   is_3ds: false
@@ -31194,6 +32878,8 @@ webhooks:
                           properties:
                             id:
                               type: integer
+                            is_next_payments:
+                              type: boolean
                             name:
                               type: string
                             type:
@@ -31386,6 +33072,7 @@ webhooks:
                   card_token: string
                   gateway:
                     id: 0
+                    is_next_payments: false
                     name: string
                     type: string
                   is_3ds: false
@@ -31563,6 +33250,8 @@ webhooks:
                           properties:
                             id:
                               type: integer
+                            is_next_payments:
+                              type: boolean
                             name:
                               type: string
                             type:

@@ -28,18 +28,43 @@ function check(name, condition, detail = '') {
 }
 
 const cache = new Map();
+// A network failure is a failed check, not a crash: status 0 with the error in the body.
 async function fetchText(url) {
   if (cache.has(url)) return cache.get(url);
-  const res = await fetch(url, { redirect: 'manual', headers: { 'user-agent': 'next-docs-live-check/1' } });
-  const body = await res.text();
-  const out = { status: res.status, headers: res.headers, body, bytes: Buffer.byteLength(body, 'utf8') };
+  let out;
+  try {
+    const res = await fetch(url, {
+      redirect: 'manual',
+      headers: { 'user-agent': 'next-docs-live-check/1' },
+      signal: AbortSignal.timeout(20_000),
+    });
+    const body = await res.text();
+    out = { status: res.status, headers: res.headers, body, bytes: Buffer.byteLength(body, 'utf8') };
+  } catch (error) {
+    out = { status: 0, headers: new Headers(), body: '', bytes: 0, error: error?.cause?.code ?? error?.name ?? String(error) };
+  }
   cache.set(url, out);
   return out;
 }
 
+// Bounded concurrency so ~200 link checks do not open ~200 connections at once.
+async function mapLimit(items, limit, fn) {
+  const results = new Array(items.length);
+  let next = 0;
+  await Promise.all(
+    Array.from({ length: Math.min(limit, items.length) }, async () => {
+      while (next < items.length) {
+        const i = next++;
+        results[i] = await fn(items[i]);
+      }
+    }),
+  );
+  return results;
+}
+
 async function page(url) {
   const r = await fetchText(url);
-  check(`200 ${url}`, r.status === 200, `status ${r.status}`);
+  check(`200 ${url}`, r.status === 200, `status ${r.status}${r.error ? ` (${r.error})` : ''}`);
   return r;
 }
 
@@ -90,15 +115,13 @@ if (capabilityMap) {
     for (const w of c.webhooks) if (w.url) linked.add(w.url);
   }
   let broken = 0;
-  await Promise.all(
-    [...linked].map(async (u) => {
-      const r = await fetchText(u);
-      if (r.status !== 200) {
-        broken += 1;
-        failures.push(`map link ${u} returned ${r.status}`);
-      }
-    }),
-  );
+  await mapLimit([...linked], 8, async (u) => {
+    const r = await fetchText(u);
+    if (r.status !== 200) {
+      broken += 1;
+      failures.push(`map link ${u} returned ${r.status}${r.error ? ` (${r.error})` : ''}`);
+    }
+  });
   check(`all ${linked.size} capability-map links resolve`, broken === 0);
 
   for (const b of capabilityMap.bundles) {

@@ -1,6 +1,6 @@
 # Agent guide for developers.nextcommerce.com
 
-This file is the navigation and evidence contract for an agent reading the Next Commerce developer documentation. It is not a setup script. Agent setup instructions will live at /agent-setup/prompt.md (tracked in developer-docs#45).
+This file is the navigation and evidence contract for an agent reading the Next Commerce developer documentation. It is not a setup script. For setup, fetch and follow [the stable agent setup prompt](https://developers.nextcommerce.com/agent-setup/prompt.md).
 
 ## What this site is
 

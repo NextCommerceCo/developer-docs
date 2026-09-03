@@ -74,6 +74,9 @@ function header(): string {
     `- [Campaigns API spec, v1](${SITE}/api/campaigns/v1.yaml): raw OpenAPI`,
     `- [Webhooks](${SITE}/docs/webhooks)`,
     `- [Skills](${SITE}/docs/skills): AI agent skills for the platform`,
+    `- [Agent setup](${SITE}/docs/agent-setup): give Claude Code, Codex, Cursor, or another coding agent a working NEXT campaign environment`,
+    `- [Agent setup prompt](${SITE}/agent-setup/prompt.md): stable plain-Markdown instructions an agent can fetch and execute`,
+    `- [Prospect evaluation prompt](${SITE}/evaluate/prompt.md): source-grounded instructions for evaluating platform capabilities, fit, gaps, and a first pilot`,
     `- [Testing](${SITE}/docs/testing)`,
     `- [Agent guide (AGENTS.md)](https://github.com/NextCommerceCo/developer-docs/blob/main/AGENTS.md): navigation and evidence rules for agents reading this site`,
     '',
@@ -116,7 +119,7 @@ export function GET() {
   });
 
   const body = keys
-    .map((key) => `## ${groupTitle(key)}\n\n${groups.get(key)!.join('\n')}\n`)
+    .map((key) => `## ${groupTitle(key)}\n\n${groups.get(key)!.sort((a, b) => a.localeCompare(b)).join('\n')}\n`)
     .join('\n');
 
   return new Response(header() + '\n' + body, {

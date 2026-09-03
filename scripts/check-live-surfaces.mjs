@@ -15,10 +15,19 @@
  * Override hosts with DEVELOPER_SITE / MERCHANT_SITE to point at a preview.
  */
 
+import { setDefaultResultOrder } from 'node:dns';
+
+// Prefer the address family that is consistently reachable from developer
+// laptops while still allowing fetch to fall back when IPv4 is unavailable.
+setDefaultResultOrder('ipv4first');
+
 const DEV = (process.env.DEVELOPER_SITE ?? 'https://developers.nextcommerce.com').replace(/\/$/, '');
 const MERCHANT = (process.env.MERCHANT_SITE ?? 'https://docs.nextcommerce.com').replace(/\/$/, '');
 const SEARCH_INDEX_BUDGET_BYTES = 6_000_000; // mirrors docs/scripts/check-search-budget.mjs
 const BUNDLE_BUDGET_BYTES = 400_000; // mirrors scripts/check-agent-surfaces.mjs
+const FETCH_TIMEOUT_MS = 15_000;
+const FETCH_ATTEMPTS = 3;
+const LINK_CONCURRENCY = 12;
 
 const failures = [];
 const passes = [];
@@ -28,47 +37,59 @@ function check(name, condition, detail = '') {
 }
 
 const cache = new Map();
-// A network failure is a failed check, not a crash: status 0 with the error in the body.
 async function fetchText(url) {
   if (cache.has(url)) return cache.get(url);
-  let out;
-  try {
-    const res = await fetch(url, {
-      redirect: 'manual',
-      headers: { 'user-agent': 'next-docs-live-check/1' },
-      signal: AbortSignal.timeout(20_000),
-    });
-    const body = await res.text();
-    out = { status: res.status, headers: res.headers, body, bytes: Buffer.byteLength(body, 'utf8') };
-  } catch (error) {
-    out = { status: 0, headers: new Headers(), body: '', bytes: 0, error: error?.cause?.code ?? error?.name ?? String(error) };
-  }
-  cache.set(url, out);
-  return out;
+  const request = (async () => {
+    let lastError = null;
+    for (let attempt = 1; attempt <= FETCH_ATTEMPTS; attempt += 1) {
+      try {
+        const res = await fetch(url, {
+          redirect: 'manual',
+          headers: { 'user-agent': 'next-docs-live-check/1' },
+          signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+        });
+        const body = await res.text();
+        const out = { status: res.status, headers: res.headers, body, bytes: Buffer.byteLength(body, 'utf8'), error: null };
+        if (res.status < 500 || attempt === FETCH_ATTEMPTS) return out;
+        lastError = new Error(`HTTP ${res.status}`);
+      } catch (error) {
+        lastError = error;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 250 * attempt));
+    }
+    return {
+      status: 0,
+      headers: new Headers(),
+      body: '',
+      bytes: 0,
+      error: lastError instanceof Error ? lastError.message : String(lastError),
+    };
+  })();
+  cache.set(url, request);
+  return request;
 }
 
-// Bounded concurrency so ~200 link checks do not open ~200 connections at once.
-// Side effects only; callers record results themselves. An exception from one
-// item is recorded as a failed check and does not stop the other workers.
-async function forEachLimit(items, limit, fn) {
+// Bounded concurrency so the link sweep does not open every connection at once.
+// A callback failure is recorded without stopping the remaining checks.
+async function forEachLimit(items, limit, callback) {
   let next = 0;
-  await Promise.all(
-    Array.from({ length: Math.min(limit, items.length) }, async () => {
-      while (next < items.length) {
-        const item = items[next++];
-        try {
-          await fn(item);
-        } catch (error) {
-          failures.push(`check for ${String(item)} threw: ${error?.message ?? error}`);
-        }
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (next < items.length) {
+      const index = next;
+      next += 1;
+      try {
+        await callback(items[index], index);
+      } catch (error) {
+        failures.push(`check for ${String(items[index])} threw: ${error?.message ?? error}`);
       }
-    }),
-  );
+    }
+  });
+  await Promise.all(workers);
 }
 
 async function page(url) {
   const r = await fetchText(url);
-  check(`200 ${url}`, r.status === 200, `status ${r.status}${r.error ? ` (${r.error})` : ''}`);
+  check(`200 ${url}`, r.status === 200, r.error ? `network error ${r.error}` : `status ${r.status}`);
   return r;
 }
 
@@ -119,13 +140,17 @@ if (capabilityMap) {
     for (const w of c.webhooks) if (w.url) linked.add(w.url);
   }
   let broken = 0;
-  await forEachLimit([...linked], 8, async (u) => {
-    const r = await fetchText(u);
-    if (r.status !== 200) {
-      broken += 1;
-      failures.push(`map link ${u} returned ${r.status}${r.error ? ` (${r.error})` : ''}`);
-    }
-  });
+  await forEachLimit(
+    [...linked],
+    LINK_CONCURRENCY,
+    async (u) => {
+      const r = await fetchText(u);
+      if (r.status !== 200) {
+        broken += 1;
+        failures.push(`map link ${u} ${r.error ? `failed: ${r.error}` : `returned ${r.status}`}`);
+      }
+    },
+  );
   check(`all ${linked.size} capability-map links resolve`, broken === 0);
 
   for (const b of capabilityMap.bundles) {
@@ -142,8 +167,20 @@ if (capabilityMap) {
 const full = await page(`${DEV}/llms-full.txt`);
 check('llms-full.txt is text', (full.headers.get('content-type') ?? '').startsWith('text/plain'));
 
+const setupPrompt = await page(`${DEV}/agent-setup/prompt.md`);
+check('agent setup prompt is Markdown', (setupPrompt.headers.get('content-type') ?? '').startsWith('text/markdown'));
+check('agent setup prompt names Claude Code, Codex, and Cursor', ['Claude Code', 'OpenAI Codex', 'Cursor'].every((name) => setupPrompt.body.includes(name)));
+check('agent setup prompt is linked from llms.txt', (await fetchText(`${DEV}/llms.txt`)).body.includes(`${DEV}/agent-setup/prompt.md`));
+
+const evaluationPrompt = await page(`${DEV}/evaluate/prompt.md`);
+check('evaluation prompt is Markdown', (evaluationPrompt.headers.get('content-type') ?? '').startsWith('text/markdown'));
+check('evaluation prompt links the capability map and domain bundles', evaluationPrompt.body.includes(`${DEV}/capabilities.json`) && evaluationPrompt.body.includes(`${DEV}/llms/`));
+check('evaluation prompt is linked from llms.txt', (await fetchText(`${DEV}/llms.txt`)).body.includes(`${DEV}/evaluate/prompt.md`));
+
 const search = await fetchText(`${MERCHANT}/api/search`);
 check('merchant search index responds', search.status === 200, `status ${search.status}`);
+check('merchant search index is JSON', (search.headers.get('content-type') ?? '').startsWith('application/json'), search.headers.get('content-type') ?? 'no content-type');
+check('merchant search index is compressed in transit', /^(br|gzip)$/.test(search.headers.get('content-encoding') ?? ''), search.headers.get('content-encoding') ?? 'no content-encoding');
 check(`merchant search index within ${SEARCH_INDEX_BUDGET_BYTES} bytes`, search.bytes <= SEARCH_INDEX_BUDGET_BYTES, `${search.bytes} bytes`);
 check('merchant search index is cached for an hour', /max-age=3600/.test(search.headers.get('cache-control') ?? ''), search.headers.get('cache-control') ?? 'no cache-control');
 check('merchant search index mentions subscriptions', /subscription/i.test(search.body));

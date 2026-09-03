@@ -38,6 +38,12 @@ if (llms !== null) {
   ]) {
     check(llms.includes(needle), `llms.txt is missing ${JSON.stringify(needle)}`);
   }
+  const pageSections = llms.slice(llms.indexOf('\n## Overview\n')).split(/^## /m).slice(1);
+  for (const section of pageSections) {
+    const lines = section.split('\n').filter((line) => line.startsWith('- ['));
+    const sorted = [...lines].sort((a, b) => a.localeCompare(b));
+    check(lines.every((line, index) => line === sorted[index]), `llms.txt section ${JSON.stringify(section.split('\n')[0])} is not sorted`);
+  }
 }
 
 // 404 page
@@ -87,6 +93,12 @@ if (capabilityMap) {
   check(capabilityMap.version === 1, `capabilities.json version is ${capabilityMap.version}`);
   check(Array.isArray(capabilityMap.capabilities) && capabilityMap.capabilities.length >= 8, 'capabilities.json has fewer than 8 capabilities');
   check(Array.isArray(capabilityMap.bundles) && capabilityMap.bundles.length === 6, 'capabilities.json does not list 6 bundles');
+  const payments = capabilityMap.capabilities.find((c) => c.id === 'payments-gateways');
+  const disputes = capabilityMap.capabilities.find((c) => c.id === 'disputes');
+  check(payments?.api_operations.length === 9, `payments-gateways has ${payments?.api_operations.length ?? 0} operations instead of 9`);
+  check(disputes?.api_operations.length === 9, `disputes has ${disputes?.api_operations.length ?? 0} operations instead of 9`);
+  check(!payments?.api_operations.some((op) => op.id.startsWith('disputes')), 'payments-gateways still contains dispute operations');
+  check(disputes?.api_operations.every((op) => op.id.startsWith('disputes')), 'disputes contains a non-dispute operation');
   const capPage = read(join(OUT, 'docs', 'capabilities.html')) ?? read(join(OUT, 'docs', 'capabilities', 'index.html'));
   check(capPage !== null, 'out/docs/capabilities.html does not exist');
   if (capPage !== null) {
@@ -105,6 +117,47 @@ if (capabilityMap) {
         check(html.includes('Related merchant guides'), `developer page ${rel} has no reciprocal merchant-guide panel`);
       }
     }
+  }
+}
+
+// Agent setup: raw Markdown and human guide are generated from one source.
+const setupPrompt = read(join(OUT, 'agent-setup', 'prompt.md'));
+check(setupPrompt !== null, 'out/agent-setup/prompt.md does not exist');
+if (setupPrompt !== null) {
+  check(setupPrompt.startsWith('<!-- next-commerce-agent-setup version='), 'agent setup prompt has no version marker');
+  check(!/\]\(\//.test(setupPrompt), 'agent setup prompt contains a relative Markdown link');
+  for (const needle of [
+    '### Claude Code',
+    '### OpenAI Codex',
+    '### Cursor',
+    '### Other agents',
+    'npx campaign-init --non-interactive --json',
+    '_site/agent-starter/landing/index.html',
+    'https://developers.nextcommerce.com/llms.txt?ref=agent-setup',
+  ]) {
+    check(setupPrompt.includes(needle), `agent setup prompt is missing ${JSON.stringify(needle)}`);
+  }
+  check(!setupPrompt.includes('--api-key'), 'agent setup prompt asks for an API key during bootstrap');
+}
+const setupGuide = read(join(OUT, 'docs', 'agent-setup.html')) ?? read(join(OUT, 'docs', 'agent-setup', 'index.html'));
+check(setupGuide !== null, 'out/docs/agent-setup.html does not exist');
+if (setupGuide !== null) {
+  check(setupGuide.includes('Read https://developers.nextcommerce.com/agent-setup/prompt.md'), 'agent setup guide is missing the one-line instruction');
+}
+
+const evaluationPrompt = read(join(OUT, 'evaluate', 'prompt.md'));
+check(evaluationPrompt !== null, 'out/evaluate/prompt.md does not exist');
+if (evaluationPrompt !== null) {
+  check(evaluationPrompt.startsWith('<!-- next-commerce-evaluation-prompt version='), 'evaluation prompt has no version marker');
+  check(!/\]\(\//.test(evaluationPrompt), 'evaluation prompt contains a relative Markdown link');
+  for (const needle of [
+    'https://developers.nextcommerce.com/capabilities.json?ref=agent-evaluation',
+    'https://developers.nextcommerce.com/llms/platform.txt?ref=agent-evaluation',
+    'https://docs.nextcommerce.com/llms.txt?ref=agent-evaluation',
+    'Cite every material claim',
+    'What is not documented',
+  ]) {
+    check(evaluationPrompt.includes(needle), `evaluation prompt is missing ${JSON.stringify(needle)}`);
   }
 }
 

@@ -1,0 +1,30 @@
+name: Live agent surfaces
+
+# Checks the deployed sites, not the branch: sitemap, robots, llms.txt links,
+# capability map, bundles, 404 recovery, search index budget, and the
+# deterministic half of the prospect-agent smoke set. Runs on a schedule and
+# by hand; a failure here means production drifted, not that a PR is wrong.
+
+on:
+  schedule:
+    - cron: '17 3 * * 1' # Mondays 03:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: '22'
+
+      - run: node scripts/check-live-surfaces.mjs

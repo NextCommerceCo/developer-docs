@@ -11,6 +11,7 @@ import { getMDXComponents } from '@/components/mdx';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { VersionSelector } from '@/components/version-selector';
 import { AutoExpandBody } from '@/components/auto-expand-body';
+import { CapabilityLinks } from '@/components/capability-links';
 import type { Metadata } from 'next';
 
 export default async function Page(props: {
@@ -41,6 +42,7 @@ export default async function Page(props: {
             a: createRelativeLink(source, page),
           })}
         />
+        <CapabilityLinks pageUrl={page.url} declaredIds={page.data.capability_ids} />
       </DocsBody>
     </DocsPage>
   );

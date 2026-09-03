@@ -1,5 +1,7 @@
 ---
 title: Install Flows
+description: Build install links for private apps with client_id and what changes when an app is published as a public app
+capability_ids: [apps]
 sidebar_position: 6
 ---
 

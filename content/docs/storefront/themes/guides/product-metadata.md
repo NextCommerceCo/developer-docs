@@ -1,5 +1,7 @@
 ---
 title: Product Metadata
+description: Render custom product metadata fields in theme templates with product.metadata.<key>
+capability_ids: [storefront-themes]
 sidebar_label: Product Metadata
 tags:
  - Guide

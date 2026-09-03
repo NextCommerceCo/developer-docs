@@ -48,12 +48,20 @@ async function fetchText(url) {
 }
 
 // Bounded concurrency so ~200 link checks do not open ~200 connections at once.
-// Side effects only; callers record results themselves.
+// Side effects only; callers record results themselves. An exception from one
+// item is recorded as a failed check and does not stop the other workers.
 async function forEachLimit(items, limit, fn) {
   let next = 0;
   await Promise.all(
     Array.from({ length: Math.min(limit, items.length) }, async () => {
-      while (next < items.length) await fn(items[next++]);
+      while (next < items.length) {
+        const item = items[next++];
+        try {
+          await fn(item);
+        } catch (error) {
+          failures.push(`check for ${String(item)} threw: ${error?.message ?? error}`);
+        }
+      }
     }),
   );
 }

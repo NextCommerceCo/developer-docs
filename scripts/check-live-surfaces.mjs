@@ -48,18 +48,14 @@ async function fetchText(url) {
 }
 
 // Bounded concurrency so ~200 link checks do not open ~200 connections at once.
-async function mapLimit(items, limit, fn) {
-  const results = new Array(items.length);
+// Side effects only; callers record results themselves.
+async function forEachLimit(items, limit, fn) {
   let next = 0;
   await Promise.all(
     Array.from({ length: Math.min(limit, items.length) }, async () => {
-      while (next < items.length) {
-        const i = next++;
-        results[i] = await fn(items[i]);
-      }
+      while (next < items.length) await fn(items[next++]);
     }),
   );
-  return results;
 }
 
 async function page(url) {
@@ -115,7 +111,7 @@ if (capabilityMap) {
     for (const w of c.webhooks) if (w.url) linked.add(w.url);
   }
   let broken = 0;
-  await mapLimit([...linked], 8, async (u) => {
+  await forEachLimit([...linked], 8, async (u) => {
     const r = await fetchText(u);
     if (r.status !== 200) {
       broken += 1;

@@ -78,6 +78,9 @@ export const docs = defineDocs({
       last_verified: z
         .string()
         .regex(/^\d{4}-\d{2}-\d{2}$/, 'last_verified must be YYYY-MM-DD')
+        .refine((v) => !Number.isNaN(Date.parse(v)) && new Date(v).toISOString().startsWith(v), {
+          message: 'last_verified must be a real calendar date',
+        })
         .optional(),
     }),
     postprocess: {

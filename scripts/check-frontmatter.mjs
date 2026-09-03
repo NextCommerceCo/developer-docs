@@ -122,7 +122,9 @@ for (const file of files) {
       if (raw === fm.raw) {
         errors.push(`${file}: could not insert capability_ids (no description line to anchor on)`);
       } else {
-        writeFileSync(abs, `---\n${raw}\n---\n` + text.slice(fm.end));
+        // Keep the file's own line ending in the rewritten wrapper.
+        const eol = text.includes('\r\n') ? '\r\n' : '\n';
+        writeFileSync(abs, `---${eol}${raw}${eol}---${eol}` + text.slice(fm.end));
         rewritten += 1;
       }
     } else {

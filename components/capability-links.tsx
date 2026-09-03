@@ -15,9 +15,8 @@ export function CapabilityLinks({ pageUrl, declaredIds }: { pageUrl: string; dec
   const capabilities = [...byId.values()];
   if (capabilities.length === 0) return null;
 
-  const merchantLinks = capabilities.flatMap((c) =>
-    c.operator_docs.map((url) => ({ url, capability: c })),
-  );
+  // Several capabilities on one page can cite the same merchant guide; list it once.
+  const merchantLinks = [...new Set(capabilities.flatMap((c) => c.operator_docs))].map((url) => ({ url }));
 
   return (
     <aside

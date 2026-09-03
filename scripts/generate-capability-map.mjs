@@ -102,10 +102,21 @@ function developerPageExists(path) {
   );
 }
 
-// Reference page for an operation, as generate-api-docs lays it out.
+// Reference page for an operation, as generate-api-docs lays it out (one folder per
+// tag, named exactly as the tag). If the generator ever changes that layout, or a tag
+// stops matching its folder, the build fails here instead of silently dropping links.
+const TAG_RE = /^[a-z0-9-]+$/;
 function operationUrl(op) {
-  const dir = join(ROOT, 'content', 'docs', 'admin-api', 'reference', op.tag ?? '', `${op.id}.mdx`);
-  return existsSync(dir) ? `/docs/admin-api/reference/${op.tag}/${op.id}` : null;
+  if (!op.tag || !TAG_RE.test(op.tag)) {
+    fail(`spec: operation ${op.id} has tag ${JSON.stringify(op.tag)}, which is not a reference folder name`);
+    return null;
+  }
+  const file = join(ROOT, 'content', 'docs', 'admin-api', 'reference', op.tag, `${op.id}.mdx`);
+  if (!existsSync(file)) {
+    fail(`operation ${op.id} has no generated reference page at admin-api/reference/${op.tag}/; run generate-api-docs first`);
+    return null;
+  }
+  return `/docs/admin-api/reference/${op.tag}/${op.id}`;
 }
 
 // Webhook reference pages are grouped by tag folder: /docs/webhooks/reference/<tag>/<event>.

@@ -81,7 +81,7 @@ function header(): string {
     '',
     'Fetch the bundle for your question before the full corpus. Each is plain Markdown: the capability records for one domain followed by the full text of the developer pages they cite.',
     '',
-    ...capabilityMap.bundles.map((b) => `- [${b.title}](${b.url}): ${b.intro}`),
+    ...capabilityMap.bundles.map((b) => `- [${linkText(b.title)}](${b.url}): ${oneLine(b.intro)}`),
     `- [Full corpus](${SITE}/llms-full.txt): every page in one file, including 500+ generated reference pages (large, about 1.5 MB); use a bundle or a page URL instead unless you need everything`,
     '',
     '## Legacy identifiers',

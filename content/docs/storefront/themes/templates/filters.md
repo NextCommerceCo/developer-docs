@@ -1,5 +1,7 @@
 ---
 title: 'Filter Reference'
+description: Built-in Django Template Language filters for lists, formatting, strings, currency, asset URLs, and math
+capability_ids: [storefront-themes]
 ---
 
 ## Arrays & Lists

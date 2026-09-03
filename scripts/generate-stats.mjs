@@ -3,7 +3,10 @@
  * Run before `next build` — wired into the "dev" and "build" npm scripts.
  *
  *   adminApiOperations — operations in the stable Admin API spec
- *   webhookEvents      — rows in the event table on content/docs/webhooks/index.mdx
+ *   webhookEvents      — entries under `webhooks` in the same spec (the source the
+ *                        webhook reference pages are generated from). The event table
+ *                        on content/docs/webhooks/index.mdx is cross-checked and a
+ *                        mismatch fails the build, so the two cannot drift.
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from 'fs';
@@ -22,8 +25,9 @@ const OUT_PATH = join(OUT_DIR, 'stats.json');
 
 const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'];
 
-function countOperations(specPath) {
-  const spec = loadYaml(readFileSync(specPath, 'utf8'));
+const spec = loadYaml(readFileSync(SPEC_PATH, 'utf8'));
+
+function countOperations() {
   const paths = spec?.paths ?? {};
   let count = 0;
   for (const item of Object.values(paths)) {
@@ -35,18 +39,30 @@ function countOperations(specPath) {
   return count;
 }
 
-function countWebhookEvents(mdxPath) {
+function countSpecWebhooks() {
+  return Object.keys(spec?.webhooks ?? {}).length;
+}
+
+// Rows in the event table whose first cell is a backticked event name, e.g. `order.created`.
+function countTableWebhooks(mdxPath) {
   const lines = readFileSync(mdxPath, 'utf8').split('\n');
-  // Table rows whose first cell is a backticked event name, e.g. `order.created`.
-  const row = /^\|\s*`[a-z0-9_]+\.[a-z0-9_.]+`\s*\|/;
+  const row = /^\|\s*`[^`|]+\.[^`|]+`\s*\|/;
   return lines.filter((line) => row.test(line)).length;
 }
 
 const stats = {
-  adminApiOperations: countOperations(SPEC_PATH),
-  webhookEvents: countWebhookEvents(WEBHOOKS_PATH),
+  adminApiOperations: countOperations(),
+  webhookEvents: countSpecWebhooks(),
   specVersion: SPEC_VERSION,
 };
+
+const tableCount = countTableWebhooks(WEBHOOKS_PATH);
+if (tableCount !== stats.webhookEvents) {
+  console.error(
+    `generate-stats: the spec defines ${stats.webhookEvents} webhook events but the table on content/docs/webhooks/index.mdx lists ${tableCount}. Update the table.`,
+  );
+  process.exit(1);
+}
 
 if (stats.adminApiOperations === 0 || stats.webhookEvents === 0) {
   console.error('generate-stats: a count came back as zero', stats);

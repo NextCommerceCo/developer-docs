@@ -60,8 +60,12 @@ if (statsRaw !== null) {
   const index = read(join(OUT, 'index.html'));
   check(index !== null, 'out/index.html does not exist');
   if (index !== null) {
-    const needle = `${stats.webhookEvents} Webhook Events`;
-    check(index.includes(needle), `index.html is missing ${JSON.stringify(needle)}`);
+    for (const needle of [
+      `<span>${stats.adminApiOperations} REST Endpoints</span>`,
+      `<span>${stats.webhookEvents} Webhook Events</span>`,
+    ]) {
+      check(index.includes(needle), `index.html is missing ${JSON.stringify(needle)}`);
+    }
   }
 }
 

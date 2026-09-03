@@ -43,6 +43,16 @@ function groupKey(url: string): string {
   return first || 'index';
 }
 
+// Frontmatter values are interpolated into Markdown link syntax; keep each
+// page on exactly one line and neutralise the characters that would break it.
+function oneLine(value: string): string {
+  return value.replace(/\s+/g, ' ').trim();
+}
+
+function linkText(value: string): string {
+  return oneLine(value).replace(/[\[\]]/g, '\\$&');
+}
+
 function header(): string {
   return [
     '# Next Commerce Developer Docs',
@@ -77,8 +87,8 @@ export function GET() {
 
   for (const page of source.getPages()) {
     const key = groupKey(page.url);
-    const title = page.data.title ?? page.url;
-    const description = page.data.description?.trim();
+    const title = linkText(page.data.title ?? page.url);
+    const description = page.data.description ? oneLine(page.data.description) : '';
     const line = description
       ? `- [${title}](${SITE}${page.url}): ${description}`
       : `- [${title}](${SITE}${page.url})`;

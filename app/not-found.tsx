@@ -15,8 +15,8 @@ export default function NotFound() {
             <li><Link href="/docs">Browse all docs</Link></li>
             <li><Link href="/docs/admin-api">Admin API</Link></li>
             <li><Link href="/docs/webhooks">Webhooks</Link></li>
-            <li><Link href="https://docs.nextcommerce.com">Merchant docs</Link></li>
-            <li><Link href="https://docs.nextcommerce.com/changelog">Changelog</Link></li>
+            <li><a href="https://docs.nextcommerce.com">Merchant docs</a></li>
+            <li><a href="https://docs.nextcommerce.com/changelog">Changelog</a></li>
             <li><Link href="/llms.txt">Agent index (llms.txt)</Link></li>
           </ul>
         </nav>

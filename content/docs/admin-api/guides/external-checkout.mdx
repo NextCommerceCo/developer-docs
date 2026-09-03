@@ -259,6 +259,8 @@ The example below uses a [Test Card Token](/docs/admin-api/guides/testing-guide)
     "statement_descriptor": "BRANDNAME" // See details below
 },
 ```
+
+To route the order to a specific gateway or gateway group, include `payment_gateway` or `payment_gateway_group` (an id, never both) inside `payment_details`. See [Gateway Routing](/docs/admin-api/guides/payment-methods/bankcard#gateway-routing) in the Bankcard guide.
 #### Statement Descriptor
 
 Merchants have the option to pass a custom `statement_descriptor` on orders so the end customer will more easily recognize the charge on their card bank statement. Using this field will override all subsequent transactions for the bankcard, even across payment gateways. 

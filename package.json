@@ -3,13 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "node scripts/generate-api-docs.mjs && npm run generate-graphql-docs && npm run build:preview && next dev --turbopack",
-    "build": "node scripts/generate-api-docs.mjs && npm run generate-graphql-docs && npm run build:preview && next build",
+    "dev": "node scripts/generate-api-docs.mjs && node scripts/generate-stats.mjs && npm run generate-graphql-docs && npm run build:preview && next dev --turbopack",
+    "build": "node scripts/generate-api-docs.mjs && node scripts/generate-stats.mjs && npm run generate-graphql-docs && npm run build:preview && next build",
     "start": "next start",
     "generate-api-docs": "node scripts/generate-api-docs.mjs",
     "generate-graphql-docs": "node scripts/generate-graphql-docs.mjs",
+    "generate-stats": "node scripts/generate-stats.mjs",
     "build:preview": "node scripts/build-preview.mjs",
     "validate-links": "node scripts/validate-links.mjs",
+    "check-agent-surfaces": "node scripts/check-agent-surfaces.mjs",
     "postinstall": "patch-package"
   },
   "dependencies": {

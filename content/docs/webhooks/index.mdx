@@ -79,7 +79,7 @@ There is no renewal-specific event. A renewal charge arrives as `transaction.cre
 </Callout>
 
 <Callout type="info" title="Disputes include chargebacks">
-There is no separate chargeback event. `dispute.created` and `dispute.updated` cover chargebacks and pre-chargeback alerts alike; the dispute's `type` distinguishes them. See the [Disputes guide](https://docs.nextcommerce.com/docs/features/payments/disputes-guide).
+Chargebacks and pre-chargeback alerts both arrive as `dispute.created` and `dispute.updated`; the dispute's `type` field says which it is. See the [Disputes guide](https://docs.nextcommerce.com/docs/features/payments/disputes-guide).
 </Callout>
 
 ### Webhook Data Structure

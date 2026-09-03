@@ -358,7 +358,9 @@
   to = "https://cart-sdk.nextcommerce.com/latest/"
   status = 301
 
-# Old Redoc-style reference URL still linked from the platform changelog
+# Old Redoc-style reference URL still linked from the platform changelog.
+# Exact path only (Netlify also matches the trailing-slash form); the deep
+# /docs/admin-api/reference/<group>/<op> pages are real and must not be caught.
 [[redirects]]
   from = "/docs/admin-api/reference"
   to = "/docs/admin-api"

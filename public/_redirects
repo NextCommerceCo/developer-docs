@@ -76,4 +76,7 @@
 /docs/campaigns/utilities/* https://cart-sdk.nextcommerce.com/latest/ 301
 /docs/campaigns/guides https://cart-sdk.nextcommerce.com/latest/ 301
 /docs/campaigns/guides/* https://cart-sdk.nextcommerce.com/latest/ 301
+# Old Redoc-style reference URL still linked from the platform changelog (with and without
+# trailing slash). Exact-path rules on purpose: /docs/admin-api/reference/<group>/<op> are real pages.
 /docs/admin-api/reference /docs/admin-api 301
+/docs/admin-api/reference/ /docs/admin-api 301

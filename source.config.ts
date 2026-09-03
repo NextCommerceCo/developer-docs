@@ -69,6 +69,16 @@ export const docs = defineDocs({
     schema: frontmatterSchema.extend({
       title: z.string().optional().default(''),
       full: z.boolean().optional(),
+      // Agent-retrieval metadata. `description` (from frontmatterSchema) is required
+      // on every authored page by scripts/check-frontmatter.mjs; the fields below are
+      // optional and validated against the capability map by the same script.
+      audience: z.array(z.enum(['merchant', 'developer'])).optional(),
+      capability_ids: z.array(z.string()).optional(),
+      status: z.enum(['available', 'beta', 'deprecated']).optional(),
+      last_verified: z
+        .string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/, 'last_verified must be YYYY-MM-DD')
+        .optional(),
     }),
     postprocess: {
       includeProcessedMarkdown: true,

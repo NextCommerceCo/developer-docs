@@ -1,0 +1,414 @@
+# Platform capability map: the hand-authored source of the projection served at
+# https://developers.nextcommerce.com/capabilities.json
+#
+# This file is an index over existing sources, not a third source of product
+# truth. The owning sources win whenever they disagree with it:
+#   - prose         -> the linked merchant (docs.nextcommerce.com) and developer pages
+#   - operations    -> public/api/admin/<version>.yaml (resolved here by tag or operationId)
+#   - webhooks      -> the `webhooks` block of the same spec (resolved and validated here)
+#   - skills        -> content/docs/skills/index.mdx (validated here)
+#   - currency      -> https://docs.nextcommerce.com/changelog
+#
+# scripts/generate-capability-map.mjs validates every field and writes
+# lib/generated/capabilities.json. The build fails on an unknown page, operation,
+# event, skill, bundle, or enum value.
+#
+# Record fields
+#   id             stable, kebab-case; consumed by page frontmatter (capability_ids) on both sites
+#   title          human name
+#   summary        one to three sentences of plain prose an agent can quote
+#   audiences      subset of [merchant, developer]
+#   operator_docs  merchant-site paths (absolute URLs are generated)
+#   developer_docs developer-site paths; must exist under content/docs after generation
+#   api_operations "tag:<tag>" selectors and/or operationIds from the stable Admin API spec
+#   webhooks       event names from the spec, or the single word "all"
+#   skills         skill names from the AI Skills page
+#   status         available | beta | deprecated
+#   last_verified  YYYY-MM-DD when a person last checked every link in the record
+#   notes          optional caveats an agent must repeat (rates, legacy names, missing events)
+
+version: 1
+spec_version: "2024-04-01"
+
+bundles:
+  - id: platform
+    title: Platform overview
+    intro: >-
+      What Next Commerce is, how the two documentation sites divide the material, the
+      Admin API versions, how to test safely, and the legacy identifiers an agent must
+      not "correct". Start here before fetching a domain bundle.
+    capabilities: [admin-api, testing, legacy-identifiers, agent-skills]
+  - id: admin-api
+    title: Admin API
+    intro: >-
+      The REST Admin API and its guides: orders and external checkout, subscriptions,
+      fulfillment, and exports. Operations are listed by tag; the versioned OpenAPI file
+      is the contract.
+    capabilities: [admin-api, orders, subscriptions, fulfillment]
+  - id: payments
+    title: Payments and gateways
+    intro: >-
+      Gateways, payment methods, gateway selection on API-created orders, disputes,
+      and the Test Gateway. NEXT Payments processing rates are not published.
+    capabilities: [payments-gateways, disputes, testing]
+  - id: campaigns
+    title: Campaigns
+    intro: >-
+      Campaign funnels: the Campaigns API, Campaign Page Kit, starter templates, and the
+      Admin API surface for campaigns and offers. Campaign orders are store orders.
+    capabilities: [campaigns]
+  - id: storefront
+    title: Storefront
+    intro: >-
+      Storefront themes and Theme Kit, template objects, tags and filters, theme settings,
+      the storefront GraphQL API, checkout links, and event tracking.
+    capabilities: [storefront-themes, checkout-links]
+  - id: apps-webhooks
+    title: Apps and webhooks
+    intro: >-
+      Building apps with OAuth, app manifests and settings, service integrations
+      (fulfillment, disputes, attribution), and every webhook event with its payload.
+    capabilities: [apps, webhooks]
+
+capabilities:
+  - id: admin-api
+    title: Admin API
+    summary: >-
+      The REST Admin API manages store resources: products, orders, customers,
+      subscriptions, fulfillment, payments, campaigns, and more. Access is by OAuth app
+      token against https://{store}.29next.store/api/admin/, with the version selected per
+      request by the X-29next-API-Version header. 2024-04-01 is the stable version;
+      2023-02-10 is deprecated; unstable carries in-progress changes.
+    audiences: [developer]
+    operator_docs:
+      - /docs/build-a-store/technical-settings/configure-webhooks
+      - /changelog
+    developer_docs:
+      - /docs/admin-api
+      - /docs/admin-api/permissions
+      - /docs/admin-api/guides/exports
+    api_operations: [tag:store, tag:exports, tag:metadata]
+    webhooks: [export.created, store.updated]
+    skills: [next-ops-scan]
+    status: available
+    last_verified: 2026-09-03
+    notes:
+      - The developer portal has no changelog of its own; version history is on the merchant changelog.
+      - There is no consolidated migration guide between API versions yet.
+
+  - id: orders
+    title: Orders and external checkout
+    summary: >-
+      Orders can be created through the Admin API from an external checkout (cart, order,
+      upsell flow) and managed afterwards: fulfil, refund, capture, cancel, and edit.
+      Campaign and storefront orders land in the same orders list.
+    audiences: [merchant, developer]
+    operator_docs:
+      - /docs/manage/orders/collect-payments-on-orders
+      - /docs/manage/orders/test-orders
+    developer_docs:
+      - /docs/admin-api/guides/external-checkout
+      - /docs/admin-api/guides/order-management
+    api_operations: [tag:orders, tag:carts]
+    webhooks: [order.created, order.updated, cart.abandoned]
+    skills: []
+    status: available
+    last_verified: 2026-09-03
+
+  - id: subscriptions
+    title: Subscriptions
+    summary: >-
+      Native recurring orders. Merchants configure phases, statuses, pause, cancellation
+      paths, decline salvage, and account updater in the dashboard; developers create and
+      manage subscriptions through the Admin API. Renewals are not a separate webhook:
+      a renewal surfaces as transaction.created (and order.created) with billing_cycle set.
+    audiences: [merchant, developer]
+    operator_docs:
+      - /docs/manage/subscriptions-guide
+      - /docs/manage/subscriptions-guide/managing-subscriptions
+      - /docs/manage/subscriptions-guide/subscription-phases
+      - /docs/manage/subscriptions-guide/subscription-statuses
+      - /docs/manage/subscriptions-guide/subscription-settings
+      - /docs/manage/subscriptions-guide/pause-subscriptions
+      - /docs/manage/subscriptions-guide/cancellation-paths
+      - /docs/manage/subscriptions-guide/decline-salvage
+      - /docs/manage/subscriptions-guide/account-updater
+      - /docs/analytics/subscription-performance
+    developer_docs:
+      - /docs/admin-api/guides/subscription-management
+    api_operations: [tag:subscriptions]
+    webhooks: [subscription.created, subscription.updated, transaction.created]
+    skills: [next-bulk-subscription]
+    status: available
+    last_verified: 2026-09-03
+    notes:
+      - There is no subscription.renewed event. Detect renewals from transaction.created with billing_cycle.
+
+  - id: payments-gateways
+    title: Payments and gateways
+    summary: >-
+      Merchants add bankcard gateways and alternative payment methods under Settings >
+      Payments and group them for routing and failure cascading. Developers choose a
+      gateway on an API-created order with payment_details.payment_gateway or
+      payment_gateway_group, and integrate each payment method through its guide.
+      NEXT Payments is the platform's own processing service.
+    audiences: [merchant, developer]
+    operator_docs:
+      - /docs/features/payments
+      - /docs/start-here/get-started/add-payment-providers
+      - /docs/features/payments/gateways/next-payments
+      - /docs/features/payments/payment-failure-cascading
+      - /docs/features/payments/authorize-and-capture-payments
+      - /docs/features/payments/3ds2-payments
+      - /docs/features/payments/external-payment-methods
+      - /docs/features/payments/risk-screening
+      - /docs/features/payments/transaction-response-codes
+    developer_docs:
+      - /docs/admin-api/guides/payment-methods
+      - /docs/admin-api/guides/payment-methods/bankcard
+      - /docs/admin-api/guides/payment-methods/apple-pay
+      - /docs/admin-api/guides/payment-methods/google-pay
+      - /docs/admin-api/guides/payment-methods/paypal
+      - /docs/admin-api/guides/payment-methods/klarna
+      - /docs/admin-api/guides/payment-methods/affirm
+      - /docs/admin-api/guides/payment-methods/afterpay
+      - /docs/admin-api/guides/payment-methods/link
+      - /docs/admin-api/guides/payment-methods/bancontact
+      - /docs/admin-api/guides/payment-methods/ideal
+      - /docs/admin-api/guides/payment-methods/sepa-debit
+      - /docs/admin-api/guides/payment-methods/swish
+      - /docs/admin-api/guides/payment-methods/twint
+    api_operations: [tag:payments]
+    webhooks: [gateway.created, gateway.updated, transaction.created, transaction.updated]
+    skills: []
+    status: available
+    last_verified: 2026-09-03
+    notes:
+      - NEXT Payments processing rates are not published in the documentation; they are quoted by sales.
+
+  - id: disputes
+    title: Disputes
+    summary: >-
+      Disputes are chargebacks. Merchants review and respond to them in the dashboard and
+      report on them; apps can act as a dispute service and receive dispute events.
+    audiences: [merchant, developer]
+    operator_docs:
+      - /docs/features/payments/disputes-guide
+      - /docs/analytics/disputes-reports
+    developer_docs:
+      - /docs/apps/guides/dispute-service
+    api_operations: []
+    webhooks: [dispute.created, dispute.updated]
+    skills: []
+    status: available
+    last_verified: 2026-09-03
+
+  - id: fulfillment
+    title: Fulfillment
+    summary: >-
+      Orders are fulfilled through locations, fulfillment statuses, and location-based
+      routing. Apps can register as a fulfillment service and receive assigned fulfillment
+      orders through the Admin API.
+    audiences: [merchant, developer]
+    operator_docs:
+      - /docs/features/fulfillment-guide
+      - /docs/features/fulfillment-guide/fulfillment-statuses
+      - /docs/features/fulfillment-guide/location-based-routing
+      - /docs/features/fulfillment-guide/advanced-settings
+      - /docs/start-here/get-started/fulfillment-settings
+    developer_docs:
+      - /docs/apps/guides/fulfillment-service
+    api_operations: [tag:fulfillment]
+    webhooks: [fulfillment.created, fulfillment.updated]
+    skills: [next-bulk-fulfill, next-bulk-move]
+    status: available
+    last_verified: 2026-09-03
+
+  - id: campaigns
+    title: Campaigns
+    summary: >-
+      Campaigns are custom checkout funnels (landing, checkout, upsell, receipt pages)
+      backed by the CORS-enabled Campaigns API, built with the Campaign Page Kit and
+      starter templates. A campaign's checkout is separate from the storefront checkout,
+      but its orders are ordinary store orders that share the orders list, inventory,
+      and subscriptions.
+    audiences: [merchant, developer]
+    operator_docs:
+      - /docs/apps/campaigns-app
+      - /docs/apps/campaigns-app/build-campaign-packages
+      - /docs/apps/campaigns-app/campaigns-offers-and-discounts
+      - /docs/apps/campaigns-app/campaign-analytics
+    developer_docs:
+      - /docs/campaigns
+      - /docs/campaigns/page-kit
+      - /docs/campaigns/templates
+      - /docs/campaigns/api
+      - /docs/campaigns/admin-api
+    api_operations: [tag:campaigns]
+    webhooks: []
+    skills: [next-campaigns-setup]
+    status: available
+    last_verified: 2026-09-03
+
+  - id: storefront-themes
+    title: Storefront themes
+    summary: >-
+      The hosted storefront is rendered from a theme built with Django Template Language.
+      Merchants install and customise themes under Storefront > Themes; developers build
+      themes locally with Theme Kit (the ntk CLI: ntk pull, ntk push, ntk watch), starting
+      from the Spark starter theme, and query storefront data through the GraphQL API.
+    audiences: [merchant, developer]
+    operator_docs:
+      - /docs/build-a-store/storefront
+      - /docs/build-a-store/storefront/themes
+      - /docs/build-a-store/storefront/pages-and-assets
+    developer_docs:
+      - /docs/storefront
+      - /docs/storefront/themes
+      - /docs/storefront/themes/theme-kit
+      - /docs/storefront/themes/settings
+      - /docs/storefront/themes/translations
+      - /docs/storefront/themes/cdn-and-caching
+      - /docs/storefront/themes/templates
+      - /docs/storefront/themes/templates/objects
+      - /docs/storefront/themes/templates/tags
+      - /docs/storefront/themes/templates/filters
+      - /docs/storefront/themes/templates/urls-and-template-paths
+      - /docs/storefront/themes/guides/custom-page-templates
+      - /docs/storefront/themes/guides/custom-product-templates
+      - /docs/storefront/themes/guides/product-variants
+      - /docs/storefront/themes/guides/product-metadata
+      - /docs/storefront/themes/guides/personalized-products
+      - /docs/storefront/graphql
+      - /docs/storefront/event-tracking
+    api_operations: [tag:storefront]
+    webhooks: []
+    skills: [next-theme-dev, next-theme-figma]
+    status: available
+    last_verified: 2026-09-03
+
+  - id: checkout-links
+    title: Checkout links
+    summary: >-
+      Prebuilt URLs that open the storefront checkout with products, quantities, and
+      attribution already applied, for use from ads, emails, and campaign pages.
+    audiences: [merchant, developer]
+    operator_docs:
+      - /docs/features/offers/shareable-coupon-links
+    developer_docs:
+      - /docs/storefront/checkout-links
+    api_operations: []
+    webhooks: []
+    skills: []
+    status: available
+    last_verified: 2026-09-03
+
+  - id: apps
+    title: Apps and OAuth
+    summary: >-
+      Apps extend a store through OAuth, a manifest, settings, snippets, and storefront
+      extensions, and can act as fulfillment, dispute, or marketing-attribution services.
+      Merchants install apps from the dashboard; App Kit is the developer toolchain.
+    audiences: [developer]
+    operator_docs: []
+    developer_docs:
+      - /docs/apps
+      - /docs/apps/app-development-flow
+      - /docs/apps/app-kit
+      - /docs/apps/manifest
+      - /docs/apps/settings
+      - /docs/apps/snippets
+      - /docs/apps/assets
+      - /docs/apps/review
+      - /docs/apps/event-tracking
+      - /docs/apps/oauth
+      - /docs/apps/oauth/getting-started
+      - /docs/apps/oauth/install-flows
+      - /docs/apps/oauth/session-auth
+      - /docs/apps/guides/server-to-server-apps
+      - /docs/apps/guides/storefront-extension
+      - /docs/apps/guides/marketing-attribution
+    api_operations: [tag:apps]
+    webhooks: [app.uninstalled]
+    skills: []
+    status: available
+    last_verified: 2026-09-03
+    notes:
+      - The merchant site documents individual apps (Klaviyo, ShipStation, Gorgias, and others) under /docs/apps/<app>, not app installation in general.
+
+  - id: webhooks
+    title: Webhooks
+    summary: >-
+      Stores send signed JSON webhooks for events on orders, customers, subscriptions,
+      transactions, disputes, fulfillment, products, gateways, tickets, exports, apps,
+      and the store itself. Merchants configure endpoints in the dashboard; developers
+      manage them through the Admin API and verify the X-29Next-Signature header.
+    audiences: [merchant, developer]
+    operator_docs:
+      - /docs/build-a-store/technical-settings/configure-webhooks
+    developer_docs:
+      - /docs/webhooks
+    api_operations: [tag:webhooks]
+    webhooks: all
+    skills: []
+    status: available
+    last_verified: 2026-09-03
+
+  - id: testing
+    title: Testing and test orders
+    summary: >-
+      There is no separate sandbox. Test cards (6011111111111117, and 6011000990139424 for
+      3DS) create tagged Test Orders on live stores without touching a gateway; the Test
+      Gateway produces realistic test transactions when an integration needs them.
+    audiences: [merchant, developer]
+    operator_docs:
+      - /docs/manage/orders/test-orders
+      - /docs/features/payments/gateways/test-gateway
+    developer_docs:
+      - /docs/testing
+      - /docs/admin-api/guides/testing-guide
+    api_operations: []
+    webhooks: []
+    skills: []
+    status: available
+    last_verified: 2026-09-03
+    notes:
+      - Do not tell a prospect there is no test mode; test cards work on live stores.
+
+  - id: legacy-identifiers
+    title: Legacy identifiers (29next)
+    summary: >-
+      Next Commerce was formerly 29 Next, and the platform still carries that name in its
+      core technical identifiers: store and account hostnames ({store}.29next.store,
+      accounts.29next.com), the X-29next-API-Version and X-29Next-Signature headers, and
+      the API key namespace. These are current, in use on every store, and not scheduled
+      to change. Use them exactly as written.
+    audiences: [merchant, developer]
+    operator_docs:
+      - /docs/start-here/get-started
+    developer_docs:
+      - /docs/admin-api
+      - /docs/webhooks
+    api_operations: []
+    webhooks: []
+    skills: []
+    status: available
+    last_verified: 2026-09-03
+    notes:
+      - Never rewrite 29next identifiers to nextcommerce; the requests would fail.
+
+  - id: agent-skills
+    title: AI agent skills
+    summary: >-
+      Pre-built skills that give AI coding agents platform knowledge (theme development,
+      campaign setup, bulk operations, daily ops scans), installable with the skills CLI
+      or loadable as plain markdown.
+    audiences: [developer]
+    operator_docs: []
+    developer_docs:
+      - /docs/skills
+    api_operations: []
+    webhooks: []
+    skills: [next-theme-figma, next-theme-dev, next-campaigns-setup, next-bulk-fulfill, next-bulk-move, next-bulk-subscription, next-ops-scan]
+    status: available
+    last_verified: 2026-09-03

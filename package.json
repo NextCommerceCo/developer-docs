@@ -3,15 +3,20 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "node scripts/generate-api-docs.mjs && node scripts/generate-stats.mjs && npm run generate-graphql-docs && npm run build:preview && next dev --turbopack",
-    "build": "node scripts/generate-api-docs.mjs && node scripts/generate-stats.mjs && npm run generate-graphql-docs && npm run build:preview && next build",
+    "dev": "npm run generate && npm run build:preview && next dev --turbopack",
+    "build": "npm run generate && npm run build:preview && next build",
     "start": "next start",
+    "generate": "node scripts/generate-api-docs.mjs && node scripts/generate-stats.mjs && node scripts/generate-graphql-docs.mjs && node scripts/generate-capability-map.mjs",
     "generate-api-docs": "node scripts/generate-api-docs.mjs",
     "generate-graphql-docs": "node scripts/generate-graphql-docs.mjs",
     "generate-stats": "node scripts/generate-stats.mjs",
+    "generate-capability-map": "node scripts/generate-capability-map.mjs",
     "build:preview": "node scripts/build-preview.mjs",
-    "validate-links": "node scripts/validate-links.mjs",
+    "validate-links": "npm run generate && node scripts/validate-links.mjs",
     "check-agent-surfaces": "node scripts/check-agent-surfaces.mjs",
+    "check-frontmatter": "node scripts/check-frontmatter.mjs",
+    "check": "npm run check-agent-surfaces && npm run check-frontmatter && node scripts/validate-links.mjs",
+    "check-live-surfaces": "node scripts/check-live-surfaces.mjs",
     "postinstall": "patch-package"
   },
   "dependencies": {

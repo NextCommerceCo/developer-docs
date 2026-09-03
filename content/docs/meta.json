@@ -1,3 +1,13 @@
 {
-  "pages": ["index", "admin-api", "campaigns", "storefront", "apps", "webhooks", "skills", "testing"]
+  "pages": [
+    "index",
+    "admin-api",
+    "campaigns",
+    "storefront",
+    "apps",
+    "webhooks",
+    "skills",
+    "testing",
+    "capabilities"
+  ]
 }

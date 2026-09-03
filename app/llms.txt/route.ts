@@ -1,4 +1,5 @@
 import { source } from '@/lib/source';
+import { capabilityMap } from '@/lib/capabilities';
 
 export const revalidate = false;
 
@@ -65,7 +66,8 @@ function header(): string {
     `- [Merchant docs](${MERCHANT_SITE}): guides for store operators, on the sibling site`,
     `- [Merchant docs index](${MERCHANT_SITE}/llms.txt)`,
     `- [Platform and API changelog](${MERCHANT_SITE}/changelog): the developer portal has no changelog of its own`,
-    `- [Full corpus](${SITE}/llms-full.txt): every page in one file (large, about 1.5 MB)`,
+    `- [Capability map (JSON)](${SITE}/capabilities.json): one record per platform capability linking merchant guides, developer guides, Admin API operations, webhook events, and skills under a stable id`,
+    `- [Capability map (readable)](${SITE}/docs/capabilities)`,
     `- [Admin API spec, 2024-04-01](${SITE}/api/admin/2024-04-01.yaml): stable, raw OpenAPI`,
     `- [Admin API spec, unstable](${SITE}/api/admin/unstable.yaml): raw OpenAPI`,
     `- [Admin API spec, 2023-02-10](${SITE}/api/admin/2023-02-10.yaml): deprecated, raw OpenAPI`,
@@ -74,6 +76,13 @@ function header(): string {
     `- [Skills](${SITE}/docs/skills): AI agent skills for the platform`,
     `- [Testing](${SITE}/docs/testing)`,
     `- [Agent guide (AGENTS.md)](https://github.com/NextCommerceCo/developer-docs/blob/main/AGENTS.md): navigation and evidence rules for agents reading this site`,
+    '',
+    '## Domain bundles',
+    '',
+    'Fetch the bundle for your question before the full corpus. Each is plain Markdown: the capability records for one domain followed by the full text of the developer pages they cite.',
+    '',
+    ...capabilityMap.bundles.map((b) => `- [${b.title}](${b.url}): ${b.intro}`),
+    `- [Full corpus](${SITE}/llms-full.txt): every page in one file, including 500+ generated reference pages (large, about 1.5 MB); use a bundle or a page URL instead unless you need everything`,
     '',
     '## Legacy identifiers',
     '',

@@ -88,7 +88,7 @@ export function GET() {
   for (const page of source.getPages()) {
     const key = groupKey(page.url);
     const title = linkText(page.data.title ?? page.url);
-    const description = page.data.description ? oneLine(page.data.description) : '';
+    const description = page.data.description ? linkText(page.data.description) : '';
     const line = description
       ? `- [${title}](${SITE}${page.url}): ${description}`
       : `- [${title}](${SITE}${page.url})`;

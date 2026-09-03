@@ -42,8 +42,8 @@ Each version has its own spec file (listed above) and its own reference section 
 
 ## Legacy identifiers
 
-Next Commerce was formerly 29 Next. Hostnames like `{store}.29next.store`, `accounts.29next.com`, and headers like `X-29next-API-Version` and `X-29Next-Signature` are current, valid technical identifiers and must be used exactly as written.
+Next Commerce was formerly 29 Next, and the platform still carries that name in its core technical identifiers: store and account hostnames (`{store}.29next.store`, `accounts.29next.com`), the `X-29next-API-Version` and `X-29Next-Signature` headers, and the API key namespace. These are current, in use on every store, and not scheduled to change. Use them exactly as written.
 
 ## Corrections
 
-Outside pull requests to this repository are not accepted. The support route for reporting documentation errors is being confirmed and will be linked here.
+Outside pull requests to this repository are not accepted. There is no public correction route yet; report documentation errors through your existing Next Commerce support contact.

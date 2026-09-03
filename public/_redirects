@@ -76,3 +76,4 @@
 /docs/campaigns/utilities/* https://cart-sdk.nextcommerce.com/latest/ 301
 /docs/campaigns/guides https://cart-sdk.nextcommerce.com/latest/ 301
 /docs/campaigns/guides/* https://cart-sdk.nextcommerce.com/latest/ 301
+/docs/admin-api/reference /docs/admin-api 301

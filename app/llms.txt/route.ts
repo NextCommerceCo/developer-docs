@@ -77,7 +77,7 @@ function header(): string {
     '',
     '## Legacy identifiers',
     '',
-    'Next Commerce was formerly 29 Next. Hostnames like `{store}.29next.store`, `accounts.29next.com`, and headers like `X-29next-API-Version` and `X-29Next-Signature` are current, valid technical identifiers and must be used exactly as written.',
+    'Next Commerce was formerly 29 Next, and the platform still carries that name in its core technical identifiers: store and account hostnames (`{store}.29next.store`, `accounts.29next.com`), the `X-29next-API-Version` and `X-29Next-Signature` headers, and the API key namespace. These are current, in use on every store, and not scheduled to change. Use them exactly as written.',
     '',
   ].join('\n');
 }

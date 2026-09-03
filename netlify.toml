@@ -357,3 +357,9 @@
   from = "/docs/campaigns/guides/*"
   to = "https://cart-sdk.nextcommerce.com/latest/"
   status = 301
+
+# Old Redoc-style reference URL still linked from the platform changelog
+[[redirects]]
+  from = "/docs/admin-api/reference"
+  to = "/docs/admin-api"
+  status = 301

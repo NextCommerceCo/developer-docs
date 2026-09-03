@@ -14,6 +14,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { siteConfig } from '@/lib/config';
+import stats from '@/lib/generated/stats.json';
 import { AlgoliaDocSearch, AlgoliaDocSearchMobile } from '@/components/search';
 import { HeroFlow } from '@/components/hero-flow';
 import { MouseSpotlight } from '@/components/mouse-spotlight';
@@ -229,11 +230,11 @@ export default function HomePage() {
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 pt-2 text-xs text-fd-muted-foreground">
               <div className="flex items-center gap-1.5">
                 <Code2 size={13} className="text-blue-400" aria-hidden="true" />
-                <span>175+ REST Endpoints</span>
+                <span>{`${stats.adminApiOperations} REST Endpoints`}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Zap size={13} className="text-orange-400" aria-hidden="true" />
-                <span>22 Webhook Events</span>
+                <span>{`${stats.webhookEvents} Webhook Events`}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Globe size={13} className="text-green-400" aria-hidden="true" />
@@ -410,6 +411,9 @@ export default function HomePage() {
             © {new Date().getFullYear()} {siteConfig.companyName}
           </span>
           <div className="flex items-center gap-4">
+            <Link href="https://docs.nextcommerce.com/changelog" className="text-xs text-fd-muted-foreground hover:text-fd-foreground transition-colors duration-150">
+              Changelog
+            </Link>
             <Link href="https://www.nextcommerce.com" className="text-xs text-fd-muted-foreground hover:text-fd-foreground transition-colors duration-150">
               nextcommerce.com
             </Link>

@@ -78,6 +78,10 @@ The `subscription` object on a `transaction.created` webhook links the charge to
 There is no renewal-specific event. A renewal charge arrives as `transaction.created` with `billing_cycle` of 1 or higher on that `subscription` object; the initial charge has `billing_cycle` 0.
 </Callout>
 
+<Callout type="info" title="Disputes include chargebacks">
+Chargebacks and pre-chargeback alerts both arrive as `dispute.created` and `dispute.updated`; the dispute's `type` field says which it is. See the [Disputes guide](https://docs.nextcommerce.com/docs/features/payments/disputes-guide).
+</Callout>
+
 ### Webhook Data Structure
 
 Webhook payloads follow the same structure as Admin API data serializers, which makes them predictable. In general, the data in a webhook payload matches the data you would get by retrieving the same resource through the API. You can set up test webhooks and view the webhook logs in the dashboard to help build and verify your receiver.

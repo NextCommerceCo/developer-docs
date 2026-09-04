@@ -23,6 +23,8 @@ setDefaultResultOrder('ipv4first');
 
 const DEV = (process.env.DEVELOPER_SITE ?? 'https://developers.nextcommerce.com').replace(/\/$/, '');
 const MERCHANT = (process.env.MERCHANT_SITE ?? 'https://docs.nextcommerce.com').replace(/\/$/, '');
+const DEV_CANONICAL = (process.env.DEVELOPER_CANONICAL_SITE ?? 'https://developers.nextcommerce.com').replace(/\/$/, '');
+const MERCHANT_CANONICAL = (process.env.MERCHANT_CANONICAL_SITE ?? 'https://docs.nextcommerce.com').replace(/\/$/, '');
 const SEARCH_INDEX_BUDGET_BYTES = 6_000_000; // mirrors docs/scripts/check-search-budget.mjs
 const SEARCH_INDEX_TRANSFER_BUDGET_BYTES = 750_000; // mirrors docs/scripts/check-search-budget.mjs
 const BUNDLE_BUDGET_BYTES = 400_000; // mirrors scripts/check-agent-surfaces.mjs
@@ -94,22 +96,30 @@ async function page(url) {
   return r;
 }
 
+function previewUrl(url) {
+  const parsed = new URL(url);
+  if (parsed.origin === DEV_CANONICAL) return `${DEV}${parsed.pathname}${parsed.search}`;
+  if (parsed.origin === MERCHANT_CANONICAL) return `${MERCHANT}${parsed.pathname}${parsed.search}`;
+  return url;
+}
+
 // ---- 1. entry surfaces -------------------------------------------------------
 
 for (const site of [DEV, MERCHANT]) {
+  const canonical = site === DEV ? DEV_CANONICAL : MERCHANT_CANONICAL;
   const sitemap = await page(`${site}/sitemap.xml`);
   check(`${site} sitemap is XML`, sitemap.body.trimStart().startsWith('<?xml') && sitemap.body.includes('<urlset'));
-  check(`${site} sitemap lists /docs pages`, sitemap.body.includes(`${site}/docs`));
+  check(`${site} sitemap lists /docs pages`, sitemap.body.includes(`${canonical}/docs`));
   const robots = await page(`${site}/robots.txt`);
   check(`${site} robots declares the sitemap`, /sitemap:\s*\S+sitemap\.xml/i.test(robots.body), robots.body.slice(0, 200));
 
   const llms = await page(`${site}/llms.txt`);
   check(`${site} llms.txt is text`, (llms.headers.get('content-type') ?? '').startsWith('text/plain'));
   check(`${site} llms.txt has no relative markdown links`, !/\]\(\//.test(llms.body));
-  const other = site === DEV ? MERCHANT : DEV;
+  const other = site === DEV ? MERCHANT_CANONICAL : DEV_CANONICAL;
   check(`${site} llms.txt links the sibling site`, llms.body.includes(other));
-  check(`${site} llms.txt links the capability map`, llms.body.includes(`${DEV}/capabilities.json`));
-  check(`${site} llms.txt links a domain bundle`, llms.body.includes(`${DEV}/llms/`));
+  check(`${site} llms.txt links the capability map`, llms.body.includes(`${DEV_CANONICAL}/capabilities.json`));
+  check(`${site} llms.txt links a domain bundle`, llms.body.includes(`${DEV_CANONICAL}/llms/`));
 
   const notFound = await fetchText(`${site}/this-page-does-not-exist-${Date.now()}`);
   check(`${site} unknown path returns 404`, notFound.status === 404, `status ${notFound.status}`);
@@ -145,7 +155,7 @@ if (capabilityMap) {
     [...linked],
     LINK_CONCURRENCY,
     async (u) => {
-      const r = await fetchText(u);
+      const r = await fetchText(previewUrl(u));
       if (r.status !== 200) {
         broken += 1;
         failures.push(`map link ${u} ${r.error ? `failed: ${r.error}` : `returned ${r.status}`}`);
@@ -155,7 +165,7 @@ if (capabilityMap) {
   check(`all ${linked.size} capability-map links resolve`, broken === 0);
 
   for (const b of capabilityMap.bundles) {
-    const r = await page(b.url);
+    const r = await page(previewUrl(b.url));
     check(`bundle ${b.id} is plain text`, (r.headers.get('content-type') ?? '').startsWith('text/plain'));
     check(`bundle ${b.id} within ${BUNDLE_BUDGET_BYTES} bytes`, r.bytes <= BUNDLE_BUDGET_BYTES, `${r.bytes} bytes`);
     const prose = r.body.replace(/^(```|~~~)[\s\S]*?^\1[^\n]*$/gm, '');
@@ -171,20 +181,21 @@ check('llms-full.txt is text', (full.headers.get('content-type') ?? '').startsWi
 const setupPrompt = await page(`${DEV}/agent-setup/prompt.md`);
 check('agent setup prompt is Markdown', (setupPrompt.headers.get('content-type') ?? '').startsWith('text/markdown'));
 check('agent setup prompt names Claude Code, Codex, and Cursor', ['Claude Code', 'OpenAI Codex', 'Cursor'].every((name) => setupPrompt.body.includes(name)));
-check('agent setup prompt is linked from llms.txt', (await fetchText(`${DEV}/llms.txt`)).body.includes(`${DEV}/agent-setup/prompt.md`));
+check('agent setup prompt is linked from llms.txt', (await fetchText(`${DEV}/llms.txt`)).body.includes(`${DEV_CANONICAL}/agent-setup/prompt.md`));
 
 const evaluationPrompt = await page(`${DEV}/evaluate/prompt.md`);
 check('evaluation prompt is Markdown', (evaluationPrompt.headers.get('content-type') ?? '').startsWith('text/markdown'));
-check('evaluation prompt links the capability map and domain bundles', evaluationPrompt.body.includes(`${DEV}/capabilities.json`) && evaluationPrompt.body.includes(`${DEV}/llms/`));
-check('evaluation prompt is linked from llms.txt', (await fetchText(`${DEV}/llms.txt`)).body.includes(`${DEV}/evaluate/prompt.md`));
+check('evaluation prompt links the capability map and domain bundles', evaluationPrompt.body.includes(`${DEV_CANONICAL}/capabilities.json`) && evaluationPrompt.body.includes(`${DEV_CANONICAL}/llms/`));
+check('evaluation prompt is linked from llms.txt', (await fetchText(`${DEV}/llms.txt`)).body.includes(`${DEV_CANONICAL}/evaluate/prompt.md`));
 
 const search = await fetchText(`${MERCHANT}/api/search`);
 check('merchant search index responds', search.status === 200, `status ${search.status}`);
 check('merchant search index is JSON', (search.headers.get('content-type') ?? '').startsWith('application/json'), search.headers.get('content-type') ?? 'no content-type');
 const searchEncoding = search.headers.get('content-encoding') ?? '';
+const compressedInTransit = searchEncoding.split(',').some((encoding) => ['br', 'gzip', 'zstd'].includes(encoding.trim()));
 check(
   'large merchant search index is compressed in transit',
-  search.bytes <= SEARCH_INDEX_TRANSFER_BUDGET_BYTES || /^(br|gzip)$/.test(searchEncoding),
+  search.bytes <= SEARCH_INDEX_TRANSFER_BUDGET_BYTES || compressedInTransit,
   `${search.bytes} decoded bytes with ${searchEncoding || 'identity'} encoding`,
 );
 check(`merchant search index within ${SEARCH_INDEX_BUDGET_BYTES} bytes`, search.bytes <= SEARCH_INDEX_BUDGET_BYTES, `${search.bytes} bytes`);

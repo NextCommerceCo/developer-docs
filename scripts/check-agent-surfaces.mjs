@@ -138,17 +138,21 @@ if (setupPrompt !== null) {
   check(setupPrompt.startsWith('<!-- next-commerce-agent-setup version='), 'agent setup prompt has no version marker');
   check(!/\]\(\//.test(setupPrompt), 'agent setup prompt contains a relative Markdown link');
   for (const needle of [
-    '### Claude Code',
-    '### OpenAI Codex',
-    '### Cursor',
-    '### Other agents',
+    '# Start a Campaign Page Kit project with an AI agent',
+    '## Before writing',
+    'npx campaign-init --help',
     'npx campaign-init --non-interactive --json',
-    '_site/agent-starter/landing/index.html',
+    '--template <selected-template>',
+    '| GitHub Copilot |',
+    '_site/',
     'https://developers.nextcommerce.com/llms.txt?ref=agent-setup',
   ]) {
     check(setupPrompt.includes(needle), `agent setup prompt is missing ${JSON.stringify(needle)}`);
   }
   check(!setupPrompt.includes('--api-key'), 'agent setup prompt asks for an API key during bootstrap');
+  check(!setupPrompt.includes('npx skills add'), 'agent setup prompt duplicates the optional skill-install workflow');
+  check(!setupPrompt.includes('--template apollo'), 'agent setup prompt silently chooses the Apollo template');
+  check(!setupPrompt.includes('agent-starter'), 'agent setup prompt silently chooses a project identity');
 }
 const setupGuide = read(join(OUT, 'docs', 'agent-setup.html')) ?? read(join(OUT, 'docs', 'agent-setup', 'index.html'));
 check(setupGuide !== null, 'out/docs/agent-setup.html does not exist');

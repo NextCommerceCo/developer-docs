@@ -35,22 +35,22 @@ writeFileSync(join(generatedDir, 'evaluation-prompt.json'), JSON.stringify({ pro
 
 const humanInstructions = source
   .replace(/^<!--[^\n]+-->\n+/, '')
-  .replace(/^# Set up a Next Commerce campaign workspace$/m, '## Instructions your agent receives');
+  .replace(/^# Start a Campaign Page Kit project with an AI agent$/m, '## Instructions your agent receives');
 const guide = `---
-title: Agent setup
-description: Give Claude Code, Codex, Cursor, or another coding agent a working Next Commerce campaign project from one instruction
+title: Campaign agent quickstart
+description: An optional agent-friendly wrapper around the current Campaign Page Kit docs and CLI that preserves the developer's workflow choices
 ---
 
 Give your coding agent this instruction:
 
 \`\`\`text
-Read https://developers.nextcommerce.com/agent-setup/prompt.md and follow the instructions. Complete the steps yourself and report what you installed.
+Read https://developers.nextcommerce.com/agent-setup/prompt.md and use it to start a new Campaign Page Kit project for this task. Preserve my existing choices. If the template, route slug, or campaign name is missing, ask me before creating files.
 \`\`\`
 
-The fetched file is plain Markdown at a stable URL. It uses the same source as the instructions below, contains no credentials, and tells the agent not to overwrite an existing project.
+The fetched file is plain Markdown at a stable URL. It uses the same source as the instructions below, contains no credentials, and keeps the current CLI and Campaigns docs authoritative. It is a campaign-specific quickstart, not general setup for every kind of Next Commerce development.
 
 ${humanInstructions}`;
 
 mkdirSync(docsDir, { recursive: true });
 writeFileSync(join(docsDir, 'index.mdx'), guide);
-console.log('Generated agent setup, human guide, and evaluation prompt from canonical Markdown sources');
+console.log('Generated campaign agent quickstart, human guide, and evaluation prompt from canonical Markdown sources');

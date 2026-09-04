@@ -1,59 +1,57 @@
-<!-- next-commerce-agent-setup version=1 date=2026-09-03 -->
+<!-- next-commerce-agent-setup version=2 date=2026-09-04 -->
 
-# Set up a Next Commerce campaign workspace
+# Start a Campaign Page Kit project with an AI agent
 
-Complete these steps yourself in the current environment. Do not ask the user to run the commands for you.
+Use this quickstart only when the user wants a new Campaign Page Kit workspace. It is an optional agent-friendly wrapper around the current Campaigns documentation and `campaign-init`; it is not a general Next Commerce development environment, a production architecture decision, or a replacement for the developer's chosen workflow.
 
-## Safety rules
+If the user wants to understand the platform, work in an existing project, build a storefront theme or app, or use the Admin API, do not scaffold a campaign. Read the [developer index](https://developers.nextcommerce.com/llms.txt?ref=agent-setup) and [platform capability map](https://developers.nextcommerce.com/capabilities.json?ref=agent-setup), identify the relevant documentation, and respond to that task instead.
 
-- Inspect the current directory before writing. If it contains an existing project, create a new `next-agent-starter` subdirectory and work there. Never overwrite an existing project or agent configuration file.
-- Check `node --version` first. Use Node.js 22 or newer. If Node.js is missing or older, stop and tell the user what is required.
-- Do not request, print, copy, or invent credentials. The starter builds without an API key. Add a real Campaign API key only when the user provides one through an approved secret mechanism.
+## Before writing
+
+- Confirm that the user's request calls for a new Campaign Page Kit project. If it is unclear, ask one concise question before installing packages or creating files.
+- Inspect the current directory. If it contains an existing project, do not add a second project or replace its configuration. Ask whether to use that project or create a new subdirectory.
+- Follow the current prerequisites in the [Campaigns quick start](https://developers.nextcommerce.com/docs/campaigns?ref=agent-setup). Do not raise the documented Node.js requirement.
+- Preserve any template, source, project name, route slug, package manager, and agent-context choice the user has already made. The commands below use the docs' npm path for an empty project; do not replace an existing project's package-manager convention.
+- Do not request, print, copy, or invent credentials. A workspace can be scaffolded and built without a Campaign API key.
 - Do not call a live store or place an order unless the user has identified the store, authorized the action, and provided suitable test access.
 
-## Create the project
+## Use the current Campaign Page Kit workflow
 
-In the empty working directory, initialize the package and install Campaign Page Kit:
+Read the [Campaign Page Kit guide](https://developers.nextcommerce.com/docs/campaigns/page-kit?ref=agent-setup), then inspect the installed CLI contract before constructing a command:
 
 ```bash
 npm init -y
 npm install next-campaign-page-kit
+npx campaign-init --help
 ```
 
-Then use the section for the agent that is running these instructions. Each command is non-interactive. The `skills` command installs only the campaign setup skill into this project. `campaign-init` creates an Apollo one-page campaign and writes the tool-specific context file.
+If the user has not supplied a template, route slug, and campaign name, ask for the missing choices together. Do not silently select a starter template. Use the current template picker or catalog described by the CLI and docs rather than copying a fixed list from this prompt.
 
-### Claude Code
+For a non-interactive agent run, replace every placeholder below with the developer-confirmed value:
 
 ```bash
-npx skills add NextCommerceCo/skills --skill next-campaigns-setup --agent claude-code --yes
-npx campaign-init --non-interactive --json --template apollo --slug agent-starter --name "Agent Starter" --ai-context claude
+npx campaign-init --non-interactive --json \
+  --template <selected-template> \
+  --slug <selected-route-slug> \
+  --name "<selected-campaign-name>" \
+  --ai-context <claude|codex|cursor|copilot|none>
 ```
 
-### OpenAI Codex
+Choose the context value that matches the current tool, or `none` when the tool is unsupported or the developer does not want a generated context file:
 
-```bash
-npx skills add NextCommerceCo/skills --skill next-campaigns-setup --agent codex --yes
-npx campaign-init --non-interactive --json --template apollo --slug agent-starter --name "Agent Starter" --ai-context codex
-```
+| Tool | `--ai-context` value |
+| --- | --- |
+| Claude Code | `claude` |
+| OpenAI Codex | `codex` |
+| Cursor | `cursor` |
+| GitHub Copilot | `copilot` |
+| Other agents | `none` |
 
-### Cursor
+`campaign-init` is the authority for scaffold behavior, supported flags, conflict handling, and exit codes. Do not reproduce the scaffold manually if it fails. Preserve its output and follow the troubleshooting guidance in the Campaign Page Kit guide.
 
-```bash
-npx skills add NextCommerceCo/skills --skill next-campaigns-setup --agent cursor --yes
-npx campaign-init --non-interactive --json --template apollo --slug agent-starter --name "Agent Starter" --ai-context cursor
-```
+The [Next Commerce AI skills guide](https://developers.nextcommerce.com/docs/skills?ref=agent-setup) describes optional reusable skills. Installing `next-campaigns-setup` is not required for this quickstart. Use it only when the developer asks for the fuller guided setup/configuration workflow or another official tool routes the task to it.
 
-### Other agents
-
-Read the [next-campaigns-setup skill](https://raw.githubusercontent.com/NextCommerceCo/skills/main/next-campaigns-setup/SKILL.md) into your current context, then run:
-
-```bash
-npx campaign-init --non-interactive --json --template apollo --slug agent-starter --name "Agent Starter" --ai-context none
-```
-
-If your agent supports project rules or skills, save the skill in its documented project-level location. Do not guess a global configuration path.
-
-## Verify the workspace
+## Verify only what was requested
 
 Run the static build:
 
@@ -61,40 +59,24 @@ Run the static build:
 npm run build
 ```
 
-Confirm that:
+Use the JSON emitted by `campaign-init` and the generated project files to confirm that:
 
-- `_data/campaigns.json` contains `agent-starter`.
-- `src/agent-starter/` exists.
-- The tool-specific context file exists: `CLAUDE.md`, `AGENTS.md`, or `.cursor/rules/campaign-page-kit.mdc`. Other agents may not have a generated file.
-- The build exits successfully and writes `_site/`.
+- the selected campaign is registered in `_data/campaigns.json`;
+- its source directory exists under `src/`;
+- the requested agent context file was created, or no context file was requested;
+- the build exits successfully and writes the campaign to `_site/`.
 
-Read these sources before making platform claims or changing the starter:
+Inspect one generated entry page and briefly describe what the selected starter contains. Treat that as proof of a local scaffold only. Do not claim the project is connected to a store, production-ready, or tested end to end without the corresponding evidence.
 
-- [Developer index](https://developers.nextcommerce.com/llms.txt?ref=agent-setup)
-- [Campaign quick start](https://developers.nextcommerce.com/docs/campaigns?ref=agent-setup)
-- [Safe testing](https://developers.nextcommerce.com/docs/testing?ref=agent-setup)
-- [Test Gateway details](https://developers.nextcommerce.com/docs/admin-api/guides/testing-guide?ref=agent-setup)
-- [Platform capability map](https://developers.nextcommerce.com/capabilities.json?ref=agent-setup)
-
-## Complete the first safe win
-
-Inspect `_site/agent-starter/landing/index.html` and confirm that the generated landing page exists. Briefly describe the campaign flow the starter contains and one sensible next customization for the user's product. This proves that the installed toolchain produced a working campaign without requiring credentials or touching a live store.
-
-If the user has already authorized a specific test store and provided a Campaign API key through an approved secret mechanism, offer to connect the starter and follow the documented Test Gateway flow. Otherwise stop at the successful static build.
-
-## Troubleshooting
-
-- If a target directory or agent configuration file already exists, do not delete or replace it. Choose a new empty subdirectory and report the path.
-- If an install fails because of a transient network or registry error, inspect the working directory first. Retry the exact command once only when it left no new project or agent-configuration files. If it made partial changes, preserve them and report the error and affected paths instead of deleting, replacing, or working around them.
-- If `campaign-init` or the build fails again, preserve the error output and report the failing command. Do not add credentials as a workaround.
+If the user explicitly wants to continue, follow the current Campaigns and testing documentation for configuration and test-store work. Otherwise stop after the verified local build; do not turn a quickstart into an unsolicited production setup.
 
 ## Report back
 
 Tell the user:
 
-1. Which directory you used.
-2. Which skill and context file you installed.
-3. Whether the static build passed.
-4. That the starter has no Campaign API key yet.
-5. What you found in the generated landing page.
-6. The next safe step: add a Campaign API key through the project's config command, connect the campaign to a store, and use the documented Test Gateway or test cards. Do not claim that a test order was placed unless you actually placed one against the user-authorized store.
+1. Which directory and existing/new project path you used.
+2. Which developer-provided template, slug, name, and agent-context value you used.
+3. Which official docs and CLI contract you followed.
+4. Whether `campaign-init` and the static build passed.
+5. What you verified in the generated output.
+6. What remains unconfigured or untested, and the next step relevant to the user's stated goal.

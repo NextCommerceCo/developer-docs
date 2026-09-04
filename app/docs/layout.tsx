@@ -3,7 +3,7 @@ import { baseOptions } from '@/lib/layout.shared';
 import { source } from '@/lib/source';
 import { AlgoliaDocSearch, AlgoliaDocSearchMobile } from '@/components/search';
 import type { ReactNode } from 'react';
-import { ChevronsLeftRightEllipsis, Megaphone, ShoppingBag, Puzzle, Webhook, Sparkles, FlaskConical, Map } from 'lucide-react';
+import { ChevronsLeftRightEllipsis, Megaphone, ShoppingBag, Puzzle, Webhook, Sparkles, FlaskConical } from 'lucide-react';
 import type { SidebarTab } from 'fumadocs-ui/utils/get-sidebar-tabs';
 
 const sectionMeta: Record<string, { icon: ReactNode; description: string; color: string }> = {
@@ -41,11 +41,6 @@ const sectionMeta: Record<string, { icon: ReactNode; description: string; color:
     icon: <FlaskConical size={16} />,
     description: 'Test cards & safe QA',
     color: 'bg-cyan-500/15 text-cyan-500',
-  },
-  '/docs/capabilities': {
-    icon: <Map size={16} />,
-    description: 'Platform capability map',
-    color: 'bg-slate-500/15 text-slate-500',
   },
 };
 

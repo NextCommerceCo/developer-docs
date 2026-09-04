@@ -11,7 +11,7 @@ The sibling site, https://docs.nextcommerce.com, is the merchant and operator do
 ## Where to start
 
 - https://developers.nextcommerce.com/llms.txt is the page index for this site, with a one-line description per page and absolute URLs. It also lists the domain bundles.
-- https://developers.nextcommerce.com/capabilities.json is the platform capability map: one record per capability with a stable id, the merchant and developer pages that document it, its Admin API operations, webhook events, skills, status, and the date its links were last verified. The readable form is https://developers.nextcommerce.com/docs/capabilities. Pages on both sites declare their ids in a `capability_ids` frontmatter field.
+- https://developers.nextcommerce.com/capabilities.json is the platform capability map: one record per capability with a stable id, the merchant and developer pages that document it, its Admin API operations, webhook events, skills, status, and the date its links were last verified. Page relationships are derived from the URLs in the map.
 - Domain bundles at https://developers.nextcommerce.com/llms/<bundle>.txt (`platform`, `admin-api`, `payments`, `campaigns`, `storefront`, `apps-webhooks`) are plain Markdown: the capability records for one domain followed by the full text of the developer pages they cite. Fetch the bundle for your question before the full corpus.
 - https://developers.nextcommerce.com/llms-full.txt is the full corpus in one file. It is large (about 1.5 MB) and includes 500+ generated reference pages; fetch it only when a bundle or a page URL is not enough.
 - Raw OpenAPI specs, which are the authority for operations, parameters, and fields:

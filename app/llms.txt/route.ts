@@ -67,7 +67,6 @@ function header(): string {
     `- [Merchant docs index](${MERCHANT_SITE}/llms.txt)`,
     `- [Platform and API changelog](${MERCHANT_SITE}/changelog): the developer portal has no changelog of its own`,
     `- [Capability map (JSON)](${SITE}/capabilities.json): one record per platform capability linking merchant guides, developer guides, Admin API operations, webhook events, and skills under a stable id`,
-    `- [Capability map (readable)](${SITE}/docs/capabilities)`,
     `- [Admin API spec, 2024-04-01](${SITE}/api/admin/2024-04-01.yaml): stable, raw OpenAPI`,
     `- [Admin API spec, unstable](${SITE}/api/admin/unstable.yaml): raw OpenAPI`,
     `- [Admin API spec, 2023-02-10](${SITE}/api/admin/2023-02-10.yaml): deprecated, raw OpenAPI`,

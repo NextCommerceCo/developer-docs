@@ -140,8 +140,8 @@ if (capabilityMap) {
   for (const id of ['testing', 'subscriptions', 'payments-gateways', 'webhooks', 'campaigns', 'storefront-themes', 'admin-api', 'legacy-identifiers']) {
     check(`capabilities.json has ${id}`, ids.has(id));
   }
-  const capPage = await page(`${DEV}/docs/capabilities`);
-  for (const c of capabilityMap.capabilities) check(`capability page anchors ${c.id}`, capPage.body.includes(`id="${c.id}"`));
+  const capPage = await fetchText(`${DEV}/docs/capabilities`);
+  check('human capability page is not published', capPage.status === 404, `status ${capPage.status}`);
 
   // Every link the map makes must resolve on the live sites.
   const linked = new Set();

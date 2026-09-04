@@ -14,12 +14,12 @@
 # event, skill, bundle, or enum value.
 #
 # Record fields
-#   id             stable, kebab-case; consumed by page frontmatter (capability_ids) on both sites
+#   id             stable, kebab-case; used by the JSON map and domain bundles
 #   title          human name
 #   summary        one to three sentences of plain prose an agent can quote
 #   audiences      subset of [merchant, developer]
 #   operator_docs  merchant-site paths (absolute URLs are generated)
-#   developer_docs developer-site paths; must exist under content/docs after generation
+#   developer_docs developer-site paths, with the best entry page first; every path must exist
 #   api_operations "tag:<tag>" selectors and/or operationIds from the stable Admin API spec
 #   webhooks       event names from the spec, or the single word "all"
 #   skills         skill names from the AI Skills page
@@ -401,9 +401,8 @@ capabilities:
       accounts.29next.com), the X-29next-API-Version and X-29Next-Signature headers, and
       the API key namespace. These are current, in use on every store, and not scheduled
       to change. Use them exactly as written.
-    audiences: [merchant, developer]
-    operator_docs:
-      - /docs/start-here/get-started
+    audiences: [developer]
+    operator_docs: []
     developer_docs:
       - /docs/admin-api
       - /docs/webhooks

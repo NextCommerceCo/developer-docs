@@ -1,7 +1,7 @@
 /**
  * Generates lib/generated/capabilities.json, the platform capability map served at
- * /capabilities.json and consumed by the /llms/<bundle>.txt routes, the capability
- * page, and the merchant docs site.
+ * /capabilities.json and consumed by the /llms/<bundle>.txt routes and the merchant
+ * docs site.
  *
  * Source: content/capabilities.yaml (hand-authored index; see its header comment).
  * Run after generate-api-docs.mjs, because developer page existence is checked
@@ -18,7 +18,7 @@
  *     live by scripts/check-live-surfaces.mjs and by the merchant repo's own CI
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, rmSync } from 'fs';
 import { join, resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { load as loadYaml } from 'js-yaml';
@@ -301,87 +301,11 @@ console.log(
     `${capabilities.reduce((n, c) => n + c.webhooks.length, 0)} webhook links`,
 );
 
-// ---- readable page ----------------------------------------------------------
-// content/docs/capabilities/index.mdx is generated (git-ignored) so the page and
-// the JSON can never list different ids or links. meta.json beside it is committed.
-
-function mdxEscape(text) {
-  return text.replace(/[{}<>]/g, (ch) => ({ '{': '&#123;', '}': '&#125;', '<': '&lt;', '>': '&gt;' })[ch]);
+// Remove the generated human-readable page from checkouts that built an older
+// version of this script. capabilities.json and the domain bundles are the agent
+// surfaces; the machine taxonomy should not occupy the public docs navigation.
+const obsoleteReadablePage = join(ROOT, 'content', 'docs', 'capabilities', 'index.mdx');
+if (existsSync(obsoleteReadablePage)) {
+  rmSync(obsoleteReadablePage);
+  console.log(`Removed obsolete ${obsoleteReadablePage}`);
 }
-
-// Links to /docs pages stay site-relative so validate-links checks them; links to
-// non-docs routes (JSON, specs, bundles) stay absolute, which the link validator
-// cannot see and which agents copy verbatim.
-function relative(url) {
-  return url.startsWith(`${DEVELOPER_SITE}/docs/`) ? url.slice(DEVELOPER_SITE.length) : url;
-}
-
-const page = [];
-page.push('---');
-page.push('title: Platform Capabilities');
-page.push('description: One record per platform capability linking merchant guides, developer guides, Admin API operations, webhook events, and AI agent skills under a stable id');
-page.push('full: true');
-page.push('---');
-page.push('');
-page.push(`This page and [capabilities.json](${DEVELOPER_SITE}/capabilities.json) are the same generated projection (${output.generated_at}) over the two documentation sites and the Admin API specification. Each capability has a stable id that pages on both sites declare in their frontmatter. Links, operations, and events come from the owning sources; when they disagree with this page, the guide, the [spec](${DEVELOPER_SITE}/api/admin/${specVersion}.yaml), or the [changelog](${MERCHANT_SITE}/changelog) wins.`);
-page.push('');
-page.push(`Agents: fetch a [domain bundle](${DEVELOPER_SITE}/llms.txt) rather than this page when you need the prose behind a capability. The JSON schema is at [capabilities.schema.json](${DEVELOPER_SITE}/capabilities.schema.json).`);
-page.push('');
-page.push('## Bundles');
-page.push('');
-page.push('| Bundle | Capabilities | Plain-text URL |');
-page.push('| --- | --- | --- |');
-for (const b of bundles) {
-  page.push(`| ${b.title} | ${b.capabilities.map((id) => `[${id}](#${id})`).join(', ')} | [${b.url.replace(DEVELOPER_SITE, '')}](${b.url}) |`);
-}
-page.push('');
-page.push('## Capabilities');
-page.push('');
-for (const c of capabilities) {
-  page.push(`### ${mdxEscape(c.title)} [#${c.id}]`);
-  page.push('');
-  page.push(`\`id: ${c.id}\` · status: ${c.status} · audiences: ${c.audiences.join(', ')} · links verified ${c.last_verified}`);
-  page.push('');
-  page.push(mdxEscape(c.summary));
-  page.push('');
-  for (const n of c.notes) page.push(`> ${mdxEscape(n)}`);
-  if (c.notes.length > 0) page.push('');
-  if (c.operator_docs.length > 0) {
-    page.push('**Merchant guides**');
-    page.push('');
-    for (const u of c.operator_docs) page.push(`- [${u.replace(MERCHANT_SITE, 'docs.nextcommerce.com')}](${u})`);
-    page.push('');
-  }
-  if (c.developer_docs.length > 0) {
-    page.push('**Developer guides**');
-    page.push('');
-    for (const u of c.developer_docs) page.push(`- [${relative(u)}](${relative(u)})`);
-    page.push('');
-  }
-  if (c.api_operations.length > 0) {
-    page.push(`**Admin API operations (${c.api_operations.length}, version ${specVersion})**`);
-    page.push('');
-    for (const op of c.api_operations) {
-      const text = `\`${op.method} ${op.path}\`${op.summary ? ` ${mdxEscape(op.summary)}` : ''}`;
-      page.push(op.url ? `- [${text}](${relative(op.url)})` : `- ${text}`);
-    }
-    page.push('');
-  }
-  if (c.webhooks.length > 0) {
-    page.push(`**Webhook events (${c.webhooks.length})**`);
-    page.push('');
-    for (const w of c.webhooks) page.push(w.url ? `- [\`${w.event}\`](${relative(w.url)})` : `- \`${w.event}\``);
-    page.push('');
-  }
-  if (c.skills.length > 0) {
-    page.push('**AI agent skills**');
-    page.push('');
-    for (const s of c.skills) page.push(`- [${s.name}](${s.url})`);
-    page.push('');
-  }
-}
-
-const pageDir = join(ROOT, 'content', 'docs', 'capabilities');
-mkdirSync(pageDir, { recursive: true });
-writeFileSync(join(pageDir, 'index.mdx'), page.join('\n') + '\n');
-console.log(`Generated ${join(pageDir, 'index.mdx')}`);

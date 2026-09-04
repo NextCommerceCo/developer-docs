@@ -78,8 +78,8 @@ if (statsRaw !== null) {
   }
 }
 
-// Capability map: the JSON served at /capabilities.json, its schema, and the
-// readable page must exist and agree on ids.
+// Capability map: the JSON served at /capabilities.json and its schema remain
+// machine-readable surfaces. The former human-readable projection stays absent.
 const capPath = join(OUT, 'capabilities.json');
 const capRaw = read(capPath);
 check(capRaw !== null, 'out/capabilities.json does not exist');
@@ -111,22 +111,12 @@ if (capabilityMap) {
   check(!payments?.api_operations.some((op) => op.id.startsWith('disputes')), 'payments-gateways still contains dispute operations');
   check(disputes?.api_operations.every((op) => op.id.startsWith('disputes')), 'disputes contains a non-dispute operation');
   const capPage = read(join(OUT, 'docs', 'capabilities.html')) ?? read(join(OUT, 'docs', 'capabilities', 'index.html'));
-  check(capPage !== null, 'out/docs/capabilities.html does not exist');
-  if (capPage !== null) {
-    for (const c of capabilityMap.capabilities) {
-      check(capPage.includes(`id="${c.id}"`), `capability page has no anchor for ${c.id}`);
-      for (const url of c.operator_docs) check(capPage.includes(url), `capability page is missing merchant link ${url}`);
-    }
-  }
+  check(capPage === null, 'out/docs/capabilities should not be built');
   for (const c of capabilityMap.capabilities) {
     for (const url of c.developer_docs) {
       const rel = url.replace('https://developers.nextcommerce.com', '');
       const html = read(join(OUT, `${rel}.html`)) ?? read(join(OUT, rel, 'index.html'));
       check(html !== null, `developer page ${rel} cited by ${c.id} was not built`);
-      // The reciprocal panel must appear on every cited developer page.
-      if (html !== null && c.operator_docs.length > 0) {
-        check(html.includes('Related merchant guides'), `developer page ${rel} has no reciprocal merchant-guide panel`);
-      }
     }
   }
 }
@@ -211,8 +201,8 @@ if (capabilityMap) {
   }
 }
 
-// 404 page links the capability map.
-if (notFound !== null) check(notFound.includes('/docs/capabilities'), '404.html does not link the capability map');
+// Keep machine-only taxonomy out of human recovery navigation.
+if (notFound !== null) check(!notFound.includes('/docs/capabilities'), '404.html links the removed capability page');
 
 if (failures.length > 0) {
   console.error('check-agent-surfaces: FAIL');

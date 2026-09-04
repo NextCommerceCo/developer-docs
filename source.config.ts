@@ -71,9 +71,8 @@ export const docs = defineDocs({
       full: z.boolean().optional(),
       // Agent-retrieval metadata. `description` (from frontmatterSchema) is required
       // on every authored page by scripts/check-frontmatter.mjs; the fields below are
-      // optional and validated against the capability map by the same script.
+      // optional.
       audience: z.array(z.enum(['merchant', 'developer'])).optional(),
-      capability_ids: z.array(z.string()).optional(),
       status: z.enum(['available', 'beta', 'deprecated']).optional(),
       last_verified: z
         .string()

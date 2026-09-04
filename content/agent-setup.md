@@ -85,7 +85,7 @@ If the user has already authorized a specific test store and provided a Campaign
 ## Troubleshooting
 
 - If a target directory or agent configuration file already exists, do not delete or replace it. Choose a new empty subdirectory and report the path.
-- If an install fails because of a transient network or registry error, retry that exact command once. Do not substitute an unofficial package or repository.
+- If an install fails because of a transient network or registry error, inspect the working directory first. Retry the exact command once only when it left no new project or agent-configuration files. If it made partial changes, preserve them and report the error and affected paths instead of deleting, replacing, or working around them.
 - If `campaign-init` or the build fails again, preserve the error output and report the failing command. Do not add credentials as a workaround.
 
 ## Report back

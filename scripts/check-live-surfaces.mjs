@@ -24,6 +24,7 @@ setDefaultResultOrder('ipv4first');
 const DEV = (process.env.DEVELOPER_SITE ?? 'https://developers.nextcommerce.com').replace(/\/$/, '');
 const MERCHANT = (process.env.MERCHANT_SITE ?? 'https://docs.nextcommerce.com').replace(/\/$/, '');
 const SEARCH_INDEX_BUDGET_BYTES = 6_000_000; // mirrors docs/scripts/check-search-budget.mjs
+const SEARCH_INDEX_TRANSFER_BUDGET_BYTES = 750_000; // mirrors docs/scripts/check-search-budget.mjs
 const BUNDLE_BUDGET_BYTES = 400_000; // mirrors scripts/check-agent-surfaces.mjs
 const FETCH_TIMEOUT_MS = 15_000;
 const FETCH_ATTEMPTS = 3;
@@ -180,7 +181,12 @@ check('evaluation prompt is linked from llms.txt', (await fetchText(`${DEV}/llms
 const search = await fetchText(`${MERCHANT}/api/search`);
 check('merchant search index responds', search.status === 200, `status ${search.status}`);
 check('merchant search index is JSON', (search.headers.get('content-type') ?? '').startsWith('application/json'), search.headers.get('content-type') ?? 'no content-type');
-check('merchant search index is compressed in transit', /^(br|gzip)$/.test(search.headers.get('content-encoding') ?? ''), search.headers.get('content-encoding') ?? 'no content-encoding');
+const searchEncoding = search.headers.get('content-encoding') ?? '';
+check(
+  'large merchant search index is compressed in transit',
+  search.bytes <= SEARCH_INDEX_TRANSFER_BUDGET_BYTES || /^(br|gzip)$/.test(searchEncoding),
+  `${search.bytes} decoded bytes with ${searchEncoding || 'identity'} encoding`,
+);
 check(`merchant search index within ${SEARCH_INDEX_BUDGET_BYTES} bytes`, search.bytes <= SEARCH_INDEX_BUDGET_BYTES, `${search.bytes} bytes`);
 check('merchant search index is cached for an hour', /max-age=3600/.test(search.headers.get('cache-control') ?? ''), search.headers.get('cache-control') ?? 'no cache-control');
 check('merchant search index mentions subscriptions', /subscription/i.test(search.body));

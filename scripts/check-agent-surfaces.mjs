@@ -6,10 +6,13 @@
 import { readFileSync, existsSync } from 'fs';
 import { join, resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { load as loadYaml } from 'js-yaml';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const OUT = join(ROOT, 'out');
+const capabilitySource = loadYaml(readFileSync(join(ROOT, 'content', 'capabilities.yaml'), 'utf8'));
+const authoredCapabilities = Array.isArray(capabilitySource?.capabilities) ? capabilitySource.capabilities : [];
 
 const failures = [];
 function check(condition, message) {
@@ -95,8 +98,16 @@ if (capabilityMap) {
   check(Array.isArray(capabilityMap.bundles) && capabilityMap.bundles.length === 6, 'capabilities.json does not list 6 bundles');
   const payments = capabilityMap.capabilities.find((c) => c.id === 'payments-gateways');
   const disputes = capabilityMap.capabilities.find((c) => c.id === 'disputes');
-  check(payments?.api_operations.length === 9, `payments-gateways has ${payments?.api_operations.length ?? 0} operations instead of 9`);
-  check(disputes?.api_operations.length === 9, `disputes has ${disputes?.api_operations.length ?? 0} operations instead of 9`);
+  const authoredOperationIds = (id) => authoredCapabilities.find((c) => c.id === id)?.api_operations ?? [];
+  const outputOperationIds = (capability) => capability?.api_operations.map((operation) => operation.id) ?? [];
+  for (const capability of [payments, disputes]) {
+    const expected = authoredOperationIds(capability?.id);
+    const actual = outputOperationIds(capability);
+    check(
+      actual.length === expected.length && expected.every((id) => actual.includes(id)),
+      `${capability?.id ?? 'missing capability'} operations differ between capabilities.yaml and capabilities.json`,
+    );
+  }
   check(!payments?.api_operations.some((op) => op.id.startsWith('disputes')), 'payments-gateways still contains dispute operations');
   check(disputes?.api_operations.every((op) => op.id.startsWith('disputes')), 'disputes contains a non-dispute operation');
   const capPage = read(join(OUT, 'docs', 'capabilities.html')) ?? read(join(OUT, 'docs', 'capabilities', 'index.html'));

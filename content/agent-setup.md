@@ -10,7 +10,7 @@ If the user wants to understand the platform, work in an existing project, build
 
 - Confirm that the user's request calls for a new Campaign Page Kit project. If it is unclear, ask one concise question before installing packages or creating files.
 - Inspect the current directory. If it contains an existing project, do not add a second project or replace its configuration. Ask whether to use that project or create a new subdirectory.
-- Follow the current prerequisites in the [Campaigns quick start](https://developers.nextcommerce.com/docs/campaigns?ref=agent-setup). Do not raise the documented Node.js requirement.
+- Use the Node.js version required by the current [Campaigns quick start](https://developers.nextcommerce.com/docs/campaigns?ref=agent-setup). Do not impose a stricter version or relax the documented requirement.
 - Preserve any template, source, project name, route slug, package manager, and agent-context choice the user has already made. The commands below use the docs' npm path for an empty project; do not replace an existing project's package-manager convention.
 - Do not request, print, copy, or invent credentials. A workspace can be scaffolded and built without a Campaign API key.
 - Do not call a live store or place an order unless the user has identified the store, authorized the action, and provided suitable test access.
@@ -25,7 +25,7 @@ npm install next-campaign-page-kit
 npx campaign-init --help
 ```
 
-If the user has not supplied a template, route slug, and campaign name, ask for the missing choices together. Do not silently select a starter template. Use the current template picker or catalog described by the CLI and docs rather than copying a fixed list from this prompt.
+If the user has not supplied a template, route slug, campaign name, and agent-context preference, ask for the missing choices together. Do not silently select a starter template or context file. Use the current template picker or catalog described by the CLI and docs rather than copying a fixed list from this prompt.
 
 For a non-interactive agent run, replace every placeholder below with the developer-confirmed value:
 

@@ -15,10 +15,22 @@
  * Override hosts with DEVELOPER_SITE / MERCHANT_SITE to point at a preview.
  */
 
+import { setDefaultResultOrder } from 'node:dns';
+
+// Prefer the address family that is consistently reachable from developer
+// laptops while still allowing fetch to fall back when IPv4 is unavailable.
+setDefaultResultOrder('ipv4first');
+
 const DEV = (process.env.DEVELOPER_SITE ?? 'https://developers.nextcommerce.com').replace(/\/$/, '');
 const MERCHANT = (process.env.MERCHANT_SITE ?? 'https://docs.nextcommerce.com').replace(/\/$/, '');
+const DEV_CANONICAL = (process.env.DEVELOPER_CANONICAL_SITE ?? 'https://developers.nextcommerce.com').replace(/\/$/, '');
+const MERCHANT_CANONICAL = (process.env.MERCHANT_CANONICAL_SITE ?? 'https://docs.nextcommerce.com').replace(/\/$/, '');
 const SEARCH_INDEX_BUDGET_BYTES = 6_000_000; // mirrors docs/scripts/check-search-budget.mjs
+const SEARCH_INDEX_TRANSFER_BUDGET_BYTES = 750_000; // mirrors docs/scripts/check-search-budget.mjs
 const BUNDLE_BUDGET_BYTES = 400_000; // mirrors scripts/check-agent-surfaces.mjs
+const FETCH_TIMEOUT_MS = 15_000;
+const FETCH_ATTEMPTS = 3;
+const LINK_CONCURRENCY = 12;
 
 const failures = [];
 const passes = [];
@@ -28,66 +40,86 @@ function check(name, condition, detail = '') {
 }
 
 const cache = new Map();
-// A network failure is a failed check, not a crash: status 0 with the error in the body.
 async function fetchText(url) {
   if (cache.has(url)) return cache.get(url);
-  let out;
-  try {
-    const res = await fetch(url, {
-      redirect: 'manual',
-      headers: { 'user-agent': 'next-docs-live-check/1' },
-      signal: AbortSignal.timeout(20_000),
-    });
-    const body = await res.text();
-    out = { status: res.status, headers: res.headers, body, bytes: Buffer.byteLength(body, 'utf8') };
-  } catch (error) {
-    out = { status: 0, headers: new Headers(), body: '', bytes: 0, error: error?.cause?.code ?? error?.name ?? String(error) };
-  }
-  cache.set(url, out);
-  return out;
+  const request = (async () => {
+    let lastError = null;
+    for (let attempt = 1; attempt <= FETCH_ATTEMPTS; attempt += 1) {
+      try {
+        const res = await fetch(url, {
+          redirect: 'manual',
+          headers: { 'user-agent': 'next-docs-live-check/1' },
+          signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+        });
+        const body = await res.text();
+        const out = { status: res.status, headers: res.headers, body, bytes: Buffer.byteLength(body, 'utf8'), error: null };
+        if (res.status < 500 || attempt === FETCH_ATTEMPTS) return out;
+        lastError = new Error(`HTTP ${res.status}`);
+      } catch (error) {
+        lastError = error;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 250 * attempt));
+    }
+    return {
+      status: 0,
+      headers: new Headers(),
+      body: '',
+      bytes: 0,
+      error: lastError instanceof Error ? lastError.message : String(lastError),
+    };
+  })();
+  cache.set(url, request);
+  return request;
 }
 
-// Bounded concurrency so ~200 link checks do not open ~200 connections at once.
-// Side effects only; callers record results themselves. An exception from one
-// item is recorded as a failed check and does not stop the other workers.
-async function forEachLimit(items, limit, fn) {
+// Bounded concurrency so the link sweep does not open every connection at once.
+// A callback failure is recorded without stopping the remaining checks.
+async function forEachLimit(items, limit, callback) {
   let next = 0;
-  await Promise.all(
-    Array.from({ length: Math.min(limit, items.length) }, async () => {
-      while (next < items.length) {
-        const item = items[next++];
-        try {
-          await fn(item);
-        } catch (error) {
-          failures.push(`check for ${String(item)} threw: ${error?.message ?? error}`);
-        }
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (next < items.length) {
+      const index = next;
+      next += 1;
+      try {
+        await callback(items[index], index);
+      } catch (error) {
+        failures.push(`check for ${String(items[index])} threw: ${error?.message ?? error}`);
       }
-    }),
-  );
+    }
+  });
+  await Promise.all(workers);
 }
 
 async function page(url) {
   const r = await fetchText(url);
-  check(`200 ${url}`, r.status === 200, `status ${r.status}${r.error ? ` (${r.error})` : ''}`);
+  check(`200 ${url}`, r.status === 200, r.error ? `network error ${r.error}` : `status ${r.status}`);
   return r;
+}
+
+function previewUrl(url) {
+  const parsed = new URL(url);
+  if (parsed.origin === DEV_CANONICAL) return `${DEV}${parsed.pathname}${parsed.search}`;
+  if (parsed.origin === MERCHANT_CANONICAL) return `${MERCHANT}${parsed.pathname}${parsed.search}`;
+  return url;
 }
 
 // ---- 1. entry surfaces -------------------------------------------------------
 
 for (const site of [DEV, MERCHANT]) {
+  const canonical = site === DEV ? DEV_CANONICAL : MERCHANT_CANONICAL;
   const sitemap = await page(`${site}/sitemap.xml`);
   check(`${site} sitemap is XML`, sitemap.body.trimStart().startsWith('<?xml') && sitemap.body.includes('<urlset'));
-  check(`${site} sitemap lists /docs pages`, sitemap.body.includes(`${site}/docs`));
+  check(`${site} sitemap lists /docs pages`, sitemap.body.includes(`${canonical}/docs`));
   const robots = await page(`${site}/robots.txt`);
   check(`${site} robots declares the sitemap`, /sitemap:\s*\S+sitemap\.xml/i.test(robots.body), robots.body.slice(0, 200));
 
   const llms = await page(`${site}/llms.txt`);
   check(`${site} llms.txt is text`, (llms.headers.get('content-type') ?? '').startsWith('text/plain'));
   check(`${site} llms.txt has no relative markdown links`, !/\]\(\//.test(llms.body));
-  const other = site === DEV ? MERCHANT : DEV;
+  const other = site === DEV ? MERCHANT_CANONICAL : DEV_CANONICAL;
   check(`${site} llms.txt links the sibling site`, llms.body.includes(other));
-  check(`${site} llms.txt links the capability map`, llms.body.includes(`${DEV}/capabilities.json`));
-  check(`${site} llms.txt links a domain bundle`, llms.body.includes(`${DEV}/llms/`));
+  check(`${site} llms.txt links the capability map`, llms.body.includes(`${DEV_CANONICAL}/capabilities.json`));
+  check(`${site} llms.txt links a domain bundle`, llms.body.includes(`${DEV_CANONICAL}/llms/`));
 
   const notFound = await fetchText(`${site}/this-page-does-not-exist-${Date.now()}`);
   check(`${site} unknown path returns 404`, notFound.status === 404, `status ${notFound.status}`);
@@ -108,8 +140,8 @@ if (capabilityMap) {
   for (const id of ['testing', 'subscriptions', 'payments-gateways', 'webhooks', 'campaigns', 'storefront-themes', 'admin-api', 'legacy-identifiers']) {
     check(`capabilities.json has ${id}`, ids.has(id));
   }
-  const capPage = await page(`${DEV}/docs/capabilities`);
-  for (const c of capabilityMap.capabilities) check(`capability page anchors ${c.id}`, capPage.body.includes(`id="${c.id}"`));
+  const capPage = await fetchText(`${DEV}/docs/capabilities`);
+  check('human capability page is not published', capPage.status === 404, `status ${capPage.status}`);
 
   // Every link the map makes must resolve on the live sites.
   const linked = new Set();
@@ -119,17 +151,21 @@ if (capabilityMap) {
     for (const w of c.webhooks) if (w.url) linked.add(w.url);
   }
   let broken = 0;
-  await forEachLimit([...linked], 8, async (u) => {
-    const r = await fetchText(u);
-    if (r.status !== 200) {
-      broken += 1;
-      failures.push(`map link ${u} returned ${r.status}${r.error ? ` (${r.error})` : ''}`);
-    }
-  });
+  await forEachLimit(
+    [...linked],
+    LINK_CONCURRENCY,
+    async (u) => {
+      const r = await fetchText(previewUrl(u));
+      if (r.status !== 200) {
+        broken += 1;
+        failures.push(`map link ${u} ${r.error ? `failed: ${r.error}` : `returned ${r.status}`}`);
+      }
+    },
+  );
   check(`all ${linked.size} capability-map links resolve`, broken === 0);
 
   for (const b of capabilityMap.bundles) {
-    const r = await page(b.url);
+    const r = await page(previewUrl(b.url));
     check(`bundle ${b.id} is plain text`, (r.headers.get('content-type') ?? '').startsWith('text/plain'));
     check(`bundle ${b.id} within ${BUNDLE_BUDGET_BYTES} bytes`, r.bytes <= BUNDLE_BUDGET_BYTES, `${r.bytes} bytes`);
     const prose = r.body.replace(/^(```|~~~)[\s\S]*?^\1[^\n]*$/gm, '');
@@ -142,8 +178,26 @@ if (capabilityMap) {
 const full = await page(`${DEV}/llms-full.txt`);
 check('llms-full.txt is text', (full.headers.get('content-type') ?? '').startsWith('text/plain'));
 
+const setupPrompt = await page(`${DEV}/agent-setup/prompt.md`);
+check('agent setup prompt is Markdown', (setupPrompt.headers.get('content-type') ?? '').startsWith('text/markdown'));
+check('agent setup prompt names Claude Code, Codex, and Cursor', ['Claude Code', 'OpenAI Codex', 'Cursor'].every((name) => setupPrompt.body.includes(name)));
+check('agent setup prompt is linked from llms.txt', (await fetchText(`${DEV}/llms.txt`)).body.includes(`${DEV_CANONICAL}/agent-setup/prompt.md`));
+
+const evaluationPrompt = await page(`${DEV}/evaluate/prompt.md`);
+check('evaluation prompt is Markdown', (evaluationPrompt.headers.get('content-type') ?? '').startsWith('text/markdown'));
+check('evaluation prompt links the capability map and domain bundles', evaluationPrompt.body.includes(`${DEV_CANONICAL}/capabilities.json`) && evaluationPrompt.body.includes(`${DEV_CANONICAL}/llms/`));
+check('evaluation prompt is linked from llms.txt', (await fetchText(`${DEV}/llms.txt`)).body.includes(`${DEV_CANONICAL}/evaluate/prompt.md`));
+
 const search = await fetchText(`${MERCHANT}/api/search`);
 check('merchant search index responds', search.status === 200, `status ${search.status}`);
+check('merchant search index is JSON', (search.headers.get('content-type') ?? '').startsWith('application/json'), search.headers.get('content-type') ?? 'no content-type');
+const searchEncoding = search.headers.get('content-encoding') ?? '';
+const compressedInTransit = searchEncoding.split(',').some((encoding) => ['br', 'gzip', 'zstd'].includes(encoding.trim()));
+check(
+  'large merchant search index is compressed in transit',
+  search.bytes <= SEARCH_INDEX_TRANSFER_BUDGET_BYTES || compressedInTransit,
+  `${search.bytes} decoded bytes with ${searchEncoding || 'identity'} encoding`,
+);
 check(`merchant search index within ${SEARCH_INDEX_BUDGET_BYTES} bytes`, search.bytes <= SEARCH_INDEX_BUDGET_BYTES, `${search.bytes} bytes`);
 check('merchant search index is cached for an hour', /max-age=3600/.test(search.headers.get('cache-control') ?? ''), search.headers.get('cache-control') ?? 'no cache-control');
 check('merchant search index mentions subscriptions', /subscription/i.test(search.body));

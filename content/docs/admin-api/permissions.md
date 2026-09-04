@@ -1,7 +1,6 @@
 ---
 title: Permissions
 description: OAuth app scopes that control read and write access to Admin API resources such as orders, carts, subscriptions, and webhooks
-capability_ids: [admin-api]
 sidebar_label: Permissions
 sidebar_position: 2
 ---

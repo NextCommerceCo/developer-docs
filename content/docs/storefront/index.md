@@ -1,7 +1,6 @@
 ---
 title: Storefront
 description: "Overview of the storefront developer tools: themes, event tracking, and the Storefront GraphQL API"
-capability_ids: [storefront-themes]
 ---
 
 The Next Commerce storefront is a flexible, customizable front-end layer for your ecommerce business. Whether you're building a completely custom storefront or enhancing an existing theme, this section will guide you through the tools and features available to developers.

@@ -6,10 +6,13 @@
 import { readFileSync, existsSync } from 'fs';
 import { join, resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { load as loadYaml } from 'js-yaml';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const OUT = join(ROOT, 'out');
+const capabilitySource = loadYaml(readFileSync(join(ROOT, 'content', 'capabilities.yaml'), 'utf8'));
+const authoredCapabilities = Array.isArray(capabilitySource?.capabilities) ? capabilitySource.capabilities : [];
 
 const failures = [];
 function check(condition, message) {
@@ -37,6 +40,12 @@ if (llms !== null) {
     'AGENTS.md',
   ]) {
     check(llms.includes(needle), `llms.txt is missing ${JSON.stringify(needle)}`);
+  }
+  const pageSections = llms.slice(llms.indexOf('\n## Overview\n')).split(/^## /m).slice(1);
+  for (const section of pageSections) {
+    const lines = section.split('\n').filter((line) => line.startsWith('- ['));
+    const sorted = [...lines].sort((a, b) => a.localeCompare(b));
+    check(lines.every((line, index) => line === sorted[index]), `llms.txt section ${JSON.stringify(section.split('\n')[0])} is not sorted`);
   }
 }
 
@@ -69,8 +78,8 @@ if (statsRaw !== null) {
   }
 }
 
-// Capability map: the JSON served at /capabilities.json, its schema, and the
-// readable page must exist and agree on ids.
+// Capability map: the JSON served at /capabilities.json and its schema remain
+// machine-readable surfaces. The former human-readable projection stays absent.
 const capPath = join(OUT, 'capabilities.json');
 const capRaw = read(capPath);
 check(capRaw !== null, 'out/capabilities.json does not exist');
@@ -87,24 +96,73 @@ if (capabilityMap) {
   check(capabilityMap.version === 1, `capabilities.json version is ${capabilityMap.version}`);
   check(Array.isArray(capabilityMap.capabilities) && capabilityMap.capabilities.length >= 8, 'capabilities.json has fewer than 8 capabilities');
   check(Array.isArray(capabilityMap.bundles) && capabilityMap.bundles.length === 6, 'capabilities.json does not list 6 bundles');
-  const capPage = read(join(OUT, 'docs', 'capabilities.html')) ?? read(join(OUT, 'docs', 'capabilities', 'index.html'));
-  check(capPage !== null, 'out/docs/capabilities.html does not exist');
-  if (capPage !== null) {
-    for (const c of capabilityMap.capabilities) {
-      check(capPage.includes(`id="${c.id}"`), `capability page has no anchor for ${c.id}`);
-      for (const url of c.operator_docs) check(capPage.includes(url), `capability page is missing merchant link ${url}`);
-    }
+  const payments = capabilityMap.capabilities.find((c) => c.id === 'payments-gateways');
+  const disputes = capabilityMap.capabilities.find((c) => c.id === 'disputes');
+  const authoredOperationIds = (id) => authoredCapabilities.find((c) => c.id === id)?.api_operations ?? [];
+  const outputOperationIds = (capability) => capability?.api_operations.map((operation) => operation.id) ?? [];
+  for (const capability of [payments, disputes]) {
+    const expected = authoredOperationIds(capability?.id);
+    const actual = outputOperationIds(capability);
+    check(
+      actual.length === expected.length && expected.every((id) => actual.includes(id)),
+      `${capability?.id ?? 'missing capability'} operations differ between capabilities.yaml and capabilities.json`,
+    );
   }
+  check(!payments?.api_operations.some((op) => op.id.startsWith('disputes')), 'payments-gateways still contains dispute operations');
+  check(disputes?.api_operations.every((op) => op.id.startsWith('disputes')), 'disputes contains a non-dispute operation');
+  const capPage = read(join(OUT, 'docs', 'capabilities.html')) ?? read(join(OUT, 'docs', 'capabilities', 'index.html'));
+  check(capPage === null, 'out/docs/capabilities should not be built');
   for (const c of capabilityMap.capabilities) {
     for (const url of c.developer_docs) {
       const rel = url.replace('https://developers.nextcommerce.com', '');
       const html = read(join(OUT, `${rel}.html`)) ?? read(join(OUT, rel, 'index.html'));
       check(html !== null, `developer page ${rel} cited by ${c.id} was not built`);
-      // The reciprocal panel must appear on every cited developer page.
-      if (html !== null && c.operator_docs.length > 0) {
-        check(html.includes('Related merchant guides'), `developer page ${rel} has no reciprocal merchant-guide panel`);
-      }
     }
+  }
+}
+
+// Agent setup: raw Markdown and human guide are generated from one source.
+const setupPrompt = read(join(OUT, 'agent-setup', 'prompt.md'));
+check(setupPrompt !== null, 'out/agent-setup/prompt.md does not exist');
+if (setupPrompt !== null) {
+  check(setupPrompt.startsWith('<!-- next-commerce-agent-setup version='), 'agent setup prompt has no version marker');
+  check(!/\]\(\//.test(setupPrompt), 'agent setup prompt contains a relative Markdown link');
+  for (const needle of [
+    '# Start a Campaign Page Kit project with an AI agent',
+    '## Before writing',
+    'npx campaign-init --help',
+    'npx campaign-init --non-interactive --json',
+    '--template <selected-template>',
+    '| GitHub Copilot |',
+    '_site/',
+    'https://developers.nextcommerce.com/llms.txt?ref=agent-setup',
+  ]) {
+    check(setupPrompt.includes(needle), `agent setup prompt is missing ${JSON.stringify(needle)}`);
+  }
+  check(!setupPrompt.includes('--api-key'), 'agent setup prompt asks for an API key during bootstrap');
+  check(!setupPrompt.includes('npx skills add'), 'agent setup prompt duplicates the optional skill-install workflow');
+  check(!setupPrompt.includes('--template apollo'), 'agent setup prompt silently chooses the Apollo template');
+  check(!setupPrompt.includes('agent-starter'), 'agent setup prompt silently chooses a project identity');
+}
+const setupGuide = read(join(OUT, 'docs', 'agent-setup.html')) ?? read(join(OUT, 'docs', 'agent-setup', 'index.html'));
+check(setupGuide !== null, 'out/docs/agent-setup.html does not exist');
+if (setupGuide !== null) {
+  check(setupGuide.includes('Read https://developers.nextcommerce.com/agent-setup/prompt.md'), 'agent setup guide is missing the one-line instruction');
+}
+
+const evaluationPrompt = read(join(OUT, 'evaluate', 'prompt.md'));
+check(evaluationPrompt !== null, 'out/evaluate/prompt.md does not exist');
+if (evaluationPrompt !== null) {
+  check(evaluationPrompt.startsWith('<!-- next-commerce-evaluation-prompt version='), 'evaluation prompt has no version marker');
+  check(!/\]\(\//.test(evaluationPrompt), 'evaluation prompt contains a relative Markdown link');
+  for (const needle of [
+    'https://developers.nextcommerce.com/capabilities.json?ref=agent-evaluation',
+    'https://developers.nextcommerce.com/llms/platform.txt?ref=agent-evaluation',
+    'https://docs.nextcommerce.com/llms.txt?ref=agent-evaluation',
+    'Cite every material claim',
+    'What is not documented',
+  ]) {
+    check(evaluationPrompt.includes(needle), `evaluation prompt is missing ${JSON.stringify(needle)}`);
   }
 }
 
@@ -143,8 +201,8 @@ if (capabilityMap) {
   }
 }
 
-// 404 page links the capability map.
-if (notFound !== null) check(notFound.includes('/docs/capabilities'), '404.html does not link the capability map');
+// Keep machine-only taxonomy out of human recovery navigation.
+if (notFound !== null) check(!notFound.includes('/docs/capabilities'), '404.html links the removed capability page');
 
 if (failures.length > 0) {
   console.error('check-agent-surfaces: FAIL');

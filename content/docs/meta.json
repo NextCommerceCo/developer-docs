@@ -7,7 +7,7 @@
     "apps",
     "webhooks",
     "skills",
-    "testing",
-    "capabilities"
+    "agent-setup",
+    "testing"
   ]
 }

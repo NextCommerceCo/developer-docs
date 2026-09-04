@@ -67,13 +67,15 @@ function header(): string {
     `- [Merchant docs index](${MERCHANT_SITE}/llms.txt)`,
     `- [Platform and API changelog](${MERCHANT_SITE}/changelog): the developer portal has no changelog of its own`,
     `- [Capability map (JSON)](${SITE}/capabilities.json): one record per platform capability linking merchant guides, developer guides, Admin API operations, webhook events, and skills under a stable id`,
-    `- [Capability map (readable)](${SITE}/docs/capabilities)`,
     `- [Admin API spec, 2024-04-01](${SITE}/api/admin/2024-04-01.yaml): stable, raw OpenAPI`,
     `- [Admin API spec, unstable](${SITE}/api/admin/unstable.yaml): raw OpenAPI`,
     `- [Admin API spec, 2023-02-10](${SITE}/api/admin/2023-02-10.yaml): deprecated, raw OpenAPI`,
     `- [Campaigns API spec, v1](${SITE}/api/campaigns/v1.yaml): raw OpenAPI`,
     `- [Webhooks](${SITE}/docs/webhooks)`,
     `- [Skills](${SITE}/docs/skills): AI agent skills for the platform`,
+    `- [Campaign agent quickstart](${SITE}/docs/agent-setup): optional wrapper around the current Campaign Page Kit docs and CLI that preserves developer choices`,
+    `- [Campaign agent quickstart prompt](${SITE}/agent-setup/prompt.md): stable plain-Markdown instructions for starting a new campaign project when that is the developer's requested task`,
+    `- [Prospect evaluation prompt](${SITE}/evaluate/prompt.md): source-grounded instructions for evaluating platform capabilities, fit, gaps, and a first pilot`,
     `- [Testing](${SITE}/docs/testing)`,
     `- [Agent guide (AGENTS.md)](https://github.com/NextCommerceCo/developer-docs/blob/main/AGENTS.md): navigation and evidence rules for agents reading this site`,
     '',
@@ -116,7 +118,7 @@ export function GET() {
   });
 
   const body = keys
-    .map((key) => `## ${groupTitle(key)}\n\n${groups.get(key)!.join('\n')}\n`)
+    .map((key) => `## ${groupTitle(key)}\n\n${groups.get(key)!.sort((a, b) => a.localeCompare(b)).join('\n')}\n`)
     .join('\n');
 
   return new Response(header() + '\n' + body, {

@@ -59,7 +59,8 @@
 #
 # Anything else under /docs/campaigns/ either still exists (api/, page-kit,
 # templates, admin-api) or never did. campaign-cart sub-paths are handled by the
-# campaign-cart/:path rule above; the bare index has its own rule below.
+# /docs/campaigns/campaign-cart/:path rule above; the bare index has its own rule
+# below.
 /docs/campaigns/utilities/debugger https://cart-sdk.nextcommerce.com/latest/reference/debugger/ 301
 /docs/campaigns/utilities/debugger/* https://cart-sdk.nextcommerce.com/latest/reference/debugger/ 301
 /docs/campaigns/utilities/exit-intent https://cart-sdk.nextcommerce.com/latest/reference/javascript-api/#on-page-popups 301
@@ -89,7 +90,7 @@
 /docs/campaigns/upsells https://cart-sdk.nextcommerce.com/latest/pages/upsell-page/ 301
 /docs/campaigns/upsells/* https://cart-sdk.nextcommerce.com/latest/pages/upsell-page/ 301
 /docs/campaigns/utilities https://cart-sdk.nextcommerce.com/latest/reference/javascript-api/#utilities 301
-# The bare campaign-cart index needs its own rule: the campaign-cart/:path rule
+# The bare campaign-cart index needs its own rule: /docs/campaigns/campaign-cart/:path
 # above only matches sub-paths, so without this the index 404s.
 /docs/campaigns/campaign-cart https://cart-sdk.nextcommerce.com/latest/start-here/how-it-works/ 301
 # Old Redoc-style reference URL still linked from the platform changelog (with and without

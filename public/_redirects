@@ -58,8 +58,8 @@
 # old paths must 404. The three surviving utilities are listed individually.
 #
 # Anything else under /docs/campaigns/ either still exists (api/, page-kit,
-# templates, admin-api) or never did. campaign-cart is handled by the
-# campaign-cart/:path rule above.
+# templates, admin-api) or never did. campaign-cart sub-paths are handled by the
+# campaign-cart/:path rule above; the bare index has its own rule below.
 /docs/campaigns/utilities/debugger https://cart-sdk.nextcommerce.com/latest/reference/debugger/ 301
 /docs/campaigns/utilities/debugger/* https://cart-sdk.nextcommerce.com/latest/reference/debugger/ 301
 /docs/campaigns/utilities/exit-intent https://cart-sdk.nextcommerce.com/latest/reference/javascript-api/#on-page-popups 301

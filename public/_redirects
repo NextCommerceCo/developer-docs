@@ -89,6 +89,9 @@
 /docs/campaigns/upsells https://cart-sdk.nextcommerce.com/latest/pages/upsell-page/ 301
 /docs/campaigns/upsells/* https://cart-sdk.nextcommerce.com/latest/pages/upsell-page/ 301
 /docs/campaigns/utilities https://cart-sdk.nextcommerce.com/latest/reference/javascript-api/#utilities 301
+# The bare campaign-cart index needs its own rule: the campaign-cart/:path rule
+# above only matches sub-paths, so without this the index 404s.
+/docs/campaigns/campaign-cart https://cart-sdk.nextcommerce.com/latest/start-here/how-it-works/ 301
 # Old Redoc-style reference URL still linked from the platform changelog (with and without
 # trailing slash). Exact-path rules on purpose: /docs/admin-api/reference/<group>/<op> are real pages.
 /docs/admin-api/reference /docs/admin-api 301

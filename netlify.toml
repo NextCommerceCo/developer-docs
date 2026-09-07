@@ -319,6 +319,14 @@
   to = "https://cart-sdk.nextcommerce.com/latest/reference/javascript-api/#utilities"
   status = 301
 
+# The bare campaign-cart index needs its own rule: the campaign-cart/:path rule
+# above only matches sub-paths, so without this the index 404s.
+
+[[redirects]]
+  from = "/docs/campaigns/campaign-cart"
+  to = "https://cart-sdk.nextcommerce.com/latest/start-here/how-it-works/"
+  status = 301
+
 # Old Redoc-style reference URL still linked from the platform changelog.
 # Exact path only (Netlify also matches the trailing-slash form); the deep
 # /docs/admin-api/reference/<group>/<op> pages are real and must not be caught.

@@ -14,9 +14,9 @@ Bankcard is the core payment method on the Admin API. Cards are charged by passi
 
 This guide covers the full bankcard flow:
 
-- **[Gateway routing](#gateway-routing)** — route charges across one or more payment gateways
-- **[Card tokenization](#card-tokenization-iframe)** — get a `card_token` with the iFrame payment form
-- **[3D Secure (3DS2)](#3d-secure-3ds2)** — process cards through an authentication flow
+- [Gateway routing](#gateway-routing): route charges across one or more payment gateways.
+- [Card tokenization](#card-tokenization-iframe): get a `card_token` with the iFrame payment form.
+- [3D Secure (3DS2)](#3d-secure-3ds2): process cards through an authentication flow.
 
 ## Order payment payload
 
@@ -39,9 +39,9 @@ Bankcard orders set `payment_method` to `card_token` and pass the tokenized card
 | `card_token` | string | Tokenized card produced by the iFrame payment form. |
 | `save_card` | boolean | Retain the card for future charges (subscriptions, one-click upsells). Defaults to `true`. |
 | `statement_descriptor` | string | Custom bank-statement descriptor (≤ 22 alphanumeric chars, spaces, and `& , . - #`). |
-| `payment_gateway` | integer | Optional — charge a **specific gateway** by id. See [Gateway routing](#gateway-routing). |
-| `payment_gateway_group` | integer | Optional — charge a **gateway group** by id. See [Gateway routing](#gateway-routing). |
-| `payment_return_url` | string (uri) | Required for **3DS** — your endpoint that receives the final order data. See [3D Secure](#3d-secure-3ds2). |
+| `payment_gateway` | integer | Optional. Charge a specific gateway by id. See [Gateway routing](#gateway-routing). |
+| `payment_gateway_group` | integer | Optional. Charge a gateway group by id. See [Gateway routing](#gateway-routing). |
+| `payment_return_url` | string (uri) | Required for 3DS. Your endpoint that receives the final order data. See [3D Secure](#3d-secure-3ds2). |
 
 <Callout type="info">
 For the complete order request (lines, user, addresses, shipping), see the [External Checkout Flow](/docs/admin-api/guides/external-checkout) guide. This guide focuses on the bankcard-specific payment detail.
@@ -54,7 +54,7 @@ By default, bankcard charges route through your store's configured payment gatew
 | Field | Type | Routes to |
 | --- | --- | --- |
 | `payment_gateway` | integer | A **single gateway** by its `id`. |
-| `payment_gateway_group` | integer | A **gateway group** by its `id` — the platform selects a member gateway. |
+| `payment_gateway_group` | integer | A **gateway group** by its `id`. The platform selects a member gateway. |
 
 ```json title="Route to a specific gateway or group"
 "payment_method": "card_token",
@@ -65,15 +65,15 @@ By default, bankcard charges route through your store's configured payment gatew
 ```
 
 <Callout type="info">
-Pass **either** `payment_gateway` **or** `payment_gateway_group` — not both. If neither is provided, the store's default routing is used.
+Pass either `payment_gateway` or `payment_gateway_group`, not both. If you pass neither, the store's default routing applies.
 </Callout>
 
 ### Get gateway and group ids
 
 The ids are integers from the Payments API:
 
-- **Gateways** — [`gatewaysList`](/docs/admin-api/reference/payments/gatewaysList) / [`gatewaysRetrieve`](/docs/admin-api/reference/payments/gatewaysRetrieve)
-- **Gateway groups** — [`gatewayGroupsList`](/docs/admin-api/reference/payments/gatewayGroupsList) / [`gatewayGroupsRetrieve`](/docs/admin-api/reference/payments/gatewayGroupsRetrieve)
+- Gateways: [`gatewaysList`](/docs/admin-api/reference/payments/gatewaysList) and [`gatewaysRetrieve`](/docs/admin-api/reference/payments/gatewaysRetrieve)
+- Gateway groups: [`gatewayGroupsList`](/docs/admin-api/reference/payments/gatewayGroupsList) and [`gatewayGroupsRetrieve`](/docs/admin-api/reference/payments/gatewayGroupsRetrieve)
 
 A gateway group also exposes its supported `available_currencies`, `available_payment_methods`, and `card_types`, so you can pick the right group for a given order.
 
@@ -81,273 +81,386 @@ A gateway group also exposes its supported `available_currencies`, `available_pa
 
 Most stores let the platform route automatically. Pass an explicit gateway or group when you need to:
 
-- **Load balance** — distribute volume across multiple gateways/processors.
-- **Region or currency routing** — send orders to the gateway that supports a given currency or market.
-- **Failover** — direct traffic to a backup gateway, or use a group so a soft-declined charge can be re-attempted on another gateway in the group.
+- Load balance volume across several gateways or processors.
+- Send orders to the gateway that supports a given currency or market.
+- Fail over to a backup gateway, or use a group so a soft decline can be retried on another gateway in the group.
 
 <Callout type="info">
-Group membership, distribution weighting, and soft-decline re-attempt behavior are configured per gateway in your store dashboard — the API selects among what's already configured.
+Group membership, distribution weighting, and soft-decline retries are configured per gateway in your store dashboard. The API only selects among what is already configured.
 </Callout>
 
 ## Card Tokenization (iFrame)
 
-Custom off-site checkouts can reduce their PCI compliance scope by leveraging our iFrame payment form to tokenize credit cards before submitting them on the Admin API.
+Tokenize cards in our iFrame payment form before you send them to the Admin API. Your checkout never handles raw card data, which keeps it out of PCI scope.
 
 <Callout type="info">
-View a fully functional [Demo](https://nextcommerceco.github.io/demo-iframe-payment-form/) to see all of the concepts in action. The demo source code is also available on [Github](https://github.com/NextCommerceCo/demo-iframe-payment-form/blob/main/index.html).
+Try the [Demo](https://nextcommerceco.github.io/demo-iframe-payment-form/). The source is on [Github](https://github.com/NextCommerceCo/demo-iframe-payment-form/blob/main/index.html).
 </Callout>
 
-The iframe payment form is a pure JS library that provides managed fields for the card number and security code to safely collect sensitive credit card information. The fields can be styled to match your external checkout HTML pages for a seamless end-user experience.
-
-<Callout type="info">
-We have partnered with [Spreedly](https://docs.spreedly.com/reference/iframe/v1/#setfieldtype) for all bankcard payments; this guide leverages their iFrame payment documentation and how to use the iFrame JS with our platform.
-</Callout>
+`payment.js` is a script hosted by Next Commerce. It exposes the `NextPayment` class, which mounts the card number and security code fields in iFrames, validates them, and returns a token. You can style the fields to match the rest of your form.
 
 ### Setup
 
-Before you get started, grab your Payments Environment Key from your store dashboard (**Settings > Payments**) — we'll use this to map the iFrame to your store's payment environment.
+You need your store's Payments Environment Key. Find it under **Settings > Payments**, or read `payments.environment_key` from the [Store Detail](/docs/admin-api/reference/store/storeDetail) endpoint.
 
 **Card tokenization steps**
 
-1. Add a payment form with card fields (name, card number, expiration, and cvv).
-2. Add Spreedly JS and initialize the iFrame on managed fields.
-3. Style the iFrame form fields to match your design.
-4. Tokenize the card with a form submit handler.
-5. Retrieve the card token.
+1. Add `payment.js` with your environment key.
+2. Add the form. Card number and security code are empty containers, the rest are normal inputs.
+3. Create a `NextPayment` and assign callbacks.
+4. Call `submit()` from your form handler.
+5. Read the token in `onTokenized`.
+
+```html title="Add payment.js"
+<script src="https://payments.29next.com/js/v1/payment.js?env_key=<STORE PAYMENT ENVIRONMENT KEY>"></script>
+```
+
+<Callout type="warn">
+`env_key` is required. A key that matches no store still returns the script, but without credentials, so every tokenization fails.
+</Callout>
+
+Add the form. `NextPayment` mounts iFrames into the two empty `div` elements. The other fields are normal inputs.
 
 ```html title="Example Payment Form HTML"
-
-<form id="payment-form" action="https://yoursite.com/checkout"
-  onsubmit='submitPaymentForm(); return false;'>
-
-  <label for="full_name">Cardholder Name</label>
-  <input type="text" id="full_name" name="full_name"><br/>
-
-  <label>Card Number</label>
-  <div id="bankcard-number" style="width:225px; height:35px; border: 2px solid"></div><br/>
-
-  <label for="month">Expiration Date</label>
-  <input type="text" id="month" name="month" maxlength="2">
-  <input type="text" id="year" name="year" maxlength="4"><br/>
-
-  <label>CVV</label>
-  <div id="bankcard-cvv" style="width:60px; height:35px; border: 2px solid "></div><br/>
-
-  <input id="submit-button" type="submit" value="Pay Now" disabled>
-
+<form id="payment-form" onsubmit='submitPaymentForm(); return false;' novalidate>
+  <label for="id_card_number">Card Number</label>
+  <div id="id_card_number"></div>
+  <label for="id_cardholder_name">Cardholder Name</label>
+  <input id="id_cardholder_name" name="cc-name" autocomplete="cc-name" type="text" placeholder="Full Name on Card">
+  <label for="id_card_exp_month">Expiry Month</label>
+  <select id="id_card_exp_month" name="expiry_month" autocomplete="cc-exp-month" required>
+    <option value="" selected disabled>MM</option>
+  </select>
+  <label for="id_card_exp_year">Expiry Year</label>
+  <select id="id_card_exp_year" name="expiry_year" autocomplete="cc-exp-year" required>
+    <option value="" selected disabled>YYYY</option>
+  </select>
+  <label for="id_card_cvv">Security Code</label>
+  <div id="id_card_cvv"></div>
+  <button type="submit" disabled>Pay Now</button>
 </form>
-
 ```
 
-After you have the form on your page, initialize the iFrame fields on card number and cvv.
+Create the instance. The constructor starts loading the iFrames at once, so assign callbacks right after it.
 
-```html title="Add JS and Configure"
-
-<script src="https://core.spreedly.com/iframe/iframe-v1.min.js"></script>
-<script>
-Spreedly.init("<STORE PAYMENT ENVIRONMENT KEY>", {
-  "numberEl": "bankcard-number",
-  "cvvEl": "bankcard-cvv"
+```js title="Initialize NextPayment"
+const submitButton = document.querySelector('#payment-form button[type="submit"]');
+const payment = new NextPayment({
+  numberEl: "id_card_number",
+  cvvEl: "id_card_cvv",
 });
-</script>
+payment.onReady = () => {
+  submitButton.removeAttribute('disabled');
+  payment.setFocus("number");
+};
 ```
+
 <Callout type="info">
-Note how the `numberEl` and `cvvEl` map to div element ids in the form to render the managed fields.
+`numberEl` and `cvvEl` are element ids, not selectors. Keep the submit button disabled until `onReady` fires.
 </Callout>
+
+#### Configuration options
+
+| Option | Required | Description |
+| --- | --- | --- |
+| `numberEl` | Yes | Container element id where the card number iFrame is mounted. |
+| `cvvEl` | Yes | Container element id where the security code iFrame is mounted. |
+| `numberFormat` | No | One of `prettyFormat` (default), `plainFormat`, or `maskedFormat`. |
+| `labels` | No | `{ number, cvv }` accessible labels. Defaults to `Card Number` and `Security Code`. |
+| `placeholder` | No | `{ number, cvv }` placeholder text. Defaults to `Card Number` and `CVV`. |
+| `titles` | No | `{ number, cvv }` title attributes. Defaults to `Enter your card number` and `Enter your Security Code`. |
+| `styling` | No | `{ number, cvv, placeholder }` objects of camelCase CSS properties. See [Style iFrame Fields](#style-iframe-fields). |
+
+Both fields are always required and use input type `text`. Card type detection is covered below.
 
 ### Style iFrame Fields
 
-For the best end-user experience, customize the iFrame form fields so they blend in with your native form fields.
+Pass a `styling` object so the iFrame fields match your native inputs. Give it the same font, size, weight, line height, colour, and padding. Each value is an object of camelCase CSS properties, not a CSS string. `placeholder` styles the placeholder text in both fields. The demo copies Bootstrap's `.form-control` values.
 
 ```js title="Example form customization"
-// example styles for iframe fields, accepts any style that can be applied with JS
-var style = 'color: #212529; font-size: 1rem; line-height: 1.5; font-weight: 400; \
-width: calc(100% - 20px); height: calc(100% - 2px); position: absolute;';
-
-// set placeholders and styles for iframe fields to make UI style
-Spreedly.on("ready", function () {
-    Spreedly.setFieldType('text');
-    Spreedly.setPlaceholder('cvv', "CVV");
-    Spreedly.setPlaceholder('number', "Card Number");
-    Spreedly.setNumberFormat('prettyFormat');
-    Spreedly.setStyle('cvv', style);
-    Spreedly.setStyle('number', style);
-
-    submitBtn.removeAttribute('disabled');
+const formControlStyle = {
+  width: '100%',
+  padding: '.375rem .75rem',
+  fontSize: '1rem',
+  fontWeight: '400',
+  lineHeight: '1.5',
+  color: '#212529',
+  fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
+};
+const payment = new NextPayment({
+  numberEl: "id_card_number",
+  cvvEl: "id_card_cvv",
+  styling: {
+    number: formControlStyle,
+    cvv: formControlStyle,
+    placeholder: { color: 'rgba(33, 37, 41, 0.75)' },
+  },
 });
-
 ```
 
-### Tokenize Card
+<Callout type="warn">
+Serve the page over HTTP or HTTPS. Opened from disk, the page has a `null` origin, the SDK cannot reach the iFrames, `onReady` never fires, and the fields keep the browser's default styling.
+</Callout>
 
-Tokenize the card with your form submission handler. The `tokenizeCreditCard` method requires that the `requiredFields` are passed as an object for form validation.
+CSS `:focus` cannot reach inside an iFrame. Use `onFieldStateChange` to style the container on focus and blur. The same payload carries the detected card type, so you can show a brand icon as the customer types.
 
-```js title="Tokenize Card on Form Submit"
+```html title="Card type icon next to the card number field"
+<img id="id_card_type" height="24" alt="" hidden>
+<div id="id_card_number"></div>
+```
 
-function submitPaymentForm() {
-    var requiredFields = {};
-    // Get required, non-sensitive, values from host page form
-    requiredFields["full_name"] = document.getElementById("full_name").value;
-    requiredFields["month"] = document.getElementById("month").value;
-    requiredFields["year"] = document.getElementById("year").value;
-    // tokenize the card
-    Spreedly.tokenizeCreditCard(requiredFields);
+```js title="Focus styling and card type detection with onFieldStateChange"
+const cardTypeIcons = {
+  visa: 'img/cardbrands/visa.svg',
+  master: 'img/cardbrands/mastercard.svg',
+  american_express: 'img/cardbrands/amex.svg',
+  discover: 'img/cardbrands/discover.svg',
+  diners_club: 'img/cardbrands/diners_club.svg',
+  jcb: 'img/cardbrands/jcb.svg',
+  maestro: 'img/cardbrands/maestro.svg',
+  dankort: 'img/cardbrands/dankort.svg',
+};
+payment.onFieldStateChange = (payload) => {
+  const {action, field, cardType} = payload;
+  const cardTypeEl = document.getElementById('id_card_type');
+  if (cardTypeIcons[cardType]) {
+    cardTypeEl.src = cardTypeIcons[cardType];
+    cardTypeEl.hidden = false;
+  } else {
+    cardTypeEl.hidden = true;
+  }
+  const fieldEl = document.querySelector(`#id_card_${field}`);
+  if (!fieldEl) return;
+  if (action === "focus") {
+    fieldEl.classList.add('active');
+  }
+  if (action === "blur") {
+    fieldEl.classList.remove('active');
+  }
 }
 ```
 
+**`onFieldStateChange` payload**
+
+| Field | Description |
+| --- | --- |
+| `field` | `number` or `cvv`. |
+| `action` | One of `focus`, `blur`, `input`, `mouseover`, `mouseout`, `enter`, `escape`, `tab`, or `shiftTab`. |
+| `cardType` | Detected brand: `visa`, `master`, `american_express`, `discover`, `diners_club`, `jcb`, `maestro`, `dankort`, and others. Empty until a brand matches. |
+| `numberLength`, `cvvLength` | Digits entered in each field. |
+| `validNumber`, `validCvv`, `luhnValid` | Current validity of each field. |
+| `focused`, `hovered` | Whether the field is focused or hovered. `hovered` is only present on mouse actions. |
+
+<Callout type="info">
+The demo's icons are in [img/cardbrands](https://github.com/NextCommerceCo/demo-iframe-payment-form/tree/main/img/cardbrands). The icon updates on every `input` action.
+</Callout>
+
+### Tokenize Card
+
+Call `submit()` from your form handler with the cardholder values as `formData`.
+
+```js title="Tokenize Card on Form Submit"
+function submitPaymentForm() {
+  submitButton.setAttribute('disabled', true);
+  submitButton.textContent = 'Processing...';
+  let full_name = document.querySelector('#id_cardholder_name').value;
+  let month = document.querySelector('#id_card_exp_month').value;
+  let year = document.querySelector('#id_card_exp_year').value;
+  const formData = {
+    full_name,
+    month,
+    year
+  };
+  payment.submit(formData);
+};
+```
+
+`submit()` returns at once. The result arrives in `onTokenized` or `onError`. First, `submit()` checks `month`, `year`, and `full_name`. If any fail, it reports them in `onValidation` and stops. Neither `onTokenized` nor `onError` fires for that attempt.
+
+<Callout type="warn">
+Always assign `onValidation`. Without it, `submit()` skips the check and sends the data anyway.
+</Callout>
+
+**`formData` fields**
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `full_name` | Yes | Cardholder name. `first_name` and `last_name` do not replace it. |
+| `month` | Yes | Expiry month, `1` to `12`. |
+| `year` | Yes | Four-digit expiry year, such as `2028`. Two-digit years are rejected. |
+
 ### Retrieve Card Token
 
-When a card has been tokenized, the `paymentMethod` event is fired that includes the generated payment method token as well as the details of the payment method record. **Use the token from your custom checkout backend to send to the Admin API when creating the order.**
+`onTokenized` fires with the result, including the payment method token and card details. Send the token to your backend and pass it to the Admin API as `card_token` when you create the order.
 
 ```js title="Retrieve Card Token"
+payment.onTokenized = (result) => {
+  const payment_method = result.tokenResponse.payment_method;
+  console.log('Payment Method Data:', payment_method);
+  document.getElementById("card-token").textContent = payment_method.token;
+  submitButton.textContent = 'Pay Now';
+  submitButton.removeAttribute('disabled');
+};
+```
 
-Spreedly.on('paymentMethod', function (token, pmData) {
-    // create your own handler to capture the token and send to your backend
-    console.log(token);
-    console.log(pmData);
-});
+<Callout type="warn">
+There are two tokens. `tokenResponse.token` is the transaction. `tokenResponse.payment_method.token` is the payment method. Pass the second one as `card_token`.
+</Callout>
+
+```json title="Example onTokenized payload"
+{
+  "message": "Token generated",
+  "tokenResponse": {
+    "token": "7Q88WFXX2C91YTWQM24GKAEV4A",
+    "succeeded": true,
+    "transaction_type": "AddPaymentMethod",
+    "state": "succeeded",
+    "message": "Succeeded!",
+    "payment_method": {
+      "token": "01M06YP7T3G2RV5ZJ5H1DSTXBD",
+      "storage_state": "cached",
+      "test": true,
+      "last_four_digits": "1111",
+      "first_six_digits": "411111",
+      "card_type": "visa",
+      "month": 11,
+      "year": 2026,
+      "full_name": "a t",
+      "payment_method_type": "credit_card",
+      "fingerprint": "474713f866e20b9c7f143ad7643364be37e0",
+      "number": "XXXX-XXXX-XXXX-1111"
+    }
+  }
+}
 ```
 
 ### Error Handling
 
-When a card fails validation, the `errors` event is fired which includes an array of objects with `attribute`, `key`, and `message` fields describing the errors for each field.
+Two callbacks report errors. `onValidation` fires when `submit()` is blocked by a bad field. `onError` fires when the tokenization request fails. Nothing fires while the customer is typing.
 
 ```js title="Error Handling"
-
-Spreedly.on('errors', function(errors) {
-  // add your own error handler to show errors to users so they can fix them
-  for (var i=0; i < errors.length; i++) {
-    var error = errors[i];
-    console.log(error);
-  };
-});
+function fieldSelectorForAttribute(attribute) {
+  if (attribute === 'number') return '#id_card_number';
+  if (attribute === 'cvv') return '#id_card_cvv';
+  if (attribute === 'month') return '#id_card_exp_month';
+  if (attribute === 'year') return '#id_card_exp_year';
+  if (attribute === 'full_name') return '#id_cardholder_name';
+  return null;
+}
+function setFieldInvalid(selector, message) {
+  let el = document.querySelector(selector);
+  if (!el) return;
+  el.classList.add('is-invalid');
+}
+payment.onValidation = (payload) => {
+  document.querySelectorAll('#payment-form .is-invalid').forEach(el => el.classList.remove('is-invalid'));
+  (payload.errors || []).forEach(err => {
+    let selector = fieldSelectorForAttribute(err.attribute);
+    if (selector) setFieldInvalid(selector, err.message);
+  });
+  submitButton.removeAttribute('disabled');
+  submitButton.textContent = 'Pay Now';
+};
+payment.onError = (error) => {
+  console.log('on error: ', error);
+  if (typeof error === 'string') {
+    alert(error);
+  } else if (error.errors && Array.isArray(error.errors)) {
+    error.errors.forEach(err => {
+      let selector = fieldSelectorForAttribute(err.attribute);
+      if (selector) setFieldInvalid(selector, err.message);
+    });
+  } else if (error.message) {
+    alert(error.message);
+  }
+  submitButton.removeAttribute('disabled');
+  submitButton.textContent = 'Pay Now';
+};
 ```
 
-```json title="Example Errors"
+#### onValidation
+
+`payload.errors` is an array of objects with `attribute`, `key`, and `message`. Two sources feed it, both from `submit()`. `NextPayment` checks `month`, `year`, and `full_name` first. If those pass, the iFrames check `number` and `cvv`. Each firing covers only its own fields.
+
+| `attribute` | Validated by |
+| --- | --- |
+| `number` | The card number iFrame. |
+| `cvv` | The security code iFrame. |
+| `month` | `submit()` pre-validation. |
+| `year` | `submit()` pre-validation. |
+| `full_name` | `submit()` pre-validation. |
+
+```json title="Example Validation Errors"
 [
   {
-    "attribute":"first_name",
-    "key":"errors.blank",
-    "message":"First name can't be blank"
-  }, {
-    "attribute":"last_name",
-    "key":"errors.blank",
-    "message":"Last name can't be blank"
+    "attribute": "month",
+    "key": "errors.invalid",
+    "message": "Expiry month is required"
+  },
+  {
+    "attribute": "full_name",
+    "key": "errors.invalid",
+    "message": "Cardholder name is required"
   }
 ]
 ```
 
-### Customizing the iFrame Fields
+#### onError
 
-The iFrame fields can be customized to match your site styles. See the [demo](https://github.com/NextCommerceCo/demo-iframe-payment-form/blob/main/index.html) for a full example.
+The payload varies by cause, so check its type first.
 
-#### setFieldType
-
-Set the input type of the iFrame fields. This is useful when you want different keyboards to display on mobile devices.
-
-By default, the iFrame fields are set to `type=number`, which displays the numerical keyboard in most browsers on most mobile devices. However, behavior does vary by browser. If you'd like to manually control the input field type you can do so with `setFieldType`.
-
-**Arguments**
-
-| Name | Description |
+| Error source | Payload |
 | --- | --- |
-| field | The iFrame field to set the placeholder. Can be one of number or cvv. |
-| type | The input field type. Can be one of number, text or tel. |
+| Card number or security code rejected, or submit throttled | A string message, for example `Invalid CVV`. |
+| Tokenization API failure | An object with an `errors` array. Each entry has `attribute`, `key`, and `message`. |
+| Other SDK failures | An object with a `message` field. |
 
-```js title="setFieldType"
-Spreedly.on('ready', function() {
-  Spreedly.setFieldType("number", "tel");
-});
-```
+When the iFrame rejects the number or security code, `onValidation` fires first, then `onError` repeats it as a string.
 
-#### setNumberFormat
+### Methods
 
-Set the card number format. If set to `prettyFormat`, the card number value will include spaces in the credit card number as they appear on a physical card. **The number field must be set to type text or tel for pretty formatting to take effect.**
+#### setFocus
 
-**Arguments**
+Focus one of the iFrame fields, for example the card number on page load or a field with an error. Does nothing before `onReady`.
 
-| Format | User Input | Display |
-| --- | --- | --- |
-| prettyFormat | `4111111111111111` | `4111 1111 1111 1111` |
-| plainFormat (default) | `4111111111111111` | `4111111111111111` |
-| maskedFormat | `4111111111111111` | `****************` |
-
-```js title="setNumberFormat"
-// Pretty format
-Spreedly.on('ready', function() {
-  Spreedly.setFieldType("number", "text");
-  Spreedly.setNumberFormat("prettyFormat");
-});
-
-// Masked format
-Spreedly.on('ready', function() {
-  Spreedly.setFieldType("cvv", "text");
-  Spreedly.setFieldType("number", "text");
-  Spreedly.setNumberFormat("maskedFormat");
-});
-```
-
-#### setPlaceholder
-
-Style iFrame fields' placeholder text if page design requires so.
-
-**Arguments**
-
-| Name | Description |
-| --- | --- |
-| field | The iFrame field to set the placeholder. Can be one of number or cvv. |
-| placeholder | The placeholder text value. |
-
-```js title="setPlaceholder"
-Spreedly.on('ready', function() {
-  Spreedly.setPlaceholder("number", "Card");
-  Spreedly.setPlaceholder("cvv", "CVV");
-});
-```
-
-#### setStyle
-
-Style iFrame fields using CSS. More than one invocation of setStyle can be used per field to organize and better structure styling directives.
-
-**Arguments**
-
-| Name | Description |
-| --- | --- |
-| field | The iFrame field to set the placeholder. Can be one of number or cvv. |
-| css | The CSS to apply. Should be vanilla CSS, -moz-appearance, or -webkit-appearance. All CSS properties should be constructed as a single string. |
-
-```js title="setStyle"
-Spreedly.on("ready", function() {
-  Spreedly.setStyle("number", "width:225px;  height:35px;");
-  Spreedly.setStyle("number", "font-size: 20px; text-align: center");
-  Spreedly.setStyle("cvv", "width:60px;  height:35px;");
-});
-```
-<Callout type="warn">
-Importing external fonts or images is not supported due to CORS restrictions.
-</Callout>
-
-#### transferFocus
-
-Set the cursor focus to one of the iFrame fields. This is useful if you want to load your form with the card number field already in focus, or auto-focus a field that contains an input error.
-
-```js title="transferFocus"
-Spreedly.transferFocus("number");
+```js title="setFocus"
+payment.setFocus("number");
 ```
 
 **Arguments**
 
 | Name | Description |
 | --- | --- |
-| field | The iFrame field to set the placeholder. Can be one of number or cvv. |
+| field | `number`, `cvv`, or `iframe`. |
 
-#### toggleAutoComplete
+#### destroy
 
-Toggle autocomplete functionality for card number and cvv fields. **By default, the autocomplete attribute is enabled**, so the first call of this function will disable autocomplete.
+Remove the iFrames. Call it before you discard an instance, such as when a modal closes, so the old instance stops reacting to events.
 
-```js title="toggleAutoComplete"
-Spreedly.toggleAutoComplete();
+```js title="destroy"
+payment.destroy();
 ```
+
+### Test Cards
+
+Use the [Test Gateway](/docs/admin-api/guides/testing-guide#test-gateway) card numbers with any name, future expiry, and security code. The demo uses `4111111111111111`.
+
+### Migrating from Spreedly iFrame v1
+
+Older integrations load `iframe-v1.min.js` and call `Spreedly` directly. Replace that script with `payment.js` from [Setup](#setup) and map the calls:
+
+| Spreedly iFrame v1 | NextPayment |
+| --- | --- |
+| `Spreedly.init(envKey, options)` | `new NextPayment(options)` |
+| `Spreedly.on('ready')` | `payment.onReady` |
+| `Spreedly.setStyle()` | `styling` option, camelCase objects |
+| `Spreedly.setPlaceholder()` | `placeholder` option |
+| `Spreedly.setNumberFormat()` | `numberFormat` option |
+| `Spreedly.setFieldType()` | Not configurable, always `text` |
+| `Spreedly.transferFocus()` | `payment.setFocus()` |
+| `Spreedly.tokenizeCreditCard()` | `payment.submit()` |
+| `Spreedly.on('paymentMethod')` | `payment.onTokenized`, token at `payment_method.token` |
+| `Spreedly.on('errors')` | `payment.onValidation` and `payment.onError` |
 
 ## 3D Secure (3DS2)
 

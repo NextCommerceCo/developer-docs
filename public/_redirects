@@ -34,48 +34,65 @@
 /docs/admin-api/guides/payment-methods/iframe-payment-form /docs/admin-api/guides/payment-methods/bankcard 301
 
 # Campaigns SDK reference moved to cart-sdk.nextcommerce.com
-/docs/campaigns/utilities/fomo https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/utilities/fomo/* https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/utilities/debugger https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/utilities/debugger/* https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/utilities/exit-intent https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/utilities/exit-intent/* https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/utilities/loading-states https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/utilities/loading-states/* https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/javascript-api/url-parameters https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/javascript-api/url-parameters/* https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/javascript-api/attribution https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/javascript-api/attribution/* https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/javascript-api/events https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/javascript-api/events/* https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/data-attributes/url-parameters https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/data-attributes/url-parameters/* https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/data-attributes/css-classes https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/data-attributes/css-classes/* https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/data-attributes https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/data-attributes/* https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/javascript-api https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/javascript-api/* https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/analytics https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/analytics/* https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/configuration https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/configuration/* https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/bundle-selector https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/bundle-selector/* https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/package-toggle https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/package-toggle/* https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/cart-summary https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/cart-summary/* https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/cart-system https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/cart-system/* https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/checkout https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/checkout/* https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/upsells https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/upsells/* https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/utilities https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/utilities/* https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/guides https://cart-sdk.nextcommerce.com/latest/ 301
-/docs/campaigns/guides/* https://cart-sdk.nextcommerce.com/latest/ 301
+#
+# Cloudflare counts every cross-host redirect as a *dynamic* rule and caps those at
+# 100 per _redirects file. An earlier version of this block enumerated all 138 old
+# paths and was rejected at deploy time with
+# "Maximum number of dynamic _redirects rules limit of 100 exceeded". These 29
+# rules plus the 4 placeholder rules above stay well inside that cap. Do not
+# expand this block back to one rule per page.
+#
+# One destination per section, deliberately. Within a section the exact rule and
+# its splat share the same target, so it does not matter which one Cloudflare
+# matches first — an earlier attempt relied on specific-before-wildcard ordering
+# and the parent wildcard won anyway on the preview deploy. Same-destination pairs
+# make that question moot.
+#
+# The cost is anchor granularity: /checkout/payment lands on the checkout page
+# rather than #payment-methods. That is an acceptable trade. What matters for
+# indexing is that each URL reaches the page that actually absorbed its content
+# instead of the site root, which Google reads as a soft 404 and drops.
+#
+# FOMO has no rule, and there is deliberately no /utilities/* catch-all that would
+# swallow it: the feature is gone from the SDK (no matches in src/), so its five
+# old paths must 404. The three surviving utilities are listed individually.
+#
+# Anything else under /docs/campaigns/ either still exists (api/, page-kit,
+# templates, admin-api) or never did. campaign-cart sub-paths are handled by the
+# /docs/campaigns/campaign-cart/:path rule above; the bare index has its own rule
+# below.
+/docs/campaigns/utilities/debugger https://cart-sdk.nextcommerce.com/latest/reference/debugger/ 301
+/docs/campaigns/utilities/debugger/* https://cart-sdk.nextcommerce.com/latest/reference/debugger/ 301
+/docs/campaigns/utilities/exit-intent https://cart-sdk.nextcommerce.com/latest/reference/javascript-api/#on-page-popups 301
+/docs/campaigns/utilities/exit-intent/* https://cart-sdk.nextcommerce.com/latest/reference/javascript-api/#on-page-popups 301
+/docs/campaigns/utilities/loading-states https://cart-sdk.nextcommerce.com/latest/reference/data-attributes/#hiding-placeholders-until-prices-load 301
+/docs/campaigns/utilities/loading-states/* https://cart-sdk.nextcommerce.com/latest/reference/data-attributes/#hiding-placeholders-until-prices-load 301
+/docs/campaigns/analytics https://cart-sdk.nextcommerce.com/latest/reference/analytics-events/ 301
+/docs/campaigns/analytics/* https://cart-sdk.nextcommerce.com/latest/reference/analytics-events/ 301
+/docs/campaigns/bundle-selector https://cart-sdk.nextcommerce.com/latest/reference/data-attributes/#bundle-selector 301
+/docs/campaigns/bundle-selector/* https://cart-sdk.nextcommerce.com/latest/reference/data-attributes/#bundle-selector 301
+/docs/campaigns/cart-summary https://cart-sdk.nextcommerce.com/latest/reference/data-attributes/#cart-summary 301
+/docs/campaigns/cart-summary/* https://cart-sdk.nextcommerce.com/latest/reference/data-attributes/#cart-summary 301
+/docs/campaigns/cart-system https://cart-sdk.nextcommerce.com/latest/reference/javascript-api/#cart-operations 301
+/docs/campaigns/cart-system/* https://cart-sdk.nextcommerce.com/latest/reference/javascript-api/#cart-operations 301
+/docs/campaigns/checkout https://cart-sdk.nextcommerce.com/latest/pages/checkout-page/ 301
+/docs/campaigns/checkout/* https://cart-sdk.nextcommerce.com/latest/pages/checkout-page/ 301
+/docs/campaigns/configuration https://cart-sdk.nextcommerce.com/latest/reference/window-globals/#windownextconfig 301
+/docs/campaigns/configuration/* https://cart-sdk.nextcommerce.com/latest/reference/window-globals/#windownextconfig 301
+/docs/campaigns/data-attributes https://cart-sdk.nextcommerce.com/latest/reference/data-attributes/ 301
+/docs/campaigns/data-attributes/* https://cart-sdk.nextcommerce.com/latest/reference/data-attributes/ 301
+/docs/campaigns/guides https://cart-sdk.nextcommerce.com/latest/start-here/getting-started/ 301
+/docs/campaigns/guides/* https://cart-sdk.nextcommerce.com/latest/start-here/getting-started/ 301
+/docs/campaigns/javascript-api https://cart-sdk.nextcommerce.com/latest/reference/javascript-api/ 301
+/docs/campaigns/javascript-api/* https://cart-sdk.nextcommerce.com/latest/reference/javascript-api/ 301
+/docs/campaigns/package-toggle https://cart-sdk.nextcommerce.com/latest/reference/data-attributes/#order-bumps 301
+/docs/campaigns/package-toggle/* https://cart-sdk.nextcommerce.com/latest/reference/data-attributes/#order-bumps 301
+/docs/campaigns/upsells https://cart-sdk.nextcommerce.com/latest/pages/upsell-page/ 301
+/docs/campaigns/upsells/* https://cart-sdk.nextcommerce.com/latest/pages/upsell-page/ 301
+/docs/campaigns/utilities https://cart-sdk.nextcommerce.com/latest/reference/javascript-api/#utilities 301
+# The bare campaign-cart index needs its own rule: /docs/campaigns/campaign-cart/:path
+# above only matches sub-paths, so without this the index 404s.
+/docs/campaigns/campaign-cart https://cart-sdk.nextcommerce.com/latest/start-here/how-it-works/ 301
 # Old Redoc-style reference URL still linked from the platform changelog (with and without
 # trailing slash). Exact-path rules on purpose: /docs/admin-api/reference/<group>/<op> are real pages.
 /docs/admin-api/reference /docs/admin-api 301

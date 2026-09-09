@@ -1,0 +1,86 @@
+---
+title: Update a Campaign Package Image
+description: Replace or remove the image on a campaign package through the Admin API, from a URL or base64 upload
+sidebar_label: Campaign Package Images
+sidebar_position: 7
+tags:
+ - Guide
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Each campaign package has an image that your funnel pages show to customers. A package starts with its product's catalogue image, and this guide covers replacing it with a campaign specific image, or removing it, through the Admin API.
+
+Requests need the `campaigns:write` scope. Listing packages to find their IDs needs `campaigns:read`.
+
+### Update Flow
+
+Replacing a package image is a 3 step process:
+
+1. Find the package `id` on the campaign using the [campaignsPackagesList](/docs/admin-api/reference/campaigns/campaignsPackagesList) endpoint.
+2. Send the new image to the [campaignsPackagesImageUpdate](/docs/admin-api/reference/campaigns/campaignsPackagesImageUpdate) endpoint, from either a URL or base64 data.
+3. Read the new `image` URL back from the response.
+
+### Find the Package
+
+[campaignsPackagesList](/docs/admin-api/reference/campaigns/campaignsPackagesList) returns every package on the campaign and filters on `name`, `product_name`, and `product_sku`.
+
+```json title="Find Package by SKU" http-method="GET" http-target="https://{store}.29next.store/api/admin/campaigns/{id}/packages/?product_sku=WIDGET-BLU"
+{}
+```
+
+Each package in the response carries its `id` and current `image` URL.
+
+### Update From a URL
+
+Pass `src` and the platform fetches the image from that URL.
+
+```json title="Update Package Image From URL" http-method="PUT" http-target="https://{store}.29next.store/api/admin/campaigns/{id}/packages/{packageId}/image/"
+{
+  "src": "https://cdn.example.com/widget-single-hero.png", // URL to fetch the image from
+  "file_name": "widget-single-hero" // optional, the extension is taken from the image
+}
+```
+
+### Update From Base64 Data
+
+Pass `attachment` with the base64-encoded file when the image is not hosted anywhere your store can reach.
+
+```json title="Update Package Image From Base64" http-method="PUT" http-target="https://{store}.29next.store/api/admin/campaigns/{id}/packages/{packageId}/image/"
+{
+  "attachment": "iVBORw0KGgoAAAANSUhEUgAA...", // base64-encoded image
+  "file_name": "widget-single-hero" // optional, the extension is taken from the image
+}
+```
+
+<Callout type="warn" title="Send Either src or attachment, Not Both">
+The request accepts one source per call. Accepted formats are JPG, JPEG, PNG, ICO, GIF, and WebP. Two limits apply independently: 10 MB file size and 25 megapixels (around 5000 x 5000). If you omit `file_name`, a name is generated automatically.
+</Callout>
+
+### Read the Result
+
+The response is the full package object, so the new `image` URL comes back on the same call with no follow-up retrieve.
+
+```json title="Response"
+{
+  "id": 2231,
+  "name": "Widget Single",
+  "image": "https://d36qjeq4w.cloudfront.net/media/.../widget-single-hero.png",
+  "product_id": 184,
+  "product_variant_id": 512,
+  ...
+}
+```
+
+### Remove an Image
+
+[campaignsPackagesImageDestroy](/docs/admin-api/reference/campaigns/campaignsPackagesImageDestroy) removes the image from the package and returns `204` with no body.
+
+```json title="Remove Package Image" http-method="DELETE" http-target="https://{store}.29next.store/api/admin/campaigns/{id}/packages/{packageId}/image/"
+{}
+```
+
+<Callout type="info" title="Where the Image Shows Up">
+The [Campaign Cart API](/docs/campaigns/api) returns the same URL as `image` on each package in the campaign response, and as `package_image` on cart and order lines. Funnel pages that render package images pick up the new image without a deploy.
+</Callout>
+
+See [Campaigns Admin API](/docs/campaigns/admin-api) for creating campaigns and packages end to end.

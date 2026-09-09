@@ -104,6 +104,23 @@ Subscription packages carry a recurring interval and a separate recurring price.
 }
 ```
 
+### Set a Package Image
+
+A package starts with its product's catalogue image. To show a campaign specific image instead, [campaignsPackagesImageUpdate](/docs/admin-api/reference/campaigns/campaignsPackagesImageUpdate) replaces it from either a URL (`src`) or base64 data (`attachment`). Send one or the other, not both.
+
+```json title="Set Package Image From a URL" http-method="PUT" http-target="https://{store}.29next.store/api/admin/campaigns/{id}/packages/{packageId}/image/"
+{
+  "src": "https://cdn.example.com/widget-single-hero.png", // image URL to fetch
+  "file_name": "widget-single-hero" // optional, the extension is taken from the image
+}
+```
+
+The response is the full package with the new `image` URL. Accepted formats are JPG, PNG, ICO, GIF, and WebP, up to 10 MB and 25 megapixels. [campaignsPackagesImageDestroy](/docs/admin-api/reference/campaigns/campaignsPackagesImageDestroy) removes the image from the package. See [Update a Campaign Package Image](/docs/admin-api/guides/campaign-package-images) for the base64 upload variant and the full flow.
+
+<Callout type="info" title="Package Images Reach Your Funnel Pages">
+The package `image` returned by the [Campaign Cart API](/docs/campaigns/api) comes from this setting, and cart and order lines carry it as `package_image`. Pages that render package images pick up the change without a deploy.
+</Callout>
+
 ### Repricing Across Currencies
 
 [campaignsPackagesCreate](/docs/admin-api/reference/campaigns/campaignsPackagesCreate) takes a single `price` and `price_recurring`. [campaignsPackagesPartialUpdate](/docs/admin-api/reference/campaigns/campaignsPackagesPartialUpdate) takes a `prices` array with one entry per currency, and currencies you leave out are not changed.
@@ -274,6 +291,8 @@ Full request and response detail lives in the Admin API reference.
 | [Campaigns Packages Retrieve](/docs/admin-api/reference/campaigns/campaignsPackagesRetrieve) | `GET /api/admin/campaigns/{id}/packages/{packageId}/` |
 | [Campaigns Packages Partial Update](/docs/admin-api/reference/campaigns/campaignsPackagesPartialUpdate) | `PATCH /api/admin/campaigns/{id}/packages/{packageId}/` |
 | [Campaigns Packages Destroy](/docs/admin-api/reference/campaigns/campaignsPackagesDestroy) | `DELETE /api/admin/campaigns/{id}/packages/{packageId}/` |
+| [Campaigns Packages Image Update](/docs/admin-api/reference/campaigns/campaignsPackagesImageUpdate) | `PUT /api/admin/campaigns/{id}/packages/{packageId}/image/` |
+| [Campaigns Packages Image Destroy](/docs/admin-api/reference/campaigns/campaignsPackagesImageDestroy) | `DELETE /api/admin/campaigns/{id}/packages/{packageId}/image/` |
 
 ### Shipping Methods
 

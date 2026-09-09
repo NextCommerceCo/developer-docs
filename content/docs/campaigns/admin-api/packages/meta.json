@@ -5,6 +5,8 @@
     "[Campaigns Packages Create](/docs/admin-api/reference/campaigns/campaignsPackagesCreate)",
     "[Campaigns Packages Retrieve](/docs/admin-api/reference/campaigns/campaignsPackagesRetrieve)",
     "[Campaigns Packages Partial Update](/docs/admin-api/reference/campaigns/campaignsPackagesPartialUpdate)",
-    "[Campaigns Packages Destroy](/docs/admin-api/reference/campaigns/campaignsPackagesDestroy)"
+    "[Campaigns Packages Destroy](/docs/admin-api/reference/campaigns/campaignsPackagesDestroy)",
+    "[Campaigns Packages Image Update](/docs/admin-api/reference/campaigns/campaignsPackagesImageUpdate)",
+    "[Campaigns Packages Image Destroy](/docs/admin-api/reference/campaigns/campaignsPackagesImageDestroy)"
   ]
 }

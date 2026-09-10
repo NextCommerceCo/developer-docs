@@ -43,6 +43,19 @@ Webhook handlers should also complete within about 20 seconds. Longer-running en
 
 Returning a `410` response code indicates the target resource is no longer available and will automatically disable the webhook.
 </Callout>
+
+### Delivery Guarantees
+
+Webhooks are delivered at least once. Every event is queued and retried until your endpoint returns a `200`. The `event_id` stays the same across retries of the same event, so you can use it to skip events you've already processed.
+
+There is no delivery time guarantee. Events are delivered from a queue, so timing depends on queue volume and any retries. We autoscale during busy periods to keep delays to a minimum, but receivers should not rely on events arriving within a specific timeframe.
+
+<Callout type="info">
+Because events can arrive out of order, use the timestamps in the payload data to determine sequence. If your app needs the current state of a resource, retrieve it from the [Admin API](/docs/admin-api).
+</Callout>
+
+We also recommend processing events asynchronously so that spikes in delivery volume don't overwhelm your endpoint.
+
 ### Webhook Events
 
 | Event                     | Description                          | Reference |

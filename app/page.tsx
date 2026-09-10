@@ -228,25 +228,31 @@ export default function HomePage() {
           <div className="relative mx-auto max-w-6xl px-6 pt-20 pb-12 md:pt-28 md:pb-16 flex flex-col items-center text-center gap-6">
             {/* Badge */}
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 pt-2 text-xs text-fd-muted-foreground">
-              <div className="flex items-center gap-1.5">
+              <Link
+                href="/docs/admin-api"
+                className="flex items-center gap-1.5 hover:text-fd-foreground transition-colors duration-150"
+              >
                 <Code2 size={13} className="text-blue-400" aria-hidden="true" />
-                <span>{`${stats.adminApiOperations} REST Endpoints`}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
+                <span>{`${stats.adminApiOperations} Admin API Endpoints`}</span>
+              </Link>
+              <Link
+                href="/docs/webhooks"
+                className="flex items-center gap-1.5 hover:text-fd-foreground transition-colors duration-150"
+              >
                 <Zap size={13} className="text-orange-400" aria-hidden="true" />
                 <span>{`${stats.webhookEvents} Webhook Events`}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
+              </Link>
+              <Link
+                href="/docs/storefront"
+                className="flex items-center gap-1.5 hover:text-fd-foreground transition-colors duration-150"
+              >
                 <Globe size={13} className="text-green-400" aria-hidden="true" />
                 <span>GraphQL Storefront API</span>
-              </div>
+              </Link>
             </div>
 
             <h1 className="text-4xl font-bold tracking-tight md:text-5xl lg:text-[3.25rem] lg:leading-[1.15]">
-              Build on{' '}
-              <span className="bg-gradient-to-r from-blue-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
-                Next Commerce
-              </span>
+              Build on Next Commerce
             </h1>
 
             <p className="text-lg text-fd-muted-foreground leading-relaxed max-w-2xl">

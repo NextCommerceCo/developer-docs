@@ -70,7 +70,7 @@ if (statsRaw !== null) {
   check(index !== null, 'out/index.html does not exist');
   if (index !== null) {
     for (const needle of [
-      `<span>${stats.adminApiOperations} REST Endpoints</span>`,
+      `<span>${stats.adminApiOperations} Admin API Endpoints</span>`,
       `<span>${stats.webhookEvents} Webhook Events</span>`,
     ]) {
       check(index.includes(needle), `index.html is missing ${JSON.stringify(needle)}`);

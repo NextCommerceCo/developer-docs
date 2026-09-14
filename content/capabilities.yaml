@@ -264,7 +264,7 @@ capabilities:
       - /docs/campaigns/admin-api
     api_operations: [tag:campaigns]
     webhooks: []
-    skills: [next-create-campaign, next-campaigns-setup]
+    skills: [next-campaigns-create, next-campaigns-setup]
     status: available
     last_verified: 2026-09-14
 
@@ -426,6 +426,6 @@ capabilities:
       - /docs/skills
     api_operations: []
     webhooks: []
-    skills: [next-theme-figma, next-theme-dev, next-create-campaign, next-campaigns-setup, next-bulk-fulfill, next-bulk-move, next-bulk-subscription, next-ops-scan]
+    skills: [next-theme-figma, next-theme-dev, next-campaigns-create, next-campaigns-setup, next-bulk-fulfill, next-bulk-move, next-bulk-subscription, next-ops-scan]
     status: available
     last_verified: 2026-09-14

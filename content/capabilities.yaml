@@ -264,9 +264,9 @@ capabilities:
       - /docs/campaigns/admin-api
     api_operations: [tag:campaigns]
     webhooks: []
-    skills: [next-campaigns-setup]
+    skills: [next-create-campaign, next-campaigns-setup]
     status: available
-    last_verified: 2026-09-03
+    last_verified: 2026-09-14
 
   - id: storefront-themes
     title: Storefront themes
@@ -418,14 +418,14 @@ capabilities:
     title: AI agent skills
     summary: >-
       Pre-built skills that give AI coding agents platform knowledge (theme development,
-      campaign setup, bulk operations, daily ops scans), installable with the skills CLI
-      or loadable as plain markdown.
+      campaign provisioning and setup, bulk operations, daily ops scans), installable with
+      the skills CLI or loadable as plain markdown.
     audiences: [developer]
     operator_docs: []
     developer_docs:
       - /docs/skills
     api_operations: []
     webhooks: []
-    skills: [next-theme-figma, next-theme-dev, next-campaigns-setup, next-bulk-fulfill, next-bulk-move, next-bulk-subscription, next-ops-scan]
+    skills: [next-theme-figma, next-theme-dev, next-create-campaign, next-campaigns-setup, next-bulk-fulfill, next-bulk-move, next-bulk-subscription, next-ops-scan]
     status: available
-    last_verified: 2026-09-03
+    last_verified: 2026-09-14

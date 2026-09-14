@@ -14,25 +14,21 @@ Below are best practices and guides for common scenarios merchants and partners 
 
 ### Product Model
 
-Every product is one of three structures, returned as `structure` on the product.
+Every product is a parent with one or more variants. The product holds the title, description, images, categories and `variant_attributes`. Each variant holds the `sku`, `prices`, `stockrecords`, `track_stock`, `allow_backorders` and its own `image` chosen from the product's images.
 
-| Structure | What it is | Where it appears |
-| --- | --- | --- |
-| `standalone` | A product sold in one form with a single variant | Product list and detail |
-| `parent` | A product with variant attributes such as Color and Size | Product list and detail |
-| `child` | One purchasable variant of a parent | The `variants` array of its parent |
+A product without `variant_attributes` still has one variant, the default variant, and that is where its SKU, price and stock live. A product with `variant_attributes` such as Color and Size has one variant per combination.
 
-The parent holds the title, description, images, categories and `variant_attributes`. Each variant holds the `sku`, `prices`, `stockrecords`, `track_stock`, `allow_backorders` and its own `image` chosen from the parent's images. A standalone product follows the same split: the product carries the content and its single default variant carries the SKU, price and stock.
+In responses, `structure` is `parent` on the product and `child` on each entry in its `variants` array. The API never creates `standalone`, so it only appears on older existing products.
 
 <Callout type="info" title="Prices and Stock Live on Variants">
 Prices and stockrecords are always on the variant. Creating a price on a parent product is rejected with "This action is not allowed on parent products." Use the variant `id` from the `variants` array when calling the prices and stockrecords endpoints.
 </Callout>
 
-### Create a Standalone Product
+### Create a Simple Product
 
-Create a standalone product with a single POST to the [productsCreate](/docs/admin-api/reference/products/productsCreate) endpoint. Send no `variant_attributes` and exactly one entry in `variants` carrying the SKU, price and stock.
+Create a product sold in one form with a single POST to the [productsCreate](/docs/admin-api/reference/products/productsCreate) endpoint. Send no `variant_attributes` and exactly one entry in `variants` carrying the SKU, price and stock for its default variant.
 
-```json title="Create Standalone Product" http-method="POST" http-target="https://{store}.29next.store/api/admin/products/"
+```json title="Create Simple Product" http-method="POST" http-target="https://{store}.29next.store/api/admin/products/"
 {
   "title": "Classic Tee",
   "description": "<p>Heavyweight cotton tee.</p>",
@@ -65,7 +61,7 @@ Create a standalone product with a single POST to the [productsCreate](/docs/adm
 }
 ```
 
-The response is the full product with `id`, `slug`, `url` and the created variant in `variants`. Without `variant_attributes` the product gets one default variant, and sending more than one entry in `variants` is rejected with "Default product must be only one."
+The response is the full product with `id`, `slug`, `url` and the default variant as the only entry in `variants`. Sending more than one entry in `variants` without `variant_attributes` is rejected with "Default product must be only one."
 
 <Callout type="info" title="Variants Need Prices and Stockrecords">
 Every variant you create must include `prices` and `stockrecords`. The only exception is a variant with `requires_shipping` set to `false`, which gets a stockrecord at your default location automatically.
@@ -237,7 +233,7 @@ Add a variant to an existing product with the [productsVariantCreate](/docs/admi
 
 ### Product Images
 
-Images belong to the parent or standalone product. Upload one from a URL with `src`, or from base64 data with `attachment`, using the [productsImageCreate](/docs/admin-api/reference/products/productsImageCreate) endpoint. Send one or the other, not both.
+Images belong to the product, not the variant. Upload one from a URL with `src`, or from base64 data with `attachment`, using the [productsImageCreate](/docs/admin-api/reference/products/productsImageCreate) endpoint. Send one or the other, not both.
 
 ```json title="Upload Image From Base64" http-method="POST" http-target="https://{store}.29next.store/api/admin/products/{id}/images/"
 {
@@ -330,6 +326,18 @@ Find the stockrecord `id` in the variant's `stockrecords` array, then PATCH the 
 }
 ```
 
+#### Remove a Location from a Variant
+
+Delete the stockrecord with the [stockrecordsDestroy](/docs/admin-api/reference/products/stockrecordsDestroy) endpoint to stop fulfilling a variant from that location.
+
+```json title="Delete Stockrecord" http-method="DELETE" http-target="https://{store}.29next.store/api/admin/stockrecords/{id}/"
+{}
+```
+
+<Callout type="warn" title="Stockrecord Delete Rules">
+A variant must keep at least one stockrecord, so the last one cannot be deleted. When `track_stock` is on, a stockrecord with `num_allocated` above zero cannot be deleted until those orders are fulfilled or cancelled. Both cases return a validation error and leave the stockrecord in place.
+</Callout>
+
 #### Find Low or Out of Stock Items
 
 The [stockrecordsList](/docs/admin-api/reference/products/stockrecordsList) endpoint filters on `inventory_availability` with `in_stock`, `low_stock`, `out_of_stock` or `untracked`, and on `location_id`, `sku` and `search_text`.
@@ -373,14 +381,14 @@ Assign categories, recommended products and ordering on the product.
 ```json title="Organize Product" http-method="PATCH" http-target="https://{store}.29next.store/api/admin/products/{id}/"
 {
   "categories": [12, 15], // full list of category ids
-  "recommended_products": [2100, 2104], // standalone or parent product ids
+  "recommended_products": [2100, 2104], // product ids, not variant ids
   "ranking": 10, // highest ranking shows first in listings
   "is_discountable": true // allow the product in offers
 }
 ```
 
 <Callout type="info" title="Recommended Products Cannot Be Variants">
-`recommended_products` accepts standalone and parent product IDs only. Passing a variant `id` is rejected.
+`recommended_products` accepts product IDs only. Passing a variant `id` is rejected.
 </Callout>
 
 ### Visibility and SEO

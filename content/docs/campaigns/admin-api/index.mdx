@@ -115,7 +115,20 @@ A package starts with its product's catalogue image. To show a campaign specific
 }
 ```
 
-The response is the full package with the new `image` URL. Accepted formats are JPG, PNG, ICO, GIF, and WebP, up to 10 MB and 25 megapixels. [campaignsPackagesImageDestroy](/docs/admin-api/reference/campaigns/campaignsPackagesImageDestroy) removes the image from the package. See [Update a Campaign Package Image](/docs/admin-api/guides/campaign-package-images) for the base64 upload variant and the full flow.
+When the image is not hosted anywhere your store can reach, pass `attachment` with the base64-encoded file instead.
+
+```json title="Set Package Image From Base64" http-method="PUT" http-target="https://{store}.29next.store/api/admin/campaigns/{id}/packages/{packageId}/image/"
+{
+  "attachment": "iVBORw0KGgoAAAANSUhEUgAA...", // base64-encoded image
+  "file_name": "widget-single-hero" // optional, the extension is taken from the image
+}
+```
+
+The response is the full package with the new `image` URL. Accepted formats are JPG, PNG, ICO, GIF, and WebP, up to 10 MB and 25 megapixels. [campaignsPackagesImageDestroy](/docs/admin-api/reference/campaigns/campaignsPackagesImageDestroy) removes the image from the package and returns `204` with no body.
+
+```json title="Remove Package Image" http-method="DELETE" http-target="https://{store}.29next.store/api/admin/campaigns/{id}/packages/{packageId}/image/"
+{}
+```
 
 <Callout type="info" title="Package Images Reach Your Funnel Pages">
 The package `image` returned by the [Campaign Cart API](/docs/campaigns/api) comes from this setting, and cart and order lines carry it as `package_image`. Pages that render package images pick up the change without a deploy.

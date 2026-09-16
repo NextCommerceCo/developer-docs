@@ -13,9 +13,21 @@ const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mon
 const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
 
 export const metadata: Metadata = {
+  // Required for Open Graph: without it Next emits relative image URLs, which
+  // scrapers reject. Every route inherits the card below.
+  metadataBase: new URL('https://developers.nextcommerce.com'),
   title: {
     template: `%s | Developers | ${siteConfig.companyName}`,
     default: `Developers | ${siteConfig.companyName}`,
+  },
+  openGraph: {
+    type: 'website',
+    siteName: `Developers | ${siteConfig.companyName}`,
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: `${siteConfig.companyName} developer documentation` }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: ['/og.png'],
   },
 };
 

@@ -8,6 +8,7 @@ tags:
 ---
 import { Callout } from 'fumadocs-ui/components/callout';
 import MoveFulfillmentOrders from '../../../_snippets/_moving-fulfillment-orders.mdx';
+import SplitFulfillmentOrders from '../../../_snippets/_splitting-fulfillment-orders.mdx';
 
 Order management operations can be automated through the Admin API for more efficient operations and bulk actions on large quanities of orders.
 
@@ -182,6 +183,7 @@ Below is the response from the [ordersRefundCalculateCreate](/docs/admin-api/ref
   "refund_lines": [
     {
       "line_id": 1000, // line item being refunded
+      "location_id": 12, // location these items are refundable at, see notes
       "quantity": 1, // number of items being refunded
       "restock_type": "no_restock", // restock action, see notes
       "refundable_quantity": 1, // items that can be refunded
@@ -211,6 +213,10 @@ Below is the response from the [ordersRefundCalculateCreate](/docs/admin-api/ref
 ```
 
 
+<Callout type="info" title="One Refund Line per Location">
+When an order has [split fulfillment](#split-fulfillment-orders) across multiple locations, its lines can be refunded at each of them. Calculate returns the `line_id` once per location, each with its own `refundable_quantity`. Pass the matching `location_id` when you create the refund.
+</Callout>
+
 #### Create Refund
 
 We're now ready to create a refund using the [ordersRefundCreate](/docs/admin-api/reference/orders/ordersRefundCreate) endpoint, see request details below.
@@ -223,6 +229,12 @@ We're now ready to create a refund using the [ordersRefundCreate](/docs/admin-ap
       "line_id": 1000, // line item being refunded
       "quantity": 1, // number of items being refunded
       "restock_type": "no_restock", // restock action (from calculate step)
+    },
+    {
+      "line_id": 1001,
+      "quantity": 2,
+      "restock_type": "cancel", // restocks, so location_id is required
+      "location_id": 12 // where the items are restocked (from calculate step)
     }
   ],
   "refund_shipping": {
@@ -238,6 +250,12 @@ We're now ready to create a refund using the [ordersRefundCreate](/docs/admin-ap
   ]
 }
 ```
+<Callout type="warn" title="location_id Is Conditionally Required">
+Restocking needs a destination, so [ordersRefundCreate](/docs/admin-api/reference/orders/ordersRefundCreate) rejects a refund line without `location_id` when `restock_type` is `return` or `cancel`. It stays optional for `no_restock`, and optional on [ordersRefundCalculateCreate](/docs/admin-api/reference/orders/ordersRefundCalculateCreate), where it narrows the response to one location.
+
+Unfulfilled items always restock as `cancel`, so any refund of unshipped items needs it.
+</Callout>
+
 <Callout type="info" title="Restock Actions">
 Depending on the product type and status of the line items being refunded, there are differen't restock actions available.
 
@@ -333,6 +351,10 @@ stateDiagram-v2
 ### Move Fulfillment Orders
 
 <MoveFulfillmentOrders />
+
+### Split Fulfillment Orders
+
+<SplitFulfillmentOrders />
 
 ### Add Fulfillment Tracking
 

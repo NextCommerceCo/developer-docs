@@ -1,0 +1,124 @@
+---
+title: API Assets
+description: Upload, list, and delete store assets through the Admin API, by file upload or from a source URL, with supported file types and size limits
+sidebar_label: Assets
+sidebar_position: 4
+tags:
+ - Guide
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Assets are the files in your store's media library, the same ones the dashboard manages under **Storefront > Assets**. Each upload is served from your store's CDN, and you can reference its URL from page content, theme templates, email templates, or anywhere else you need hosted media.
+
+Use this API to migrate media from another platform, upload images as part of a catalogue sync, or let an integration add files without dashboard access.
+
+<Callout type="info" title="Not the same as App Assets">
+Store assets are separate from [App Assets](/docs/apps/assets), which are static files bundled inside an App and referenced from snippets and event trackers. App Assets ship with the app bundle and are not managed through this API.
+</Callout>
+
+Reading assets requires the `assets:read` scope, and creating or deleting them requires `assets:write`. See [Permissions](/docs/admin-api/permissions).
+
+## Upload an Asset
+
+Create an asset with the [assetsCreate](/docs/admin-api/reference/assets/assetsCreate) endpoint. Supply the file one of two ways, never both:
+
+| Field | Detail |
+| ------ | ------ |
+| `file` | The file itself, sent as `multipart/form-data`. |
+| `src` | A URL the platform downloads the file from. Write-only, it is not returned in the response. |
+
+Passing both is rejected, and so is passing neither.
+
+### Upload a File
+
+Send the file as `multipart/form-data`.
+
+```bash title="Upload an Asset File"
+curl -X POST "https://{store}.29next.store/api/admin/assets/" \
+  -H "Authorization: Bearer {access_token}" \
+  -H "X-29next-API-Version: 2024-04-01" \
+  -F "file=@./product-hero.jpg"
+```
+
+### Upload from a Source URL
+
+Pass `src` and the platform fetches the file for you, which is the shorter path when the media is already hosted somewhere public.
+
+```json title="Create Asset from URL" http-method="POST" http-target="https://{store}.29next.store/api/admin/assets/"
+{
+  "src": "https://example.com/media/product-hero.jpg", // platform downloads this
+  "name": "product-hero.jpg" // optional, see naming below
+}
+```
+
+Both forms return the created asset:
+
+```json title="Asset Response"
+{
+  "id": 4021,
+  "name": "product-hero.jpg",
+  "file": "https://cdn.29next.store/.../product-hero.jpg", // CDN URL to reference
+  "created_at": "2026-09-16T10:04:11Z"
+}
+```
+
+<Callout type="info" title="Asset Naming">
+Leave `name` off and the asset uses the uploaded file's name. If you set it, the extension must match the actual file, or the request is rejected.
+</Callout>
+
+## List and Retrieve Assets
+
+[assetsList](/docs/admin-api/reference/assets/assetsList) returns a cursor-paginated list of every asset in the store, and [assetsRetrieve](/docs/admin-api/reference/assets/assetsRetrieve) returns a single asset by id.
+
+```json title="List Assets" http-method="GET" http-target="https://{store}.29next.store/api/admin/assets/"
+{
+  "next": "https://{store}.29next.store/api/admin/assets/?cursor=cD0yMDI2", // null on the last page
+  "previous": null,
+  "results": [
+    {
+      "id": 4021,
+      "name": "product-hero.jpg",
+      "file": "https://cdn.29next.store/.../product-hero.jpg",
+      "created_at": "2026-09-16T10:04:11Z"
+    }
+  ]
+}
+```
+
+## Delete an Asset
+
+[assetsDestroy](/docs/admin-api/reference/assets/assetsDestroy) permanently removes an asset and returns `204 No Content`.
+
+```json title="Delete an Asset" http-method="DELETE" http-target="https://{store}.29next.store/api/admin/assets/{id}/"
+```
+
+<Callout type="warn" title="Deleting Is Permanent">
+Deleting an asset is not reversible. It is removed from the media library, stops appearing in `assetsList`, and can no longer be retrieved by id.
+
+Repoint anything that references the asset's CDN URL before you delete it, whether that is a storefront page, a theme template, an email template, or an external landing page.
+</Callout>
+
+## Replacing an Asset
+
+There is no update endpoint, so an asset cannot be renamed and its file cannot be swapped in place. Upload the replacement, repoint references at the new CDN URL, then delete the old asset.
+
+## Supported File Types
+
+| Category | Extensions |
+| ------ | ------ |
+| Images | `jpg` `jpeg` `png` `gif` `webp` `svg` `ico` |
+| Documents | `pdf` `doc` `docx` `csv` `xls` `xlsx` |
+| Video and audio | `mp4` `webm` `mov` `mp3` |
+
+## File Size Limits
+
+| File type | Maximum size |
+| ------ | ------ |
+| Images, meaning `jpg` `jpeg` `png` `gif` `webp` `svg` `ico` | 10 MiB |
+| Every other supported type | 100 MiB |
+
+The same limits apply whether you upload the file directly or have the platform fetch it from `src`. Going over returns `400 Bad Request` with the message `The file must not exceed 10 MiB.`, keyed on `file` for a direct upload and on `src` for a URL fetch.
+
+<Callout type="info" title="Fetching from src">
+When you supply `src`, the platform streams the file and stops as soon as it passes the limit, so an oversized URL fails rather than downloading in full. The request also times out after 10 seconds, and a source that does not return `200` fails with `Unable to retrieve the file from this URL.`
+</Callout>

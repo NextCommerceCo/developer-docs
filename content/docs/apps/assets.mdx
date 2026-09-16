@@ -8,6 +8,10 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 App Assets are static files included in an App that can be included in Event Trackers or Snippets to extend storefront themes.
 
+<Callout type="info" title="Not the same as store Assets">
+App Assets ship inside your App bundle. They are separate from a store's media library under **Storefront > Assets**, which is managed through the [Assets API](/docs/admin-api/guides/assets).
+</Callout>
+
 <Callout type="warn">
 **App bundle max size is 2MB**, it's important to minimize and reduce the size of the assets in your App to maintain efficiency. If you are compiling CSS or JS bundles locally, it is recommended to not include the raw source files and only include the compiled minified files.
 

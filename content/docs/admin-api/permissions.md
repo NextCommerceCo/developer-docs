@@ -10,6 +10,8 @@ Admin API access is controlled granularly by Scopes that are associated with eac
 | ------ | ------ |
 | `admin:read` | Access to list and view all data |
 | `admin:write` | Access to create and update all data |
+| `assets:read` | Access to list and view store assets |
+| `assets:write` | Access to create and delete store assets |
 | `campaigns:read` | Access to list and view campaigns |
 | `campaigns:write` | Access to create and update campaigns |
 | `carts:read` | Access to list and view carts |

@@ -62,7 +62,7 @@ bundles:
     intro: >-
       Storefront themes and Theme Kit, template objects, tags and filters, theme settings,
       the storefront GraphQL API, checkout links, and event tracking.
-    capabilities: [storefront-themes, checkout-links]
+    capabilities: [storefront-themes, checkout-links, assets]
   - id: apps-webhooks
     title: Apps and webhooks
     intro: >-
@@ -191,7 +191,7 @@ capabilities:
     webhooks: [gateway.created, gateway.updated, transaction.created, transaction.updated]
     skills: []
     status: available
-    last_verified: 2026-09-03
+    last_verified: 2026-09-16
     notes:
       - NEXT Payments processing rates are not published in the documentation; they are quoted by sales.
 
@@ -240,7 +240,27 @@ capabilities:
     webhooks: [fulfillment.created, fulfillment.updated]
     skills: [next-bulk-fulfill, next-bulk-move]
     status: available
-    last_verified: 2026-09-03
+    last_verified: 2026-09-16
+
+  - id: assets
+    title: Store assets
+    summary: >-
+      A store's media library: images, documents, fonts and other files uploaded under
+      Storefront > Assets and served from the store CDN. The Admin API can list, upload
+      (by file or from a source URL) and delete them. Distinct from App Assets, which are
+      static files bundled inside an app.
+    audiences: [merchant, developer]
+    operator_docs:
+      - /docs/build-a-store/storefront/pages-and-assets
+    developer_docs:
+      - /docs/admin-api/guides/assets
+    api_operations: [tag:assets]
+    webhooks: []
+    skills: []
+    status: available
+    last_verified: 2026-09-16
+    notes:
+      - There is no update operation; replacing an asset means uploading the new file and deleting the old one.
 
   - id: campaigns
     title: Campaigns

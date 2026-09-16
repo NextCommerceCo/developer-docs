@@ -1,0 +1,54 @@
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Splitting a fulfillment order moves some items onto a second fulfillment order and leaves the rest on the original.
+
+Use it when a location can ship part of what it was sent but not all of it. Split off items that cannot be shipped and then fulfill the remaining items. The split items become their own fulfillment order, which can be moved, held, or cancelled separately. The alternative is rejecting the whole request, which sends the order back to the merchant to amend and request fulfillment again.
+
+#### Split a Fulfillment Order
+
+Use the [fulfillmentOrdersSplit](/docs/admin-api/reference/fulfillment/fulfillmentOrdersSplit) endpoint, passing the line items and quantities to move onto the new fulfillment order. Both `id` and `quantity` are required for each entry.
+
+```json title="Split a Fulfillment Order" http-method="POST" http-target="https://{store}.29next.store/api/admin/fulfillment-orders/{id}/split/"
+{
+  "fulfillment_order_line_items": [
+    {
+      "id": 85730, // fulfillment order line to split off
+      "quantity": 1 // how many units to move to the new fulfillment order
+    }
+  ]
+}
+```
+
+The response returns both fulfillment orders, so you can see the resulting split without a follow-up request.
+
+```json title="Split Response"
+{
+  "original_fulfillment_order": {
+    "id": 80473, // keeps the items you did not split
+    "status": "open",
+    "supported_actions": ["create_fulfillment", "hold_fulfillment", "move", "cancel_fulfillment_order", "split"]
+  },
+  "split_fulfillment_order": {
+    "id": 80474, // new fulfillment order holding the split items
+    "status": "open"
+  }
+}
+```
+
+The split fulfillment order inherits the original's status, request status, shipping address, shipping method, and assigned location. A `fulfillment_order_split` event is added to the order timeline.
+
+#### Split Rules
+
+- Each line must belong to the fulfillment order being split.
+- `quantity` cannot exceed that line's `fulfillable_quantity`.
+- The original must keep at least one item. To relocate everything, use [fulfillmentOrdersMove](/docs/admin-api/reference/fulfillment/fulfillmentOrdersMove) instead.
+
+<Callout type="warn" title="supported_actions Is Not the Whole Permission Story">
+`supported_actions` reports what the fulfillment order allows, not what your token may do with it.
+
+Once a fulfillment service has accepted the work, splitting it is their call. On a fulfillment order with `"status": "processing"` and `"request_status": "accepted"`, only `admin:write` or `fulfillment_service:write` can split. `fulfillment_orders:write` alone gets a `400` with `{"action": ["Not allowed"]}` while `split` still sits in `supported_actions`.
+</Callout>
+
+<Callout type="info" title="Splitting Changes How You Refund">
+A split leaves the same order line fulfillable at two locations, so [ordersRefundCalculateCreate](/docs/admin-api/reference/orders/ordersRefundCalculateCreate) returns it once per location and refunds need `location_id` to pick one. See [Order Refunds](/docs/admin-api/guides/order-management#order-refunds).
+</Callout>

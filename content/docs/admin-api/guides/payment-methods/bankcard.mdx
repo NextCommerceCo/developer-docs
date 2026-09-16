@@ -65,7 +65,7 @@ By default, bankcard charges route through your store's configured payment gatew
 ```
 
 <Callout type="info">
-Pass either `payment_gateway` or `payment_gateway_group`, not both. If you pass neither, the store's default routing applies.
+Pass either `payment_gateway` or `payment_gateway_group`, not both. If you pass neither, the store's default routing applies. To see which group that is, look for `"is_default": true` in [gatewayGroupsList](/docs/admin-api/reference/payments/gatewayGroupsList).
 </Callout>
 
 ### Get gateway and group ids

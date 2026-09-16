@@ -1,22 +1,6 @@
 components:
   schemas:
-    AddLineItem:
-      description: |-
-        Any transaction that be a part of handle_payment,
-            for saving and update status of order
-      properties:
-        lines:
-          items:
-            $ref: '#/components/schemas/CreateOrderLine'
-          type: array
-        payment_details:
-          oneOf:
-            - $ref: '#/components/schemas/AddLineItemPaymentDetail'
-            - type: 'null'
-      required:
-        - lines
-      type: object
-    AddLineItemPaymentDetail:
+    AddLineItemPaymentDetailRequest:
       properties:
         payment_gateway:
           type:
@@ -32,7 +16,23 @@ components:
             - string
             - 'null'
       type: object
-    AddOrderLine:
+    AddLineItemRequest:
+      description: |-
+        Any transaction that be a part of handle_payment,
+            for saving and update status of order
+      properties:
+        lines:
+          items:
+            $ref: '#/components/schemas/CreateOrderLineRequest'
+          type: array
+        payment_details:
+          oneOf:
+            - $ref: '#/components/schemas/AddLineItemPaymentDetailRequest'
+            - type: 'null'
+      required:
+        - lines
+      type: object
+    AddOrderLineRequest:
       properties:
         metadata: {}
         price:
@@ -52,12 +52,13 @@ components:
           type: integer
         reason:
           description: Reason for adding this item.
+          minLength: 1
           type: string
       required:
         - product_id
         - quantity
       type: object
-    AddOrderShipmentTracking:
+    AddOrderShipmentTrackingRequest:
       properties:
         carrier:
           description: |-
@@ -149,19 +150,12 @@ components:
             - string
             - 'null'
           x-spec-enum-id: 0615dfb0936c2c3f
-        date_created:
-          format: date-time
-          readOnly: true
-          type: string
         lines:
           items:
             type:
               - integer
               - 'null'
           type: array
-        reference:
-          readOnly: true
-          type: string
         send_shipped_notification:
           type:
             - boolean
@@ -174,11 +168,8 @@ components:
           type:
             - string
             - 'null'
-      required:
-        - date_created
-        - reference
       type: object
-    AddSubscriptionLine:
+    AddSubscriptionLineRequest:
       properties:
         metadata:
           oneOf:
@@ -220,6 +211,47 @@ components:
           type: string
       required:
         - id
+      type: object
+    Asset:
+      properties:
+        created_at:
+          format: date-time
+          readOnly: true
+          type: string
+        file:
+          format: uri
+          pattern: (?:jpg|png|pdf|webp|jpeg|doc|docx|csv|xlsx|xls|gif|svg|ico|eot|ttf|woff|woff2|mp4|webm|mp3|mov|css|js|scss|sass|zip|rar|tar|gz|7z)$
+          type: string
+        id:
+          readOnly: true
+          type: integer
+        name:
+          description: The name of the asset. Defaults to the uploaded/downloaded file's name if not provided.
+          maxLength: 200
+          type: string
+      required:
+        - created_at
+        - id
+      type: object
+    AssetRequest:
+      properties:
+        file:
+          format: binary
+          pattern: (?:jpg|png|pdf|webp|jpeg|doc|docx|csv|xlsx|xls|gif|svg|ico|eot|ttf|woff|woff2|mp4|webm|mp3|mov|css|js|scss|sass|zip|rar|tar|gz|7z)$
+          type: string
+        name:
+          description: The name of the asset. Defaults to the uploaded/downloaded file's name if not provided.
+          maxLength: 200
+          minLength: 1
+          type: string
+        src:
+          description: The source URL of the file. An external URL can be used for images, generic files, or external videos. Mutually exclusive with `file`.
+          format: uri
+          minLength: 1
+          type:
+            - string
+            - 'null'
+          writeOnly: true
       type: object
     Attachment:
       properties:
@@ -407,6 +439,66 @@ components:
         - line1
         - line4
       type: object
+    BillingAddressRequest:
+      properties:
+        country:
+          description: The address country code.
+          minLength: 1
+          title: ISO 3166-1 alpha-2
+          type: string
+        first_name:
+          description: The first name of the address.
+          maxLength: 255
+          minLength: 1
+          type: string
+        last_name:
+          description: The last name of the address.
+          maxLength: 255
+          minLength: 1
+          type: string
+        line1:
+          description: The first line of the address.
+          maxLength: 255
+          minLength: 1
+          title: First line of address
+          type: string
+        line2:
+          description: Optional second line of of the address.
+          maxLength: 255
+          title: Second line of address
+          type: string
+        line3:
+          description: Optional third line of of the address.
+          maxLength: 255
+          title: Third line of address
+          type: string
+        line4:
+          description: City of the address.
+          maxLength: 255
+          minLength: 1
+          title: City
+          type: string
+        phone_number:
+          description: The address phone number.
+          maxLength: 128
+          type: string
+        postcode:
+          description: The address post code or zip code.
+          maxLength: 64
+          title: Post/Zip-code
+          type: string
+        state:
+          description: The address state/province.
+          maxLength: 255
+          title: State/Province
+          type: string
+      required:
+        - country
+        - first_name
+        - last_name
+        - line1
+        - line4
+      type: object
     CalculateRefundLineResponse:
       properties:
         amount_excl_tax:
@@ -420,6 +512,9 @@ components:
           readOnly: true
           type: string
         line_id:
+          readOnly: true
+          type: integer
+        location_id:
           readOnly: true
           type: integer
         product_id:
@@ -463,6 +558,7 @@ components:
         - amount_excl_tax
         - amount_incl_tax
         - line_id
+        - location_id
         - product_id
         - product_image
         - product_title
@@ -475,14 +571,14 @@ components:
         - variant_id
         - variant_title
       type: object
-    CalculateRefundRequest:
+    CalculateRefundRequestRequest:
       properties:
         refund_lines:
           items:
-            $ref: '#/components/schemas/RefundLineRequest'
+            $ref: '#/components/schemas/RefundLineRequestRequest'
           type: array
         refund_shipping:
-          $ref: '#/components/schemas/RefundShippingRequest'
+          $ref: '#/components/schemas/RefundShippingRequestRequest'
       type: object
     CalculateRefundResponse:
       properties:
@@ -592,9 +688,10 @@ components:
         - refundable_amount
         - type
       type: object
-    CancelOrder:
+    CancelOrderRequest:
       properties:
         cancel_reason:
+          minLength: 1
           type: string
         full_refund:
           default: false
@@ -605,7 +702,7 @@ components:
       required:
         - cancel_reason
       type: object
-    CancelSubscription:
+    CancelSubscriptionRequest:
       properties:
         cancel_reason:
           description: |-
@@ -638,35 +735,35 @@ components:
       required:
         - cancel_reason
       type: object
-    CancellationRequest:
+    CancellationRequestAcceptRequest:
       properties:
         message:
           type:
             - string
             - 'null'
       type: object
-    CancellationRequestAccept:
+    CancellationRequestCancelRequest:
       properties:
         message:
           type:
             - string
             - 'null'
       type: object
-    CancellationRequestCancel:
+    CancellationRequestRejectRequest:
       properties:
         message:
           type:
             - string
             - 'null'
       type: object
-    CancellationRequestReject:
+    CancellationRequestRequest:
       properties:
         message:
           type:
             - string
             - 'null'
       type: object
-    CaptureTransaction:
+    CaptureTransactionRequest:
       properties:
         amount:
           description: |2-
@@ -971,12 +1068,58 @@ components:
         - name
         - slug
       type: object
-    CloseFulfillmentOrder:
+    CategoryRequest:
+      properties:
+        description:
+          type: string
+        external_tax_code:
+          description: Tax code to be used with external tax systems such as Avalara, Taxjar.
+          title: Tax Code
+          type:
+            - string
+            - 'null'
+        image:
+          description: URL of the image to fetch and associate with the category
+          format: uri
+          type:
+            - string
+            - 'null'
+        is_public:
+          description: Show this category in search results and catalogue listings.
+          type: boolean
+        meta_description:
+          type:
+            - string
+            - 'null'
+        meta_title:
+          type:
+            - string
+            - 'null'
+        name:
+          maxLength: 255
+          minLength: 1
+          type: string
+        slug:
+          maxLength: 255
+          minLength: 1
+          pattern: ^[-a-zA-Z0-9_]+$
+          type: string
+        template:
+          description: Use a custom template from your theme to customize the category display.
+          title: Theme Template
+          type:
+            - string
+            - 'null'
+      required:
+        - name
+        - slug
+      type: object
+    CloseFulfillmentOrderRequest:
       properties:
         message:
           type: string
       type: object
-    CollectPayment:
+    CollectPaymentRequest:
       properties:
         send_payment_notification:
           default: false
@@ -1038,25 +1181,27 @@ components:
         - code
         - name
       type: object
-    CreateCart:
+    CreateCartRequest:
       properties:
         attribution:
-          $ref: '#/components/schemas/CreateMarketingAttribution'
+          $ref: '#/components/schemas/CreateMarketingAttributionRequest'
         currency:
           maxLength: 3
+          minLength: 1
           type: string
         lines:
           items:
-            $ref: '#/components/schemas/CreateOrderLine'
+            $ref: '#/components/schemas/CreateOrderLineRequest'
           type: array
         metadata:
           oneOf:
             - {}
             - type: 'null'
         user:
-          $ref: '#/components/schemas/CreateUser'
+          $ref: '#/components/schemas/CreateUserRequest'
         vouchers:
           items:
+            minLength: 1
             type: string
           type:
             - array
@@ -1064,7 +1209,7 @@ components:
       required:
         - lines
       type: object
-    CreateDefinition:
+    CreateDefinitionRequest:
       properties:
         enable_export:
           default: false
@@ -1073,9 +1218,11 @@ components:
           default: false
           type: boolean
         key:
+          minLength: 1
           type: string
         name:
           maxLength: 255
+          minLength: 1
           type: string
         object:
           description: |-
@@ -1125,7 +1272,7 @@ components:
           x-spec-enum-id: 079b46b0c121a3e8
         validations:
           items:
-            $ref: '#/components/schemas/Validation'
+            $ref: '#/components/schemas/ValidationRequest'
           type: array
       required:
         - key
@@ -1133,7 +1280,15 @@ components:
         - object
         - type
       type: object
-    CreateDispute:
+    CreateDisputeNoteRequest:
+      properties:
+        message:
+          minLength: 1
+          type: string
+      required:
+        - message
+      type: object
+    CreateDisputeRequest:
       properties:
         amount:
           format: decimal
@@ -1154,38 +1309,14 @@ components:
           type:
             - string
             - 'null'
-        date_created:
-          format: date-time
-          readOnly: true
-          type: string
         happened_at:
           format: date-time
           title: Dispute Date
           type: string
-        id:
-          readOnly: true
-          type: integer
         metadata:
           oneOf:
             - {}
             - type: 'null'
-        order:
-          readOnly: true
-          type:
-            - string
-            - 'null'
-        report_amount:
-          format: decimal
-          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
-          readOnly: true
-          type:
-            - string
-            - 'null'
-        report_currency:
-          readOnly: true
-          type:
-            - string
-            - 'null'
         resolution:
           description: |-
             * `could_not_find_order` - Transaction Not found
@@ -1222,18 +1353,6 @@ components:
           type:
             - string
             - 'null'
-        status:
-          description: |-
-            * `new` - New
-            * `open` - Open
-            * `resolved` - Resolved
-          enum:
-            - new
-            - open
-            - resolved
-          readOnly: true
-          type: string
-          x-spec-enum-id: 4c48cc1c536a35b2
         transaction:
           type:
             - integer
@@ -1247,22 +1366,8 @@ components:
             - chargeback
           type: string
           x-spec-enum-id: 3c60da80149644ea
-      required:
-        - date_created
-        - id
-        - order
-        - report_amount
-        - report_currency
-        - status
       type: object
-    CreateDisputeNote:
-      properties:
-        message:
-          type: string
-      required:
-        - message
-      type: object
-    CreateExport:
+    CreateExportRequest:
       properties:
         date_from:
           format: date-time
@@ -1306,29 +1411,17 @@ components:
         - date_to
         - type
       type: object
-    CreateFulfillment:
-      properties:
-        fulfillment_order_line_items:
-          items:
-            $ref: '#/components/schemas/FulfillmentOrderLineItem'
-          type: array
-        notify:
-          default: true
-          type: boolean
-        tracking_info:
-          items:
-            $ref: '#/components/schemas/TrackingInfo'
-          type: array
-      type: object
-    CreateFulfillmentEvent:
+    CreateFulfillmentEventRequest:
       properties:
         city:
           description: City of the address.
+          minLength: 1
           type:
             - string
             - 'null'
         country:
           description: The address country code.
+          minLength: 1
           title: ISO 3166-1 alpha-2
           type:
             - string
@@ -1417,10 +1510,25 @@ components:
       required:
         - status
       type: object
-    CreateGiftCard:
+    CreateFulfillmentRequest:
+      properties:
+        fulfillment_order_line_items:
+          items:
+            $ref: '#/components/schemas/FulfillmentOrderLineItemRequest'
+          type: array
+        notify:
+          default: true
+          type: boolean
+        tracking_info:
+          items:
+            $ref: '#/components/schemas/TrackingInfoRequest'
+          type: array
+      type: object
+    CreateGiftCardRequest:
       properties:
         currency:
           maxLength: 3
+          minLength: 1
           type: string
         expired_at:
           format: date-time
@@ -1432,12 +1540,12 @@ components:
           pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
           type: string
         user:
-          $ref: '#/components/schemas/CreateUser'
+          $ref: '#/components/schemas/CreateUserRequest'
       required:
         - currency
         - initial
       type: object
-    CreateMarketingAttribution:
+    CreateMarketingAttributionRequest:
       properties:
         affiliate:
           description: Affiliate identifier.
@@ -1517,22 +1625,60 @@ components:
             - string
             - 'null'
       type: object
-    CreateOrder:
+    CreateOrderLineRequest:
+      properties:
+        is_upsell:
+          default: false
+          type: boolean
+        metadata:
+          oneOf:
+            - {}
+            - type: 'null'
+        price:
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          type: string
+        product_id:
+          type: integer
+        properties:
+          default: {}
+          oneOf:
+            - {}
+            - type: 'null'
+        quantity:
+          minimum: 1
+          type: integer
+        subscription:
+          $ref: '#/components/schemas/CreateOrderSubscriptionLineRequest'
+      required:
+        - product_id
+        - quantity
+      type: object
+    CreateOrderNoteRequest:
+      properties:
+        message:
+          minLength: 1
+          type: string
+      required:
+        - message
+      type: object
+    CreateOrderRequest:
       description: |-
         Any transaction that be a part of handle_payment,
             for saving and update status of order
       properties:
         attribution:
-          $ref: '#/components/schemas/CreateMarketingAttribution'
+          $ref: '#/components/schemas/CreateMarketingAttributionRequest'
         billing_address:
           oneOf:
-            - $ref: '#/components/schemas/BillingAddress'
+            - $ref: '#/components/schemas/BillingAddressRequest'
             - type: 'null'
         billing_same_as_shipping_address:
           default: false
           type: boolean
         currency:
           maxLength: 3
+          minLength: 1
           type: string
         date_placed:
           format: date-time
@@ -1541,7 +1687,7 @@ components:
             - 'null'
         lines:
           items:
-            $ref: '#/components/schemas/CreateOrderLine'
+            $ref: '#/components/schemas/CreateOrderLineRequest'
           type: array
         metadata:
           oneOf:
@@ -1553,7 +1699,7 @@ components:
           type: array
         payment_details:
           oneOf:
-            - $ref: '#/components/schemas/PaymentDetail'
+            - $ref: '#/components/schemas/PaymentDetailRequest'
             - type: 'null'
         payment_method:
           description: |-
@@ -1602,9 +1748,10 @@ components:
           type: boolean
         shipping_address:
           oneOf:
-            - $ref: '#/components/schemas/ShippingAddress'
+            - $ref: '#/components/schemas/ShippingAddressRequest'
             - type: 'null'
         shipping_code:
+          minLength: 1
           type:
             - string
             - 'null'
@@ -1628,6 +1775,7 @@ components:
           x-spec-enum-id: 84cac15b283ee444
         tags:
           items:
+            minLength: 1
             type:
               - string
               - 'null'
@@ -1639,9 +1787,10 @@ components:
           default: false
           type: boolean
         user:
-          $ref: '#/components/schemas/CreateUser'
+          $ref: '#/components/schemas/CreateUserRequest'
         vouchers:
           items:
+            minLength: 1
             type: string
           type:
             - array
@@ -1649,43 +1798,7 @@ components:
       required:
         - lines
       type: object
-    CreateOrderLine:
-      properties:
-        is_upsell:
-          default: false
-          type: boolean
-        metadata:
-          oneOf:
-            - {}
-            - type: 'null'
-        price:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          type: string
-        product_id:
-          type: integer
-        properties:
-          default: {}
-          oneOf:
-            - {}
-            - type: 'null'
-        quantity:
-          minimum: 1
-          type: integer
-        subscription:
-          $ref: '#/components/schemas/CreateOrderSubscriptionLine'
-      required:
-        - product_id
-        - quantity
-      type: object
-    CreateOrderNote:
-      properties:
-        message:
-          type: string
-      required:
-        - message
-      type: object
-    CreateOrderSubscriptionLine:
+    CreateOrderSubscriptionLineRequest:
       properties:
         interval:
           description: |-
@@ -1711,21 +1824,13 @@ components:
         - interval
         - interval_count
       type: object
-    CreateProduct:
+    CreateProductRequest:
       properties:
         categories:
           deprecated: true
           items:
             type: integer
           type: array
-        date_created:
-          format: date-time
-          readOnly: true
-          type: string
-        date_updated:
-          format: date-time
-          readOnly: true
-          type: string
         description:
           type: string
         enable_subscription:
@@ -1736,14 +1841,6 @@ components:
           type:
             - string
             - 'null'
-        id:
-          readOnly: true
-          type: integer
-        images:
-          items:
-            $ref: '#/components/schemas/ProductImage'
-          readOnly: true
-          type: array
         interval:
           description: |-
             * `day` - Day
@@ -1796,20 +1893,10 @@ components:
           maximum: 2147483647
           minimum: -2147483648
           type: integer
-        rating:
-          format: double
-          readOnly: true
-          type:
-            - number
-            - 'null'
         recommended_products:
           items:
             type: integer
           type: array
-        slug:
-          pattern: ^[-a-zA-Z0-9_]+$
-          readOnly: true
-          type: string
         template:
           description: Custom template name from your theme, ie catalogue/product.{custom_name}.html
           title: Theme Template
@@ -1817,109 +1904,43 @@ components:
             - string
             - 'null'
         title:
-          type: string
-        url:
-          format: uri
-          readOnly: true
+          minLength: 1
           type: string
         variant_attributes:
           items:
-            $ref: '#/components/schemas/ProductVariantAttribute'
+            $ref: '#/components/schemas/ProductVariantAttributeRequest'
           type: array
         variants:
           items:
-            $ref: '#/components/schemas/CreateProductVariantForProduct'
+            $ref: '#/components/schemas/CreateProductVariantForProductRequest'
           type: array
       required:
-        - date_created
-        - date_updated
-        - id
-        - images
-        - rating
-        - slug
         - title
-        - url
       type: object
-    CreateProductVariant:
-      properties:
-        allow_backorders:
-          description: Continue selling when out of stock.
-          type: boolean
-        image:
-          type:
-            - integer
-            - 'null'
-        metadata:
-          oneOf:
-            - {}
-            - type: 'null'
-        prices:
-          items:
-            $ref: '#/components/schemas/ProductPrices'
-          type: array
-        requires_shipping:
-          title: Requires shipping?
-          type: boolean
-        sku:
-          description: Stock Keeping Unit
-          type:
-            - string
-            - 'null'
-        stockrecords:
-          items:
-            $ref: '#/components/schemas/StockrecordLocation'
-          type: array
-        track_stock:
-          description: Track inventory quantities at fulfillment locations.
-          title: Track Stock Levels
-          type: boolean
-        unit_cost:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          title: Cost Per Item
-          type:
-            - string
-            - 'null'
-        upc:
-          description: Universal Product Code
-          type:
-            - string
-            - 'null'
-        variant_attribute_values:
-          items:
-            $ref: '#/components/schemas/ProductVariantAttributeValue'
-          type: array
-          writeOnly: true
-      required:
-        - variant_attribute_values
-      type: object
-    CreateProductVariantAttributeValue:
+    CreateProductVariantAttributeValueRequest:
       properties:
         name:
+          minLength: 1
           type: string
         value:
+          minLength: 1
           type: string
       required:
         - name
         - value
       type: object
-    CreateProductVariantForProduct:
+    CreateProductVariantForProductRequest:
       properties:
         allow_backorders:
           description: Continue selling when out of stock.
           type: boolean
-        image:
-          readOnly: true
-          type:
-            - integer
-            - 'null'
         metadata:
           oneOf:
             - {}
             - type: 'null'
         prices:
           items:
-            $ref: '#/components/schemas/ProductPrices'
+            $ref: '#/components/schemas/ProductPricesRequest'
           type: array
         requires_shipping:
           title: Requires shipping?
@@ -1931,7 +1952,7 @@ components:
             - 'null'
         stockrecords:
           items:
-            $ref: '#/components/schemas/StockrecordLocation'
+            $ref: '#/components/schemas/StockrecordLocationRequest'
           type: array
         track_stock:
           description: Track inventory quantities at fulfillment locations.
@@ -1951,15 +1972,77 @@ components:
             - 'null'
         variant_attribute_values:
           items:
-            $ref: '#/components/schemas/CreateProductVariantAttributeValue'
+            $ref: '#/components/schemas/CreateProductVariantAttributeValueRequest'
           type: array
-      required:
-        - image
       type: object
-    CreateRefundLineRequest:
+    CreateProductVariantRequest:
+      properties:
+        allow_backorders:
+          description: Continue selling when out of stock.
+          type: boolean
+        image:
+          type:
+            - integer
+            - 'null'
+        metadata:
+          oneOf:
+            - {}
+            - type: 'null'
+        prices:
+          items:
+            $ref: '#/components/schemas/ProductPricesRequest'
+          type: array
+        requires_shipping:
+          title: Requires shipping?
+          type: boolean
+        sku:
+          description: Stock Keeping Unit
+          type:
+            - string
+            - 'null'
+        stockrecords:
+          items:
+            $ref: '#/components/schemas/StockrecordLocationRequest'
+          type: array
+        track_stock:
+          description: Track inventory quantities at fulfillment locations.
+          title: Track Stock Levels
+          type: boolean
+        unit_cost:
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          title: Cost Per Item
+          type:
+            - string
+            - 'null'
+        upc:
+          description: Universal Product Code
+          type:
+            - string
+            - 'null'
+        variant_attribute_values:
+          items:
+            $ref: '#/components/schemas/ProductVariantAttributeValueRequest'
+          type: array
+          writeOnly: true
+      required:
+        - variant_attribute_values
+      type: object
+    CreateRefundLineRequestRequest:
       properties:
         line_id:
           type: integer
+        location_id:
+          description: |2
+
+                The ID of the location the items are restocked at. This is required in the orderRefundCreate
+                endpoint when restock_type is return or cancel.
+
+                A line can be refundable at more than one location, e.g. after a fulfillment order was split,
+                which the orderRefundCalculate endpoint reports as one refund line per location.
+          type:
+            - integer
+            - 'null'
         quantity:
           minimum: 0
           type: integer
@@ -1992,22 +2075,23 @@ components:
         - quantity
         - restock_type
       type: object
-    CreateSubscription:
+    CreateSubscriptionRequest:
       description: |-
         Any transaction that be a part of handle_payment,
             for saving and update status of order
       properties:
         attribution:
-          $ref: '#/components/schemas/CreateMarketingAttribution'
+          $ref: '#/components/schemas/CreateMarketingAttributionRequest'
         billing_address:
           oneOf:
-            - $ref: '#/components/schemas/BillingAddress'
+            - $ref: '#/components/schemas/BillingAddressRequest'
             - type: 'null'
         billing_same_as_shipping_address:
           default: false
           type: boolean
         currency:
           maxLength: 12
+          minLength: 1
           type: string
         interval:
           description: |-
@@ -2027,7 +2111,7 @@ components:
           type: integer
         lines:
           items:
-            $ref: '#/components/schemas/CreateOrderLine'
+            $ref: '#/components/schemas/CreateOrderLineRequest'
           type: array
         next_renewal_date:
           description: 'format: YYYY-MM-DDThh:mm:ss #eg. 2021-12-07T12:04:45'
@@ -2035,7 +2119,7 @@ components:
           type: string
         payment_details:
           oneOf:
-            - $ref: '#/components/schemas/SubscriptionPaymentDetail'
+            - $ref: '#/components/schemas/SubscriptionPaymentDetailRequest'
             - type: 'null'
         payment_method:
           description: '* `card_token` - Card Token'
@@ -2045,9 +2129,10 @@ components:
           x-spec-enum-id: 98d6b14356537d48
         shipping_address:
           oneOf:
-            - $ref: '#/components/schemas/ShippingAddress'
+            - $ref: '#/components/schemas/ShippingAddressRequest'
             - type: 'null'
         shipping_code:
+          minLength: 1
           type:
             - string
             - 'null'
@@ -2062,7 +2147,7 @@ components:
           default: false
           type: boolean
         user:
-          $ref: '#/components/schemas/CreateUser'
+          $ref: '#/components/schemas/CreateUserRequest'
       required:
         - interval
         - interval_count
@@ -2071,7 +2156,7 @@ components:
         - payment_method
         - user
       type: object
-    CreateTicketComment:
+    CreateTicketCommentRequest:
       properties:
         attachments:
           items:
@@ -2091,15 +2176,10 @@ components:
           type:
             - string
             - 'null'
-        id:
-          readOnly: true
-          type: integer
         is_public:
           type: boolean
-      required:
-        - id
       type: object
-    CreateUpdatePage:
+    CreateUpdatePageRequest:
       properties:
         content:
           type: string
@@ -2126,23 +2206,13 @@ components:
             - 'null'
         title:
           maxLength: 200
+          minLength: 1
           type: string
       required:
         - title
       type: object
-    CreateUpdateStockRecord:
+    CreateUpdateStockRecordRequest:
       properties:
-        date_created:
-          format: date-time
-          readOnly: true
-          type: string
-        date_updated:
-          format: date-time
-          readOnly: true
-          type: string
-        id:
-          readOnly: true
-          type: integer
         location_id:
           type: integer
         low_stock_threshold:
@@ -2153,19 +2223,11 @@ components:
           type: integer
         product:
           type: integer
-        sku:
-          deprecated: true
-          readOnly: true
-          type: string
       required:
-        - date_created
-        - date_updated
-        - id
         - location_id
         - product
-        - sku
       type: object
-    CreateUpdateTicket:
+    CreateUpdateTicketRequest:
       properties:
         assignee:
           type:
@@ -2173,22 +2235,16 @@ components:
             - 'null'
         comment:
           allOf:
-            - $ref: '#/components/schemas/CreateTicketComment'
+            - $ref: '#/components/schemas/CreateTicketCommentRequest'
           description: An object that adds a comment to the ticket.
-        created_at:
-          format: date-time
-          readOnly: true
-          type: string
         from_email:
           description: In case user contact from email and user does not in system yet.
           format: email
           type:
             - string
             - 'null'
-        id:
-          readOnly: true
-          type: integer
         order:
+          minLength: 1
           title: Order number
           type:
             - string
@@ -2228,9 +2284,11 @@ components:
           type: string
           x-spec-enum-id: 30751850e74b0756
         subject:
+          minLength: 1
           type: string
         tags:
           items:
+            minLength: 1
             type:
               - string
               - 'null'
@@ -2239,14 +2297,6 @@ components:
           type:
             - integer
             - 'null'
-        updated_at:
-          format: date-time
-          readOnly: true
-          type: string
-      required:
-        - created_at
-        - id
-        - updated_at
       type: object
     CreateUser:
       properties:
@@ -2396,12 +2446,162 @@ components:
         - line1
         - line4
       type: object
-    CreateUserNote:
+    CreateUserAddressRequest:
+      properties:
+        country:
+          description: The address country code.
+          minLength: 1
+          title: ISO 3166-1 alpha-2
+          type: string
+        first_name:
+          description: The first name of the address.
+          maxLength: 255
+          type: string
+        is_default_for_billing:
+          description: Use this address as the default billing address.
+          title: Default billing address?
+          type: boolean
+        is_default_for_shipping:
+          description: Use this address as the default shipping address.
+          title: Default shipping address?
+          type: boolean
+        last_name:
+          description: The last name of the address.
+          maxLength: 255
+          type: string
+        line1:
+          description: The first line of the address.
+          maxLength: 255
+          minLength: 1
+          title: First line of address
+          type: string
+        line2:
+          description: Optional second line of of the address.
+          maxLength: 255
+          title: Second line of address
+          type: string
+        line3:
+          description: Optional third line of of the address.
+          maxLength: 255
+          title: Third line of address
+          type: string
+        line4:
+          description: City of the address.
+          maxLength: 255
+          minLength: 1
+          title: City
+          type: string
+        notes:
+          description: Tell us anything we should know when delivering your order.
+          title: Instructions
+          type: string
+        phone_number:
+          description: The address phone number.
+          maxLength: 128
+          type: string
+        postcode:
+          description: The address post code or zip code.
+          maxLength: 64
+          title: Post/Zip-code
+          type: string
+        state:
+          description: The address state/province.
+          maxLength: 255
+          title: State/Province
+          type: string
+      required:
+        - country
+        - line1
+        - line4
+      type: object
+    CreateUserNoteRequest:
       properties:
         message:
+          minLength: 1
           type: string
       required:
         - message
+      type: object
+    CreateUserRequest:
+      properties:
+        accepts_marketing:
+          title: Subscribe to Marketing Emails
+          type: boolean
+        email:
+          format: email
+          minLength: 1
+          type:
+            - string
+            - 'null'
+        first_name:
+          maxLength: 255
+          type: string
+        id:
+          type:
+            - integer
+            - 'null'
+        ip:
+          title: Ip address
+          type:
+            - string
+            - 'null'
+        language:
+          description: |-
+            required : E164
+
+            * `en` - English
+            * `fr` - Français
+            * `th` - ภาษาไทย
+            * `de` - Deutsch
+            * `sv` - Svenska
+            * `no` - Norsk
+            * `it` - Italiano
+            * `es` - Español
+            * `nl` - Nederlands
+            * `pt` - Português
+            * `da` - Dansk
+            * `fi` - Suomi
+          enum:
+            - en
+            - fr
+            - th
+            - de
+            - sv
+            - 'no'
+            - it
+            - es
+            - nl
+            - pt
+            - da
+            - fi
+            - ''
+            - null
+          type:
+            - string
+            - 'null'
+          x-spec-enum-id: 70ceea9c8488568b
+        last_name:
+          maxLength: 255
+          type: string
+        metadata:
+          oneOf:
+            - {}
+            - type: 'null'
+        phone_number:
+          type:
+            - string
+            - 'null'
+        tags:
+          items:
+            minLength: 1
+            type:
+              - string
+              - 'null'
+          type: array
+        user_agent:
+          type:
+            - string
+            - 'null'
       type: object
     Currency:
       properties:
@@ -2656,6 +2856,72 @@ components:
         - message
         - updated_at
       type: object
+    DisputeRequest:
+      properties:
+        amount:
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          title: Dispute Amount
+          type:
+            - string
+            - 'null'
+        arn:
+          type:
+            - string
+            - 'null'
+        case_number:
+          type:
+            - string
+            - 'null'
+        currency:
+          type:
+            - string
+            - 'null'
+        metadata:
+          oneOf:
+            - {}
+            - type: 'null'
+        resolution:
+          description: |-
+            * `could_not_find_order` - Transaction Not found
+            * `declined_or_canceled_nothing_to_do` - Nothing To Do
+            * `issued_full_refund` - Issued Full Refund
+            * `issued_refund_for_remaining_amount` - Refunded Remaining Amount
+            * `3ds_authorized_successfully` - Transaction 3DS Authorized
+            * `previously_refunded_nothing_to_do` - Previously Refunded
+            * `unable_to_refund_merchant_account_closed` - Unable to Refund
+            * `won` - Won
+            * `lost` - Lost
+            * `accepted` - Accepted
+            * `other` - Other
+          enum:
+            - could_not_find_order
+            - declined_or_canceled_nothing_to_do
+            - issued_full_refund
+            - issued_refund_for_remaining_amount
+            - 3ds_authorized_successfully
+            - previously_refunded_nothing_to_do
+            - unable_to_refund_merchant_account_closed
+            - won
+            - lost
+            - accepted
+            - other
+            - ''
+            - null
+          type:
+            - string
+            - 'null'
+          x-spec-enum-id: 8848f3a079993862
+        resolution_other_message:
+          title: Other Message
+          type:
+            - string
+            - 'null'
+        transaction:
+          type:
+            - integer
+            - 'null'
+      type: object
     Export:
       properties:
         created_at:
@@ -2753,83 +3019,6 @@ components:
           type: array
       required:
         - types
-      type: object
-    Fulfillment:
-      properties:
-        carrier:
-          readOnly: true
-          type: string
-        date_created:
-          format: date-time
-          type: string
-        delivered_at:
-          format: date-time
-          type:
-            - string
-            - 'null'
-        delivery_status:
-          description: |-
-            Expected delivery statuses.
-
-            * `None` - No Status
-            * `tracking_added` - Tracking Added
-            * `in_transit` - In Transit
-            * `out_for_delivery` - Out For Delivery
-            * `attempted_delivery` - Attempted Delivery
-            * `failed_delivery` - Failed Delivery
-            * `delivered` - Delivered
-            * `delayed` - Delayed
-          enum:
-            - null
-            - tracking_added
-            - in_transit
-            - out_for_delivery
-            - attempted_delivery
-            - failed_delivery
-            - delivered
-            - delayed
-            - ''
-          readOnly: true
-          x-spec-enum-id: 3b886e5b796c0603
-        id:
-          readOnly: true
-          type: integer
-        last_event_date:
-          format: date-time
-          readOnly: true
-          type: string
-        lines:
-          readOnly: true
-          type: string
-        processing_at:
-          format: date-time
-          type:
-            - string
-            - 'null'
-        reference:
-          maxLength: 512
-          type: string
-        requires_shipping:
-          type: boolean
-        status:
-          readOnly: true
-          type: string
-        tracking_code:
-          readOnly: true
-          type: string
-        tracking_link:
-          readOnly: true
-          type: string
-      required:
-        - carrier
-        - date_created
-        - delivery_status
-        - id
-        - last_event_date
-        - lines
-        - status
-        - tracking_code
-        - tracking_link
       type: object
     FulfillmentEvent:
       properties:
@@ -3221,7 +3410,9 @@ components:
           type: string
         stockrecord_id:
           readOnly: true
-          type: integer
+          type:
+            - integer
+            - 'null'
         tax_lines:
           items:
             $ref: '#/components/schemas/FulfillmentTaxPriceBreakdown'
@@ -3249,7 +3440,7 @@ components:
         - tax_lines
         - total_discount
       type: object
-    FulfillmentOrderLineItem:
+    FulfillmentOrderLineItemRequest:
       properties:
         id:
           type: integer
@@ -3262,32 +3453,42 @@ components:
       type: object
     FulfillmentRequest:
       properties:
-        fulfillment_order_line_items:
-          items:
-            $ref: '#/components/schemas/FulfillmentOrderLineItem'
-          type: array
-        message:
+        date_created:
+          format: date-time
+          type: string
+        delivered_at:
+          format: date-time
           type:
             - string
             - 'null'
-        notify:
+        processing_at:
+          format: date-time
+          type:
+            - string
+            - 'null'
+        reference:
+          maxLength: 512
+          type: string
+        requires_shipping:
           type: boolean
+      required:
+        - date_created
       type: object
-    FulfillmentRequestAccept:
+    FulfillmentRequestAcceptRequest:
       properties:
         message:
           type:
             - string
             - 'null'
       type: object
-    FulfillmentRequestCancel:
+    FulfillmentRequestCancelRequest:
       properties:
         message:
           type:
             - string
             - 'null'
       type: object
-    FulfillmentRequestReject:
+    FulfillmentRequestRejectRequest:
       properties:
         message:
           type:
@@ -3312,6 +3513,19 @@ components:
             - string
             - 'null'
           x-spec-enum-id: e024b9d5cc05f27d
+      type: object
+    FulfillmentRequestRequest:
+      properties:
+        fulfillment_order_line_items:
+          items:
+            $ref: '#/components/schemas/FulfillmentOrderLineItemRequest'
+          type: array
+        message:
+          type:
+            - string
+            - 'null'
+        notify:
+          type: boolean
       type: object
     FulfillmentRequestResponse:
       properties:
@@ -3557,6 +3771,8 @@ components:
         id:
           readOnly: true
           type: integer
+        is_default:
+          type: boolean
         name:
           maxLength: 256
           type: string
@@ -3566,9 +3782,10 @@ components:
         - available_payment_methods
         - card_types
         - id
+        - is_default
         - name
       type: object
-    HoldFulfillment:
+    HoldFulfillmentRequest:
       description: Serializer for serializing incoming Fulfillment Hold post data
       properties:
         reason:
@@ -3601,6 +3818,12 @@ components:
         value: {}
       required:
         - key
+        - value
+      type: object
+    LineAttributeRequest:
+      properties:
+        value: {}
+      required:
         - value
       type: object
     Location:
@@ -3676,9 +3899,84 @@ components:
         - line1
         - line4
       type: object
-    MarkAsPaid:
+    LocationAddressRequest:
+      properties:
+        country:
+          description: The address country code.
+          minLength: 1
+          title: ISO 3166-1 alpha-2
+          type: string
+        line1:
+          description: The first line of the address.
+          maxLength: 255
+          minLength: 1
+          title: First line of address
+          type: string
+        line2:
+          description: Optional second line of of the address.
+          maxLength: 255
+          title: Second line of address
+          type: string
+        line3:
+          description: Optional third line of of the address.
+          maxLength: 255
+          title: Third line of address
+          type: string
+        line4:
+          description: City of the address.
+          maxLength: 255
+          minLength: 1
+          title: City
+          type: string
+        phone_number:
+          description: The address phone number.
+          maxLength: 128
+          type: string
+        postcode:
+          description: The address post code or zip code.
+          maxLength: 64
+          title: Post/Zip-code
+          type: string
+        state:
+          description: The address state/province.
+          maxLength: 255
+          title: State/County
+          type: string
+      required:
+        - country
+        - line1
+        - line4
+      type: object
+    LocationRequest:
+      properties:
+        accept_return:
+          title: Accepts Returns
+          type: boolean
+        address:
+          $ref: '#/components/schemas/LocationAddressRequest'
+        allowed_destination_countries:
+          description: List of country codes this location can ship to.
+          items:
+            minLength: 1
+            title: Allowed Destination Countries
+            type: string
+          type: array
+        callback_url:
+          format: uri
+          minLength: 1
+          type:
+            - string
+            - 'null'
+        name:
+          maxLength: 128
+          type: string
+      required:
+        - address
+      type: object
+    MarkAsPaidRequest:
       properties:
         external_payment_method:
+          minLength: 1
           type:
             - string
             - 'null'
@@ -3819,23 +4117,23 @@ components:
           type: string
           x-spec-enum-id: 4d67e89980fba849
       type: object
-    MoveFulfillmentOrder:
-      properties:
-        fulfillment_order_line_items:
-          items:
-            $ref: '#/components/schemas/MoveFulfillmentOrderLineItem'
-          type: array
-        new_location_id:
-          type: integer
-      required:
-        - new_location_id
-      type: object
-    MoveFulfillmentOrderLineItem:
+    MoveFulfillmentOrderLineItemRequest:
       properties:
         id:
           type: integer
       required:
         - id
+      type: object
+    MoveFulfillmentOrderRequest:
+      properties:
+        fulfillment_order_line_items:
+          items:
+            $ref: '#/components/schemas/MoveFulfillmentOrderLineItemRequest'
+          type: array
+        new_location_id:
+          type: integer
+      required:
+        - new_location_id
       type: object
     MoveFulfillmentOrderResponse:
       properties:
@@ -4291,17 +4589,8 @@ components:
         - variant_id
         - variant_title
       type: object
-    OrderLineDetail:
+    OrderLineDetailRequest:
       properties:
-        created_at:
-          format: date-time
-          readOnly: true
-          type:
-            - string
-            - 'null'
-        id:
-          readOnly: true
-          type: integer
         is_gift_card:
           type: boolean
         is_upsell:
@@ -4312,6 +4601,7 @@ components:
             - type: 'null'
         price_currency:
           maxLength: 12
+          minLength: 1
           type: string
         price_excl_tax:
           format: decimal
@@ -4329,57 +4619,19 @@ components:
           format: decimal
           pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
           type: string
-        product:
-          allOf:
-            - $ref: '#/components/schemas/Product '
-          readOnly: true
-        properties:
-          items:
-            $ref: '#/components/schemas/LineAttribute'
-          readOnly: true
-          type: array
         quantity:
           maximum: 2147483647
           minimum: 0
           type: integer
         stockrecord:
-          $ref: '#/components/schemas/Stockrecord'
-        tax_lines:
-          items:
-            $ref: '#/components/schemas/TaxPriceBreakdown'
-          readOnly: true
-          type: array
-        total_cost:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          type: string
-        unit_cost:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          type: string
-        updated_at:
-          format: date-time
-          readOnly: true
-          type:
-            - string
-            - 'null'
+          $ref: '#/components/schemas/StockrecordRequest'
       required:
-        - created_at
-        - id
         - price_currency
         - price_excl_tax
         - price_excl_tax_excl_discounts
         - price_incl_tax
         - price_incl_tax_excl_discounts
-        - product
-        - properties
         - stockrecord
-        - tax_lines
-        - total_cost
-        - unit_cost
-        - updated_at
       type: object
     OrderLineReport:
       properties:
@@ -4840,6 +5092,25 @@ components:
         - id
         - slug
         - title
+      type: object
+    PaginatedAssetList:
+      properties:
+        next:
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+          format: uri
+          nullable: true
+          type: string
+        previous:
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+          format: uri
+          nullable: true
+          type: string
+        results:
+          items:
+            $ref: '#/components/schemas/Asset'
+          type: array
+      required:
+        - results
       type: object
     PaginatedCartList:
       properties:
@@ -5373,7 +5644,7 @@ components:
       required:
         - results
       type: object
-    PatchedCreateUpdatePage:
+    PatchedCreateUpdatePageRequest:
       properties:
         content:
           type: string
@@ -5400,21 +5671,11 @@ components:
             - 'null'
         title:
           maxLength: 200
+          minLength: 1
           type: string
       type: object
-    PatchedCreateUpdateStockRecord:
+    PatchedCreateUpdateStockRecordRequest:
       properties:
-        date_created:
-          format: date-time
-          readOnly: true
-          type: string
-        date_updated:
-          format: date-time
-          readOnly: true
-          type: string
-        id:
-          readOnly: true
-          type: integer
         location_id:
           type: integer
         low_stock_threshold:
@@ -5425,12 +5686,8 @@ components:
           type: integer
         product:
           type: integer
-        sku:
-          deprecated: true
-          readOnly: true
-          type: string
       type: object
-    PatchedCreateUpdateTicket:
+    PatchedCreateUpdateTicketRequest:
       properties:
         assignee:
           type:
@@ -5438,22 +5695,16 @@ components:
             - 'null'
         comment:
           allOf:
-            - $ref: '#/components/schemas/CreateTicketComment'
+            - $ref: '#/components/schemas/CreateTicketCommentRequest'
           description: An object that adds a comment to the ticket.
-        created_at:
-          format: date-time
-          readOnly: true
-          type: string
         from_email:
           description: In case user contact from email and user does not in system yet.
           format: email
           type:
             - string
             - 'null'
-        id:
-          readOnly: true
-          type: integer
         order:
+          minLength: 1
           title: Order number
           type:
             - string
@@ -5493,9 +5744,11 @@ components:
           type: string
           x-spec-enum-id: 30751850e74b0756
         subject:
+          minLength: 1
           type: string
         tags:
           items:
+            minLength: 1
             type:
               - string
               - 'null'
@@ -5504,12 +5757,8 @@ components:
           type:
             - integer
             - 'null'
-        updated_at:
-          format: date-time
-          readOnly: true
-          type: string
       type: object
-    PatchedDispute:
+    PatchedDisputeRequest:
       properties:
         amount:
           format: decimal
@@ -5530,39 +5779,10 @@ components:
           type:
             - string
             - 'null'
-        date_created:
-          format: date-time
-          readOnly: true
-          type: string
-        happened_at:
-          format: date-time
-          readOnly: true
-          title: Dispute Date
-          type: string
-        id:
-          readOnly: true
-          type: integer
         metadata:
           oneOf:
             - {}
             - type: 'null'
-        order:
-          readOnly: true
-          type:
-            - string
-            - 'null'
-        report_amount:
-          format: decimal
-          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
-          readOnly: true
-          type:
-            - string
-            - 'null'
-        report_currency:
-          readOnly: true
-          type:
-            - string
-            - 'null'
         resolution:
           description: |-
             * `could_not_find_order` - Transaction Not found
@@ -5599,34 +5819,12 @@ components:
           type:
             - string
             - 'null'
-        status:
-          description: |-
-            * `new` - New
-            * `open` - Open
-            * `resolved` - Resolved
-          enum:
-            - new
-            - open
-            - resolved
-          readOnly: true
-          type: string
-          x-spec-enum-id: 4c48cc1c536a35b2
         transaction:
           type:
             - integer
             - 'null'
-        type:
-          description: |-
-            * `alert` - Alert
-            * `chargeback` - Chargeback
-          enum:
-            - alert
-            - chargeback
-          readOnly: true
-          type: string
-          x-spec-enum-id: 3c60da80149644ea
       type: object
-    PatchedProductImageUpdate:
+    PatchedProductImageUpdateRequest:
       properties:
         caption:
           maxLength: 200
@@ -5636,15 +5834,12 @@ components:
           maximum: 2147483647
           minimum: 0
           type: integer
-        id:
-          readOnly: true
-          type: integer
         variants:
           items:
             type: integer
           type: array
       type: object
-    PatchedUpdateDefinition:
+    PatchedUpdateDefinitionRequest:
       properties:
         enable_export:
           default: false
@@ -5654,6 +5849,7 @@ components:
           type: boolean
         name:
           maxLength: 255
+          minLength: 1
           type: string
         object:
           description: |-
@@ -5682,10 +5878,10 @@ components:
           x-spec-enum-id: 06e58adfbb02ad1f
         validations:
           items:
-            $ref: '#/components/schemas/Validation'
+            $ref: '#/components/schemas/ValidationRequest'
           type: array
       type: object
-    PatchedUpdateGiftCard:
+    PatchedUpdateGiftCardRequest:
       properties:
         expired_at:
           format: date-time
@@ -5693,30 +5889,32 @@ components:
             - string
             - 'null'
         user:
-          $ref: '#/components/schemas/CreateUser'
+          $ref: '#/components/schemas/CreateUserRequest'
       type: object
-    PatchedUpdateOrder:
+    PatchedUpdateOrderLineRequest:
+      properties:
+        metadata: {}
+        properties:
+          default: {}
+          oneOf:
+            - {}
+            - type: 'null'
+        quantity:
+          minimum: 0
+          type: integer
+        reason:
+          description: Reason for editing this item.
+          minLength: 1
+          type: string
+      type: object
+    PatchedUpdateOrderRequest:
       properties:
         attribution:
-          $ref: '#/components/schemas/CreateMarketingAttribution'
+          $ref: '#/components/schemas/CreateMarketingAttributionRequest'
         billing_address:
           oneOf:
-            - $ref: '#/components/schemas/BillingAddress'
+            - $ref: '#/components/schemas/BillingAddressRequest'
             - type: 'null'
-        created_at:
-          format: date-time
-          readOnly: true
-          type: string
-        currency:
-          readOnly: true
-          type: string
-        date_placed:
-          format: date-time
-          readOnly: true
-          type: string
-        display_taxes:
-          readOnly: true
-          type: string
         fulfillment_status:
           description: |-
             The order's status in terms of fulfillment.
@@ -5738,211 +5936,29 @@ components:
             - incomplete
           type: string
           x-spec-enum-id: f7a016fc10fb8390
-        fulfillments:
-          items:
-            $ref: '#/components/schemas/Fulfillment'
-          readOnly: true
-          type: array
-        is_test:
-          readOnly: true
-          type: boolean
-        lines:
-          items:
-            $ref: '#/components/schemas/OrderLineDetail'
-          readOnly: true
-          type: array
         metadata:
           description: Additional order metadata.
           oneOf:
             - {}
             - type: 'null'
-        number:
-          readOnly: true
-          title: Order number
-          type: string
-        offer_discounts:
-          items:
-            $ref: '#/components/schemas/OrderOfferDiscount'
-          readOnly: true
-          type: array
-        order_status_url:
-          format: uri
-          readOnly: true
-          type: string
-        original_shipping_excl_tax:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          type: string
-        original_shipping_incl_tax:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          type: string
-        original_total_excl_tax:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          type: string
-        original_total_incl_tax:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          type: string
-        payment_status:
-          description: |-
-            * `pending` - Payment Pending
-            * `authorized` - Authorized
-            * `expiring` - Expiring
-            * `expired` - Expired
-            * `paid` - Paid
-            * `voided` - Voided
-            * `refunded` - Refunded
-            * `partially_paid` - Partially Paid
-            * `partially_refunded` - Partially Refunded
-            * `partially_voided` - Partially Voided
-          enum:
-            - pending
-            - authorized
-            - expiring
-            - expired
-            - paid
-            - voided
-            - refunded
-            - partially_paid
-            - partially_refunded
-            - partially_voided
-          readOnly: true
-          type: string
-          x-spec-enum-id: 4ddf29c57b2eb8f6
-        refunds:
-          items:
-            $ref: '#/components/schemas/Refund'
-          readOnly: true
-          type: array
-        report_values:
-          allOf:
-            - $ref: '#/components/schemas/OrderReportValues'
-          readOnly: true
         shipping_address:
           oneOf:
-            - $ref: '#/components/schemas/ShippingAddress'
+            - $ref: '#/components/schemas/ShippingAddressRequest'
             - type: 'null'
-        shipping_code:
-          readOnly: true
-          type: string
-        shipping_excl_tax:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          title: Shipping charge (excl. tax)
-          type: string
-        shipping_incl_tax:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          title: Shipping charge (inc. tax)
-          type: string
-        shipping_method:
-          readOnly: true
-          type: string
-        shipping_tax:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          type: string
-        shipping_tax_lines:
-          items:
-            $ref: '#/components/schemas/TaxPriceBreakdown'
-          readOnly: true
-          type: array
-        source:
-          readOnly: true
-          type: string
         status:
           description: The order's overall status.
           maxLength: 100
           type: string
-        subscription_lifecycle:
-          readOnly: true
-          type: string
-        subscriptions:
-          items:
-            $ref: '#/components/schemas/OrderSubscription'
-          readOnly: true
-          type: array
-        supports_post_purchase_upsells:
-          readOnly: true
-          type: boolean
         tags:
           description: An array of tags associated with the order.
           items:
+            minLength: 1
             type:
               - string
               - 'null'
           type: array
-        tax_lines:
-          items:
-            $ref: '#/components/schemas/TaxSerailizer'
-          readOnly: true
-          type: array
-        total_cost:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          type: string
-        total_excl_tax:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          title: Order total (excl. tax)
-          type: string
-        total_incl_tax:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          title: Order total (inc. tax)
-          type: string
-        total_tax:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          type: string
-        transactions:
-          items:
-            $ref: '#/components/schemas/TransactionObject'
-          readOnly: true
-          type: array
-        updated_at:
-          format: date-time
-          readOnly: true
-          type: string
-        user:
-          allOf:
-            - $ref: '#/components/schemas/UserInline'
-          readOnly: true
-        voucher_discounts:
-          items:
-            $ref: '#/components/schemas/OrderVoucherOffer'
-          readOnly: true
-          type: array
       type: object
-    PatchedUpdateOrderLine:
-      properties:
-        metadata: {}
-        properties:
-          default: {}
-          oneOf:
-            - {}
-            - type: 'null'
-        quantity:
-          minimum: 0
-          type: integer
-        reason:
-          description: Reason for editing this item.
-          type: string
-      type: object
-    PatchedUpdatePriceWithCurrency:
+    PatchedUpdatePriceWithCurrencyRequest:
       properties:
         price:
           format: decimal
@@ -5970,21 +5986,13 @@ components:
             - string
             - 'null'
       type: object
-    PatchedUpdateProduct:
+    PatchedUpdateProductRequest:
       properties:
         categories:
           deprecated: true
           items:
             type: integer
           type: array
-        date_created:
-          format: date-time
-          readOnly: true
-          type: string
-        date_updated:
-          format: date-time
-          readOnly: true
-          type: string
         description:
           type: string
         enable_subscription:
@@ -5995,14 +6003,6 @@ components:
           type:
             - string
             - 'null'
-        id:
-          readOnly: true
-          type: integer
-        images:
-          items:
-            $ref: '#/components/schemas/ProductImage'
-          readOnly: true
-          type: array
         interval:
           description: |-
             * `day` - Day
@@ -6055,20 +6055,10 @@ components:
           maximum: 2147483647
           minimum: -2147483648
           type: integer
-        rating:
-          format: double
-          readOnly: true
-          type:
-            - number
-            - 'null'
         recommended_products:
           items:
             type: integer
           type: array
-        slug:
-          pattern: ^[-a-zA-Z0-9_]+$
-          readOnly: true
-          type: string
         template:
           description: Custom template name from your theme, ie catalogue/product.{custom_name}.html
           title: Theme Template
@@ -6076,21 +6066,18 @@ components:
             - string
             - 'null'
         title:
-          type: string
-        url:
-          format: uri
-          readOnly: true
+          minLength: 1
           type: string
         variant_attributes:
           items:
-            $ref: '#/components/schemas/ProductVariantAttribute'
+            $ref: '#/components/schemas/ProductVariantAttributeRequest'
           type: array
         variants:
           items:
-            $ref: '#/components/schemas/UpdateProductVariantForProduct'
+            $ref: '#/components/schemas/UpdateProductVariantForProductRequest'
           type: array
       type: object
-    PatchedUpdateProductVariant:
+    PatchedUpdateProductVariantRequest:
       properties:
         allow_backorders:
           description: Continue selling when out of stock.
@@ -6105,7 +6092,7 @@ components:
             - type: 'null'
         prices:
           items:
-            $ref: '#/components/schemas/ProductPrices'
+            $ref: '#/components/schemas/ProductPricesRequest'
           type: array
         requires_shipping:
           title: Requires shipping?
@@ -6115,11 +6102,6 @@ components:
           type:
             - string
             - 'null'
-        stockrecords:
-          items:
-            $ref: '#/components/schemas/StockrecordLocation'
-          readOnly: true
-          type: array
         track_stock:
           description: Track inventory quantities at fulfillment locations.
           title: Track Stock Levels
@@ -6138,39 +6120,18 @@ components:
             - 'null'
         variant_attribute_values:
           items:
-            $ref: '#/components/schemas/ProductVariantAttributeValue'
+            $ref: '#/components/schemas/ProductVariantAttributeValueRequest'
           type: array
           writeOnly: true
       type: object
-    PatchedUpdateSubscription:
+    PatchedUpdateSubscriptionRequest:
       properties:
         attribution:
-          $ref: '#/components/schemas/CreateMarketingAttribution'
+          $ref: '#/components/schemas/CreateMarketingAttributionRequest'
         billing_address:
           oneOf:
-            - $ref: '#/components/schemas/BillingAddress'
+            - $ref: '#/components/schemas/BillingAddressRequest'
             - type: 'null'
-        cancel_reason:
-          readOnly: true
-          type: string
-        cancel_reason_other_message:
-          readOnly: true
-          type:
-            - string
-            - 'null'
-        currency:
-          readOnly: true
-          type: string
-        date_created:
-          format: date-time
-          readOnly: true
-          type: string
-        frequency:
-          readOnly: true
-          type: string
-        id:
-          readOnly: true
-          type: integer
         interval:
           description: |-
             * `day` - Day
@@ -6187,45 +6148,23 @@ components:
         interval_count:
           minimum: 1
           type: integer
-        is_tax_known:
-          deprecated: true
-          readOnly: true
-          type: boolean
         is_test:
           type: boolean
-        lines:
-          items:
-            $ref: '#/components/schemas/SubscriptionLine'
-          readOnly: true
-          type: array
         next_renewal_date:
           format: date-time
           type:
             - string
             - 'null'
-        num_lines:
-          readOnly: true
-          type: integer
-        num_orders:
-          readOnly: true
-          type: integer
-        orders:
-          items:
-            $ref: '#/components/schemas/SubscriptionOrder'
-          readOnly: true
-          type: array
         payment_details:
           oneOf:
-            - $ref: '#/components/schemas/SubscriptionPaymentDetail'
+            - $ref: '#/components/schemas/SubscriptionPaymentDetailRequest'
             - type: 'null'
-        payment_method:
-          readOnly: true
-          type: string
         shipping_address:
           oneOf:
-            - $ref: '#/components/schemas/ShippingAddress'
+            - $ref: '#/components/schemas/ShippingAddressRequest'
             - type: 'null'
         shipping_code:
+          minLength: 1
           type:
             - string
             - 'null'
@@ -6248,39 +6187,19 @@ components:
             - retrying
           type: string
           x-spec-enum-id: c5c93fe104ef015e
-        total:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          type: string
-        user:
-          allOf:
-            - $ref: '#/components/schemas/UserInline'
-          readOnly: true
       type: object
-    PatchedUpdateUser:
+    PatchedUpdateUserRequest:
       properties:
         accepts_marketing:
           title: Subscribe to Marketing Emails
           type: boolean
-        addresses:
-          items:
-            $ref: '#/components/schemas/UserAddress'
-          readOnly: true
-          type: array
-        date_joined:
-          format: date-time
-          readOnly: true
-          type: string
         email:
           format: email
+          minLength: 1
           type: string
         first_name:
           maxLength: 255
           type: string
-        id:
-          readOnly: true
-          type: integer
         ip:
           title: Ip address
           type:
@@ -6331,43 +6250,23 @@ components:
           oneOf:
             - {}
             - type: 'null'
-        orders_count:
-          default: 0
-          readOnly: true
-          type: integer
         phone_number:
           type:
             - string
             - 'null'
-        subscriptions_count:
-          readOnly: true
-          type: integer
         tags:
           items:
+            minLength: 1
             type:
               - string
               - 'null'
           type: array
-        total_spent:
-          default: '0.00'
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          type: string
         user_agent:
           type:
             - string
             - 'null'
-        user_type:
-          description: 'Available values : customer, lead, dashboard'
-          enum:
-            - customer
-            - lead
-            - dashboard
-          readOnly: true
-          type: string
       type: object
-    PatchedWebhook:
+    PatchedWebhookRequest:
       properties:
         active:
           type: boolean
@@ -6375,10 +6274,6 @@ components:
           type:
             - string
             - 'null'
-        created_at:
-          format: date-time
-          readOnly: true
-          type: string
         events:
           description: List of event triggers for the webhook.
           items:
@@ -6412,22 +6307,14 @@ components:
               - 'null'
             x-spec-enum-id: 2fff8156f601ff82
           type: array
-        id:
-          readOnly: true
-          type: integer
         name:
           description: A label to identify this webhook in the list. Maximum 50 characters.
           title: Webhook Name
           type:
             - string
             - 'null'
-        next_check_date:
-          format: date-time
-          readOnly: true
-          type:
-            - string
-            - 'null'
         secret_key:
+          minLength: 1
           type:
             - string
             - 'null'
@@ -6435,17 +6322,11 @@ components:
           description: Full url for your webhook receiver endpoint.
           format: uri
           maxLength: 255
+          minLength: 1
           title: Webhook target
           type: string
-        updated_at:
-          format: date-time
-          readOnly: true
-          type: string
-        warning_count:
-          readOnly: true
-          type: integer
       type: object
-    PauseSubscription:
+    PauseSubscriptionRequest:
       properties:
         pause_until:
           description: 'Date until the subscription is paused (format: YYYY-MM-DD). If omitted, paused indefinitely and auto-cancelled if not resumed within 6 months.'
@@ -6477,13 +6358,14 @@ components:
         - certificate_token
         - environment_key
       type: object
-    PaymentDetail:
+    PaymentDetailRequest:
       properties:
         authorize_value:
           format: decimal
           pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
           type: string
         card_token:
+          minLength: 1
           type:
             - string
             - 'null'
@@ -6534,6 +6416,7 @@ components:
             - 'null'
         payment_return_url:
           format: uri
+          minLength: 1
           type:
             - string
             - 'null'
@@ -6546,6 +6429,7 @@ components:
             - integer
             - 'null'
         reference_transaction_id:
+          minLength: 1
           type:
             - string
             - 'null'
@@ -6886,6 +6770,14 @@ components:
         - title
         - url
       type: object
+    Product Request:
+      properties:
+        upc:
+          description: Universal Product Code
+          type:
+            - string
+            - 'null'
+      type: object
     ProductCategory:
       properties:
         id:
@@ -6903,6 +6795,16 @@ components:
         - name
         - slug
       type: object
+    ProductCategoryRequest:
+      properties:
+        slug:
+          maxLength: 255
+          minLength: 1
+          pattern: ^[-a-zA-Z0-9_]+$
+          type: string
+      required:
+        - slug
+      type: object
     ProductImage:
       properties:
         attachment:
@@ -6918,21 +6820,44 @@ components:
           maximum: 2147483647
           minimum: 0
           type: integer
-        file_name:
-          type: string
-          writeOnly: true
         id:
           readOnly: true
           type: integer
+      required:
+        - id
+      type: object
+    ProductImageRequest:
+      properties:
+        attachment:
+          description: The base64 string file to upload (image attachment).
+          minLength: 1
+          type:
+            - string
+            - 'null'
+        caption:
+          maxLength: 200
+          type: string
+        display_order:
+          description: An image with a display order of zero will be the primary image for a product
+          maximum: 2147483647
+          minimum: 0
+          type: integer
+        file_name:
+          minLength: 1
+          type: string
+          writeOnly: true
         src:
           description: URL of the image to fetch and associate with the product
           format: uri
+          minLength: 1
           type:
             - string
             - 'null'
           writeOnly: true
-      required:
-        - id
+        variants:
+          items:
+            type: integer
+          type: array
       type: object
     ProductList:
       properties:
@@ -7100,6 +7025,40 @@ components:
       required:
         - price
       type: object
+    ProductPricesRequest:
+      properties:
+        currency:
+          maxLength: 12
+          minLength: 1
+          type: string
+        price:
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          type: string
+        retail:
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          title: Price (retail)
+          type:
+            - string
+            - 'null'
+        subscription:
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          title: Subscription Price
+          type:
+            - string
+            - 'null'
+        subscription_suggested_downsell:
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          title: Suggested Downsell Price
+          type:
+            - string
+            - 'null'
+      required:
+        - price
+      type: object
     ProductVariant:
       properties:
         allow_backorders:
@@ -7224,6 +7183,20 @@ components:
         - name
         - values
       type: object
+    ProductVariantAttributeRequest:
+      properties:
+        name:
+          maxLength: 128
+          minLength: 1
+          type: string
+        values:
+          items:
+            type: string
+          type: array
+      required:
+        - name
+        - values
+      type: object
     ProductVariantAttributeValue:
       properties:
         code:
@@ -7235,6 +7208,17 @@ components:
           type: string
       required:
         - code
+        - name
+        - value
+      type: object
+    ProductVariantAttributeValueRequest:
+      properties:
+        name:
+          minLength: 1
+          type: string
+        value:
+          type: string
+      required:
         - name
         - value
       type: object
@@ -7382,6 +7366,28 @@ components:
         - amount_incl_tax
         - currency
       type: object
+    RefundAdjustmentRequest:
+      properties:
+        amount_excl_tax:
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          type: string
+        amount_incl_tax:
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          type: string
+        type:
+          description: |-
+            * `refund_shipping` - Refund Shipping
+            * `refund_discrepancy` - Refund Discrepancy
+          enum:
+            - refund_shipping
+            - refund_discrepancy
+          type: string
+          x-spec-enum-id: 1bc4eac94a84cc0a
+      required:
+        - type
+      type: object
     RefundLine:
       properties:
         amount_excl_tax:
@@ -7451,8 +7457,49 @@ components:
       type: object
     RefundLineRequest:
       properties:
+        amount_excl_tax:
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          type: string
+        amount_incl_tax:
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          type: string
+        quantity:
+          maximum: 2147483647
+          minimum: 0
+          type: integer
+        restock_type:
+          description: |-
+            * `cancel` - Cancel
+            * `no_restock` - No Restock
+            * `return` - Return
+          enum:
+            - cancel
+            - no_restock
+            - return
+          type: string
+          x-spec-enum-id: fdd1ffe20f0e32e5
+      required:
+        - amount_excl_tax
+        - amount_incl_tax
+        - quantity
+      type: object
+    RefundLineRequestRequest:
+      properties:
         line_id:
           type: integer
+        location_id:
+          description: |2
+
+                The ID of the location the items are restocked at. This is required in the orderRefundCreate
+                endpoint when restock_type is return or cancel.
+
+                A line can be refundable at more than one location, e.g. after a fulfillment order was split,
+                which the orderRefundCalculate endpoint reports as one refund line per location.
+          type:
+            - integer
+            - 'null'
         quantity:
           minimum: 0
           type: integer
@@ -7484,22 +7531,23 @@ components:
         - line_id
         - quantity
       type: object
-    RefundOrder:
+    RefundOrderRequest:
       properties:
         note:
+          minLength: 1
           type: string
         refund_lines:
           items:
-            $ref: '#/components/schemas/CreateRefundLineRequest'
+            $ref: '#/components/schemas/CreateRefundLineRequestRequest'
           type: array
         refund_shipping:
-          $ref: '#/components/schemas/RefundShippingRequest'
+          $ref: '#/components/schemas/RefundShippingRequestRequest'
         send_refund_notification:
           default: true
           type: boolean
         transactions:
           items:
-            $ref: '#/components/schemas/RefundTransactionRequest'
+            $ref: '#/components/schemas/RefundTransactionRequestRequest'
           type: array
       required:
         - transactions
@@ -7530,7 +7578,37 @@ components:
         - total_return_excl_tax
         - total_return_incl_tax
       type: object
-    RefundShippingRequest:
+    RefundRequest:
+      properties:
+        adjustments:
+          items:
+            $ref: '#/components/schemas/RefundAdjustmentRequest'
+          type: array
+        created_at:
+          format: date-time
+          type: string
+        note:
+          type:
+            - string
+            - 'null'
+        order_number:
+          minLength: 1
+          type: string
+        refund_line_items:
+          items:
+            $ref: '#/components/schemas/RefundLineRequest'
+          type: array
+        transactions:
+          items:
+            $ref: '#/components/schemas/TransactionObjectRequest'
+          type: array
+      required:
+        - adjustments
+        - order_number
+        - refund_line_items
+        - transactions
+      type: object
+    RefundShippingRequestRequest:
       properties:
         amount_excl_tax:
           format: decimal
@@ -7540,7 +7618,7 @@ components:
           default: false
           type: boolean
       type: object
-    RefundTransaction:
+    RefundTransactionRequest:
       properties:
         amount:
           format: decimal
@@ -7555,7 +7633,7 @@ components:
       required:
         - amount
       type: object
-    RefundTransactionRequest:
+    RefundTransactionRequestRequest:
       properties:
         amount:
           format: decimal
@@ -7570,7 +7648,7 @@ components:
         - amount
         - id
       type: object
-    ResolveDispute:
+    ResolveDisputeRequest:
       properties:
         create_external_refund:
           type:
@@ -7717,7 +7795,7 @@ components:
         - updated_at
         - user
       type: object
-    ResumeSubscription:
+    ResumeSubscriptionRequest:
       properties:
         next_renewal_date:
           description: 'Date for the next rebill to reactivate the subscription (format: YYYY-MM-DD). Must be a future date.'
@@ -7726,7 +7804,7 @@ components:
       required:
         - next_renewal_date
       type: object
-    RetrySubscription:
+    RetrySubscriptionRequest:
       properties:
         payment_gateway:
           type:
@@ -7797,6 +7875,71 @@ components:
         - line4
         - phone_number
       type: object
+    ShippingAddressRequest:
+      properties:
+        country:
+          description: The address country code.
+          minLength: 1
+          title: ISO 3166-1 alpha-2
+          type: string
+        first_name:
+          description: The first name of the address.
+          maxLength: 255
+          minLength: 1
+          type: string
+        last_name:
+          description: The last name of the address.
+          maxLength: 255
+          minLength: 1
+          type: string
+        line1:
+          description: The first line of the address.
+          maxLength: 255
+          minLength: 1
+          title: First line of address
+          type: string
+        line2:
+          description: Optional second line of of the address.
+          maxLength: 255
+          title: Second line of address
+          type: string
+        line3:
+          description: Optional third line of of the address.
+          maxLength: 255
+          title: Third line of address
+          type: string
+        line4:
+          description: City of the address.
+          maxLength: 255
+          minLength: 1
+          title: City
+          type: string
+        notes:
+          description: Tell us anything we should know when delivering your order.
+          title: Instructions
+          type: string
+        phone_number:
+          description: The address phone number.
+          maxLength: 128
+          type: string
+        postcode:
+          description: The address post code or zip code.
+          maxLength: 64
+          title: Post/Zip-code
+          type: string
+        state:
+          description: The address state/province.
+          maxLength: 255
+          title: State/Province
+          type: string
+      required:
+        - country
+        - first_name
+        - last_name
+        - line1
+        - line4
+        - phone_number
+      type: object
     ShippingMethod:
       properties:
         code:
@@ -7857,6 +8000,36 @@ components:
           type: string
       required:
         - currency
+      type: object
+    SplitFulfillmentOrderLineItemRequest:
+      properties:
+        id:
+          type: integer
+        quantity:
+          minimum: 1
+          type: integer
+      required:
+        - id
+        - quantity
+      type: object
+    SplitFulfillmentOrderRequest:
+      properties:
+        fulfillment_order_line_items:
+          items:
+            $ref: '#/components/schemas/SplitFulfillmentOrderLineItemRequest'
+          type: array
+      required:
+        - fulfillment_order_line_items
+      type: object
+    SplitFulfillmentOrderResponse:
+      properties:
+        original_fulfillment_order:
+          $ref: '#/components/schemas/FulfillmentOrder'
+        split_fulfillment_order:
+          $ref: '#/components/schemas/FulfillmentOrder'
+      required:
+        - original_fulfillment_order
+        - split_fulfillment_order
       type: object
     StockRecord:
       properties:
@@ -7932,11 +8105,55 @@ components:
         - variant_id
         - variant_title
       type: object
-    Stockrecord:
+    StockrecordLocation:
       properties:
         id:
           readOnly: true
           type: integer
+        location_id:
+          type: integer
+        low_stock_threshold:
+          maximum: 2147483647
+          minimum: 0
+          type: integer
+        num_allocated:
+          readOnly: true
+          title: Number allocated
+          type:
+            - integer
+            - 'null'
+        num_in_stock:
+          maximum: 2147483647
+          minimum: -2147483648
+          title: Number in stock
+          type:
+            - integer
+            - 'null'
+      required:
+        - id
+        - location_id
+        - num_allocated
+      type: object
+    StockrecordLocationRequest:
+      properties:
+        location_id:
+          type: integer
+        low_stock_threshold:
+          maximum: 2147483647
+          minimum: 0
+          type: integer
+        num_in_stock:
+          maximum: 2147483647
+          minimum: -2147483648
+          title: Number in stock
+          type:
+            - integer
+            - 'null'
+      required:
+        - location_id
+      type: object
+    StockrecordRequest:
+      properties:
         low_stock_threshold:
           maximum: 2147483647
           minimum: 0
@@ -7978,37 +8195,6 @@ components:
           type:
             - string
             - 'null'
-      required:
-        - id
-      type: object
-    StockrecordLocation:
-      properties:
-        id:
-          readOnly: true
-          type: integer
-        location_id:
-          type: integer
-        low_stock_threshold:
-          maximum: 2147483647
-          minimum: 0
-          type: integer
-        num_allocated:
-          readOnly: true
-          title: Number allocated
-          type:
-            - integer
-            - 'null'
-        num_in_stock:
-          maximum: 2147483647
-          minimum: -2147483648
-          title: Number in stock
-          type:
-            - integer
-            - 'null'
-      required:
-        - id
-        - location_id
-        - num_allocated
       type: object
     Store:
       properties:
@@ -8386,6 +8572,31 @@ components:
         - variant_id
         - variant_title
       type: object
+    SubscriptionLineRequest:
+      properties:
+        metadata:
+          oneOf:
+            - {}
+            - type: 'null'
+        price:
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          type: string
+        product:
+          $ref: '#/components/schemas/Product Request'
+        quantity:
+          maximum: 2147483647
+          minimum: 0
+          type: integer
+        stockrecord:
+          allOf:
+            - $ref: '#/components/schemas/StockrecordRequest'
+          deprecated: true
+      required:
+        - price
+        - product
+        - stockrecord
+      type: object
     SubscriptionOrder:
       properties:
         billing_cycle:
@@ -8398,9 +8609,10 @@ components:
         - billing_cycle
         - order_number
       type: object
-    SubscriptionPaymentDetail:
+    SubscriptionPaymentDetailRequest:
       properties:
         card_token:
+          minLength: 1
           type:
             - string
             - 'null'
@@ -8585,6 +8797,17 @@ components:
         - amount
         - currency
       type: object
+    TaxPriceBreakdownRequest:
+      properties:
+        rate:
+          format: double
+          type: number
+        tax_id:
+          type: integer
+      required:
+        - rate
+        - tax_id
+      type: object
     TaxReportValueSeraizlier:
       properties:
         amount:
@@ -8633,6 +8856,21 @@ components:
         - report_values
         - tax_title
       type: object
+    TaxSerailizerRequest:
+      properties:
+        amount:
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          type: string
+        currency:
+          type:
+            - string
+            - 'null'
+        source:
+          type:
+            - string
+            - 'null'
+      type: object
     Template:
       properties:
         content:
@@ -8644,6 +8882,27 @@ components:
         name:
           description: 'Example: ''flatpages/default.html'''
           maxLength: 256
+          type: string
+        theme:
+          type:
+            - integer
+            - 'null'
+      required:
+        - name
+        - theme
+      type: object
+    TemplateRequest:
+      properties:
+        content:
+          type: string
+        file:
+          format: binary
+          title: Upload File
+          type: string
+        name:
+          description: 'Example: ''flatpages/default.html'''
+          maxLength: 256
+          minLength: 1
           type: string
         theme:
           type:
@@ -8665,6 +8924,17 @@ components:
           type: string
       required:
         - id
+        - name
+      type: object
+    ThemeRequest:
+      properties:
+        active:
+          type: boolean
+        name:
+          maxLength: 255
+          minLength: 1
+          type: string
+      required:
         - name
       type: object
     Ticket:
@@ -8809,7 +9079,7 @@ components:
         - id
         - name
       type: object
-    TrackingInfo:
+    TrackingInfoRequest:
       properties:
         carrier:
           description: |-
@@ -9224,6 +9494,68 @@ components:
         - response_code
         - type
       type: object
+    TransactionObjectRequest:
+      properties:
+        amount:
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          type: string
+        auth_code:
+          type:
+            - string
+            - 'null'
+        currency:
+          type:
+            - string
+            - 'null'
+        external_id:
+          type:
+            - string
+            - 'null'
+        is_disputed:
+          type: boolean
+        is_external:
+          type: boolean
+        is_initial_retry:
+          type:
+            - boolean
+            - 'null'
+        is_test:
+          type:
+            - boolean
+            - 'null'
+        network_transaction_id:
+          type:
+            - string
+            - 'null'
+        payment_method:
+          type:
+            - string
+            - 'null'
+        response_code:
+          type: integer
+        statement_descriptor:
+          type:
+            - string
+            - 'null'
+        status:
+          description: |-
+            * `succeeded` - Succeeded
+            * `failed` - Failed
+          enum:
+            - succeeded
+            - failed
+            - ''
+          type: string
+          x-spec-enum-id: a6661c405ff6d2ee
+        type:
+          minLength: 1
+          type: string
+      required:
+        - amount
+        - response_code
+        - type
+      type: object
     TransactionPaymentDetail:
       properties:
         bankcard_first_six:
@@ -9311,16 +9643,13 @@ components:
         - billing_cycle
         - id
       type: object
-    UpdateCart:
+    UpdateCartRequest:
       properties:
         attribution:
-          $ref: '#/components/schemas/CreateMarketingAttribution'
-        id:
-          readOnly: true
-          type: integer
+          $ref: '#/components/schemas/CreateMarketingAttributionRequest'
         lines:
           items:
-            $ref: '#/components/schemas/CreateOrderLine'
+            $ref: '#/components/schemas/CreateOrderLineRequest'
           type: array
         metadata:
           oneOf:
@@ -9328,16 +9657,16 @@ components:
             - type: 'null'
         vouchers:
           items:
+            minLength: 1
             type: string
           type:
             - array
             - 'null'
           writeOnly: true
       required:
-        - id
         - lines
       type: object
-    UpdateDefinition:
+    UpdateDefinitionRequest:
       properties:
         enable_export:
           default: false
@@ -9347,6 +9676,7 @@ components:
           type: boolean
         name:
           maxLength: 255
+          minLength: 1
           type: string
         object:
           description: |-
@@ -9375,34 +9705,20 @@ components:
           x-spec-enum-id: 06e58adfbb02ad1f
         validations:
           items:
-            $ref: '#/components/schemas/Validation'
+            $ref: '#/components/schemas/ValidationRequest'
           type: array
       required:
         - name
         - object
       type: object
-    UpdateOrder:
+    UpdateOrderRequest:
       properties:
         attribution:
-          $ref: '#/components/schemas/CreateMarketingAttribution'
+          $ref: '#/components/schemas/CreateMarketingAttributionRequest'
         billing_address:
           oneOf:
-            - $ref: '#/components/schemas/BillingAddress'
+            - $ref: '#/components/schemas/BillingAddressRequest'
             - type: 'null'
-        created_at:
-          format: date-time
-          readOnly: true
-          type: string
-        currency:
-          readOnly: true
-          type: string
-        date_placed:
-          format: date-time
-          readOnly: true
-          type: string
-        display_taxes:
-          readOnly: true
-          type: string
         fulfillment_status:
           description: |-
             The order's status in terms of fulfillment.
@@ -9424,231 +9740,27 @@ components:
             - incomplete
           type: string
           x-spec-enum-id: f7a016fc10fb8390
-        fulfillments:
-          items:
-            $ref: '#/components/schemas/Fulfillment'
-          readOnly: true
-          type: array
-        is_test:
-          readOnly: true
-          type: boolean
-        lines:
-          items:
-            $ref: '#/components/schemas/OrderLineDetail'
-          readOnly: true
-          type: array
         metadata:
           description: Additional order metadata.
           oneOf:
             - {}
             - type: 'null'
-        number:
-          readOnly: true
-          title: Order number
-          type: string
-        offer_discounts:
-          items:
-            $ref: '#/components/schemas/OrderOfferDiscount'
-          readOnly: true
-          type: array
-        order_status_url:
-          format: uri
-          readOnly: true
-          type: string
-        original_shipping_excl_tax:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          type: string
-        original_shipping_incl_tax:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          type: string
-        original_total_excl_tax:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          type: string
-        original_total_incl_tax:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          type: string
-        payment_status:
-          description: |-
-            * `pending` - Payment Pending
-            * `authorized` - Authorized
-            * `expiring` - Expiring
-            * `expired` - Expired
-            * `paid` - Paid
-            * `voided` - Voided
-            * `refunded` - Refunded
-            * `partially_paid` - Partially Paid
-            * `partially_refunded` - Partially Refunded
-            * `partially_voided` - Partially Voided
-          enum:
-            - pending
-            - authorized
-            - expiring
-            - expired
-            - paid
-            - voided
-            - refunded
-            - partially_paid
-            - partially_refunded
-            - partially_voided
-          readOnly: true
-          type: string
-          x-spec-enum-id: 4ddf29c57b2eb8f6
-        refunds:
-          items:
-            $ref: '#/components/schemas/Refund'
-          readOnly: true
-          type: array
-        report_values:
-          allOf:
-            - $ref: '#/components/schemas/OrderReportValues'
-          readOnly: true
         shipping_address:
           oneOf:
-            - $ref: '#/components/schemas/ShippingAddress'
+            - $ref: '#/components/schemas/ShippingAddressRequest'
             - type: 'null'
-        shipping_code:
-          readOnly: true
-          type: string
-        shipping_excl_tax:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          title: Shipping charge (excl. tax)
-          type: string
-        shipping_incl_tax:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          title: Shipping charge (inc. tax)
-          type: string
-        shipping_method:
-          readOnly: true
-          type: string
-        shipping_tax:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          type: string
-        shipping_tax_lines:
-          items:
-            $ref: '#/components/schemas/TaxPriceBreakdown'
-          readOnly: true
-          type: array
-        source:
-          readOnly: true
-          type: string
         status:
           description: The order's overall status.
           maxLength: 100
           type: string
-        subscription_lifecycle:
-          readOnly: true
-          type: string
-        subscriptions:
-          items:
-            $ref: '#/components/schemas/OrderSubscription'
-          readOnly: true
-          type: array
-        supports_post_purchase_upsells:
-          readOnly: true
-          type: boolean
         tags:
           description: An array of tags associated with the order.
           items:
+            minLength: 1
             type:
               - string
               - 'null'
           type: array
-        tax_lines:
-          items:
-            $ref: '#/components/schemas/TaxSerailizer'
-          readOnly: true
-          type: array
-        total_cost:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          type: string
-        total_excl_tax:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          title: Order total (excl. tax)
-          type: string
-        total_incl_tax:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          title: Order total (inc. tax)
-          type: string
-        total_tax:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          type: string
-        transactions:
-          items:
-            $ref: '#/components/schemas/TransactionObject'
-          readOnly: true
-          type: array
-        updated_at:
-          format: date-time
-          readOnly: true
-          type: string
-        user:
-          allOf:
-            - $ref: '#/components/schemas/UserInline'
-          readOnly: true
-        voucher_discounts:
-          items:
-            $ref: '#/components/schemas/OrderVoucherOffer'
-          readOnly: true
-          type: array
-      required:
-        - created_at
-        - currency
-        - date_placed
-        - display_taxes
-        - fulfillments
-        - is_test
-        - lines
-        - number
-        - offer_discounts
-        - order_status_url
-        - original_shipping_excl_tax
-        - original_shipping_incl_tax
-        - original_total_excl_tax
-        - original_total_incl_tax
-        - payment_status
-        - refunds
-        - report_values
-        - shipping_code
-        - shipping_excl_tax
-        - shipping_incl_tax
-        - shipping_method
-        - shipping_tax
-        - shipping_tax_lines
-        - source
-        - subscription_lifecycle
-        - subscriptions
-        - supports_post_purchase_upsells
-        - tax_lines
-        - total_cost
-        - total_excl_tax
-        - total_incl_tax
-        - total_tax
-        - transactions
-        - updated_at
-        - user
-        - voucher_discounts
       type: object
     UpdatePriceWithCurrency:
       properties:
@@ -9680,21 +9792,13 @@ components:
       required:
         - price
       type: object
-    UpdateProduct:
+    UpdateProductRequest:
       properties:
         categories:
           deprecated: true
           items:
             type: integer
           type: array
-        date_created:
-          format: date-time
-          readOnly: true
-          type: string
-        date_updated:
-          format: date-time
-          readOnly: true
-          type: string
         description:
           type: string
         enable_subscription:
@@ -9705,14 +9809,6 @@ components:
           type:
             - string
             - 'null'
-        id:
-          readOnly: true
-          type: integer
-        images:
-          items:
-            $ref: '#/components/schemas/ProductImage'
-          readOnly: true
-          type: array
         interval:
           description: |-
             * `day` - Day
@@ -9765,20 +9861,10 @@ components:
           maximum: 2147483647
           minimum: -2147483648
           type: integer
-        rating:
-          format: double
-          readOnly: true
-          type:
-            - number
-            - 'null'
         recommended_products:
           items:
             type: integer
           type: array
-        slug:
-          pattern: ^[-a-zA-Z0-9_]+$
-          readOnly: true
-          type: string
         template:
           description: Custom template name from your theme, ie catalogue/product.{custom_name}.html
           title: Theme Template
@@ -9786,29 +9872,60 @@ components:
             - string
             - 'null'
         title:
-          type: string
-        url:
-          format: uri
-          readOnly: true
+          minLength: 1
           type: string
         variant_attributes:
           items:
-            $ref: '#/components/schemas/ProductVariantAttribute'
+            $ref: '#/components/schemas/ProductVariantAttributeRequest'
           type: array
         variants:
           items:
-            $ref: '#/components/schemas/UpdateProductVariantForProduct'
+            $ref: '#/components/schemas/UpdateProductVariantForProductRequest'
           type: array
-      required:
-        - date_created
-        - date_updated
-        - id
-        - images
-        - rating
-        - slug
-        - url
       type: object
-    UpdateProductVariant:
+    UpdateProductVariantForProductRequest:
+      properties:
+        allow_backorders:
+          description: Continue selling when out of stock.
+          type: boolean
+        id:
+          type: integer
+        metadata:
+          oneOf:
+            - {}
+            - type: 'null'
+        prices:
+          items:
+            $ref: '#/components/schemas/ProductPricesRequest'
+          type: array
+        requires_shipping:
+          title: Requires shipping?
+          type: boolean
+        sku:
+          description: Stock Keeping Unit
+          type:
+            - string
+            - 'null'
+        track_stock:
+          description: Track inventory quantities at fulfillment locations.
+          title: Track Stock Levels
+          type: boolean
+        unit_cost:
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          title: Cost Per Item
+          type:
+            - string
+            - 'null'
+        upc:
+          description: Universal Product Code
+          type:
+            - string
+            - 'null'
+      required:
+        - id
+      type: object
+    UpdateProductVariantRequest:
       properties:
         allow_backorders:
           description: Continue selling when out of stock.
@@ -9823,7 +9940,7 @@ components:
             - type: 'null'
         prices:
           items:
-            $ref: '#/components/schemas/ProductPrices'
+            $ref: '#/components/schemas/ProductPricesRequest'
           type: array
         requires_shipping:
           title: Requires shipping?
@@ -9833,11 +9950,6 @@ components:
           type:
             - string
             - 'null'
-        stockrecords:
-          items:
-            $ref: '#/components/schemas/StockrecordLocation'
-          readOnly: true
-          type: array
         track_stock:
           description: Track inventory quantities at fulfillment locations.
           title: Track Stock Levels
@@ -9856,68 +9968,13 @@ components:
             - 'null'
         variant_attribute_values:
           items:
-            $ref: '#/components/schemas/ProductVariantAttributeValue'
+            $ref: '#/components/schemas/ProductVariantAttributeValueRequest'
           type: array
           writeOnly: true
       required:
-        - stockrecords
         - variant_attribute_values
       type: object
-    UpdateProductVariantForProduct:
-      properties:
-        allow_backorders:
-          description: Continue selling when out of stock.
-          type: boolean
-        id:
-          type: integer
-        image:
-          readOnly: true
-          type:
-            - integer
-            - 'null'
-        metadata:
-          oneOf:
-            - {}
-            - type: 'null'
-        prices:
-          items:
-            $ref: '#/components/schemas/ProductPrices'
-          type: array
-        requires_shipping:
-          title: Requires shipping?
-          type: boolean
-        sku:
-          description: Stock Keeping Unit
-          type:
-            - string
-            - 'null'
-        stockrecords:
-          items:
-            $ref: '#/components/schemas/StockrecordLocation'
-          readOnly: true
-          type: array
-        track_stock:
-          description: Track inventory quantities at fulfillment locations.
-          title: Track Stock Levels
-          type: boolean
-        unit_cost:
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          title: Cost Per Item
-          type:
-            - string
-            - 'null'
-        upc:
-          description: Universal Product Code
-          type:
-            - string
-            - 'null'
-      required:
-        - id
-        - image
-        - stockrecords
-      type: object
-    UpdateSubscriptionLine:
+    UpdateSubscriptionLineRequest:
       properties:
         metadata:
           oneOf:
@@ -9937,29 +9994,18 @@ components:
       required:
         - quantity
       type: object
-    UpdateUser:
+    UpdateUserRequest:
       properties:
         accepts_marketing:
           title: Subscribe to Marketing Emails
           type: boolean
-        addresses:
-          items:
-            $ref: '#/components/schemas/UserAddress'
-          readOnly: true
-          type: array
-        date_joined:
-          format: date-time
-          readOnly: true
-          type: string
         email:
           format: email
+          minLength: 1
           type: string
         first_name:
           maxLength: 255
           type: string
-        id:
-          readOnly: true
-          type: integer
         ip:
           title: Ip address
           type:
@@ -10010,49 +10056,21 @@ components:
           oneOf:
             - {}
             - type: 'null'
-        orders_count:
-          default: 0
-          readOnly: true
-          type: integer
         phone_number:
           type:
             - string
             - 'null'
-        subscriptions_count:
-          readOnly: true
-          type: integer
         tags:
           items:
+            minLength: 1
             type:
               - string
               - 'null'
           type: array
-        total_spent:
-          default: '0.00'
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
-          readOnly: true
-          type: string
         user_agent:
           type:
             - string
             - 'null'
-        user_type:
-          description: 'Available values : customer, lead, dashboard'
-          enum:
-            - customer
-            - lead
-            - dashboard
-          readOnly: true
-          type: string
-      required:
-        - addresses
-        - date_joined
-        - id
-        - orders_count
-        - subscriptions_count
-        - total_spent
-        - user_type
       type: object
     User:
       properties:
@@ -10239,6 +10257,74 @@ components:
         - line1
         - line4
       type: object
+    UserAddressRequest:
+      properties:
+        country:
+          description: The address country code.
+          minLength: 1
+          title: ISO 3166-1 alpha-2
+          type: string
+        first_name:
+          description: The first name of the address.
+          maxLength: 255
+          type: string
+        is_default_for_billing:
+          description: Use this address as the default billing address.
+          title: Default billing address?
+          type: boolean
+        is_default_for_shipping:
+          description: Use this address as the default shipping address.
+          title: Default shipping address?
+          type: boolean
+        last_name:
+          description: The last name of the address.
+          maxLength: 255
+          type: string
+        line1:
+          description: The first line of the address.
+          maxLength: 255
+          minLength: 1
+          title: First line of address
+          type: string
+        line2:
+          description: Optional second line of of the address.
+          maxLength: 255
+          title: Second line of address
+          type: string
+        line3:
+          description: Optional third line of of the address.
+          maxLength: 255
+          title: Third line of address
+          type: string
+        line4:
+          description: City of the address.
+          maxLength: 255
+          minLength: 1
+          title: City
+          type: string
+        notes:
+          description: Tell us anything we should know when delivering your order.
+          title: Instructions
+          type: string
+        phone_number:
+          description: The address phone number.
+          maxLength: 128
+          type: string
+        postcode:
+          description: The address post code or zip code.
+          maxLength: 64
+          title: Post/Zip-code
+          type: string
+        state:
+          description: The address state/province.
+          maxLength: 255
+          title: State/Province
+          type: string
+      required:
+        - country
+        - line1
+        - line4
+      type: object
     UserInline:
       properties:
         accepts_marketing:
@@ -10279,6 +10365,43 @@ components:
             - 'null'
       required:
         - id
+      type: object
+    UserInlineRequest:
+      properties:
+        accepts_marketing:
+          title: Subscribe to Marketing Emails
+          type: boolean
+        email:
+          format: email
+          minLength: 1
+          title: Email address
+          type:
+            - string
+            - 'null'
+        first_name:
+          maxLength: 255
+          type: string
+        ip:
+          title: Ip address
+          type:
+            - string
+            - 'null'
+        language:
+          title: Preferred language
+          type:
+            - string
+            - 'null'
+        last_name:
+          maxLength: 255
+          type: string
+        phone_number:
+          type:
+            - string
+            - 'null'
+        user_agent:
+          type:
+            - string
+            - 'null'
       type: object
     UserNote:
       properties:
@@ -10586,6 +10709,90 @@ components:
         - updated_at
         - voucher_discounts
       type: object
+    UserRequest:
+      properties:
+        accepts_marketing:
+          title: Subscribe to Marketing Emails
+          type: boolean
+        addresses:
+          items:
+            $ref: '#/components/schemas/UserAddressRequest'
+          type: array
+        email:
+          format: email
+          minLength: 1
+          type: string
+        first_name:
+          maxLength: 255
+          type: string
+        ip:
+          title: Ip address
+          type:
+            - string
+            - 'null'
+        is_blocked:
+          default: false
+          type: boolean
+        language:
+          description: |-
+            required : E164
+
+            * `en` - English
+            * `fr` - Français
+            * `th` - ภาษาไทย
+            * `de` - Deutsch
+            * `sv` - Svenska
+            * `no` - Norsk
+            * `it` - Italiano
+            * `es` - Español
+            * `nl` - Nederlands
+            * `pt` - Português
+            * `da` - Dansk
+            * `fi` - Suomi
+          enum:
+            - en
+            - fr
+            - th
+            - de
+            - sv
+            - 'no'
+            - it
+            - es
+            - nl
+            - pt
+            - da
+            - fi
+            - ''
+            - null
+          type:
+            - string
+            - 'null'
+          x-spec-enum-id: 70ceea9c8488568b
+        last_name:
+          maxLength: 255
+          type: string
+        metadata:
+          oneOf:
+            - {}
+            - type: 'null'
+        phone_number:
+          type:
+            - string
+            - 'null'
+        tags:
+          items:
+            minLength: 1
+            type:
+              - string
+              - 'null'
+          type: array
+        user_agent:
+          type:
+            - string
+            - 'null'
+      required:
+        - email
+      type: object
     Validation:
       properties:
         type:
@@ -10609,13 +10816,38 @@ components:
         - type
         - value
       type: object
-    VerifyTransaction:
+    ValidationRequest:
+      properties:
+        type:
+          description: |-
+            * `maximum_length` - maximum_length
+            * `maximum_value` - maximum_value
+            * `minimum_value` - minimum_value
+            * `maximum_precision` - maximum_precision
+            * `accept_only_image` - accept_only_image
+          enum:
+            - maximum_length
+            - maximum_value
+            - minimum_value
+            - maximum_precision
+            - accept_only_image
+          type: string
+          x-spec-enum-id: e6e4b370566eb845
+        value:
+          type: string
+      required:
+        - type
+        - value
+      type: object
+    VerifyTransactionRequest:
       properties:
         card_token:
           maxLength: 128
+          minLength: 1
           type: string
         currency:
           maxLength: 12
+          minLength: 1
           type: string
         payment_gateway:
           type:
@@ -10626,7 +10858,7 @@ components:
             - integer
             - 'null'
         user:
-          $ref: '#/components/schemas/CreateUser'
+          $ref: '#/components/schemas/CreateUserRequest'
       required:
         - card_token
         - currency
@@ -10770,6 +11002,69 @@ components:
         - updated_at
         - warning_count
       type: object
+    WebhookRequest:
+      properties:
+        active:
+          type: boolean
+        api_version:
+          type:
+            - string
+            - 'null'
+        events:
+          description: List of event triggers for the webhook.
+          items:
+            enum:
+              - cart.abandoned
+              - customer.created
+              - customer.deleted
+              - customer.redacted
+              - customer.updated
+              - dispute.created
+              - dispute.updated
+              - export.created
+              - fulfillment.created
+              - fulfillment.updated
+              - gateway.created
+              - gateway.updated
+              - gateway_group.created
+              - gateway_group.updated
+              - order.created
+              - order.updated
+              - product.created
+              - product.deleted
+              - product.updated
+              - store.updated
+              - subscription.created
+              - subscription.updated
+              - transaction.created
+              - transaction.updated
+            type:
+              - string
+              - 'null'
+            x-spec-enum-id: 2fff8156f601ff82
+          type: array
+        name:
+          description: A label to identify this webhook in the list. Maximum 50 characters.
+          title: Webhook Name
+          type:
+            - string
+            - 'null'
+        secret_key:
+          minLength: 1
+          type:
+            - string
+            - 'null'
+        target:
+          description: Full url for your webhook receiver endpoint.
+          format: uri
+          maxLength: 255
+          minLength: 1
+          title: Webhook target
+          type: string
+      required:
+        - events
+        - target
+      type: object
   securitySchemes:
     oauth2:
       description: 'Generate an [Access Token through **Settings > API Access**](https://developers.nextcommerce.com/docs/admin-api) for single store access or use the [Authorization Code flow with your partner App Client ID](https://developers.nextcommerce.com/docs/apps/oauth). Use required permission scopes for API endpoint access. <br/><br/>**Example** <br/> `Authorization: Bearer 123`'
@@ -10779,6 +11074,8 @@ components:
           scopes:
             admin:read: Access to list and view all data
             admin:write: Access to create and update all data
+            assets:read: Access to list and view assets
+            assets:write: Access to create and update assets
             campaigns:read: Access to list and view campaigns
             campaigns:write: Access to create and update campaigns
             carts:read: Access to list and view carts
@@ -11045,6 +11342,125 @@ paths:
         - oauth2: []
       tags:
         - apps
+  /assets/:
+    get:
+      operationId: assetsList
+      parameters:
+        - description: The pagination cursor value.
+          in: query
+          name: cursor
+          required: false
+          schema:
+            type: string
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: '2024-04-01'
+            enum:
+              - '2024-04-01'
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAssetList'
+          description: ''
+      security:
+        - oauth2:
+            - assets:read
+      tags:
+        - assets
+    post:
+      operationId: assetsCreate
+      parameters:
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: '2024-04-01'
+            enum:
+              - '2024-04-01'
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssetRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AssetRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AssetRequest'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+          description: ''
+      security:
+        - oauth2:
+            - assets:write
+      tags:
+        - assets
+  /assets/{id}/:
+    delete:
+      operationId: assetsDestroy
+      parameters:
+        - description: A unique integer value identifying this asset.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: '2024-04-01'
+            enum:
+              - '2024-04-01'
+            type: string
+      responses:
+        '204':
+          description: No response body
+      security:
+        - oauth2:
+            - assets:write
+      tags:
+        - assets
+    get:
+      operationId: assetsRetrieve
+      parameters:
+        - description: A unique integer value identifying this asset.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: '2024-04-01'
+            enum:
+              - '2024-04-01'
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+          description: ''
+      security:
+        - oauth2:
+            - assets:read
+      tags:
+        - assets
   /assigned-fulfillment-orders/:
     get:
       description: Retrieve assigned fulfillment order requests
@@ -15816,13 +16232,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateCart'
+              $ref: '#/components/schemas/CreateCartRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CreateCart'
+              $ref: '#/components/schemas/CreateCartRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateCart'
+              $ref: '#/components/schemas/CreateCartRequest'
         required: true
       responses:
         '201':
@@ -15915,13 +16331,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateCart'
+              $ref: '#/components/schemas/UpdateCartRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/UpdateCart'
+              $ref: '#/components/schemas/UpdateCartRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UpdateCart'
+              $ref: '#/components/schemas/UpdateCartRequest'
         required: true
       responses:
         '200':
@@ -15982,13 +16398,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Category'
+              $ref: '#/components/schemas/CategoryRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Category'
+              $ref: '#/components/schemas/CategoryRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Category'
+              $ref: '#/components/schemas/CategoryRequest'
         required: true
       responses:
         '201':
@@ -16055,13 +16471,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Category'
+              $ref: '#/components/schemas/CategoryRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Category'
+              $ref: '#/components/schemas/CategoryRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Category'
+              $ref: '#/components/schemas/CategoryRequest'
         required: true
       responses:
         '200':
@@ -16272,13 +16688,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateDispute'
+              $ref: '#/components/schemas/CreateDisputeRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CreateDispute'
+              $ref: '#/components/schemas/CreateDisputeRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateDispute'
+              $ref: '#/components/schemas/CreateDisputeRequest'
       responses:
         '201':
           content:
@@ -16370,13 +16786,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedDispute'
+              $ref: '#/components/schemas/PatchedDisputeRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedDispute'
+              $ref: '#/components/schemas/PatchedDisputeRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedDispute'
+              $ref: '#/components/schemas/PatchedDisputeRequest'
       responses:
         '200':
           content:
@@ -16411,13 +16827,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Dispute'
+              $ref: '#/components/schemas/DisputeRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Dispute'
+              $ref: '#/components/schemas/DisputeRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Dispute'
+              $ref: '#/components/schemas/DisputeRequest'
       responses:
         '200':
           content:
@@ -16489,13 +16905,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateDisputeNote'
+              $ref: '#/components/schemas/CreateDisputeNoteRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CreateDisputeNote'
+              $ref: '#/components/schemas/CreateDisputeNoteRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateDisputeNote'
+              $ref: '#/components/schemas/CreateDisputeNoteRequest'
         required: true
       responses:
         '200':
@@ -16532,13 +16948,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ResolveDispute'
+              $ref: '#/components/schemas/ResolveDisputeRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/ResolveDispute'
+              $ref: '#/components/schemas/ResolveDisputeRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/ResolveDispute'
+              $ref: '#/components/schemas/ResolveDisputeRequest'
       responses:
         '200':
           content:
@@ -16643,13 +17059,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateExport'
+              $ref: '#/components/schemas/CreateExportRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CreateExport'
+              $ref: '#/components/schemas/CreateExportRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateExport'
+              $ref: '#/components/schemas/CreateExportRequest'
         required: true
       responses:
         '201':
@@ -17014,13 +17430,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CancellationRequest'
+              $ref: '#/components/schemas/CancellationRequestRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CancellationRequest'
+              $ref: '#/components/schemas/CancellationRequestRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CancellationRequest'
+              $ref: '#/components/schemas/CancellationRequestRequest'
       responses:
         '200':
           content:
@@ -17056,13 +17472,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CancellationRequestAccept'
+              $ref: '#/components/schemas/CancellationRequestAcceptRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CancellationRequestAccept'
+              $ref: '#/components/schemas/CancellationRequestAcceptRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CancellationRequestAccept'
+              $ref: '#/components/schemas/CancellationRequestAcceptRequest'
       responses:
         '200':
           content:
@@ -17099,13 +17515,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CancellationRequestCancel'
+              $ref: '#/components/schemas/CancellationRequestCancelRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CancellationRequestCancel'
+              $ref: '#/components/schemas/CancellationRequestCancelRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CancellationRequestCancel'
+              $ref: '#/components/schemas/CancellationRequestCancelRequest'
       responses:
         '200':
           content:
@@ -17141,13 +17557,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CancellationRequestReject'
+              $ref: '#/components/schemas/CancellationRequestRejectRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CancellationRequestReject'
+              $ref: '#/components/schemas/CancellationRequestRejectRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CancellationRequestReject'
+              $ref: '#/components/schemas/CancellationRequestRejectRequest'
       responses:
         '200':
           content:
@@ -17184,13 +17600,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CloseFulfillmentOrder'
+              $ref: '#/components/schemas/CloseFulfillmentOrderRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CloseFulfillmentOrder'
+              $ref: '#/components/schemas/CloseFulfillmentOrderRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CloseFulfillmentOrder'
+              $ref: '#/components/schemas/CloseFulfillmentOrderRequest'
       responses:
         '200':
           content:
@@ -17227,13 +17643,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/FulfillmentRequest'
+              $ref: '#/components/schemas/FulfillmentRequestRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/FulfillmentRequest'
+              $ref: '#/components/schemas/FulfillmentRequestRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/FulfillmentRequest'
+              $ref: '#/components/schemas/FulfillmentRequestRequest'
       responses:
         '200':
           content:
@@ -17269,13 +17685,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/FulfillmentRequestAccept'
+              $ref: '#/components/schemas/FulfillmentRequestAcceptRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/FulfillmentRequestAccept'
+              $ref: '#/components/schemas/FulfillmentRequestAcceptRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/FulfillmentRequestAccept'
+              $ref: '#/components/schemas/FulfillmentRequestAcceptRequest'
       responses:
         '200':
           content:
@@ -17312,13 +17728,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/FulfillmentRequestCancel'
+              $ref: '#/components/schemas/FulfillmentRequestCancelRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/FulfillmentRequestCancel'
+              $ref: '#/components/schemas/FulfillmentRequestCancelRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/FulfillmentRequestCancel'
+              $ref: '#/components/schemas/FulfillmentRequestCancelRequest'
       responses:
         '200':
           content:
@@ -17354,13 +17770,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/FulfillmentRequestReject'
+              $ref: '#/components/schemas/FulfillmentRequestRejectRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/FulfillmentRequestReject'
+              $ref: '#/components/schemas/FulfillmentRequestRejectRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/FulfillmentRequestReject'
+              $ref: '#/components/schemas/FulfillmentRequestRejectRequest'
       responses:
         '200':
           content:
@@ -17428,13 +17844,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateFulfillment'
+              $ref: '#/components/schemas/CreateFulfillmentRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CreateFulfillment'
+              $ref: '#/components/schemas/CreateFulfillmentRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateFulfillment'
+              $ref: '#/components/schemas/CreateFulfillmentRequest'
       responses:
         '201':
           content:
@@ -17471,13 +17887,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/HoldFulfillment'
+              $ref: '#/components/schemas/HoldFulfillmentRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/HoldFulfillment'
+              $ref: '#/components/schemas/HoldFulfillmentRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/HoldFulfillment'
+              $ref: '#/components/schemas/HoldFulfillmentRequest'
         required: true
       responses:
         '200':
@@ -17515,13 +17931,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MoveFulfillmentOrder'
+              $ref: '#/components/schemas/MoveFulfillmentOrderRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/MoveFulfillmentOrder'
+              $ref: '#/components/schemas/MoveFulfillmentOrderRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/MoveFulfillmentOrder'
+              $ref: '#/components/schemas/MoveFulfillmentOrderRequest'
         required: true
       responses:
         '200':
@@ -17560,6 +17976,50 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FulfillmentOrder'
+          description: ''
+      security:
+        - oauth2:
+            - fulfillment_service:write
+            - fulfillment_orders:write
+      tags:
+        - fulfillment
+  /fulfillment-orders/{id}/split/:
+    post:
+      description: Split line items of a fulfillment order into a new fulfillment order.
+      operationId: fulfillmentOrdersSplit
+      parameters:
+        - description: A unique integer value identifying this fulfillment order.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-29next-API-Version
+          required: true
+          schema:
+            default: '2024-04-01'
+            enum:
+              - '2024-04-01'
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SplitFulfillmentOrderRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SplitFulfillmentOrderRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SplitFulfillmentOrderRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SplitFulfillmentOrderResponse'
           description: ''
       security:
         - oauth2:
@@ -17789,13 +18249,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateGiftCard'
+              $ref: '#/components/schemas/CreateGiftCardRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CreateGiftCard'
+              $ref: '#/components/schemas/CreateGiftCardRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateGiftCard'
+              $ref: '#/components/schemas/CreateGiftCardRequest'
         required: true
       responses:
         '201':
@@ -17862,13 +18322,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateGiftCard'
+              $ref: '#/components/schemas/PatchedUpdateGiftCardRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateGiftCard'
+              $ref: '#/components/schemas/PatchedUpdateGiftCardRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateGiftCard'
+              $ref: '#/components/schemas/PatchedUpdateGiftCardRequest'
       responses:
         '200':
           content:
@@ -17960,13 +18420,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Location'
+              $ref: '#/components/schemas/LocationRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Location'
+              $ref: '#/components/schemas/LocationRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Location'
+              $ref: '#/components/schemas/LocationRequest'
         required: true
       responses:
         '201':
@@ -18061,13 +18521,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Location'
+              $ref: '#/components/schemas/LocationRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Location'
+              $ref: '#/components/schemas/LocationRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Location'
+              $ref: '#/components/schemas/LocationRequest'
         required: true
       responses:
         '200':
@@ -18207,13 +18667,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateDefinition'
+              $ref: '#/components/schemas/CreateDefinitionRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CreateDefinition'
+              $ref: '#/components/schemas/CreateDefinitionRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateDefinition'
+              $ref: '#/components/schemas/CreateDefinitionRequest'
         required: true
       responses:
         '201':
@@ -18306,13 +18766,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateDefinition'
+              $ref: '#/components/schemas/PatchedUpdateDefinitionRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateDefinition'
+              $ref: '#/components/schemas/PatchedUpdateDefinitionRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateDefinition'
+              $ref: '#/components/schemas/PatchedUpdateDefinitionRequest'
       responses:
         '200':
           content:
@@ -18347,13 +18807,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateDefinition'
+              $ref: '#/components/schemas/UpdateDefinitionRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/UpdateDefinition'
+              $ref: '#/components/schemas/UpdateDefinitionRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UpdateDefinition'
+              $ref: '#/components/schemas/UpdateDefinitionRequest'
         required: true
       responses:
         '200':
@@ -18755,13 +19215,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateOrder'
+              $ref: '#/components/schemas/CreateOrderRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CreateOrder'
+              $ref: '#/components/schemas/CreateOrderRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateOrder'
+              $ref: '#/components/schemas/CreateOrderRequest'
         required: true
       responses:
         '201':
@@ -18828,13 +19288,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateOrder'
+              $ref: '#/components/schemas/PatchedUpdateOrderRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateOrder'
+              $ref: '#/components/schemas/PatchedUpdateOrderRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateOrder'
+              $ref: '#/components/schemas/PatchedUpdateOrderRequest'
       responses:
         '200':
           content:
@@ -18869,13 +19329,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateOrder'
+              $ref: '#/components/schemas/UpdateOrderRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/UpdateOrder'
+              $ref: '#/components/schemas/UpdateOrderRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UpdateOrder'
+              $ref: '#/components/schemas/UpdateOrderRequest'
       responses:
         '200':
           content:
@@ -18911,13 +19371,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddLineItem'
+              $ref: '#/components/schemas/AddLineItemRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/AddLineItem'
+              $ref: '#/components/schemas/AddLineItemRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/AddLineItem'
+              $ref: '#/components/schemas/AddLineItemRequest'
         required: true
       responses:
         '200':
@@ -18954,13 +19414,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CancelOrder'
+              $ref: '#/components/schemas/CancelOrderRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CancelOrder'
+              $ref: '#/components/schemas/CancelOrderRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CancelOrder'
+              $ref: '#/components/schemas/CancelOrderRequest'
         required: true
       responses:
         '200':
@@ -19028,13 +19488,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CollectPayment'
+              $ref: '#/components/schemas/CollectPaymentRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CollectPayment'
+              $ref: '#/components/schemas/CollectPaymentRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CollectPayment'
+              $ref: '#/components/schemas/CollectPaymentRequest'
       responses:
         '200':
           content:
@@ -19131,13 +19591,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddOrderShipmentTracking'
+              $ref: '#/components/schemas/AddOrderShipmentTrackingRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/AddOrderShipmentTracking'
+              $ref: '#/components/schemas/AddOrderShipmentTrackingRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/AddOrderShipmentTracking'
+              $ref: '#/components/schemas/AddOrderShipmentTrackingRequest'
       responses:
         '201':
           content:
@@ -19249,13 +19709,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateFulfillmentEvent'
+              $ref: '#/components/schemas/CreateFulfillmentEventRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CreateFulfillmentEvent'
+              $ref: '#/components/schemas/CreateFulfillmentEventRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateFulfillmentEvent'
+              $ref: '#/components/schemas/CreateFulfillmentEventRequest'
         required: true
       responses:
         '200':
@@ -19368,13 +19828,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddOrderLine'
+              $ref: '#/components/schemas/AddOrderLineRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/AddOrderLine'
+              $ref: '#/components/schemas/AddOrderLineRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/AddOrderLine'
+              $ref: '#/components/schemas/AddOrderLineRequest'
         required: true
       responses:
         '201':
@@ -19451,13 +19911,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateOrderLine'
+              $ref: '#/components/schemas/PatchedUpdateOrderLineRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateOrderLine'
+              $ref: '#/components/schemas/PatchedUpdateOrderLineRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateOrderLine'
+              $ref: '#/components/schemas/PatchedUpdateOrderLineRequest'
       responses:
         '200':
           content:
@@ -19493,13 +19953,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MarkAsPaid'
+              $ref: '#/components/schemas/MarkAsPaidRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/MarkAsPaid'
+              $ref: '#/components/schemas/MarkAsPaidRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/MarkAsPaid'
+              $ref: '#/components/schemas/MarkAsPaidRequest'
       responses:
         '200':
           content:
@@ -19571,13 +20031,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateOrderNote'
+              $ref: '#/components/schemas/CreateOrderNoteRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CreateOrderNote'
+              $ref: '#/components/schemas/CreateOrderNoteRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateOrderNote'
+              $ref: '#/components/schemas/CreateOrderNoteRequest'
         required: true
       responses:
         '200':
@@ -19614,13 +20074,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RefundOrder'
+              $ref: '#/components/schemas/RefundOrderRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/RefundOrder'
+              $ref: '#/components/schemas/RefundOrderRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/RefundOrder'
+              $ref: '#/components/schemas/RefundOrderRequest'
         required: true
       responses:
         '200':
@@ -19656,13 +20116,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CalculateRefundRequest'
+              $ref: '#/components/schemas/CalculateRefundRequestRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CalculateRefundRequest'
+              $ref: '#/components/schemas/CalculateRefundRequestRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CalculateRefundRequest'
+              $ref: '#/components/schemas/CalculateRefundRequestRequest'
       responses:
         '200':
           content:
@@ -19727,13 +20187,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateUpdatePage'
+              $ref: '#/components/schemas/CreateUpdatePageRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CreateUpdatePage'
+              $ref: '#/components/schemas/CreateUpdatePageRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateUpdatePage'
+              $ref: '#/components/schemas/CreateUpdatePageRequest'
         required: true
       responses:
         '201':
@@ -19826,13 +20286,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedCreateUpdatePage'
+              $ref: '#/components/schemas/PatchedCreateUpdatePageRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedCreateUpdatePage'
+              $ref: '#/components/schemas/PatchedCreateUpdatePageRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedCreateUpdatePage'
+              $ref: '#/components/schemas/PatchedCreateUpdatePageRequest'
       responses:
         '200':
           content:
@@ -19867,13 +20327,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateUpdatePage'
+              $ref: '#/components/schemas/CreateUpdatePageRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CreateUpdatePage'
+              $ref: '#/components/schemas/CreateUpdatePageRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateUpdatePage'
+              $ref: '#/components/schemas/CreateUpdatePageRequest'
         required: true
       responses:
         '200':
@@ -19972,13 +20432,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateProduct'
+              $ref: '#/components/schemas/CreateProductRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CreateProduct'
+              $ref: '#/components/schemas/CreateProductRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateProduct'
+              $ref: '#/components/schemas/CreateProductRequest'
         required: true
       responses:
         '201':
@@ -20068,13 +20528,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateProductVariant'
+              $ref: '#/components/schemas/PatchedUpdateProductVariantRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateProductVariant'
+              $ref: '#/components/schemas/PatchedUpdateProductVariantRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateProductVariant'
+              $ref: '#/components/schemas/PatchedUpdateProductVariantRequest'
       responses:
         '200':
           content:
@@ -20108,13 +20568,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateProductVariant'
+              $ref: '#/components/schemas/UpdateProductVariantRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/UpdateProductVariant'
+              $ref: '#/components/schemas/UpdateProductVariantRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UpdateProductVariant'
+              $ref: '#/components/schemas/UpdateProductVariantRequest'
         required: true
       responses:
         '200':
@@ -20207,13 +20667,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateProduct'
+              $ref: '#/components/schemas/PatchedUpdateProductRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateProduct'
+              $ref: '#/components/schemas/PatchedUpdateProductRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateProduct'
+              $ref: '#/components/schemas/PatchedUpdateProductRequest'
       responses:
         '200':
           content:
@@ -20248,13 +20708,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateProduct'
+              $ref: '#/components/schemas/UpdateProductRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/UpdateProduct'
+              $ref: '#/components/schemas/UpdateProductRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UpdateProduct'
+              $ref: '#/components/schemas/UpdateProductRequest'
       responses:
         '200':
           content:
@@ -20320,13 +20780,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProductImage'
+              $ref: '#/components/schemas/ProductImageRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/ProductImage'
+              $ref: '#/components/schemas/ProductImageRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/ProductImage'
+              $ref: '#/components/schemas/ProductImageRequest'
       responses:
         '200':
           content:
@@ -20436,13 +20896,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedProductImageUpdate'
+              $ref: '#/components/schemas/PatchedProductImageUpdateRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedProductImageUpdate'
+              $ref: '#/components/schemas/PatchedProductImageUpdateRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedProductImageUpdate'
+              $ref: '#/components/schemas/PatchedProductImageUpdateRequest'
       responses:
         '200':
           content:
@@ -20508,13 +20968,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProductPrices'
+              $ref: '#/components/schemas/ProductPricesRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/ProductPrices'
+              $ref: '#/components/schemas/ProductPricesRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/ProductPrices'
+              $ref: '#/components/schemas/ProductPricesRequest'
         required: true
       responses:
         '200':
@@ -20622,13 +21082,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedUpdatePriceWithCurrency'
+              $ref: '#/components/schemas/PatchedUpdatePriceWithCurrencyRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedUpdatePriceWithCurrency'
+              $ref: '#/components/schemas/PatchedUpdatePriceWithCurrencyRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedUpdatePriceWithCurrency'
+              $ref: '#/components/schemas/PatchedUpdatePriceWithCurrencyRequest'
       responses:
         '200':
           content:
@@ -20694,13 +21154,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateProductVariant'
+              $ref: '#/components/schemas/CreateProductVariantRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CreateProductVariant'
+              $ref: '#/components/schemas/CreateProductVariantRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateProductVariant'
+              $ref: '#/components/schemas/CreateProductVariantRequest'
         required: true
       responses:
         '200':
@@ -20871,13 +21331,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateUpdateStockRecord'
+              $ref: '#/components/schemas/CreateUpdateStockRecordRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CreateUpdateStockRecord'
+              $ref: '#/components/schemas/CreateUpdateStockRecordRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateUpdateStockRecord'
+              $ref: '#/components/schemas/CreateUpdateStockRecordRequest'
         required: true
       responses:
         '201':
@@ -20970,13 +21430,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedCreateUpdateStockRecord'
+              $ref: '#/components/schemas/PatchedCreateUpdateStockRecordRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedCreateUpdateStockRecord'
+              $ref: '#/components/schemas/PatchedCreateUpdateStockRecordRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedCreateUpdateStockRecord'
+              $ref: '#/components/schemas/PatchedCreateUpdateStockRecordRequest'
       responses:
         '200':
           content:
@@ -21357,13 +21817,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateSubscription'
+              $ref: '#/components/schemas/CreateSubscriptionRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CreateSubscription'
+              $ref: '#/components/schemas/CreateSubscriptionRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateSubscription'
+              $ref: '#/components/schemas/CreateSubscriptionRequest'
         required: true
       responses:
         '201':
@@ -21430,13 +21890,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateSubscription'
+              $ref: '#/components/schemas/PatchedUpdateSubscriptionRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateSubscription'
+              $ref: '#/components/schemas/PatchedUpdateSubscriptionRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateSubscription'
+              $ref: '#/components/schemas/PatchedUpdateSubscriptionRequest'
       responses:
         '200':
           content:
@@ -21472,13 +21932,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CancelSubscription'
+              $ref: '#/components/schemas/CancelSubscriptionRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CancelSubscription'
+              $ref: '#/components/schemas/CancelSubscriptionRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CancelSubscription'
+              $ref: '#/components/schemas/CancelSubscriptionRequest'
         required: true
       responses:
         '200':
@@ -21515,13 +21975,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddSubscriptionLine'
+              $ref: '#/components/schemas/AddSubscriptionLineRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/AddSubscriptionLine'
+              $ref: '#/components/schemas/AddSubscriptionLineRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/AddSubscriptionLine'
+              $ref: '#/components/schemas/AddSubscriptionLineRequest'
         required: true
       responses:
         '201':
@@ -21596,13 +22056,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateSubscriptionLine'
+              $ref: '#/components/schemas/UpdateSubscriptionLineRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/UpdateSubscriptionLine'
+              $ref: '#/components/schemas/UpdateSubscriptionLineRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UpdateSubscriptionLine'
+              $ref: '#/components/schemas/UpdateSubscriptionLineRequest'
         required: true
       responses:
         '200':
@@ -21639,13 +22099,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PauseSubscription'
+              $ref: '#/components/schemas/PauseSubscriptionRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PauseSubscription'
+              $ref: '#/components/schemas/PauseSubscriptionRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PauseSubscription'
+              $ref: '#/components/schemas/PauseSubscriptionRequest'
       responses:
         '200':
           content:
@@ -21712,13 +22172,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ResumeSubscription'
+              $ref: '#/components/schemas/ResumeSubscriptionRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/ResumeSubscription'
+              $ref: '#/components/schemas/ResumeSubscriptionRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/ResumeSubscription'
+              $ref: '#/components/schemas/ResumeSubscriptionRequest'
         required: true
       responses:
         '200':
@@ -21755,13 +22215,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RetrySubscription'
+              $ref: '#/components/schemas/RetrySubscriptionRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/RetrySubscription'
+              $ref: '#/components/schemas/RetrySubscriptionRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/RetrySubscription'
+              $ref: '#/components/schemas/RetrySubscriptionRequest'
       responses:
         '200':
           content:
@@ -21858,13 +22318,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Theme'
+              $ref: '#/components/schemas/ThemeRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Theme'
+              $ref: '#/components/schemas/ThemeRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Theme'
+              $ref: '#/components/schemas/ThemeRequest'
         required: true
       responses:
         '201':
@@ -22014,13 +22474,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Template'
+              $ref: '#/components/schemas/TemplateRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Template'
+              $ref: '#/components/schemas/TemplateRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Template'
+              $ref: '#/components/schemas/TemplateRequest'
         required: true
       responses:
         '200':
@@ -22194,13 +22654,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateUpdateTicket'
+              $ref: '#/components/schemas/CreateUpdateTicketRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CreateUpdateTicket'
+              $ref: '#/components/schemas/CreateUpdateTicketRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateUpdateTicket'
+              $ref: '#/components/schemas/CreateUpdateTicketRequest'
       responses:
         '201':
           content:
@@ -22300,13 +22760,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedCreateUpdateTicket'
+              $ref: '#/components/schemas/PatchedCreateUpdateTicketRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedCreateUpdateTicket'
+              $ref: '#/components/schemas/PatchedCreateUpdateTicketRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedCreateUpdateTicket'
+              $ref: '#/components/schemas/PatchedCreateUpdateTicketRequest'
       responses:
         '200':
           content:
@@ -22341,13 +22801,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateUpdateTicket'
+              $ref: '#/components/schemas/CreateUpdateTicketRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CreateUpdateTicket'
+              $ref: '#/components/schemas/CreateUpdateTicketRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateUpdateTicket'
+              $ref: '#/components/schemas/CreateUpdateTicketRequest'
       responses:
         '200':
           content:
@@ -22413,13 +22873,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateTicketComment'
+              $ref: '#/components/schemas/CreateTicketCommentRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CreateTicketComment'
+              $ref: '#/components/schemas/CreateTicketCommentRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateTicketComment'
+              $ref: '#/components/schemas/CreateTicketCommentRequest'
       responses:
         '200':
           content:
@@ -22765,13 +23225,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VerifyTransaction'
+              $ref: '#/components/schemas/VerifyTransactionRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/VerifyTransaction'
+              $ref: '#/components/schemas/VerifyTransactionRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/VerifyTransaction'
+              $ref: '#/components/schemas/VerifyTransactionRequest'
         required: true
       responses:
         '200':
@@ -22839,13 +23299,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CaptureTransaction'
+              $ref: '#/components/schemas/CaptureTransactionRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CaptureTransaction'
+              $ref: '#/components/schemas/CaptureTransactionRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CaptureTransaction'
+              $ref: '#/components/schemas/CaptureTransactionRequest'
       responses:
         '200':
           content:
@@ -22881,13 +23341,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RefundTransaction'
+              $ref: '#/components/schemas/RefundTransactionRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/RefundTransaction'
+              $ref: '#/components/schemas/RefundTransactionRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/RefundTransaction'
+              $ref: '#/components/schemas/RefundTransactionRequest'
         required: true
       responses:
         '200':
@@ -23021,13 +23481,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/UserRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/UserRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/UserRequest'
         required: true
       responses:
         '201':
@@ -23094,13 +23554,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateUser'
+              $ref: '#/components/schemas/PatchedUpdateUserRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateUser'
+              $ref: '#/components/schemas/PatchedUpdateUserRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedUpdateUser'
+              $ref: '#/components/schemas/PatchedUpdateUserRequest'
       responses:
         '200':
           content:
@@ -23135,13 +23595,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateUser'
+              $ref: '#/components/schemas/UpdateUserRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/UpdateUser'
+              $ref: '#/components/schemas/UpdateUserRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UpdateUser'
+              $ref: '#/components/schemas/UpdateUserRequest'
       responses:
         '200':
           content:
@@ -23212,13 +23672,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateUserAddress'
+              $ref: '#/components/schemas/CreateUserAddressRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CreateUserAddress'
+              $ref: '#/components/schemas/CreateUserAddressRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateUserAddress'
+              $ref: '#/components/schemas/CreateUserAddressRequest'
         required: true
       responses:
         '201':
@@ -23329,13 +23789,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserAddress'
+              $ref: '#/components/schemas/UserAddressRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/UserAddress'
+              $ref: '#/components/schemas/UserAddressRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UserAddress'
+              $ref: '#/components/schemas/UserAddressRequest'
         required: true
       responses:
         '200':
@@ -23408,13 +23868,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateUserNote'
+              $ref: '#/components/schemas/CreateUserNoteRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CreateUserNote'
+              $ref: '#/components/schemas/CreateUserNoteRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateUserNote'
+              $ref: '#/components/schemas/CreateUserNoteRequest'
         required: true
       responses:
         '200':
@@ -23581,13 +24041,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Webhook'
+              $ref: '#/components/schemas/WebhookRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Webhook'
+              $ref: '#/components/schemas/WebhookRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Webhook'
+              $ref: '#/components/schemas/WebhookRequest'
         required: true
       responses:
         '201':
@@ -23680,13 +24140,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedWebhook'
+              $ref: '#/components/schemas/PatchedWebhookRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedWebhook'
+              $ref: '#/components/schemas/PatchedWebhookRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedWebhook'
+              $ref: '#/components/schemas/PatchedWebhookRequest'
       responses:
         '200':
           content:
@@ -23721,13 +24181,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Webhook'
+              $ref: '#/components/schemas/WebhookRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Webhook'
+              $ref: '#/components/schemas/WebhookRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Webhook'
+              $ref: '#/components/schemas/WebhookRequest'
         required: true
       responses:
         '200':
@@ -26258,6 +26718,7 @@ webhooks:
                     - code: string
                       label: string
                   id: 0
+                  is_default: false
                   name: string
                 re_attemp_intitial_charge: null
               event_id: a7a26ff2-e851-45b6-9634-d595f45458b7
@@ -26465,6 +26926,8 @@ webhooks:
                           type: array
                         id:
                           type: integer
+                        is_default:
+                          type: boolean
                         name:
                           maxLength: 256
                           type: string
@@ -26593,6 +27056,7 @@ webhooks:
                     - code: string
                       label: string
                   id: 0
+                  is_default: false
                   name: string
                 re_attemp_intitial_charge: null
               event_id: a7a26ff2-e851-45b6-9634-d595f45458b7
@@ -26800,6 +27264,8 @@ webhooks:
                           type: array
                         id:
                           type: integer
+                        is_default:
+                          type: boolean
                         name:
                           maxLength: 256
                           type: string
@@ -30426,9 +30892,7 @@ webhooks:
                   - attachment: null
                     caption: string
                     display_order: 0
-                    file_name: string
                     id: 0
-                    src: null
                 interval: null
                 interval_counts: null
                 is_discountable: false
@@ -30548,16 +31012,8 @@ webhooks:
                             maximum: 2147483647
                             minimum: 0
                             type: integer
-                          file_name:
-                            type: string
-                            writeOnly: true
                           id:
                             type: integer
-                          src:
-                            description: URL of the image to fetch and associate with the product
-                            format: uri
-                            type: string
-                            writeOnly: true
                         required:
                           - id
                         type: object
@@ -30964,9 +31420,7 @@ webhooks:
                   - attachment: null
                     caption: string
                     display_order: 0
-                    file_name: string
                     id: 0
-                    src: null
                 interval: null
                 interval_counts: null
                 is_discountable: false
@@ -31086,16 +31540,8 @@ webhooks:
                             maximum: 2147483647
                             minimum: 0
                             type: integer
-                          file_name:
-                            type: string
-                            writeOnly: true
                           id:
                             type: integer
-                          src:
-                            description: URL of the image to fetch and associate with the product
-                            format: uri
-                            type: string
-                            writeOnly: true
                         required:
                           - id
                         type: object
@@ -33844,6 +34290,7 @@ webhooks:
         - payments
 tags:
   - name: apps
+  - name: assets
   - name: fulfillment
   - name: campaigns
   - name: carts

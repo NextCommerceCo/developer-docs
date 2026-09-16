@@ -58,7 +58,7 @@ Below is an example API call to create a campaign for a US English funnel that a
   "name": "Spring Widget Launch US", // internal reference name
   "currency": "USD", // default currency for orders on this campaign
   "language": "en", // preferred customer language
-  "payment_gateway_group_id": 4, // from gatewayGroupsList
+  "payment_gateway_group_id": 4, // from gatewayGroupsList, is_default marks the store default
   "additional_currencies": ["CAD"], // currencies supported beyond the default
   "available_payment_methods": ["card_token", "paypal"], // codes from gatewayGroupsList
   "available_express_payment_methods": ["apple_pay"], // express codes from gatewayGroupsList
@@ -66,6 +66,8 @@ Below is an example API call to create a campaign for a US English funnel that a
   "statement_descriptor": "WIDGETCO" // shown on the customer's card statement
 }
 ```
+
+Each entry from [gatewayGroupsList](/docs/admin-api/reference/payments/gatewayGroupsList) carries an `is_default` flag marking the store's default gateway group. Use it to prepopulate `payment_gateway_group_id` rather than asking the merchant to pick a group they have already configured as their default.
 
 The response returns the campaign `id` you use for every package call, and the `api_key` your funnel pages authenticate with.
 

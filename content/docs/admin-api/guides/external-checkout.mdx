@@ -116,7 +116,7 @@ Add additional products (line items) to the original order through the [ordersAd
 }
 ```
 <Callout type="warn">
-The `ordersAddLineItemsCreate` API requires that the order initial **payment method** supports merchant initiated charges. Current supported payment methods are `bankcard` and `paypal` (with Reference Transactions enabled).
+The `ordersAddLineItemsCreate` API requires that the order initial **payment method** supports merchant initiated charges. See the [Payment Methods](/docs/admin-api/guides/payment-methods) capability matrix for which methods support upsells.
 </Callout>
 ### Cart / Order / Upsell lines Detail
 Cart, Order, and Upsell line items represent the products the customer is purchasing. When an order is created, the product fulfillment location will be automatically chosen based on product stock records and inventory availability.

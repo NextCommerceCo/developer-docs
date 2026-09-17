@@ -38,6 +38,10 @@ The assets directory is used to upload static asset files used in the theme such
 {{ 'css/style.css'|asset_url }}
 ```
 
+<Callout type="warn">
+Never hardcode a CDN asset URL in a template — asset URLs change on every push and the hardcoded link will break. Use `asset_url` for all theme asset references.
+</Callout>
+
 ### Configs
 The configs directory is used to store your theme settings options and also the settings data as they should be configured with the theme.
 

@@ -103,6 +103,10 @@ Creating an order is the core resource in an external checkout flow, see the exa
 
 Add additional products (line items) to the original order through the [ordersAddLineItemsCreate](/docs/admin-api/reference/orders/ordersAddLineItemsCreate) API. Adding items to the order will automatically re-use the order's initial payment method to collect payment for the additional products.
 
+<Callout type="idea">
+Check `supports_post_purchase_upsells` on the initial order create response before attempting an upsell. This boolean tells you whether the order accepts upsells.
+</Callout>
+
 ```json title="Request" http-method="POST" http-target="https://{store}.29next.store/api/admin/orders/{number}/add-line-items/"
 {
   "lines": [

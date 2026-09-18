@@ -256,6 +256,35 @@ console.log(result);
 
 ```
 
+By default, the upsell charge routes through the same gateway used for the original order. To pin the upsell charge to a specific gateway group or gateway, pass `payment_gateway_group` or `payment_gateway` inside `payment_detail`.
+
+```javascript title="Add Upsell with a Specific Gateway Group"
+const refId = '<YOUR ORDER REF ID>'
+var payload = {
+    "lines": [
+        {
+            "package_id": 1
+        }
+    ],
+    "payment_detail": {
+        "payment_gateway_group": 3 // optional, OR "payment_gateway": 12
+    }
+}
+const response = await fetch('https://campaigns.apps.29next.com/api/v1/orders/' + refId + '/upsells/', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        "Authorization": '<YOUR CAMPAIGN API KEY>' // Campaign API Key
+    },
+    body: JSON.stringify(payload),
+});
+const result = await response.json();
+console.log(result);
+```
+<Callout type="info" title="Gateway Routing">
+Both fields are optional integer ids. Pass either `payment_gateway_group` or `payment_gateway`, not both. See [Gateway Routing](/docs/admin-api/guides/payment-methods/bankcard#gateway-routing) for retrieving the ids.
+</Callout>
+
 ### Order Confirmation
 
 On the order confirmation page, you can retrieve the order details and map the values to your template to show an order summary to the customer.

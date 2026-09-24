@@ -12,6 +12,10 @@ layout: center
     Each input is named with data-next-checkout-field. First name, last name
     and email are required; the phone is optional unless its input carries
     `required` or data-next-required="true".
+    The SDK shows the shipping country's flag inside the phone field and
+    writes the number in that country's format as it is typed; the order
+    receives it as E.164. A number typed with + keeps the shipping country's
+    flag, and in a country without phone rules the number is left as typed.
 
   SHIPPING INFORMATION — built by the SDK (data-next-address="shipping")
     The empty <div> becomes the fields the selected country collects, in the
@@ -129,16 +133,6 @@ layout: center
     color: #dc2626;
     font-size: 12px;
   }
-  .checkout-demo .field .iti {
-    display: block;
-  }
-  .checkout-demo .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-  }
   .checkout-demo button[type='submit'] {
     width: 100%;
     height: 48px;
@@ -222,12 +216,6 @@ layout: center
   [data-next-address] .next-error-label {
     color: #dc2626;
   }
-  .next-address-field .iti {
-    display: block;
-  }
-  .iti:has(.next-address-control:placeholder-shown) + .next-address-label {
-    display: none;
-  }
 </style>
 
 <form data-next-checkout="form" class="checkout-demo">
@@ -267,8 +255,6 @@ layout: center
     </div>
     <div class="row">
       <div class="field">
-        <!-- The SDK wraps the phone input in a country-code picker, so its
-             label is kept for screen readers only. -->
         <input
           id="phone"
           data-next-checkout-field="phone"
@@ -276,7 +262,7 @@ layout: center
           placeholder="Phone (Optional)"
           type="tel"
         />
-        <label for="phone" class="sr-only">Phone</label>
+        <label for="phone">Phone</label>
       </div>
     </div>
   </section>

@@ -25,6 +25,11 @@ layout: center
     city, state, postcode and country. They attach to the address1 field by
     name, so the block's fields get them with no extra markup.
 
+  SUBMIT
+    Continue validates every field and shows the SDK's messages under the
+    ones that fail. This page has no cart and no payment step, so a valid
+    form stops there and no order is created.
+
   STYLING
     The SDK ships no styling for the block, so the <style> below styles both
     groups the same way. The customer fields copy the block's markup
@@ -111,8 +116,27 @@ layout: center
     border-color: #2563eb;
     outline: none;
   }
-  .checkout-demo .has-error {
+  .checkout-demo input.has-error,
+  .checkout-demo select.has-error {
     border-color: #dc2626;
+  }
+  .checkout-demo .next-error-label {
+    display: block;
+    margin-top: 4px;
+    color: #dc2626;
+    font-size: 12px;
+  }
+  .checkout-demo button[type='submit'] {
+    width: 100%;
+    height: 48px;
+    margin-top: 12px;
+    border: 0;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
   }
   .checkout-demo .field label,
   .checkout-demo .next-address-label {
@@ -206,4 +230,6 @@ layout: center
     <h2>Shipping Information</h2>
     <div data-next-address="shipping"></div>
   </section>
+
+  <button type="submit">Continue</button>
 </form>

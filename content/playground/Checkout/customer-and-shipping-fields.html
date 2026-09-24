@@ -1,0 +1,186 @@
+<!--
+title: Customer and Shipping Fields
+description: Customer information written by hand, then a shipping address the SDK builds for the selected country with data-next-address. The address block needs an SDK build that includes it; until one is released, point SDK Host at a build that does.
+order: 1
+layout: center
+-->
+
+<!--
+  HOW THIS WORKS:
+  ─────────────────────────────────────────────────────────────────────────────
+  CUSTOMER INFORMATION — written by hand
+    Each input is named with data-next-checkout-field. First name, last name
+    and email are required; the phone is optional unless its input carries
+    `required` or data-next-required="true".
+
+  SHIPPING INFORMATION — built by the SDK (data-next-address="shipping")
+    The empty <div> becomes the fields the selected country collects, in the
+    order that country writes them. Change the country to watch it rebuild:
+    Japan leads with the postcode, and a field the country does not collect
+    is left out. City, state and postcode stay hidden until the street
+    address has a value.
+
+  STYLING
+    The SDK ships no styling for the block, so the <style> below styles both
+    groups the same way. The customer fields copy the block's markup
+    (a wrapper holding the input, then its label) so one set of rules covers
+    both. Target a block field by name with [data-next-address-field="postal"],
+    never by row number: the rows differ per country.
+  ─────────────────────────────────────────────────────────────────────────────
+-->
+
+<meta name="next-api-key" content="Lj41tZAXbaw9H6ZEruZ36w8ExL5sdhkCznBsS5mq" />
+<meta name="next-page-type" content="checkout" />
+
+<style>
+  .checkout-demo {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 560px;
+    padding: 24px;
+    color: #111827;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+  .checkout-demo h2 {
+    margin: 0 0 16px;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .checkout-demo section + section {
+    margin-top: 28px;
+  }
+  .checkout-demo .row,
+  .checkout-demo .next-address-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .checkout-demo .field,
+  .checkout-demo .next-address-field {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+  }
+  .checkout-demo input,
+  .checkout-demo select {
+    box-sizing: border-box;
+    width: 100%;
+    height: 48px;
+    padding: 18px 12px 4px;
+    border: 1px solid #c9ccd1;
+    border-radius: 8px;
+    background: #fff;
+    color: inherit;
+    font: inherit;
+    font-size: 15px;
+  }
+  .checkout-demo select {
+    appearance: none;
+    padding-right: 36px;
+    background: #fff
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='2 4.75 7 9.25 12 4.75'/%3E%3C/svg%3E")
+      no-repeat right 12px center / 14px;
+  }
+  .checkout-demo input:placeholder-shown {
+    padding: 12px;
+  }
+  .checkout-demo input::placeholder {
+    color: #6b7280;
+  }
+  .checkout-demo input:focus,
+  .checkout-demo select:focus {
+    border-color: #2563eb;
+    outline: none;
+  }
+  .checkout-demo .has-error {
+    border-color: #dc2626;
+  }
+  .checkout-demo .field label,
+  .checkout-demo .next-address-label {
+    position: absolute;
+    top: 6px;
+    left: 13px;
+    color: #6b7280;
+    font-size: 11px;
+    pointer-events: none;
+  }
+  .checkout-demo input:placeholder-shown + label {
+    display: none;
+  }
+  .checkout-demo .next-address-hint {
+    display: block;
+    margin-top: 4px;
+    color: #6b7280;
+    font-size: 12px;
+  }
+  .checkout-demo .iti {
+    width: 100%;
+  }
+  .checkout-demo .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .checkout-demo [data-next-address-state='loading'] {
+    min-height: 256px;
+  }
+</style>
+
+<form data-next-checkout="form" class="checkout-demo">
+  <section>
+    <h2>Customer Information</h2>
+    <div class="row">
+      <div class="field">
+        <input
+          id="fname"
+          data-next-checkout-field="fname"
+          autocomplete="given-name"
+          placeholder="First Name*"
+        />
+        <label for="fname">First Name</label>
+      </div>
+      <div class="field">
+        <input
+          id="lname"
+          data-next-checkout-field="lname"
+          autocomplete="family-name"
+          placeholder="Last Name*"
+        />
+        <label for="lname">Last Name</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <input
+          id="email"
+          data-next-checkout-field="email"
+          autocomplete="email"
+          placeholder="Email*"
+          type="email"
+        />
+        <label for="email">Email</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <!-- The SDK wraps the phone input in a country-code picker, so its
+             label is kept for screen readers only. -->
+        <input
+          id="phone"
+          data-next-checkout-field="phone"
+          autocomplete="tel"
+          placeholder="Phone (Optional)"
+          type="tel"
+        />
+        <label for="phone" class="sr-only">Phone</label>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Shipping Information</h2>
+    <div data-next-address="shipping"></div>
+  </section>
+</form>

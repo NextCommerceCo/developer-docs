@@ -20,6 +20,11 @@ layout: center
     is left out. City, state and postcode stay hidden until the street
     address has a value.
 
+  ADDRESS SUGGESTIONS  (addressConfig.enableAutocomplete)
+    Typing a street address offers whole addresses; picking one fills the
+    city, state, postcode and country. They attach to the address1 field by
+    name, so the block's fields get them with no extra markup.
+
   STYLING
     The SDK ships no styling for the block, so the <style> below styles both
     groups the same way. The customer fields copy the block's markup
@@ -32,13 +37,27 @@ layout: center
 <meta name="next-api-key" content="Lj41tZAXbaw9H6ZEruZ36w8ExL5sdhkCznBsS5mq" />
 <meta name="next-page-type" content="checkout" />
 
+<script>
+  // Merge into the config the playground preview already set, rather than
+  // replacing it.
+  window.nextConfig = Object.assign(window.nextConfig || {}, {
+    addressConfig: { enableAutocomplete: true },
+  });
+</script>
+
 <style>
   .checkout-demo {
     box-sizing: border-box;
     width: 100%;
     max-width: 560px;
-    padding: 24px;
+    margin: 24px 16px;
+    padding: 28px 24px;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
     color: #111827;
+    color-scheme: light;
     font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
   }
   .checkout-demo h2 {
@@ -125,6 +144,10 @@ layout: center
   }
   .checkout-demo [data-next-address-state='loading'] {
     min-height: 256px;
+  }
+  /* The suggestion list is appended to <body>, outside the form. */
+  .pac-container-nextcommerce {
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
   }
 </style>
 

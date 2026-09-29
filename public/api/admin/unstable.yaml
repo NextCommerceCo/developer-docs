@@ -11081,17 +11081,17 @@ info:
   description: |
 
     ## Authentication
-    The Admin API uses Oauth 2 Bearer Access Tokens to manage access to your store's resources. Oauth Apps (and associated access tokens) can be tailored with object-level permission to ensure that each integrated service only has access to necessary objects.
+    The Admin API uses OAuth 2 Bearer Access Tokens to manage access to your store's resources. OAuth Apps (and associated access tokens) can be tailored with object-level permission to ensure that each integrated service only has access to necessary objects.
 
     Before using the Admin API, you'll need to create a store and create an OAuth App necessary for API access.
 
-    To create an OAuth App, navigate to **Settings > API Access** and create a new Oauth App with applicable [permission scopes](https://developers.29next.com/docs/api/admin/permissions/) to retrieve your Access Token.
+    To create an OAuth App, navigate to **Settings > API Access** and create a new OAuth App with applicable [permission scopes](https://developers.nextcommerce.com/docs/admin-api/permissions) to retrieve your Access Token.
 
-    It's recommended to create unique Oauth Apps per external system so that you can revoke as needed.
+    It's recommended to create unique OAuth Apps per external system so that you can revoke as needed.
 
     ## Versioning
 
-    API versioning allows 29 Next to continuously evolve the platform while maintaining predictable behavior for existing APIs with a path for upgrades and deprecations.
+    API versioning allows Next Commerce to continuously evolve the platform while maintaining predictable behavior for existing APIs with a path for upgrades and deprecations.
 
     To specify a version, pass the `X-29Next-Api-Version` header with your desired API version.
 

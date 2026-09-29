@@ -10,7 +10,7 @@ import { Callout } from 'fumadocs-ui/components/callout';
 import MoveFulfillmentOrders from '../../../_snippets/_moving-fulfillment-orders.mdx';
 import SplitFulfillmentOrders from '../../../_snippets/_splitting-fulfillment-orders.mdx';
 
-Order management operations can be automated through the Admin API for more efficient operations and bulk actions on large quanities of orders.
+Order management operations can be automated through the Admin API for more efficient operations and bulk actions on large quantities of orders.
 
 Below are best practices and guides for common scenarios merchants and partners use to manage orders on the Admin API.
 
@@ -108,17 +108,17 @@ Below is an example POST request to the [ordersLinesCreate](/docs/admin-api/refe
 
 #### Collect Payment for Outstanding Balance
 
-Orders can have an outstanding balance owed by the customer as a result of changing items on the order. To collect the outstanding balance, use the [ordersCollectPaymentCreate](/docs/admin-api/reference/orders/ordersCollectPaymentCreate) endpoint to initate a payment transaction with the order's initial payment method.
+Orders can have an outstanding balance owed by the customer as a result of changing items on the order. To collect the outstanding balance, use the [ordersCollectPaymentCreate](/docs/admin-api/reference/orders/ordersCollectPaymentCreate) endpoint to initiate a payment transaction with the order's initial payment method.
 
 ```json title="Collect Payment for Outstanding Balance" http-method="POST" http-target="https://{store}.29next.store/api/admin/orders/{number}/collect-payment/"
 {
-  "send_payment_notification": true // optionally send notificaiton to customer
+  "send_payment_notification": true // optionally send notification to customer
 }
 ```
 
 ### Order Refunds
 
-Order management actions that require refunding and removing items from an order can be done through the refund flow. The refund flow is espcially useful when creating partial refunds or creating refunds for items that have already shipped to the customer.
+Order management actions that require refunding and removing items from an order can be done through the refund flow. The refund flow is especially useful when creating partial refunds or creating refunds for items that have already shipped to the customer.
 
 #### Refund Flow
 ```mermaid
@@ -132,7 +132,7 @@ stateDiagram-v2
 ```
 
 Refunding specific items of an order is a 3-step process:
-1. Retreive order line items using the [ordersRetrieve](/docs/admin-api/reference/orders/ordersRetrieve) endpoint.
+1. Retrieve order line items using the [ordersRetrieve](/docs/admin-api/reference/orders/ordersRetrieve) endpoint.
 2. Calculate the refund using the [ordersRefundCalculateCreate](/docs/admin-api/reference/orders/ordersRefundCalculateCreate) endpoint.
 3. Create the refund using the [ordersRefundCreate](/docs/admin-api/reference/orders/ordersRefundCreate) endpoint.
 
@@ -142,7 +142,7 @@ Order Refund Calculate APIs are only available on `2024-04-01` version and newer
 </Callout>
 #### Retrieve Order Lines
 
-Below is an abreviated example request to [ordersRetrieve](/docs/admin-api/reference/orders/ordersRetrieve) endpoint to get the line items of the order.
+Below is an abbreviated example request to [ordersRetrieve](/docs/admin-api/reference/orders/ordersRetrieve) endpoint to get the line items of the order.
 
 ```json title="Retrieve Order Details" http-method="GET" http-target="https://{store}.29next.store/api/admin/orders/{number}/"
 {
@@ -196,7 +196,7 @@ Below is the response from the [ordersRefundCalculateCreate](/docs/admin-api/ref
     "amount_incl_tax": "3.99", // amount to be refunded incl tax
     "amount_excl_tax": "3.99", // amount to be refunded excl tax
     "total_tax": "0.00", // shipping tax to be refunded
-    "refundable_amount": "4.99" // shipping amount avialable to refund
+    "refundable_amount": "4.99" // shipping amount available to refund
   },
   "transactions": [
     {
@@ -205,7 +205,7 @@ Below is the response from the [ordersRefundCalculateCreate](/docs/admin-api/ref
       "refundable_amount": "184.96" // amount available to refund with this transaction
     }
   ],
-  "amount_excl_tax": "63.98", // total amoutn excl tax being refunded
+  "amount_excl_tax": "63.98", // total amount excl tax being refunded
   "amount_incl_tax": "63.98", // total amount incl to be refunded
   "total_tax": "0.00", // total tax being refunded
   "currency": "USD"
@@ -257,11 +257,11 @@ Unfulfilled items always restock as `cancel`, so any refund of unshipped items n
 </Callout>
 
 <Callout type="info" title="Restock Actions">
-Depending on the product type and status of the line items being refunded, there are differen't restock actions available.
+Depending on the product type and status of the line items being refunded, there are different restock actions available.
 
 **Physical Product**
 - If unfulfilled, restock_type must be `cancel`.
-- If fullfilled, restock_type can be `return` or `no_restock`.
+- If fulfilled, restock_type can be `return` or `no_restock`.
 
 **Digital Product**
 - If unfulfilled, restock_type must be `cancel`.
@@ -382,7 +382,7 @@ Canceling an order is a common order management task when you need to cancel the
 
 ```json title="Cancel Order Request" http-method="POST" http-target="https://{store}.29next.store/api/admin/orders/{number}/cancel/"
 {
-  "cancel_reason": "Customer wants to cancel", // Appropiate cancel reason message
+  "cancel_reason": "Customer wants to cancel", // Appropriate cancel reason message
   "full_refund": true, // Refund all remaining payments or not
   "send_cancel_notification": true // Send the customer a notification or not
 }

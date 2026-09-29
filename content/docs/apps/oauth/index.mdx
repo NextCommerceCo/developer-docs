@@ -8,7 +8,7 @@ This guide introduces OAuth Authentication for Server-side Apps to access the Ad
 
 ### Introduction to OAuth
 
-OAuth 2.0 is the industry standard protocol for authorizing and assigning permissions to 3rd party apps. There are many great guides on the internet regarding OAuth 2.0, such as this [OAuth 2.0 introduction guide from Auth0.com](https://auth0.com/intro-to-iam/what-is-oauth-2/). Your Server-side App's language most likely has pre-built packages to assist with handling Oauth 2.0 Authentication flows.
+OAuth 2.0 is the industry standard protocol for authorizing and assigning permissions to 3rd party apps. There are many great guides on the internet regarding OAuth 2.0, such as this [OAuth 2.0 introduction guide from Auth0.com](https://auth0.com/intro-to-iam/what-is-oauth-2/). Your Server-side App's language most likely has pre-built packages to assist with handling OAuth 2.0 Authentication flows.
 
 
 ### Access Tokens
@@ -38,7 +38,7 @@ sequenceDiagram
 ##### Authorization Flow Step Detail
 
 1. User initiates the App installation process.
-2. Store redirects to the App URL configured in App Oauth Settings.
+2. Store redirects to the App URL configured in App OAuth Settings.
 3. App redirects to the store to load the OAuth Authorization view and requests the merchant to authorize app and permission required scopes, [see authorization link example](/docs/apps/oauth/getting-started#step-2-app-permissions-setup).
 4. User authorizes the app and requested permission scopes in the store dashboard.
 5. Store redirects to the Redirect URL with an [Authorization Code](https://oauth.net/2/grant-types/authorization-code/), a temporary credential representing the authorization, [see authorization code example](/docs/apps/oauth/getting-started#step-3-confirm-installation).
@@ -47,6 +47,6 @@ sequenceDiagram
 8. The app can now access the Admin API using the Access Token, [see Admin API examples](/docs/admin-api).
 
 
-### Oauth Guides
+### OAuth Guides
 
 

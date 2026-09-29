@@ -15,7 +15,7 @@ Subscription management actions most often times will only affect future renewal
 </Callout>
 ### Create Subscription
 
-Subscriptions can be created directly through the [subscriptionsCreate](/docs/admin-api/reference/subscriptions/subscriptionsCreate) Admin API endpoint for scenarios such as custom order flows or importing subcriptions from another platform.
+Subscriptions can be created directly through the [subscriptionsCreate](/docs/admin-api/reference/subscriptions/subscriptionsCreate) Admin API endpoint for scenarios such as custom order flows or importing subscriptions from another platform.
 
 ```json title="Create Subscription" http-method="POST" http-target="https://{store}.29next.store/api/admin/subscriptions/"
 {
@@ -52,7 +52,7 @@ Updating subscription recurring items and pricing can be done through [subscript
 
 **Adding an Additional Product**
 
-To add a new product to a subscription, use the [subscriptionLinesCreate](/docs/admin-api/reference/subscriptions/subscriptionsLinesCreate) Admin API endpoint with the product, price, and quanity details.
+To add a new product to a subscription, use the [subscriptionLinesCreate](/docs/admin-api/reference/subscriptions/subscriptionsLinesCreate) Admin API endpoint with the product, price, and quantity details.
 
 ```json title="Adding an Additional Product" http-method="POST" http-target="https://{store}.29next.store/api/admin/subscriptions/{id}/lines/"
 {
@@ -64,7 +64,7 @@ To add a new product to a subscription, use the [subscriptionLinesCreate](/docs/
 
 **Updating an Existing Line Item Product Price**
 
-To update and existing product price and quantity on a subscription line, use the [subscriptionsLinesUpdate](/docs/admin-api/reference/subscriptions/subscriptionsLinesUpdate) Admin API endpoint with the new price, and new quanity details.
+To update and existing product price and quantity on a subscription line, use the [subscriptionsLinesUpdate](/docs/admin-api/reference/subscriptions/subscriptionsLinesUpdate) Admin API endpoint with the new price, and new quantity details.
 
 ```json title="Updating an Existing Product" http-method="PUT" http-target="https://{store}.29next.store/api/admin/subscriptions/{id}/lines/{lineId}/"
 {
@@ -86,7 +86,7 @@ Subscriptions must have at least one line item with a product, you can alternati
 </Callout>
 ### Updating Renewal Schedule
 
-Changing the renewal schedule of a subscription can be achived with a PATCH request to the [subscriptionsPartialUpdate](/docs/admin-api/reference/subscriptions/subscriptionsPartialUpdate) endpoint with a new `interval` and `interval_count`, ie 30 days.
+Changing the renewal schedule of a subscription can be achieved with a PATCH request to the [subscriptionsPartialUpdate](/docs/admin-api/reference/subscriptions/subscriptionsPartialUpdate) endpoint with a new `interval` and `interval_count`, ie 30 days.
 
 ```json title="Update Subscription Renewal Schedule" http-method="PATCH" http-target="https://{store}.29next.store/api/admin/subscriptions/{id}/"
 {
@@ -170,7 +170,7 @@ To change the bankcard on a subscription, pass a new `card_token` with a PATCH r
 <Callout type="info">
 To update a bankcard on a subscription, you must use the **[iFrame to tokenize](/docs/admin-api/guides/payment-methods/bankcard)** the bankcard and use the `card_token` when updating the subscription itself.
 
-The new bankcard will be automatically verfied with a `verify` request to a payment gateway to ensure the new bankcard is valid and can be used for future renewals. If the bankcard cannot be verified, the update request will fail and return an error.
+The new bankcard will be automatically verified with a `verify` request to a payment gateway to ensure the new bankcard is valid and can be used for future renewals. If the bankcard cannot be verified, the update request will fail and return an error.
 </Callout>
 **New Bankcard Payment Method Flow**
 ```mermaid
@@ -205,7 +205,7 @@ stateDiagram-v2
 
 ### Retrying Renewal
 
-Subscriptions that are `past_due` status can be attemted to retry the renewal, often combined with a new `payment_gateway`, by using the [subscriptionsRetryCreate](/docs/admin-api/reference/subscriptions/subscriptionsRetryCreate) endpoint.
+Subscriptions that are `past_due` status can be attempted to retry the renewal, often combined with a new `payment_gateway`, by using the [subscriptionsRetryCreate](/docs/admin-api/reference/subscriptions/subscriptionsRetryCreate) endpoint.
 
 ```json title="Retry Subscription Renewal" http-method="POST" http-target="https://{store}.29next.store/api/admin/subscriptions/{id}/retry/"
 {

@@ -98,7 +98,7 @@ Cardinal pluralization can be used to display different translations based on th
 <Tab value="Template">
 
 ```django title="Cardinal Pluralization"
-<h2>{% t 'customer.notifcations.total' with count=notification.count %}</h2>
+<h2>{% t 'customer.notifications.total' with count=notification.count %}</h2>
 ```
 
 </Tab>
@@ -107,7 +107,7 @@ Cardinal pluralization can be used to display different translations based on th
 ```json title="Cardinal Pluralization"
 {
     "customer": {
-        "notifcations": {
+        "notifications": {
             "one": "You have {{ count }} notification.",
             "other": "You have {{ count }} notifications.",
             "zero": "You don't have any notifications."

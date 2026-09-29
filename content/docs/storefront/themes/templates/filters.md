@@ -142,7 +142,7 @@ For example, if value is <b>escaping</b>, the output will be \\u003Cb\\u003Eesca
 
 ### json_script
 
-Safely outputs a variable object as JSON, wrapped in a `<script>` tag, ready for Javascript.
+Safely outputs a variable object as JSON, wrapped in a `<script>` tag, ready for JavaScript.
 
 ```django title="json_script"
 {{ value|json_script:"my-data" }}

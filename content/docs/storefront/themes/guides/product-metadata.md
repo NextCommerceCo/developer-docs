@@ -25,7 +25,7 @@ Let's look at an example of adding support for a **Product Tagline** to a produc
 
 **Create Tagline Product Metadata Field**
 
-In your store Metadata settings, create a new Metadata Definition for your tagline. Set the the **object** to `Product` and **key** to `tagline`.
+In your store Metadata settings, create a new Metadata Definition for your tagline. Set the **object** to `Product` and **key** to `tagline`.
 
 **Add Tagline Attribute Variable to Product Template**
 

@@ -262,7 +262,7 @@ export default function HomePage() {
             <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
               <Link
                 href="/docs"
-                className="inline-flex items-center gap-2 rounded-md bg-fd-primary px-5 py-2.5 text-sm font-medium text-fd-primary-foreground hover:opacity-90 transition-opacity duration-150"
+                className="inline-flex items-center gap-2 rounded-md bg-(--color-fd-primary-solid) px-5 py-2.5 text-sm font-medium text-white hover:bg-(--color-fd-primary-solid-hover) transition-colors duration-150"
               >
                 Start Building
                 <ArrowRight size={14} aria-hidden="true" />
@@ -307,7 +307,7 @@ export default function HomePage() {
                   </code>
                   <Link
                     href="/docs/skills"
-                    className="inline-flex items-center gap-2 rounded-md bg-fd-primary px-4 py-2 text-sm font-medium text-fd-primary-foreground hover:opacity-90 transition-opacity duration-150"
+                    className="inline-flex items-center gap-2 rounded-md bg-(--color-fd-primary-solid) px-4 py-2 text-sm font-medium text-white hover:bg-(--color-fd-primary-solid-hover) transition-colors duration-150"
                   >
                     View skills
                     <ArrowRight size={14} aria-hidden="true" />
@@ -366,7 +366,7 @@ export default function HomePage() {
                 <div className="flex flex-wrap gap-3">
                   <Link
                     href="/docs/admin-api"
-                    className="inline-flex items-center gap-2 rounded-md bg-fd-primary px-4 py-2 text-sm font-medium text-fd-primary-foreground hover:opacity-90 transition-opacity duration-150"
+                    className="inline-flex items-center gap-2 rounded-md bg-(--color-fd-primary-solid) px-4 py-2 text-sm font-medium text-white hover:bg-(--color-fd-primary-solid-hover) transition-colors duration-150"
                   >
                     API Reference
                     <ArrowRight size={14} aria-hidden="true" />

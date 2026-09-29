@@ -52,7 +52,7 @@ Session tokens are generated from the store dashboard and can be used by your Ap
 ``` mermaid
 sequenceDiagram
   autonumber
-  Store->>App: Redirects to App Oauth App URL with JWT token.
+  Store->>App: Redirects to App OAuth App URL with JWT token.
   App->>User: App decrypt/verify JWT token to authorize request
   App->>User: App loads an authenticated view for user.
 ```

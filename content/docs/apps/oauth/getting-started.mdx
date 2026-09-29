@@ -13,14 +13,14 @@ To get started, make sure that you have your Apps' `client_id` and `client_secre
 
 ### Step 2: App Permissions Setup
 
-During the App installation flow, Apps that have `oauth` configured will be redirected to the Oauth App URL from thee App Settings.
+During the App installation flow, Apps that have `oauth` configured will be redirected to the OAuth App URL from the App Settings.
 
 <Callout type="warn">
 
 Your app should redirect the user back to the store authorization view configured with the scope permissions your app requires.
 </Callout>
 <Callout type="info">
-At every stage in the Oauth flow you'll receive a querystring variable `store` with the network domain of the store that is installing the app. **You should use this in your app logic as the unique identifier for the store.**
+At every stage in the OAuth flow you'll receive a querystring variable `store` with the network domain of the store that is installing the app. **You should use this in your app logic as the unique identifier for the store.**
 </Callout>
 ```bash title="Authorization Link Format"
 https://{network_domain}/oauth2/authorize/?response_type=code&client_id={client_id}&redirect_uri={redirect_uri}&scope={scopes}
@@ -28,9 +28,9 @@ https://{network_domain}/oauth2/authorize/?response_type=code&client_id={client_
 
 |Parameter|Description|
 |-----|-----|
-|`network_domain`| The store network domain that is installing the app. Can be referenced from the `store` url parameter sent to your App Oauth App URL.  |
+|`network_domain`| The store network domain that is installing the app. Can be referenced from the `store` url parameter sent to your App OAuth App URL.  |
 |`response_type`| Must be `code`, which only authorization flow supported at this time. |
-|`client_id`| Your app `client_id` found in in your partner account.|
+|`client_id`| Your app `client_id` found in your partner account.|
 |`redirect_uri`|The url you want to receive the Authorization Code in your app. **Must be listed in your app Redirect URLs setting**. |
 |`scope`| A space separated list of scopes such as `orders:read orders:write users:read users:write`. [See list of all available scopes](/docs/admin-api/permissions). |
 
@@ -45,7 +45,7 @@ https://yourapp.com/setup/authorize/?store={network_domain}&code={authorization_
 
 |Parameter|Description|
 |-----|-----|
-|`network_domain`| The store network domain that is installing the app. Can be referenced from the `store` url parameter sent to your app Oauth Redirect URL.  |
+|`network_domain`| The store network domain that is installing the app. Can be referenced from the `store` url parameter sent to your app OAuth Redirect URL.  |
 |`authorization_code`| The authorization code used to retrieve the Access Token in the next step.  |
 
 ### Step 4: Retrieve Access Token

@@ -11,7 +11,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 Dispute service apps are integrations that manage the processing of payment disputes (alerts and chargebacks) on behalf of merchants seamlessly within the platform.
 
 <Callout type="info">
-Dispute Service Apps are [Server to Server Apps](/docs/apps/guides/server-to-server-apps) that use the Oauth flow to obtain API Access and then use the [Admin APIs](/docs/admin-api) and [Webhooks](/docs/webhooks) to subscribe to store event activity.
+Dispute Service Apps are [Server to Server Apps](/docs/apps/guides/server-to-server-apps) that use the OAuth flow to obtain API Access and then use the [Admin APIs](/docs/admin-api) and [Webhooks](/docs/webhooks) to subscribe to store event activity.
 </Callout>
 ## Disputes
 
@@ -114,7 +114,7 @@ To create a dispute in the store using the [disputesCreate](/docs/admin-api/refe
   "arn": "string", // optional
   "case_number": "string", // optional
   "happened_at": "2019-08-24T14:15:22Z", // date when dispute occurred
-  "amount": "string", // dispute amount, sometimes doesnt match transaction amount
+  "amount": "string", // dispute amount, sometimes doesn't match transaction amount
   "currency": "USD", // dispute currency
 }
 ```

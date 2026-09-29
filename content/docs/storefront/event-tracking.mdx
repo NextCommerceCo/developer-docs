@@ -32,7 +32,7 @@ Event trackers are pure javascript, meaning third-party event tracking scripts s
 
 Below is the equivalent expressed as a javascript function to create and append the script tag to the document head.
 
-```javascript title="Converetd Javascript Script Tag"
+```javascript title="Converted JavaScript Script Tag"
 (function() {
   var script = document.createElement('script');
   script.async = true;
@@ -227,7 +227,7 @@ All events have `context` of the parent frame to easily access contextual data a
 | `navigator` | Data from the top-frame `navigator` object (e.g., userAgent, language). | [Navigator](https://developer.mozilla.org/en-US/docs/Web/API/Navigator) |
 | `window`    | Data from the top-frame `window` object (e.g., innerWidth, location). | [Window](https://developer.mozilla.org/en-US/docs/Web/API/Window) |
 
-```json title="Example conext object"
+```json title="Example context object"
 {
     "context": {
         "document": {...}, // frame parent document 
@@ -441,7 +441,7 @@ analytics.subscribe("product_viewed", event => {
         "date_created": "2024-01-24T02:02:52.811742-05:00",
         "date_updated": "2024-10-03T04:32:52.860659-04:00",
         "metadata": {
-            "excerpt": "<div>Product conent.</div>",
+            "excerpt": "<div>Product content.</div>",
             "special": "Special Promo",
             "external_id": "12345"
         }

@@ -7,11 +7,14 @@
 
 /* Canonical token source: design-system/tokens/ + fumadocs-bridge.css */
 
-/* Light: the solid blue (#3366fc, --ds-primary-solid) because fd-primary is
-   also link text on white, where #3c7dff is 3.77:1. Dark keeps #3c7dff. */
+/* fd-primary is blue text: the solid blue (#3366fc, --ds-primary-solid) on
+   white, where #3c7dff is 3.77:1; dark keeps #3c7dff. Filled controls use
+   --color-fd-primary-solid in both modes (white on #3c7dff is 3.77:1). */
 :root {
   --color-fd-primary: #3366fc;
   --color-fd-primary-foreground: #ffffff;
+  --color-fd-primary-solid: #3366fc;
+  --color-fd-primary-solid-hover: #2a5bd7;
   --color-fd-idea: oklch(65% 0.2 145);
   --font-sans: var(--font-inter);
 }

@@ -7,7 +7,7 @@ description: Localize theme templates with the t tag, locale JSON files, variabl
 
 Theme templates can be fully localized with translations so that your store visitors are shown content in their local language. Use the t (translation) tag in your templates to access string translations in the locale files. Learn more about the [t tag](/docs/storefront/themes/templates/tags#t) and theme Locale files.
 
-### Using Translations in Practice
+## Using Translations in Practice
 
 The `t` tag accepts an initial argument that is the key reference to the translation string in a locale file.
 
@@ -42,7 +42,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 </Tabs>
 
 
-### Passing Variable Arguments to Translations
+## Passing Variable Arguments to Translations
 
 You can pass multiple named arguments to translations through the `t` tag used in the translation.
 
@@ -75,7 +75,7 @@ You can pass multiple named arguments to translations through the `t` tag used i
 </Tabs>
 
 
-### Pluralization Support
+## Pluralization Support
 
 The t tag accepts two arguments for pluralization:
 - Pass the count argument with a value for cardinal pluralization, ie 1, 2, 3, 4.
@@ -90,7 +90,7 @@ Pluralization rules follow [Unicode CLDR](https://github.com/unicode-org/cldr) s
 - `few`
 - `many`
 
-#### Cardinal Pluralization
+### Cardinal Pluralization
 
 Cardinal pluralization can be used to display different translations based on the value passed to `count`.
 
@@ -134,7 +134,7 @@ Cardinal pluralization can be used to display different translations based on th
 </Tabs>
 
 
-#### Ordinal Pluralization
+### Ordinal Pluralization
 
 Ordinal pluralization can be used to display different translations based on the index value to display the ordering of an object.
 

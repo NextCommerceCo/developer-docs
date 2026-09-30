@@ -14,7 +14,7 @@ The Exports API allows you to generate and download bulk data exports from your 
 Exports are processed asynchronously. After creating an export, you'll need to poll for completion before downloading the file.
 </Callout>
 
-### Export Flow
+## Export Flow
 
 ```mermaid
 sequenceDiagram
@@ -32,7 +32,7 @@ Creating and downloading an export is a 3-step process:
 2. Create a new export using the [exportsCreate](/docs/admin-api/reference/exports/exportsCreate) endpoint with your desired type and date range.
 3. When you receive the `export.created` webhook, download the file using the [exportsDownloadRetrieve](/docs/admin-api/reference/exports/exportsDownloadRetrieve) endpoint.
 
-### Available Export Types
+## Available Export Types
 
 Use the [exportsTypesRetrieve](/docs/admin-api/reference/exports/exportsTypesRetrieve) endpoint to list all available export types, or reference the table below.
 
@@ -52,7 +52,7 @@ Use the [exportsTypesRetrieve](/docs/admin-api/reference/exports/exportsTypesRet
 | `fulfillment_list` | Fulfillments |
 | `fulfillment_line_items` | Fulfillment Line Items |
 
-### Create an Export
+## Create an Export
 
 To create a new export, send a POST request to the [exportsCreate](/docs/admin-api/reference/exports/exportsCreate) endpoint with the export `type` and date range.
 
@@ -78,7 +78,7 @@ The response returns the export object with a `pending` status.
 }
 ```
 
-### Poll Export Status
+## Poll Export Status
 
 After creating an export, poll the [exportsRetrieve](/docs/admin-api/reference/exports/exportsRetrieve) endpoint until the `status` changes from `pending` to `available`.
 
@@ -98,7 +98,7 @@ After creating an export, poll the [exportsRetrieve](/docs/admin-api/reference/e
 Avoid polling too frequently. Checking every couple of minutes is sufficient for pending exports. For a more efficient approach, subscribe to the `export.created` [webhook event](/docs/webhooks) to be notified immediately when an export is available for download.
 </Callout>
 
-### Download Export File
+## Download Export File
 
 Once the export status is `available`, use the [exportsDownloadRetrieve](/docs/admin-api/reference/exports/exportsDownloadRetrieve) endpoint to get a download URL for the CSV file.
 
@@ -112,7 +112,7 @@ Once the export status is `available`, use the [exportsDownloadRetrieve](/docs/a
 Download URLs are temporary signed URLs. Fetch the file promptly after retrieving the URL. If the URL expires, request a new one from the download endpoint.
 </Callout>
 
-### Export Webhooks
+## Export Webhooks
 
 Subscribe to the `export.created` [webhook event](/docs/webhooks) to be notified immediately when an export is available for download. The webhook payload includes the export object data, allowing you to proceed directly to downloading the file without additional API calls.
 
@@ -121,7 +121,7 @@ Using the `export.created` webhook is the recommended approach for automated exp
 </Callout>
 
 
-### List Exports
+## List Exports
 
 Use the [exportsList](/docs/admin-api/reference/exports/exportsList) endpoint to retrieve previous exports with optional filtering by type and creation date.
 

@@ -12,7 +12,7 @@ Catalogue management can be automated through the Admin API to sync products fro
 
 Below are best practices and guides for common scenarios merchants and partners use to manage products on the Admin API. Requests need the `catalogue:write` scope, and reading products needs `catalogue:read`.
 
-### Product Model
+## Product Model
 
 Every product is a parent with one or more variants. The product holds the title, description, images, categories and `variant_attributes`. Each variant holds the `sku`, `prices`, `stockrecords`, `track_stock`, `allow_backorders` and its own `image` chosen from the product's images.
 
@@ -24,7 +24,7 @@ In responses, `structure` is `parent` on the product and `child` on each entry i
 Prices and stockrecords are always on the variant. Creating a price on a parent product is rejected with "This action is not allowed on parent products." Use the variant `id` from the `variants` array when calling the prices and stockrecords endpoints.
 </Callout>
 
-### Create a Simple Product
+## Create a Simple Product
 
 Create a product sold in one form with a single POST to the [productsCreate](/docs/admin-api/reference/products/productsCreate) endpoint. Send no `variant_attributes` and exactly one entry in `variants` carrying the SKU, price and stock for its default variant.
 
@@ -67,14 +67,14 @@ The response is the full product with `id`, `slug`, `url` and the default varian
 Every variant you create must include `prices` and `stockrecords`. The only exception is a variant with `requires_shipping` set to `false`, which gets a stockrecord at your default location automatically.
 </Callout>
 
-### Create a Product with Variants
+## Create a Product with Variants
 
 A product sold in several options is a parent with `variant_attributes` such as Color and Size, and one variant per combination. There are two ways to create it:
 
 - **Single request** creates the parent and its variants in one call. Use it when the variants share the parent's images.
 - **Step by step** creates the parent, uploads images, then creates each variant. Use it when each variant needs its own image, because a variant's `image` is an ID from the parent's image list and cannot be set inside the nested `variants` array.
 
-#### Single Request
+### Single Request
 
 Send `variant_attributes` and `variants` together to the [productsCreate](/docs/admin-api/reference/products/productsCreate) endpoint. Each variant picks one value for every attribute in `variant_attribute_values`.
 
@@ -131,7 +131,7 @@ Each `value` in `variant_attribute_values` must be one of the `values` listed on
 
 You do not have to create every combination up front. Add the rest later with the [Add a Variant](#add-a-variant) flow.
 
-#### Step by Step
+### Step by Step
 
 Creating a product with an image on each variant is a 3 step process:
 
@@ -149,7 +149,7 @@ stateDiagram-v2
 2. Upload each image to the parent using the [productsImageCreate](/docs/admin-api/reference/products/productsImageCreate) endpoint and keep the returned image `id`.
 3. Create each variant using the [productsVariantCreate](/docs/admin-api/reference/products/productsVariantCreate) endpoint with `image` set to one of those IDs.
 
-#### Step 1: Create the Parent
+### Step 1: Create the Parent
 
 ```json title="Create Parent Product" http-method="POST" http-target="https://{store}.29next.store/api/admin/products/"
 {
@@ -169,7 +169,7 @@ stateDiagram-v2
 }
 ```
 
-#### Step 2: Upload the Images
+### Step 2: Upload the Images
 
 ```json title="Upload Product Image" http-method="POST" http-target="https://{store}.29next.store/api/admin/products/{id}/images/"
 {
@@ -182,7 +182,7 @@ stateDiagram-v2
 
 The response carries the image `id` you need in the next step.
 
-#### Step 3: Create the Variants
+### Step 3: Create the Variants
 
 ```json title="Create Variant" http-method="POST" http-target="https://{store}.29next.store/api/admin/products/{id}/variants/"
 {
@@ -212,7 +212,7 @@ The response carries the image `id` you need in the next step.
 The response from [productsVariantCreate](/docs/admin-api/reference/products/productsVariantCreate) is the full list of the parent's variants, not only the one you created. Match yours by `sku` or `metadata` to read back its `id`.
 </Callout>
 
-### Add a Variant
+## Add a Variant
 
 Add a variant to an existing product with the [productsVariantCreate](/docs/admin-api/reference/products/productsVariantCreate) endpoint, using the same request as the step by step flow above. The attribute and value must already exist on the parent, so add a new value first with a PATCH to the [productsPartialUpdate](/docs/admin-api/reference/products/productsPartialUpdate) endpoint.
 
@@ -231,7 +231,7 @@ Add a variant to an existing product with the [productsVariantCreate](/docs/admi
 `variant_attributes` on an update is the complete list. Any attribute you leave out is deleted from the product, and any value you leave out of `values` is deleted from that attribute. Always send every attribute and every value you want to keep.
 </Callout>
 
-### Product Images
+## Product Images
 
 Images belong to the product, not the variant. Upload one from a URL with `src`, or from base64 data with `attachment`, using the [productsImageCreate](/docs/admin-api/reference/products/productsImageCreate) endpoint. Send one or the other, not both.
 
@@ -248,7 +248,7 @@ Images belong to the product, not the variant. Upload one from a URL with `src`,
 The image with `display_order` of `0` is the product's primary image. Change the order with a PATCH to the [productsImageUpdate](/docs/admin-api/reference/products/productsImageUpdate) endpoint.
 </Callout>
 
-#### Assign an Image to Variants
+### Assign an Image to Variants
 
 Set which variants show an image with `variants` on the [productsImageUpdate](/docs/admin-api/reference/products/productsImageUpdate) endpoint. A variant with no assigned image shows all of the parent's images.
 
@@ -260,7 +260,7 @@ Set which variants show an image with `variants` on the [productsImageUpdate](/d
 
 The same link can be made from the variant side by setting `image` on the [productsVariantsPartialUpdate](/docs/admin-api/reference/products/productsVariantsPartialUpdate) endpoint.
 
-#### Remove an Image
+### Remove an Image
 
 ```json title="Remove Image" http-method="DELETE" http-target="https://{store}.29next.store/api/admin/products/{id}/images/{imageId}/"
 {}
@@ -270,7 +270,7 @@ The same link can be made from the variant side by setting `image` on the [produ
 Posting an image to a variant `id` is rejected with "The product cannot be a variant." Upload to the parent and assign it as shown above.
 </Callout>
 
-### Pricing
+## Pricing
 
 Each variant has one price per currency. Add a currency to a variant with the [productsPricesCreate](/docs/admin-api/reference/products/productsPricesCreate) endpoint, using the variant `id` in the path.
 
@@ -298,13 +298,13 @@ Remove a currency with the [productsPricesDestroy](/docs/admin-api/reference/pro
 A price is rejected with "Currency is not available." when the store does not have that currency enabled, and with "This currency already exists." when the variant already has a price in it. Use PATCH to change an existing price.
 </Callout>
 
-### Inventory
+## Inventory
 
 Stock is tracked per variant per fulfillment location in a stockrecord. Find your location IDs with the [locationsList](/docs/admin-api/reference/fulfillment/locationsList) endpoint.
 
 Two flags on the variant control how stock is applied. `track_stock` turns inventory tracking on, and `allow_backorders` keeps the variant purchasable when `num_in_stock` reaches zero.
 
-#### Update Stock Level
+### Update Stock Level
 
 Find the stockrecord `id` in the variant's `stockrecords` array, then PATCH the [stockrecordsPartialUpdate](/docs/admin-api/reference/products/stockrecordsPartialUpdate) endpoint.
 
@@ -315,7 +315,7 @@ Find the stockrecord `id` in the variant's `stockrecords` array, then PATCH the 
 }
 ```
 
-#### Add a Location to a Variant
+### Add a Location to a Variant
 
 ```json title="Create Stockrecord" http-method="POST" http-target="https://{store}.29next.store/api/admin/stockrecords/"
 {
@@ -326,7 +326,7 @@ Find the stockrecord `id` in the variant's `stockrecords` array, then PATCH the 
 }
 ```
 
-#### Remove a Location from a Variant
+### Remove a Location from a Variant
 
 Delete the stockrecord with the [stockrecordsDestroy](/docs/admin-api/reference/products/stockrecordsDestroy) endpoint to stop fulfilling a variant from that location.
 
@@ -338,7 +338,7 @@ Delete the stockrecord with the [stockrecordsDestroy](/docs/admin-api/reference/
 A variant must keep at least one stockrecord, so the last one cannot be deleted. When `track_stock` is on, a stockrecord with `num_allocated` above zero cannot be deleted until those orders are fulfilled or cancelled. Both cases return a validation error and leave the stockrecord in place.
 </Callout>
 
-#### Find Low or Out of Stock Items
+### Find Low or Out of Stock Items
 
 The [stockrecordsList](/docs/admin-api/reference/products/stockrecordsList) endpoint filters on `inventory_availability` with `in_stock`, `low_stock`, `out_of_stock` or `untracked`, and on `location_id`, `sku` and `search_text`.
 
@@ -348,7 +348,7 @@ The [stockrecordsList](/docs/admin-api/reference/products/stockrecordsList) endp
 
 Each stockrecord in the response carries `num_in_stock`, `num_allocated` for units reserved by open orders, and `net_stock_level` for what remains sellable.
 
-### Subscription Products
+## Subscription Products
 
 Set `enable_subscription` on the product to allow it in subscription orders. When it is `true`, `interval` and `interval_counts` are required.
 
@@ -362,7 +362,7 @@ Set `enable_subscription` on the product to allow it in subscription orders. Whe
 
 Set the subscription price per currency on each variant with `subscription` in [Pricing](#pricing). See [API Subscription Management](/docs/admin-api/guides/subscription-management) for managing the subscriptions themselves.
 
-### Organize the Catalogue
+## Organize the Catalogue
 
 Create a category with the [categoriesCreate](/docs/admin-api/reference/products/categoriesCreate) endpoint. A `slug` with `/` creates the parent categories in the path, so `apparel/tees` creates Apparel and nests Tees under it.
 
@@ -391,7 +391,7 @@ Assign categories, recommended products and ordering on the product.
 `recommended_products` accepts product IDs only. Passing a variant `id` is rejected.
 </Callout>
 
-### Visibility and SEO
+## Visibility and SEO
 
 `is_public` controls whether the product shows in search results and catalogue listings. Set it to `false` for a product that should stay purchasable through a direct link, a campaign or an upsell without being discoverable.
 
@@ -405,7 +405,7 @@ Assign categories, recommended products and ordering on the product.
 }
 ```
 
-### Sync From an External System
+## Sync From an External System
 
 When another system owns the catalogue, key each product on its SKU and store the external ID in `metadata` so later runs can find it without a lookup table.
 
@@ -470,7 +470,7 @@ stateDiagram-v2
 
 Metadata keys must be defined first with the [metadataCreate](/docs/admin-api/reference/metadata/metadataCreate) endpoint, with `object` set to `product` or `variant`. To react to changes made in the dashboard, subscribe to product [webhooks](/docs/webhooks).
 
-### Retire a Product
+## Retire a Product
 
 To stop selling a product without losing its order history, set `is_public` to `false` and remove it from the campaigns and offers that reference it. A variant that has been purchased should be kept for the same reason. Remove its variant attribute values instead of deleting it so it no longer appears as a selectable option.
 

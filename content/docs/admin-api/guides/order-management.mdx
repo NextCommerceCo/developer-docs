@@ -15,7 +15,7 @@ Order management operations can be automated through the Admin API for more effi
 Below are best practices and guides for common scenarios merchants and partners use to manage orders on the Admin API.
 
 
-### Order Items Editing
+## Order Items Editing
 
 Editing items on an order is common practice, such as swapping products purchased for a different size or color with the same value without needing to collect payment or create a refund.
 
@@ -24,7 +24,7 @@ Order editing APIs are only available on 2024-04-01 API Version and above, if yo
 
 Order editing APIs also do not affect order payment within each request. To remove items with an associated refund, see [order refunds](#order-refunds). Using order edit APIs can result in the customer owing or the merchant owing to the customer.
 </Callout>
-#### Line Item Quantities Explained
+### Line Item Quantities Explained
 
 Order line items have 4 quantity attributes that represent quantities at different states in an order life cycle.
 
@@ -46,7 +46,7 @@ Order line items have 4 quantity attributes that represent quantities at differe
 ]
 ```
 
-### Swap Items Flow
+## Swap Items Flow
 
 ```mermaid
 stateDiagram-v2
@@ -68,7 +68,7 @@ Swapping Items on an order is a 4 step process:
 4.  [Collect payment for an outstanding](#collect-payment-for-outstanding-balance) balance using the [ordersCollectPaymentCreate](/docs/admin-api/reference/orders/ordersCollectPaymentCreate) endpoint.
 
 
-#### Update Existing Line Item
+### Update Existing Line Item
 
 Below is an example API call to change the quantity of a line item to 1. If the existing quantity was 2, this would remove 1 quantity, can also be used to increase line item quantity. This endpoint only accepts quantity changes, to change the product or price, see [ordersLinesCreate](/docs/admin-api/reference/orders/ordersLinesCreate) endpoint.
 
@@ -79,7 +79,7 @@ Below is an example API call to change the quantity of a line item to 1. If the 
 }
 ```
 
-#### Remove Full Line Item
+### Remove Full Line Item
 
 Below is an example DELETE request to the [ordersLinesDestroy](/docs/admin-api/reference/orders/ordersLinesDestroy) endpoint to remove a line item.
 
@@ -93,7 +93,7 @@ Line items have `editable_quantity` which represents the item quantity not alrea
 
 **If `editable_quantity` is `0`, the line item cannot be edited.**
 </Callout>
-#### Create New Line Item
+### Create New Line Item
 
 Below is an example POST request to the [ordersLinesCreate](/docs/admin-api/reference/orders/ordersLinesCreate) endpoint to create a new line item.
 
@@ -106,7 +106,7 @@ Below is an example POST request to the [ordersLinesCreate](/docs/admin-api/refe
 }
 ```
 
-#### Collect Payment for Outstanding Balance
+### Collect Payment for Outstanding Balance
 
 Orders can have an outstanding balance owed by the customer as a result of changing items on the order. To collect the outstanding balance, use the [ordersCollectPaymentCreate](/docs/admin-api/reference/orders/ordersCollectPaymentCreate) endpoint to initiate a payment transaction with the order's initial payment method.
 
@@ -116,11 +116,11 @@ Orders can have an outstanding balance owed by the customer as a result of chang
 }
 ```
 
-### Order Refunds
+## Order Refunds
 
 Order management actions that require refunding and removing items from an order can be done through the refund flow. The refund flow is especially useful when creating partial refunds or creating refunds for items that have already shipped to the customer.
 
-#### Refund Flow
+### Refund Flow
 ```mermaid
 stateDiagram-v2
     direction LR
@@ -140,7 +140,7 @@ Refunding specific items of an order is a 3-step process:
 <Callout type="info">
 Order Refund Calculate APIs are only available on `2024-04-01` version and newer. See [API Versioning](/docs/admin-api#versioning) for how to specify a version in your requests.
 </Callout>
-#### Retrieve Order Lines
+### Retrieve Order Lines
 
 Below is an abbreviated example request to [ordersRetrieve](/docs/admin-api/reference/orders/ordersRetrieve) endpoint to get the line items of the order.
 
@@ -158,7 +158,7 @@ Below is an abbreviated example request to [ordersRetrieve](/docs/admin-api/refe
 <Callout type="warn" title="Order Payments Must Be Captured">
 Order payments must be captured in order to create partial refunds, uncaptured payments cannot be partially refunded.
 </Callout>
-#### Calculate Refund
+### Calculate Refund
 
 Call the [ordersRefundCalculateCreate](/docs/admin-api/reference/orders/ordersRefundCalculateCreate) endpoint with your line items to calculate the refund and see which initial payment transactions will be refunded.
 
@@ -217,7 +217,7 @@ Below is the response from the [ordersRefundCalculateCreate](/docs/admin-api/ref
 When an order has [split fulfillment](#split-fulfillment-orders) across multiple locations, its lines can be refunded at each of them. Calculate returns the `line_id` once per location, each with its own `refundable_quantity`. Pass the matching `location_id` when you create the refund.
 </Callout>
 
-#### Create Refund
+### Create Refund
 
 We're now ready to create a refund using the [ordersRefundCreate](/docs/admin-api/reference/orders/ordersRefundCreate) endpoint, see request details below.
 
@@ -267,7 +267,7 @@ Depending on the product type and status of the line items being refunded, there
 - If unfulfilled, restock_type must be `cancel`.
 - If fulfilled, restock_type must be `no_restock`.
 </Callout>
-### Update Shipping Address
+## Update Shipping Address
 
 Updating an order shipping address is a common task that can be done with a PATCH request to the [ordersUpdate](/docs/admin-api/reference/orders/ordersUpdate) endpoint.
 
@@ -287,7 +287,7 @@ Updating an order shipping address is a common task that can be done with a PATC
 
 Updating an order shipping address should be done **before** the order is sent to a fulfillment location for fulfillment. If the order has already been accepted and processing, send a a [cancellationRequestSend](/docs/admin-api/reference/fulfillment/cancellationRequestSend) request and then [fulfillmentRequestSend](/docs/admin-api/reference/fulfillment/fulfillmentRequestSend) after you've updated the shipping address.
 </Callout>
-### Request Fulfillment
+## Request Fulfillment
 
 Fulfillment can be requested immediately through the [fulfillmentRequestSend](/docs/admin-api/reference/fulfillment/fulfillmentRequestSend) for cases that you'd like to immediately send the fulfillment order to the fulfillment location for fulfillment.
 
@@ -305,7 +305,7 @@ Fulfillment can be requested immediately through the [fulfillmentRequestSend](/d
 }
 ```
 
-### Hold Fulfillment
+## Hold Fulfillment
 
 Holding fulfillment for an order while waiting for additional review or making adjustments to the order before sending to the fulfillment location for shipping.
 
@@ -326,7 +326,7 @@ stateDiagram-v2
 }
 ```
 
-### Cancel Fulfillment
+## Cancel Fulfillment
 
 Canceling a fulfillment order that is already accepted and processing with a fulfillment location is a common order management task to stop fulfillment or as a prerequisite step to moving a fulfillment order to a new location.
 
@@ -348,15 +348,15 @@ stateDiagram-v2
 }
 ```
 
-### Move Fulfillment Orders
+## Move Fulfillment Orders
 
 <MoveFulfillmentOrders />
 
-### Split Fulfillment Orders
+## Split Fulfillment Orders
 
 <SplitFulfillmentOrders />
 
-### Add Fulfillment Tracking
+## Add Fulfillment Tracking
 
 Adding tracking information to a fulfillment order marks it as fulfilled and optionally notifies the customer with shipment tracking details. Use the [fulfillmentsCreate](/docs/admin-api/reference/fulfillment/fulfillmentsCreate) endpoint to create a fulfillment with tracking info.
 
@@ -376,7 +376,7 @@ Adding tracking information to a fulfillment order marks it as fulfilled and opt
 The `tracking_info` field accepts an array, allowing you to add multiple tracking numbers for a single fulfillment order when a shipment is split across multiple packages.
 </Callout>
 
-### Cancel Order
+## Cancel Order
 
 Canceling an order is a common order management task when you need to cancel the entire order and refund all payment transactions. To cancel an order, send a request to the [ordersCancelCreate](/docs/admin-api/reference/orders/ordersCancelCreate) endpoint.
 

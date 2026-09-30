@@ -12,14 +12,14 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 Klarna transactions send the customer through a Klarna redirect flow, with the resulting order information provided back to your application.  Below are the steps needed to get Klarna set up and working on the Admin API.
 
-### API Payment Redirect Flow
+## API Payment Redirect Flow
 
 
 import RedirectPaymentFlow from '../../../../_snippets/_redirect-payment-flow.mdx';
 
 <RedirectPaymentFlow />
 
-### Create Order on Admin API
+## Create Order on Admin API
 
 When creating a new order using Klarna using the orders_create API method, you must specify the `payment_method=klarna` as well as provide a `payment_return_url`. The `payment_return_url` is your endpoint that will receive a POST request containing the final order data.
 
@@ -39,7 +39,7 @@ When creating a new order using Klarna using the orders_create API method, you m
 You can optionally provide a `payment_gateway` when creating the order to use a Klarna account connected to a specific gateway. 
 
 </Callout>
-### Redirect Customer to Klarna
+## Redirect Customer to Klarna
 The response when creating the order will provide a `payment_complete_url`. Your application should redirect the customer to this URL for completing the payment on Klarna.
 
 ```json title="Response with Payment Complete URL"
@@ -49,18 +49,18 @@ The response when creating the order will provide a `payment_complete_url`. Your
 }
 ```
 
-### Receiving Order Data
+## Receiving Order Data
 
 import RedirectPaymentStep3 from '../../../../_snippets/_redirect-payment-flows-step-3.mdx';
 
 <RedirectPaymentStep3 />
 
 
-### Upsells
+## Upsells
 
 Klarna supports one-click upsells through the [ordersAddLineItemsCreate](/docs/admin-api/reference/orders/ordersAddLineItemsCreate) API, enabling additional items to be added to the order with a payment transaction.
 
-### Recurring
+## Recurring
 
 Klarna via NEXT Payments supports recurring transactions and can be used as a payment method for an order with subscription items. 
 

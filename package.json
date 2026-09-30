@@ -16,7 +16,8 @@
     "validate-links": "npm run generate && node scripts/validate-links.mjs",
     "check-agent-surfaces": "node scripts/check-agent-surfaces.mjs",
     "check-frontmatter": "node scripts/check-frontmatter.mjs",
-    "check": "npm run check-agent-surfaces && npm run check-frontmatter && node scripts/validate-links.mjs",
+    "check": "npm run check-agent-surfaces && npm run check-frontmatter && npm run check-markup && node scripts/validate-links.mjs",
+    "check-markup": "node scripts/check-markup.mjs",
     "check-live-surfaces": "node scripts/check-live-surfaces.mjs",
     "postinstall": "patch-package"
   },

@@ -9,7 +9,7 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 Pages created in the storefront dashboard (**Storefront > Pages**) can have very diverse design requirements that often require custom layouts. In this guide, we'll go over some of the best practices for creating and managing custom page templates.
 
-### Page Templates Location
+## Page Templates Location
 
 In the `templates/pages` directory of a theme, theme developers can edit/manage the custom page templates.
 
@@ -20,9 +20,9 @@ pages
   └── page.<custom2>.html
 ```
 
-### Extend & Override
+## Extend & Override
 
-**Create a Custom Page Template**
+### Create a Custom Page Template
 
 Create a new page template in the `templates/pages` directory with the following naming convention:
 
@@ -33,7 +33,7 @@ templates/pages/page.<custom>.html
 Templates that follow this naming convention will be selectable from the page detail area in the storefront dashboard.
 
 
-**Extend & Override Default Page Template**
+### Extend & Override Default Page Template
 
 As a best practice, you should [extend](/docs/storefront/themes/templates/tags#extends--block) the default page template to override the necessary [template blocks](/docs/storefront/themes/templates/tags#extends--block) to achieve your customization with a limited amount of duplicate code.
 
@@ -47,7 +47,7 @@ As a best practice, you should [extend](/docs/storefront/themes/templates/tags#e
 ```
 This strategy will simplify the creation and management of custom page templates so you can focus on the customized areas for the new custom product template.
 
-**Select Template for Page**
+### Select Template for Page
 
 On your page of choice, select your newly created template as the **Theme Template** to activate the template for your page in the storefront.
 

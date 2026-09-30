@@ -12,69 +12,81 @@ For an optional quickstart that follows the current Campaign Page Kit CLI withou
 
 ## Install
 
-The simplest path is the [`skills` CLI](https://github.com/vercel-labs/skills) — it pulls `SKILL.md` files from a GitHub repo and drops them into the right config directory for whichever assistant you use. The target agent is auto-detected by default.
+The [`skills` CLI](https://github.com/vercel-labs/skills) is the quickest path: it pulls each skill from GitHub and installs it into the skill directory of the AI tool it detects.
 
 ```bash
-# Install every skill from this repo
-npx skills add NextCommerceCo/skills
+# Install every skill for your detected agent
+npx skills add NextCommerceCo/skills -g
 
 # Install one skill
-npx skills add NextCommerceCo/skills -s next-theme-dev
+npx skills add NextCommerceCo/skills -g --skill next-ops-scan
 
-# List skills without installing
-npx skills add NextCommerceCo/skills --list
-
-# Target a specific agent (auto-detected by default)
-npx skills add NextCommerceCo/skills -a claude-code
+# Target a specific agent
+npx skills add NextCommerceCo/skills -g -a codex
 ```
 
-Once installed, Claude Code auto-detects when a skill is relevant, or you can invoke it directly with `/<skill-name>` (e.g. `/next-theme-dev`). If the skills directory didn't exist before Claude Code started, restart it so it can discover the new directory.
+To manage versions from a checkout, clone the repository and run its guided installer. It previews every change before writing, and installs into Claude Code (`~/.claude/skills`), Codex (`~/.codex/skills`), or `~/.agents/skills`.
 
 ```bash
-# Update every installed skill
-npx skills update
-
-# Update one skill
-npx skills update next-theme-dev
+git clone https://github.com/NextCommerceCo/skills.git
+cd skills
+./skills.sh
 ```
 
+Restart your agent session after installing so it loads the new skills. Then ask for the work in plain language, or invoke a skill directly with `/<skill-name>` in Claude Code (for example `/next-ops-scan`).
+
 <Callout type="info">
-For agents the `skills` CLI doesn't support, each `SKILL.md` is plain markdown — load it as a system prompt, context file, or chat upload.
+For agents without a native skill directory, each `SKILL.md` is plain markdown: load it as a system prompt, context file, rule, or chat upload.
 </Callout>
 
 ### Ask your AI tool to install
 
-You can also let your AI tool drive the install — it knows where files live for the current OS and assistant:
+You can also let your AI tool drive the install. It knows where files live for your operating system and assistant:
 
 ```text
 Install the Next Commerce AI skill I need from https://github.com/NextCommerceCo/skills.
-Use the installation location for my current AI tool and operating system. If my tool
-supports native skills, install each skill as a directory containing its SKILL.md.
-If it only supports rules, prompts, or context files, add the relevant SKILL.md there.
-Prefer HTTPS clone unless my GitHub SSH access is already configured.
+Prefer cloning the repo and running ./skills.sh, choosing the installation location for my
+current AI tool. If a local checkout is not appropriate, use the public npx skills installer
+or load the relevant SKILL.md as context.
 ```
 
 Tell it which skill you want, or ask it to inspect [`skills.json`](https://github.com/NextCommerceCo/skills/blob/main/skills.json) and choose the relevant one.
+
+### Keep skills up to date
+
+An installed skill is a copy, so it doesn't change when the repository does. Check before starting work that depends on one:
+
+- **With a checkout:** run `git pull --ff-only`, then `./skills.sh status` to mark older copies `stale`, and `./skills.sh install <target> <skill>` to replace them.
+- **With the `skills` CLI:** run `npx skills update`.
+- **Without either:** compare the `version:` line in your installed `SKILL.md` with that skill's `version` in [`skills.json`](https://github.com/NextCommerceCo/skills/blob/main/skills.json).
+
+`next-campaigns-create` checks for a newer version itself each time it runs. Restart the agent session after any update.
 
 ## Available skills
 
 | Skill | What it does | When to use it |
 | --- | --- | --- |
-| [**next-theme-figma**](https://github.com/NextCommerceCo/skills/tree/main/next-theme-figma) | Prepare Figma storefront designs for Spark theme implementation — validates source structure, classifies sections and assets, records Spark divergences, and generates a low-inference handoff for `next-theme-dev` | You have a Figma storefront design (PDP, homepage, etc.) you want to turn into a Next Commerce theme |
-| [**next-theme-dev**](https://github.com/NextCommerceCo/skills/tree/main/next-theme-dev) | Build and customize storefront themes — DTL templates, ntk CLI, Tailwind CSS, settings, side cart | You're editing theme files, setting up a new storefront, or debugging template issues |
-| [**next-campaigns-create**](https://github.com/NextCommerceCo/skills/tree/main/next-campaigns-create) | Provision a launch-ready Campaigns App campaign over the Admin API — reads the store's catalogue, gateways, and shipping methods, recommends a structure, then creates the campaign, packages, shipping methods, and tier/voucher offers behind an approval gate; hands back the campaign `api_key` and package IDs | A new campaign needs to exist on a store before funnel work starts — creates new campaigns only, it can't edit an existing one |
-| [**next-campaigns-setup**](https://github.com/NextCommerceCo/skills/tree/main/next-campaigns-setup) | End-to-end CPK campaign setup — scaffolds the project, copies a starter template, seeds `campaigns.json`, wires up the API key, store details, and analytics in one pass | Starting a new CPK campaign for a brand — after the campaign exists in the Campaigns App |
-| [**next-bulk-fulfill**](https://github.com/NextCommerceCo/skills/tree/main/next-bulk-fulfill) | Update orders to **Fulfilled** with tracking numbers from a CSV | A fulfillment provider shipped orders but tracking didn't sync back — orders stuck in *Processing* |
-| [**next-bulk-move**](https://github.com/NextCommerceCo/skills/tree/main/next-bulk-move) | Move fulfillment orders between warehouse locations in bulk — by order-number file or by Product ID / SKU list | Switching fulfillment providers, or moving every FO containing a given SKU/product to a new location |
-| [**next-bulk-subscription**](https://github.com/NextCommerceCo/skills/tree/main/next-bulk-subscription) | Apply official actions (pause, cancel) or a PATCH (renewal date, interval, gateway, address) to a list of subscription IDs | Merchant wants to bulk-pause, bulk-shift renewals, bulk-cancel, or migrate subscriptions between gateways |
-| [**next-ops-scan**](https://github.com/NextCommerceCo/skills/tree/main/next-ops-scan) | Read-only daily operations risk scan for a store — surfaces Incomplete orders, Rejected orders, and delivery-tracking failures or stale shipments with manual next steps | You want a routine health check to catch risky orders and reduce disputes |
+| [**next-theme-figma**](https://github.com/NextCommerceCo/skills/tree/main/next-theme-figma) | Turn a Figma storefront design into a validated, low-inference handoff package for `next-theme-dev`: sections, assets, geometry, copy, and design tokens | You have a Figma storefront design (PDP, homepage, and so on) to build as a Next Commerce theme |
+| [**next-theme-design**](https://github.com/NextCommerceCo/skills/tree/main/next-theme-design) | Turn a live website or its HTML into a validated handoff package for `next-theme-dev`: captures at three widths, sections, geometry, copy decisions, styles, behaviors, and commerce divergences | You want an existing page, such as a merchant's landing page, rebuilt as a Next Commerce storefront |
+| [**next-theme-dev**](https://github.com/NextCommerceCo/skills/tree/main/next-theme-dev) | Build, modify, and debug storefront themes: Spark, Intro Bootstrap, Theme Settings, the `ntk` CLI, DTL templates, storefront GraphQL, and builds from Figma or live-site handoff packages | You're editing theme files, setting up a new storefront, building from a handoff package, or debugging templates |
+| [**next-campaigns-create**](https://github.com/NextCommerceCo/skills/tree/main/next-campaigns-create) | Create a launch-ready Campaigns App campaign over the Admin API: packages, shipping, quantity Buy 1/2/3, buy-X-get-Y as a labeled percentage, and gift-with-purchase, behind a plan-hash approval gate. Hands back the campaign `api_key` and package IDs | A new campaign needs to exist on a store before funnel work starts. It creates new campaigns only |
+| [**next-campaigns-setup**](https://github.com/NextCommerceCo/skills/tree/main/next-campaigns-setup) | Scaffold and configure a new Campaign Page Kit campaign end to end: project, starter template, config, and analytics | Starting a new CPK campaign after the campaign exists in the Campaigns App |
+| [**next-bulk-fulfill**](https://github.com/NextCommerceCo/skills/tree/main/next-bulk-fulfill) | Mark orders **Fulfilled** with tracking numbers from a CSV when a fulfillment provider's sync-back fails | A provider shipped orders but tracking didn't sync back, leaving orders stuck in *Processing* |
+| [**next-bulk-move**](https://github.com/NextCommerceCo/skills/tree/main/next-bulk-move) | Move fulfillment orders between warehouse locations in bulk, from a file of order numbers or a product/SKU list | Switching fulfillment providers, or moving every fulfillment order containing a given SKU or product |
+| [**next-bulk-subscription**](https://github.com/NextCommerceCo/skills/tree/main/next-bulk-subscription) | Pause, cancel, or update subscriptions in bulk from a CSV or XLSX of subscription IDs, with a dry run and verification | Bulk-pausing, shifting renewal dates, changing intervals or gateways, or cancelling a list of subscriptions |
+| [**next-ops-scan**](https://github.com/NextCommerceCo/skills/tree/main/next-ops-scan) | Read-only daily risk scan for one store: Incomplete and Rejected orders, delivery-tracking failures, and stale shipments | A routine health check to catch risky orders and reduce disputes |
+
+For design-led theme work, run `next-theme-figma` (Figma source) or `next-theme-design` (live page source) before `next-theme-dev`. The three theme skills are installed together.
 
 ## Prerequisites
 
-Each skill lists its own requirements in its `SKILL.md`. Common across all skills:
+Each skill lists its own requirements in its `SKILL.md` and `README.md`. In general:
 
-- Access to a Next Commerce store
-- An API key with the scopes specified by the skill (create at **Dashboard → Settings → API Access**)
+- **Operations and campaign provisioning skills** (`next-bulk-*`, `next-ops-scan`, `next-campaigns-create`) run Python 3 scripts that use only the standard library. They need an Admin API token with the scopes the skill names, in a local `.env` as `{SUBDOMAIN}_NEXT_ADMIN_API_TOKEN` or in the environment. Create the API access under **Settings → API Access**.
+- **Theme skills** need Python 3.10 or newer (`next-theme-figma` also uses Node.js), a browser tool that can take screenshots, and for `next-theme-dev` a Storefront OAuth app API key with `themes:read` and `themes:write`.
+- **`next-campaigns-setup`** needs Node.js and npm, a Campaign Page Kit project, and the campaign's Campaign Cart API key.
+
+Skills that change store data (bulk actions, campaign creation, theme pushes) show a plan or dry run and wait for your approval before writing.
 
 ## Machine-readable index
 

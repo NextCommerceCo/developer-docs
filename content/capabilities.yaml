@@ -321,7 +321,7 @@ capabilities:
       - /docs/storefront/event-tracking
     api_operations: [tag:storefront]
     webhooks: []
-    skills: [next-theme-dev, next-theme-figma]
+    skills: [next-theme-dev, next-theme-figma, next-theme-design]
     status: available
     last_verified: 2026-09-03
 
@@ -437,15 +437,15 @@ capabilities:
   - id: agent-skills
     title: AI agent skills
     summary: >-
-      Pre-built skills that give AI coding agents platform knowledge (theme development,
-      campaign provisioning and setup, bulk operations, daily ops scans), installable with
-      the skills CLI or loadable as plain markdown.
+      Pre-built skills that give AI coding agents platform knowledge (Figma and live-site
+      theme handoffs, theme development, campaign provisioning and setup, bulk operations,
+      daily ops scans), installable with the skills CLI or loadable as plain markdown.
     audiences: [developer]
     operator_docs: []
     developer_docs:
       - /docs/skills
     api_operations: []
     webhooks: []
-    skills: [next-theme-figma, next-theme-dev, next-campaigns-create, next-campaigns-setup, next-bulk-fulfill, next-bulk-move, next-bulk-subscription, next-ops-scan]
+    skills: [next-theme-figma, next-theme-design, next-theme-dev, next-campaigns-create, next-campaigns-setup, next-bulk-fulfill, next-bulk-move, next-bulk-subscription, next-ops-scan]
     status: available
     last_verified: 2026-09-14

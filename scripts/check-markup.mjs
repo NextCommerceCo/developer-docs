@@ -39,6 +39,7 @@ for (const rel of files) {
   }
   let inCode = false;
   let prev = snippet ? 2 : 1;
+  let first = true;
   for (; i < lines.length; i++) {
     const line = lines[i];
     if (/^\s*(```|~~~)/.test(line)) inCode = !inCode;
@@ -49,11 +50,12 @@ for (const rel of files) {
       const level = heading[1].length;
       const text = (heading[2] ?? '').trim();
       if (!text) errors.push(`${at} empty heading`);
-      if (prev === 1 && title && norm(text) === norm(title)) errors.push(`${at} heading repeats the page title: ${text}`);
+      if (first && title && norm(text) === norm(title)) errors.push(`${at} heading repeats the page title: ${text}`);
       if (text.includes('**')) errors.push(`${at} bold inside a heading: ${line.trim()}`);
       if (level > prev + 1) errors.push(`${at} h${level} follows h${prev}; use h${prev + 1}`);
       if (level === 1) errors.push(`${at} h1 in the body; the frontmatter title is the page h1`);
       prev = level;
+      first = false;
       continue;
     }
     for (const link of line.matchAll(/\[([^\]\n]*)\]\(/g)) {

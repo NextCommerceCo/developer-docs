@@ -254,10 +254,10 @@ Returns the store object with general information about the store and the contac
 
 ```django title="Example Store Object Usage"
 <address>
-{{ store.legal_name }}
-{{ store.address.line_1 }}
+{{ store.legal_name }}<br>
+{{ store.address.line_1 }}<br>
 {% if store.address.line_2 %}{{ store.address.line_2 }}<br>{% endif %}
-{{ store.address.city }}, {{ store.address.state }} {{ store.address.postcode }}
+{{ store.address.city }}, {{ store.address.state }} {{ store.address.postcode }}<br>
 {{ store.address.country }}
 </address>
 <p><a href="mailto:{{ store.email }}">Email Support</a></p>

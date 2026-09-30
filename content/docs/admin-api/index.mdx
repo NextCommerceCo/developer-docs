@@ -6,12 +6,12 @@ sidebar_position: 5
 ---
 import { Callout } from 'fumadocs-ui/components/callout';
 
-### Getting Started
+## Getting Started
 
 At the core of Next Commerce, the Admin API lets developers manage store resources, integrate third-party services, and build seamless external order flows.
 
 
-### Authentication
+## Authentication
 
 The Admin API uses the OAuth 2 authorization protocol to manage access to your store's resources. OAuth apps and associated access tokens can be tailored with object-level permissions to ensure that each integrated service only has access to the objects it needs.
 
@@ -38,11 +38,11 @@ Admin API tokens provide full access to your system, including the ability to pe
 
 **Always keep your Admin API tokens private and secure.**
 </Callout>
-### Versioning
+## Versioning
 
 API versioning allows Next Commerce to continuously evolve the platform while maintaining predictable behavior for existing APIs with a path for upgrades and deprecations.
 
-**Admin API Versions**
+### Admin API Versions
 
 | Version | Status | Docs |
 | ---- | ---- | ---- |
@@ -51,14 +51,14 @@ API versioning allows Next Commerce to continuously evolve the platform while ma
 | `unstable` | Unstable | [View Reference](/docs/admin-api/reference/unstable/orders/ordersList) |
 
 
-**Specify an API Version**
+### Specify an API Version
 
 To specify a version, pass the `X-29next-API-Version` header with your desired API version.
 
 <Callout type="warn">
 It is **highly recommended** to specify your version on your API requests to ensure consistency for your integration.
 </Callout>
-### Rate Limits
+## Rate Limits
 
 Admin APIs are rate-limited to maintain the stability and equity of our platform for all users. We employ a number of methods to enforce rate limits.
 

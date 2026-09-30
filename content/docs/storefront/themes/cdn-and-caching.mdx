@@ -11,14 +11,14 @@ Storefront leverages CDNs and many caching strategies to ensure fast performant 
 <Callout type="info" title="Use Network Domain while Building Themes">
 Always use the store network domain `https://{store}.29next.store` when developing, previewing, debugging, and verifying themes. Do not use a mapped public storefront domain to decide whether a theme change landed.
 </Callout>
-### Asset CDN
+## Asset CDN
 
 All merchant uploaded media assets and theme assets are loaded from our CDN for the fastest performance. 
 
 - **Media** - Links to uploaded media should always use the `cdn.29next.store`
 - **Theme Assets** - Theme assets should use the [asset_url](/docs/storefront/themes/templates/filters#asset_url) in templates which always generates a full CDN link on the storefront.
 
-### Full Page Caching
+## Full Page Caching
 
 All pages on storefront are cached for 5 minutes to ensure popular pages are as fast as possible for customers and minimal impact on the overall platform load. 
 
@@ -30,7 +30,7 @@ All pages on storefront are cached for 5 minutes to ensure popular pages are as 
 <Callout type="idea" title="Verify the Network Domain First">
 Confirm the latest theme on `https://{store}.29next.store` first. After it is correct there, check the mapped public storefront domain as a final customer-path smoke test.
 </Callout>
-### Template Caching
+## Template Caching
 
 Themes use many templates ie `layouts`, `partials`, and `assets` that when compiled together create amazing customer experiences. Templates are cached in memory to reduce database queries when compiling templates into the full html response. 
 

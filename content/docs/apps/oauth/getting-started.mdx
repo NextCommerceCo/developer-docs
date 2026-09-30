@@ -7,11 +7,11 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 Server-side Apps that use Stores' Admin API must obtain authorization using OAuth 2.0 ([see overview](/docs/apps/oauth)). This guide shows you how to authorize your app and retrieve your Access Token to access the Admin API.
 
-### Step 1: Retrieve API Credentials
+## Step 1: Retrieve API Credentials
 
 To get started, make sure that you have your Apps' `client_id` and `client_secret` available on the App details in your Partner account.
 
-### Step 2: App Permissions Setup
+## Step 2: App Permissions Setup
 
 During the App installation flow, Apps that have `oauth` configured will be redirected to the OAuth App URL from the App Settings.
 
@@ -35,7 +35,7 @@ https://{network_domain}/oauth2/authorize/?response_type=code&client_id={client_
 |`scope`| A space separated list of scopes such as `orders:read orders:write users:read users:write`. [See list of all available scopes](/docs/admin-api/permissions). |
 
 
-### Step 3: Confirm Installation
+## Step 3: Confirm Installation
 
 After user click's Authorize to confirm App installation, it will redirect to the `redirect_uri` with `?store={network_domain}&code={authorize_code}` appended.
 
@@ -48,7 +48,7 @@ https://yourapp.com/setup/authorize/?store={network_domain}&code={authorization_
 |`network_domain`| The store network domain that is installing the app. Can be referenced from the `store` url parameter sent to your app OAuth Redirect URL.  |
 |`authorization_code`| The authorization code used to retrieve the Access Token in the next step.  |
 
-### Step 4: Retrieve Access Token
+## Step 4: Retrieve Access Token
 
 After you have the `authorization_code`, you then need to retrieve the access token to gain access to the Admin API.
 

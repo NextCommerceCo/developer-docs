@@ -15,7 +15,7 @@ import IntroTheme from '../../../_snippets/_view-intro-theme.mdx';
 <IntroTheme />
 
 
-### Layout & Structure
+## Layout & Structure
 The Storefront theme framework has a set guideline for the base directories of your theme for your assets, html, and settings.
 
 ```shell title="Storefront Theme Structure"
@@ -31,7 +31,7 @@ theme
 ```
 
 
-### Assets
+## Assets
 The assets directory is used to upload static asset files used in the theme such as images, stylesheets, web fonts, and javascript files. The assets directory works in conjunction with the [`asset_url` template filter](/docs/storefront/themes/templates/filters#asset_url) to render the full path on your storefront.
 
 ```django title="Example link in template to /assets/css/style.css"
@@ -42,7 +42,7 @@ The assets directory is used to upload static asset files used in the theme such
 Never hardcode a CDN asset URL in a template — asset URLs change on every push and the hardcoded link will break. Use `asset_url` for all theme asset references.
 </Callout>
 
-### Configs
+## Configs
 The configs directory is used to store your theme settings options and also the settings data as they should be configured with the theme.
 
 - `settings_schema.json` is used to generate the theme settings form
@@ -55,7 +55,7 @@ configs
 ```
 [See Theme Settings Guide](/docs/storefront/themes/settings)
 
-### Locales
+## Locales
 
 The `locales` directory is used to for storefront theme translation json files. The translation files are used in conjunction with the translation template tag to support multiple languages for your storefront.
 
@@ -71,7 +71,7 @@ locales
 ```
 [See Translations Guide](/docs/storefront/themes/translations)
 
-### Layouts
+## Layouts
 The `layouts` directory is used to store base templates that are then extended from in view specific templates, see extends and block template tags for more on template inheritance. See the [`extends` template tag](/docs/storefront/themes/templates/tags#extends--block) for more on template inheritance.
 
 ```shell title="Layouts Directory Example"
@@ -79,7 +79,7 @@ layouts
  └── base.html
 ```
 
-### Partials
+## Partials
 The partials directory is used to store reusable which are reusable snippets of code that can be used in tandem with the include template tag for reuse across many templates. See the includes template tag for more on template inheritance with partials.
 
 ```shell title="Partials Directory Example"
@@ -98,7 +98,7 @@ partials
 ```
 
 
-### Templates
+## Templates
 The templates directory is used to store all templates for a theme, see [URLs and Template Paths](/docs/storefront/themes/templates/urls-and-template-paths) for reference.
 
 ```shell title="Templates Directory Example"
@@ -128,14 +128,14 @@ templates
      └── index.html
 ```
 
-### Sass
+## Sass
 
 The sass directory accepts scss files for use in a theme. See Theme Kit for more details on local sass compiling.
 
 <Callout type="warn">
 Sass files are not automatically compiled in the platform and must be compiled to css files locally for use in templates from the assets directory.
 </Callout>
-### Theme Kit
+## Theme Kit
 
 [Theme Kit](https://github.com/NextCommerceCo/theme-kit) is a command line tool for developers to build an maintain storefront themes programmatically, allowing theme developers to:
 

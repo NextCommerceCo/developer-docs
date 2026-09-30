@@ -5,7 +5,7 @@ description: "Overview of the storefront developer tools: themes, event tracking
 
 The Next Commerce storefront is a flexible, customizable front-end layer for your ecommerce business. Whether you're building a completely custom storefront or enhancing an existing theme, this section will guide you through the tools and features available to developers.
 
-### Themes
+## Themes
 
 Themes allow you to fully control the look and feel of your storefront using modern front-end technologies. Each theme includes layouts, templates, stylesheets, and scripts, giving you full creative freedom to build a branded customer experience.
 
@@ -16,7 +16,7 @@ Themes allow you to fully control the look and feel of your storefront using mod
 Learn how to [build and manage your theme →](/docs/storefront/themes)
 
 
-### Event Tracking
+## Event Tracking
 
 Capture user behavior, conversion events, and key storefront interactions with built-in event tracking tools.
 
@@ -27,7 +27,7 @@ Capture user behavior, conversion events, and key storefront interactions with b
 Learn how to [implement tracking for your storefront →](/docs/storefront/event-tracking)
 
 
-### Storefront GraphQL API
+## Storefront GraphQL API
 
 Power deeper customizations, dynamic content loading, and headless experiences using our Storefront GraphQL API.
 

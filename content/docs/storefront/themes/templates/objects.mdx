@@ -254,10 +254,10 @@ Returns the store object with general information about the store and the contac
 
 ```django title="Example Store Object Usage"
 <address>
-{{ store.legal_name }}<br>
-{{ store.address.line_1 }}<br>
+{{ store.legal_name }}
+{{ store.address.line_1 }}
 {% if store.address.line_2 %}{{ store.address.line_2 }}<br>{% endif %}
-{{ store.address.city }}, {{ store.address.state }} {{ store.address.postcode }}<br>
+{{ store.address.city }}, {{ store.address.state }} {{ store.address.postcode }}
 {{ store.address.country }}
 </address>
 <p><a href="mailto:{{ store.email }}">Email Support</a></p>
@@ -637,7 +637,7 @@ The session object is returned by the [`purchase_info_for_product`](/docs/storef
 {% endif %}
 ```
 
-**session.price**
+#### session.price
 
 | Property | Type | Description |
 | ----- | ------ | ------ |
@@ -647,7 +647,7 @@ The session object is returned by the [`purchase_info_for_product`](/docs/storef
 | `currency` | String | The currency code for this price. |
 | `excl_tax` | Decimal | The price excluding tax. |
 
-**session.availability**
+#### session.availability
 
 | Property | Type | Description |
 | ----- | ------ | ------ |
@@ -777,7 +777,7 @@ Cart line object available on the cart page (`templates/cart.html`) through the 
 | ----- | ------ | ------ |
 | `properties` | List | Line item properties captured on the product page, see [Personalized Products](/docs/storefront/themes/guides/personalized-products). Property names starting with an underscore are excluded. |
 
-**line.properties**
+#### line.properties
 
 | Property | Type | Description |
 | ----- | ------ | ------ |

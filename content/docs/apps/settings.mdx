@@ -15,7 +15,7 @@ import GoogleAnalytics from '../../_snippets/_view-google-analytics.mdx';
 <GoogleAnalytics />
 
 
-### Example Usage
+## Example Usage
 
 At this time, the primary use case of settings is to allow apps to store settings data that can then be used with snippets. This makes it possible to extend storefront theme's natively through the use of that are rendered in themes yet fully contained and controlled by your app. :tada:
 
@@ -54,7 +54,7 @@ if (app.settings.custom_app_id_enabled) {
 <Callout type="info">
 For Sever to Server Apps with access to the Admin API, you can update the app settings values stored in the database on the Admin API allowing you to configure the app from your external application.
 </Callout>
-### Reference
+## Reference
 
 | Attribute       | Required         | Description               |
 | -----------| --------------------|---------------- |
@@ -70,11 +70,11 @@ For Sever to Server Apps with access to the Admin API, you can update the app se
 |`min_value`| No | Applicable to number field types to set a min value. |
 
 
-### Input Types
+## Input Types
 
 Settings schema input types map to input fields that will be rendered in the theme settings form in the dashboard.
 
-#### text
+### text
 
 ```json title="text"
 {
@@ -89,7 +89,7 @@ Settings schema input types map to input fields that will be rendered in the the
 ```
 
 
-#### textarea
+### textarea
 
 ```json title="textarea"
 {
@@ -101,7 +101,7 @@ Settings schema input types map to input fields that will be rendered in the the
 }
 ```
 
-#### checkbox
+### checkbox
 
 ```json title="checkbox"
 {
@@ -112,7 +112,7 @@ Settings schema input types map to input fields that will be rendered in the the
     "default": true
 }
 ```
-#### number
+### number
 ```json title="number"
 {
     "type": "number",
@@ -126,7 +126,7 @@ Settings schema input types map to input fields that will be rendered in the the
 ```
 
 
-#### email
+### email
 
 ```json title="email"
 {
@@ -138,7 +138,7 @@ Settings schema input types map to input fields that will be rendered in the the
 }
 ```
 
-#### radio
+### radio
 
 ```json title="radio"
 {
@@ -160,7 +160,7 @@ Settings schema input types map to input fields that will be rendered in the the
 }
 ```
 
-#### select
+### select
 ```json title="select"
 {
     "type": "select",
@@ -185,7 +185,7 @@ Settings schema input types map to input fields that will be rendered in the the
 }
 ```
 
-#### multi-select
+### multi-select
 ```json title="multi-select"
 {
     "type": "select",
@@ -210,7 +210,7 @@ Settings schema input types map to input fields that will be rendered in the the
 }
 ```
 
-#### url
+### url
 ```json title="url"
 {
     "type": "url",
@@ -222,7 +222,7 @@ Settings schema input types map to input fields that will be rendered in the the
 ```
 
 
-#### color
+### color
 ```json title="color"
 {
     "type": "color",

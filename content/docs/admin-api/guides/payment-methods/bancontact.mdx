@@ -14,14 +14,14 @@ import { Callout } from 'fumadocs-ui/components/callout';
 Bancontact transactions send the customer through a Bancontact redirect flow, with the resulting order information provided back to your application.  Below are the steps needed to get Bancontact set up and working on the Admin API.
 
 
-### API Payment Redirect Flow
+## API Payment Redirect Flow
 
 
 import RedirectPaymentFlow from '../../../../_snippets/_redirect-payment-flow.mdx';
 
 <RedirectPaymentFlow />
 
-### Create Order on Admin API
+## Create Order on Admin API
 
 When creating a new order using Bancontact using the orders_create API method, you must specify the `payment_method=bancontact` as well as provide a `payment_return_url`. The `payment_return_url` is your endpoint that will receive a POST request containing the final order data.
 
@@ -41,7 +41,7 @@ When creating a new order using Bancontact using the orders_create API method, y
 You can optionally provide a `payment_gateway` when creating the order to use a Bancontact account connected to a specific gateway. 
 
 </Callout>
-### Redirect Customer to Bancontact
+## Redirect Customer to Bancontact
 The response when creating the order will provide a `payment_complete_url`. Your application should redirect the customer to this URL for completing the payment on Bancontact.
 
 ```json title="Response with Payment Complete URL"
@@ -51,13 +51,13 @@ The response when creating the order will provide a `payment_complete_url`. Your
 }
 ```
 
-### Receiving Order Data
+## Receiving Order Data
 
 import RedirectPaymentStep3 from '../../../../_snippets/_redirect-payment-flows-step-3.mdx';
 
 <RedirectPaymentStep3 />
 
 
-### Upsells
+## Upsells
 
 Upsells are not supported with Bancontact payments.

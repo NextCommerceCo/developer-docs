@@ -14,14 +14,14 @@ import { Callout } from 'fumadocs-ui/components/callout';
 For custom PayPal checkouts, there are two checkout flows available, the standard method where a user enters their shipping address, chooses products, and then checks out via PayPal; and the "One-Click" method, where the user is not required to enter shipping information before being redirected to PayPal checkout.
 
 
-### API Payment Redirect Flow
+## API Payment Redirect Flow
 
 
 import RedirectPaymentFlow from '../../../../_snippets/_redirect-payment-flow.mdx';
 
 <RedirectPaymentFlow />
 
-### Create Order on Admin API
+## Create Order on Admin API
 
 When creating a new order using PayPal using the orders_create API method, you must specify the `payment_method=paypal` as well as provide a `payment_return_url`. The `payment_return_url` is your endpoint that will receive a POST request containing the final order data.
 
@@ -39,7 +39,7 @@ When creating a new order using PayPal using the orders_create API method, you m
 <Callout type="idea">
 You can optionally provide a `paypal_account` when creating the order to use a PayPal account other than the store default PayPal account.
 </Callout>
-### Redirect Customer to PayPal
+## Redirect Customer to PayPal
 The response when creating the order will provide a `payment_complete_url`. Your application should redirect the customer to this URL for completing the payment on PayPal.
 
 ```json title="Response with Payment Complete URL"
@@ -49,14 +49,14 @@ The response when creating the order will provide a `payment_complete_url`. Your
 }
 ```
 
-### Receiving Order Data
+## Receiving Order Data
 
 import RedirectPaymentStep3 from '../../../../_snippets/_redirect-payment-flows-step-3.mdx';
 
 <RedirectPaymentStep3 />
 
 
-### Upsells
+## Upsells
 
 PayPal supports one-click upsells through the [ordersAddLineItemsCreate](/docs/admin-api/reference/orders/ordersAddLineItemsCreate) API, enabling additional items to be added to the order with a payment transaction.
 

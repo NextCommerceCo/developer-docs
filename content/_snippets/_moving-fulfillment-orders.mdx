@@ -5,7 +5,7 @@ Moving a fulfillment order items to a new fulfillment location is a common order
 
 
 
-#### Move Fulfillment Order Flow
+### Move Fulfillment Order Flow
 ```mermaid
 stateDiagram-v2
     direction LR
@@ -20,7 +20,7 @@ Moving fulfillment order items is a 2-step process:
 <Callout type="info">
 Fulfillment Orders must be `"status": "open"` to be moved to a new location. If the fulfillment order you want to move is   `"status": "processing"`, use the [cancellationRequestSend](/docs/admin-api/reference/fulfillment/cancellationRequestSend) endpoint to request cancellation with the current fulfillment location before moving to a new location.
 </Callout>
-#### Retrieve Available Locations
+### Retrieve Available Locations
 
 Fulfillment order line items often contain products that are in stock at many locations where they could be fulfilled from. To check what locations fulfillment order items are available at, use the [availableLocationsRetrieve](/docs/admin-api/reference/fulfillment/availableLocationsRetrieve) endpoint.
 
@@ -46,7 +46,7 @@ Fulfillment order line items often contain products that are in stock at many lo
 }
 ```
 
-#### Move a Fulfillment Order
+### Move a Fulfillment Order
 
 Once the available locations fulfillment order line items can move, use the [fulfillmentOrdersMove](/docs/admin-api/reference/fulfillment/fulfillmentOrdersMove) endpoint to move all or some of the line items.
 

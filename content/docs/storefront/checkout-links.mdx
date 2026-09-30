@@ -5,16 +5,16 @@ description: URL parameters for pre-loading a store's checkout with products, vo
 
 Checkout Links allow you add links from any website, email or web marketing channel directly to your store's checkout flow with items pre-loaded in their cart.
 
-### Example Checkout Links
+## Example Checkout Links
 
-#### As a one-time purchase
+### As a one-time purchase
 
 With the link below, 2 products would be added to the cart with an applied voucher.
 
 ```bash title="One-Time Purchase"
 https://{domain}/checkout/add/?product=12:1&product=13:3&voucher=PROMO&currency=usd
 ```
-#### As a subscription
+### As a subscription
 
 With the following link, 1 product would be added to the cart as a subscription renewing every 3 months.
 
@@ -23,11 +23,11 @@ https://{domain}/checkout/add/?product=12:1:3:month&currency=usd
 ```
 
 
-### Supported Parameters
+## Supported Parameters
 
 Checkout link parameters can be broadly split into two groups, [Cart Parameters](#cart-parameters) controlling the products and discounts applied to the cart and [Attribution Parameters](#attribution-parameters) to marketing attribution reporting.
 
-#### Cart Parameters
+### Cart Parameters
 
 | Parameter | Values | Description |
 | -----------| -------- |--------------------|
@@ -37,7 +37,7 @@ Checkout link parameters can be broadly split into two groups, [Cart Parameters]
 | `replace` | true/false | replace existing cart, default is true |
 
 
-#### Attribution Parameters
+### Attribution Parameters
 In addition to populating the cart, you can pass attribution parameters to attribute the order to your marketing channel.
 
 | Parameter | Description |

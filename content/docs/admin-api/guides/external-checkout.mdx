@@ -21,7 +21,7 @@ stateDiagram-v2
     upsell --> Confirmation
 ```
 
-### Create Cart
+## Create Cart
 
 Carts are the starting point for all orders, carts are essentially draft orders waiting to be converted into orders. Creating the cart is a vital step in capturing leads and setting up abandoned cart flows.
 
@@ -57,7 +57,7 @@ Carts are the starting point for all orders, carts are essentially draft orders 
 - Attribution added to a cart is carried over to the Orders and Subscriptions created on the users next order, you do not need to pass this data on the order request.
 - If you need to capture an address with the cart, use the [usersAddressesCreate](/docs/admin-api/reference/customers/usersAddressesCreate) endpoint which will create a default address for the user.
 </Callout>
-### Create Order
+## Create Order
 Creating an order is the core resource in an external checkout flow, see the example below to familiarize yourself with the [ordersCreate](/docs/admin-api/reference/orders/ordersCreate) API endpoint.
 
 ```json title="Request" http-method="POST" http-target="https://{store}.29next.store/api/admin/orders/"
@@ -99,7 +99,7 @@ Creating an order is the core resource in an external checkout flow, see the exa
 - If you already created an address for the user, pass `use_default_shipping_address` and `use_default_billing_address` as true to use their default address for the order.
 - For additional payment methods, see the [Payment Methods](/docs/admin-api/guides/payment-methods) guides — [Bankcard](/docs/admin-api/guides/payment-methods/bankcard), [3DS2](/docs/admin-api/guides/payment-methods/bankcard#3d-secure-3ds2), [Apple Pay](/docs/admin-api/guides/payment-methods/apple-pay), [PayPal](/docs/admin-api/guides/payment-methods/paypal), [Klarna](/docs/admin-api/guides/payment-methods/klarna), [Affirm](/docs/admin-api/guides/payment-methods/affirm), [Afterpay](/docs/admin-api/guides/payment-methods/afterpay), [Twint](/docs/admin-api/guides/payment-methods/twint), [Swish](/docs/admin-api/guides/payment-methods/swish), [Bancontact](/docs/admin-api/guides/payment-methods/bancontact), and [SEPA](/docs/admin-api/guides/payment-methods/sepa-debit).
 </Callout>
-### Add Upsells
+## Add Upsells
 
 Add additional products (line items) to the original order through the [ordersAddLineItemsCreate](/docs/admin-api/reference/orders/ordersAddLineItemsCreate) API. Adding items to the order will automatically re-use the order's initial payment method to collect payment for the additional products.
 
@@ -122,7 +122,7 @@ Check `supports_post_purchase_upsells` on the initial order create response befo
 <Callout type="warn">
 The `ordersAddLineItemsCreate` API requires that the order initial **payment method** supports merchant initiated charges. See the [Payment Methods](/docs/admin-api/guides/payment-methods) capability matrix for which methods support upsells.
 </Callout>
-### Cart / Order / Upsell lines Detail
+## Cart / Order / Upsell lines Detail
 Cart, Order, and Upsell line items represent the products the customer is purchasing. When an order is created, the product fulfillment location will be automatically chosen based on product stock records and inventory availability.
 
 ```json title="Specify Line Items and Currency"
@@ -140,7 +140,7 @@ Cart, Order, and Upsell line items represent the products the customer is purcha
 <Callout type="idea">
 Ensure you use the variant product ID for order line items. **Single variant products still contain a variant product future product management to add additional variants.**
 </Callout>
-#### Subscription Line Items
+### Subscription Line Items
 
 Lines also accept an optional `subscription` object to specify a subscription that will be automatically created after the initial order is successfully created.
 
@@ -165,7 +165,7 @@ Subscription line items have two `price` fields available. The order line item l
 <Callout type="warn">
 Orders with Subscription line items **must have an initial payment** (order total > 0.00) to validate and retain the bankcard for future usage.
 </Callout>
-#### Custom Line Item Properties
+### Custom Line Item Properties
 
 Lines accept an optional `properties` object of key/value pairs to capture customization details for personalized or made-to-order products, such as an engraving, monogram, or gift message. The values are stored on the line item and persist to the created order (and to the subscription line item when the line creates a subscription).
 
@@ -185,7 +185,7 @@ Lines accept an optional `properties` object of key/value pairs to capture custo
 <Callout type="info">
 Line item `properties` are used to determine the uniqueness of line item products and flow all the way through to fulfillment order line items for customized product fulfillment.
 </Callout>
-### Cart / Order User Detail
+## Cart / Order User Detail
 
 The `user` object on carts/orders represents the **customer** which includes their contact details.  Below are the recommended fields to pass for the user for ease of use and support of external integrations that may rely on the data, i.e. `user_agent`.
 
@@ -207,7 +207,7 @@ Users are first checked for an existing user by `email` before creating a new us
 <Callout type="warn">
 **It is not recommended to pass `phone_number` directly on the user when creating a cart or order, we recommend passing a local phone number in the `shipping_address` instead.** Address fields have country context, which allows local phone numbers to be passed and converted to [E.164 format](https://en.wikipedia.org/wiki/E.164) before being saved. A `phone_number` passed to the `user` object directly must be in E.164 format.
 </Callout>
-### Cart / Order Attribution Detail
+## Cart / Order Attribution Detail
 Cart and Order `attribution` object sets the [marketing attribution](https://docs.nextcommerce.com/docs/features/offers/marketing-attribution) on the order for tracking the source of orders and use in orders reporting. You can also pass in [metadata](https://docs.nextcommerce.com/docs/build-a-store/technical-settings/metadata-fields-and-tags) fields that are configured on the store to track custom attribution parameters and integrate external tracking platforms.
 
 ```json title="Attribution Detail"
@@ -219,7 +219,7 @@ Cart and Order `attribution` object sets the [marketing attribution](https://doc
 }
 ```
 
-### Order Shipping Detail
+## Order Shipping Detail
 
 ```json title="Shipping Detail"
 "shipping_code": "default",
@@ -227,7 +227,7 @@ Cart and Order `attribution` object sets the [marketing attribution](https://doc
 ```
 The `shipping_code` is an optional field to specify the Shipping Method to be used for the order, **if not passed, the cheapest Shipping Method will be used**.  `shipping_price` is also optional and provides a way to override the configured price for the Shipping Method of the order allowing you to discount or charge an upsell for shipping on the order.
 
-### Order Addresses Detail
+## Order Addresses Detail
 The `shipping_address` object on the order represents the address where the order will be shipped, and similarly for the `billing_address`. The first `shipping_address` and `billing_address` created for a user is automatically set as their default shipping and billing address, [see API Reference](/docs/admin-api/reference/orders/ordersCreate).
 
 <Callout type="idea">
@@ -250,7 +250,7 @@ Use `billing_same_as_shipping_address` to forego having to pass a full duplicate
 - User `phone_number` is automatically saved from the user's first address if they do not have an existing `phone_number`.
 - In a "Two Step" flow where the customer address is collected before creating the order, create an address for the user and then pass the `use_default_shipping_address` and `use_default_billing_address` as true on the `orders_create` request.
 </Callout>
-### Order Payment Detail
+## Order Payment Detail
 
 The order `payment_method` and `payment_details` objects work in tandem to specify the payment method for the order and provide any additional data that may be required per payment method.
 
@@ -266,14 +266,14 @@ The example below uses a [Test Card Token](/docs/admin-api/guides/testing-guide)
 ```
 
 To route the order to a specific gateway or gateway group, include `payment_gateway` or `payment_gateway_group` (an id, never both) inside `payment_details`. See [Gateway Routing](/docs/admin-api/guides/payment-methods/bankcard#gateway-routing) in the Bankcard guide.
-#### Statement Descriptor
+### Statement Descriptor
 
 Merchants have the option to pass a custom `statement_descriptor` on orders so the end customer will more easily recognize the charge on their card bank statement. Using this field will override all subsequent transactions for the bankcard, even across payment gateways. 
 
 <Callout type="info" title="Statement Descriptor Validation">
 Descriptors can be up to 22 alphanumeric characters, spaces, and these special characters: `& , . - #`.  Passing in an invalid statement descriptor will be ignored.
 </Callout>
-#### Payment Method Guides
-See the [**Payment Methods**](/docs/admin-api/guides/payment-methods) section for method-specific guides on creating orders, plus the full capability matrix (flow type, express checkout, upsell, and subscription support per method).
+### Payment Method Guides
+See the [Payment Methods](/docs/admin-api/guides/payment-methods) section for method-specific guides on creating orders, plus the full capability matrix (flow type, express checkout, upsell, and subscription support per method).
 
 **[View all payment methods →](/docs/admin-api/guides/payment-methods)**

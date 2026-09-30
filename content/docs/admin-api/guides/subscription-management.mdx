@@ -13,7 +13,7 @@ Subscriptions management can be done through Admin API to automate business proc
 <Callout type="info">
 Subscription management actions most often times will only affect future renewals orders/charges of the subscription.
 </Callout>
-### Create Subscription
+## Create Subscription
 
 Subscriptions can be created directly through the [subscriptionsCreate](/docs/admin-api/reference/subscriptions/subscriptionsCreate) Admin API endpoint for scenarios such as custom order flows or importing subscriptions from another platform.
 
@@ -46,11 +46,11 @@ Subscriptions can be created directly through the [subscriptionsCreate](/docs/ad
 }
 ```
 
-### Updating Products & Pricing
+## Updating Products & Pricing
 
 Updating subscription recurring items and pricing can be done through [subscriptionLinesCreate](/docs/admin-api/reference/subscriptions/subscriptionsLinesCreate), [subscriptionLinesUpdate](/docs/admin-api/reference/subscriptions/subscriptionsLinesUpdate), and [subscriptionsLinesDestroy](/docs/admin-api/reference/subscriptions/subscriptionsLinesDestroy) endpoints.
 
-**Adding an Additional Product**
+### Adding an Additional Product
 
 To add a new product to a subscription, use the [subscriptionLinesCreate](/docs/admin-api/reference/subscriptions/subscriptionsLinesCreate) Admin API endpoint with the product, price, and quantity details.
 
@@ -62,7 +62,7 @@ To add a new product to a subscription, use the [subscriptionLinesCreate](/docs/
 }
 ```
 
-**Updating an Existing Line Item Product Price**
+### Updating an Existing Line Item Product Price
 
 To update and existing product price and quantity on a subscription line, use the [subscriptionsLinesUpdate](/docs/admin-api/reference/subscriptions/subscriptionsLinesUpdate) Admin API endpoint with the new price, and new quantity details.
 
@@ -73,7 +73,7 @@ To update and existing product price and quantity on a subscription line, use th
 }
 ```
 
-**Removing a Product**
+### Removing a Product
 
 To remove a product from a subscription, send a DELETE request to the [subscriptionsLinesDestroy](/docs/admin-api/reference/subscriptions/subscriptionsLinesDestroy) endpoint to remove the line item (ie the product) from future renewal orders created from the subscription.
 
@@ -84,7 +84,7 @@ To remove a product from a subscription, send a DELETE request to the [subscript
 <Callout type="warn">
 Subscriptions must have at least one line item with a product, you can alternatively cancel the subscription to stop all future renewals.
 </Callout>
-### Updating Renewal Schedule
+## Updating Renewal Schedule
 
 Changing the renewal schedule of a subscription can be achieved with a PATCH request to the [subscriptionsPartialUpdate](/docs/admin-api/reference/subscriptions/subscriptionsPartialUpdate) endpoint with a new `interval` and `interval_count`, ie 30 days.
 
@@ -96,7 +96,7 @@ Changing the renewal schedule of a subscription can be achieved with a PATCH req
 }
 ```
 
-### Changing Next Renewal Date
+## Changing Next Renewal Date
 
 Changing the next renewal date of a subscription can be achieved through updating the `next_renewal_date` key on the subscription object with a PATCH request to the [subscriptionsPartialUpdate](/docs/admin-api/reference/subscriptions/subscriptionsPartialUpdate) endpoint with your new renewal date and time.
 
@@ -110,7 +110,7 @@ Changing the next renewal date of a subscription can be achieved through updatin
 If you would like to immediately renew the subscription, you can pass a date from the past and the subscription will process a renewal attempt within the next 30 minutes.
 </Callout>
 
-### Triggering a Renewal
+## Triggering a Renewal
 
 To immediately trigger a renewal order for an active subscription, use the [subscriptionsRenewCreate](/docs/admin-api/reference/subscriptions/subscriptionsRenewCreate) endpoint. This creates a new renewal order on demand without waiting for the next scheduled renewal date.
 
@@ -124,7 +124,7 @@ The endpoint returns the full subscription object with updated renewal details o
 The subscription must be in an `active` status to trigger a renewal. For subscriptions in `past_due` status, use the [subscriptionsRetryCreate](/docs/admin-api/reference/subscriptions/subscriptionsRetryCreate) endpoint instead.
 </Callout>
 
-### Identifying Subscription Charges
+## Identifying Subscription Charges
 
 When a `transaction.created` webhook is associated with a subscription, `data.subscription` contains the subscription ID and billing cycle:
 
@@ -147,11 +147,11 @@ When a `transaction.created` webhook is associated with a subscription, `data.su
 
 The subscription object is empty when the transaction is not associated with a subscription.
 
-### Updating Payment Details
+## Updating Payment Details
 
 Updating the Payment Gateway of a subscription can done through the [subscriptionsPartialUpdate](/docs/admin-api/reference/subscriptions/subscriptionsPartialUpdate) endpoint.
 
-**Changing Payment Gateway**
+### Changing Payment Gateway
 
 To change the payment gateway used for bankcard payments of a subscription, send a PATCH request to the [subscriptionsPartialUpdate](/docs/admin-api/reference/subscriptions/subscriptionsPartialUpdate) endpoint with the new `payment_gateway`.
 
@@ -163,7 +163,7 @@ To change the payment gateway used for bankcard payments of a subscription, send
 }
 ```
 
-**Updating Bankcard Payment Method**
+### Updating Bankcard Payment Method
 
 To change the bankcard on a subscription, pass a new `card_token` with a PATCH request to the [subscriptionsPartialUpdate](/docs/admin-api/reference/subscriptions/subscriptionsPartialUpdate) endpoint.
 
@@ -203,7 +203,7 @@ stateDiagram-v2
 }
 ```
 
-### Retrying Renewal
+## Retrying Renewal
 
 Subscriptions that are `past_due` status can be attempted to retry the renewal, often combined with a new `payment_gateway`, by using the [subscriptionsRetryCreate](/docs/admin-api/reference/subscriptions/subscriptionsRetryCreate) endpoint.
 
@@ -216,7 +216,7 @@ Subscriptions that are `past_due` status can be attempted to retry the renewal, 
 <Callout type="idea">
 The subscription retry endpoint is useful for custom recovery logic when attempting to recover failing subscriptions.
 </Callout>
-### Pause
+## Pause
 
 To temporarily stop renewals on an active subscription without cancelling it, use the [subscriptionsPauseCreate](/docs/admin-api/reference/subscriptions/subscriptionsPauseCreate) endpoint. Pausing is useful for win-back flows, customer-requested holds, or pausing a cohort during inventory or fulfillment issues.
 
@@ -240,7 +240,7 @@ To resume a paused subscription before its `pause_until` date — or to reactiva
 }
 ```
 
-### Cancel
+## Cancel
 
 To cancel a subscription, use the [subscriptionsCancelCreate](/docs/admin-api/reference/subscriptions/subscriptionsCancelCreate) endpoint to stop all future renewals.
 
@@ -253,7 +253,7 @@ To cancel a subscription, use the [subscriptionsCancelCreate](/docs/admin-api/re
 }
 ```
 
-### Bulk Subscription Actions
+## Bulk Subscription Actions
 
 <Callout type="idea">
 The [`/next-bulk-subscription`](https://github.com/NextCommerceCo/skills/tree/main/next-bulk-subscription) skill in the Next Commerce AI skills repo wraps this workflow — CSV ingestion, dry-run validation, rate limiting, and results reporting for bulk pauses, cancellations, renewal-date shifts, and other subscription updates — for Claude Code, Cursor, and other AI coding agents.

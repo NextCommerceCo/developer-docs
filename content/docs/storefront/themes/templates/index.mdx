@@ -6,14 +6,14 @@ sidebar_position: 1
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
-### Introduction
+## Introduction
 
 The storefront theme templates language is designed to be both powerful and easy to use. If you have any exposure to working with other text-based template languages such as Jinja2 or Liquid, you should feel right at home.
 
 <Callout type="idea">
 The storefront theme template system provides **tags, filters** and **variables** for control flow logic inside of a template.
 </Callout>
-### Variables
+## Variables
 
 Variables look like this: `{{ variable }}`  and contain the content the template uses to render to the page. Variables contain a dictionary structure of content and use . notation to access attributes.
 
@@ -34,7 +34,7 @@ Variables look like this: `{{ variable }}`  and contain the content the template
 </Tab>
 </Tabs>
 
-### Filters
+## Filters
 
 Filters allow you to modify the output of a variables and look like this `{{ customer.name|title }}`. This would display the value of `{{ customer.name }}` after being filtered there the title filter to make format the string to title case.  See built-in filter reference.
 
@@ -57,7 +57,7 @@ Filters allow you to modify the output of a variables and look like this `{{ cus
 </Tabs>
 
 
-### Tags
+## Tags
 
 Tags can do many things such as control flow, iterations, template inheritance, and theme translations. Tags look like this `{% tag %}` . [See built-in tag reference](/docs/storefront/themes/templates/tags).
 

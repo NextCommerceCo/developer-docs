@@ -9,7 +9,7 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 Products can have very diverse design requirements that often require custom layouts. In this guide, we'll go over some of the best practices for creating and managing custom product templates.
 
-### Product Templates Location
+## Product Templates Location
 
 In the `templates/catalogue` directory of a theme, theme developers can edit/manage the product page templates.
 
@@ -20,9 +20,9 @@ catalogue
   └── product.<custom2>.html
 ```
 
-### Extend & Override
+## Extend & Override
 
-**Create a Custom Product Template**
+### Create a Custom Product Template
 
 Create a new product template in the **templates>catalogue** directory with the following naming convention:
 
@@ -33,7 +33,7 @@ templates/catalogue/product.<custom>.html
 Templates that follow this naming convention will be selectable on the product detail to use on the storefront.
 
 
-**Extend & Override Default Product Template**
+### Extend & Override Default Product Template
 
 As a best practice, you should [extend](/docs/storefront/themes/templates/tags#extends--block) the default product template to override the necessary [template blocks](/docs/storefront/themes/templates/tags#extends--block) to achieve your customization with a limited amount of duplicate code.
 
@@ -56,7 +56,7 @@ As a best practice, you should [extend](/docs/storefront/themes/templates/tags#e
 This strategy will simplify the creation and management of custom product templates so you can focus on the customized areas for the new custom product template.
 
 
-**Select Template for Product**
+### Select Template for Product
 
 On your product of choice, select your newly created template as the Product Template to activate the template on your product in the storefront.
 

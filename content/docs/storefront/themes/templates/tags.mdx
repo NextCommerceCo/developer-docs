@@ -9,7 +9,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 Template tags enable theme developers to include and extend templates and blocks, add logical operators, query and filter data, and much more. See all available template tags below.
 
-### app_asset_url
+## app_asset_url
 
 The `app_asset_url` tag is used to reference asset files included in app snippets.
 
@@ -17,7 +17,7 @@ The `app_asset_url` tag is used to reference asset files included in app snippet
 <script src=="{% app_asset_url 'assets/my-app.js' %}"></script>
 ```
 
-### app_hook
+## app_hook
 
 The `app_hook` tag specifies a theme storefront location Apps can inject snippets into to extend storefront templates from Apps. Theme developers should ensure their templates include all available `app_hooks` to ensure compatibility with all Apps.
 
@@ -33,7 +33,7 @@ import AppHookLocations from '../../../../_snippets/_app-hook-locations.mdx';
 <AppHookLocations />
 
 
-### add_query_param
+## add_query_param
 
 The `add_query_param` tag appends or updates a query parameter on the current URL. Commonly used for building pagination links and filter URLs while preserving existing query parameters.
 
@@ -65,7 +65,7 @@ The `add_query_param` tag appends or updates a query parameter on the current UR
 | param_name | The query parameter name to set, eg `'page'`. |
 | value | The value to assign to the parameter. |
 
-### annotate_form_field
+## annotate_form_field
 
 The `annotate_form_field` tag adds HTML attributes to a form field based on its Django form field properties (required, type, etc.). Useful for adding client-side validation and accessibility attributes.
 
@@ -74,7 +74,7 @@ The `annotate_form_field` tag adds HTML attributes to a form field based on its 
 {{ field }}
 ```
 
-### boolean operators
+## boolean operators
 If tags may be used in combination with boolean operators for conditional control flow.
 
 | Operator     | Description |
@@ -93,7 +93,7 @@ If tags may be used in combination with boolean operators for conditional contro
 | `<=`      | less than or equal to |
 | `>=`      | greater than or equal to |
 
-### cart_form
+## cart_form
 
 The `cart_form` tag generates an add-to-cart form for a product. Required on every product page to enable purchasing.
 
@@ -156,7 +156,7 @@ The tag returns a form object, not rendered HTML. Loop over it to render each fi
 
 Add [line item property](/docs/storefront/themes/guides/personalized-products) inputs to this form to capture customer personalization such as an engraving or gift message.
 
-### comment
+## comment
 
 Ignores everything between `{% comment %}` and `{% endcomment %}`. An optional note may be inserted in the first tag. For example, this is useful when commenting out code for documenting why the code was disabled.
 
@@ -167,7 +167,7 @@ Ignores everything between `{% comment %}` and `{% endcomment %}`. An optional n
 {% endcomment %}
 ```
 
-### core_js
+## core_js
 
 The `core_js` tag outputs the platform's core JavaScript bundle. This is required in every theme's base layout and powers cart functionality, AJAX form submissions, CSRF token handling, and other platform features.
 
@@ -188,7 +188,7 @@ The `core_js` tag outputs the platform's core JavaScript bundle. This is require
 jQuery must be loaded before `{% core_js %}`. The platform's core JavaScript depends on jQuery being available in the global scope.
 </Callout>
 
-### csrf_token
+## csrf_token
 
 This tag is used for CSRF protection and required on any template with a form that sends a POST request to the back end.
 
@@ -200,7 +200,7 @@ This tag is used for CSRF protection and required on any template with a form th
 </form>
 ```
 
-### extends & block
+## extends & block
 
 Extends and block tags allow you to define blocks of content in a base template that can be overridden by templates that extend from it for template inheritance.
 
@@ -250,7 +250,7 @@ Extends and block tags allow you to define blocks of content in a base template 
 </Tab>
 </Tabs>
 
-### for
+## for
 
 Loops over each item in array, making the item available in a context variable. For example, to display a list of products provided in the `{{ products }}` variable.
 
@@ -262,7 +262,7 @@ Loops over each item in array, making the item available in a context variable. 
 </ul>
 ```
 
-### if, elif, & else
+## if, elif, & else
 Use the if tag to evaluate if a variable is "true" and control the contents displayed.
 
 ```django title="if, elif, & else"
@@ -275,7 +275,7 @@ Use the if tag to evaluate if a variable is "true" and control the contents disp
 {% endif %}
 ```
 
-### include
+## include
 
 Loads a template and renders it with the current context. This is a way of including other templates within a template.
 
@@ -290,7 +290,7 @@ Loads a template and renders it with the current context. This is a way of inclu
 <Callout type="warn">
 A word of caution, multi-level inclusion inside of iterative loops can create performance penalties while rendering a page html for site visitors. Use **includes** sparingly when working inside iterative loops.
 </Callout>
-### image_thumbnail
+## image_thumbnail
 The `image_thumbnail` tag is used to resize images dynamically in templates. The tag accepts arguments that control how the image is resized.
 
 ```django title="image_thumbnail"
@@ -314,13 +314,13 @@ The `image_thumbnail` tag is used to resize images dynamically in templates. The
 |padding|Padding is a boolean and controls if the image should be padded to fit the specified geometry.|
 
 
-### now
+## now
 
 Displays the current date and/or time, using a format according to the given string. [See available date reference for format options](https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date).
 
 
 
-### purchase_info_for_product
+## purchase_info_for_product
 
 The `purchase_info_for_product` tag is used to retrieve the price of a product in the current user session's currency.
 
@@ -337,7 +337,7 @@ The `purchase_info_for_product` tag is used to retrieve the price of a product i
 | product | Must pass the current `product` context object. |
 
 
-### purchase_info_for_line
+## purchase_info_for_line
 
 The `purchase_info_for_line` tag retrieves the price and availability of a cart line item in the current session's currency. Works the same as `purchase_info_for_product` but accepts a cart line object.
 
@@ -353,7 +353,7 @@ The `purchase_info_for_line` tag retrieves the price and availability of a cart 
 | request | Must pass the current `request` context object. |
 | line | Must pass a cart `line` context object. |
 
-### render_field
+## render_field
 
 The `render_field` tag renders a form field with additional HTML attributes. Use it to add CSS classes, placeholders, and other attributes to Django form fields in templates.
 
@@ -379,7 +379,7 @@ The `render_field` tag renders a form field with additional HTML attributes. Use
 | field | The form field object to render. |
 | attributes | HTML attributes to add, using `attr="value"` or `attr+="value"` (append) syntax. |
 
-### seo
+## seo
 The `seo` tag generates SEO meta data for products in standardized format for consumption by 3rd party systems.
 
 ```django title="seo"
@@ -388,7 +388,7 @@ The `seo` tag generates SEO meta data for products in standardized format for co
 The tag is expected to be added to the top of product details template to generate necessary SEO meta data.
 
 
-### t
+## t
 
 The `t` (translation) tag is used to display localized content from a theme's translations files. The t tag accepts a key and additional replacement variable arguments to access the theme translations and return the language appropriate string for display to the user.
 
@@ -396,7 +396,7 @@ The `t` (translation) tag is used to display localized content from a theme's tr
 {% t 'customer.orders.order_count' with count=orders.count %}
 ```
 
-### url
+## url
 
 Returns an absolute url path reference matching a given view with parameters. See the URL & Template Path reference for a list of all URL names to use with the `{% url %}` template tag.
 
@@ -404,7 +404,7 @@ Returns an absolute url path reference matching a given view with parameters. Se
 <a href="{% url 'blog:blog-list' %}">Blog</a>
 ```
 
-### where
+## where
 
 Queries and filters store objects to dynamically assign objects to a variable.
 

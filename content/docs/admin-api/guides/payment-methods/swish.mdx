@@ -11,13 +11,13 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 Swish transactions send the customer through a hosted payment flow, with the resulting order information returned to your application. Before using Swish, make sure it is enabled for the NEXT Payments account and store. Swish is available for eligible Swedish checkout traffic in SEK.
 
-### API Payment Redirect Flow
+## API Payment Redirect Flow
 
 import RedirectPaymentFlow from '../../../../_snippets/_redirect-payment-flow.mdx';
 
 <RedirectPaymentFlow />
 
-### Create Order on Admin API
+## Create Order on Admin API
 
 When creating an order with the `orders_create` API method, specify `payment_method=swish` and provide a `payment_return_url`. The `payment_return_url` is your endpoint that receives a POST request containing the final order data.
 
@@ -36,7 +36,7 @@ When creating an order with the `orders_create` API method, specify `payment_met
 You can optionally provide a `payment_gateway` or `payment_gateway_group` to route the order through a specific eligible NEXT Payments configuration.
 </Callout>
 
-### Redirect Customer to Swish
+## Redirect Customer to Swish
 
 The order response provides a `payment_complete_url`. Redirect the customer to this URL to complete the payment with Swish.
 
@@ -47,16 +47,16 @@ The order response provides a `payment_complete_url`. Redirect the customer to t
 }
 ```
 
-### Receiving Order Data
+## Receiving Order Data
 
 import RedirectPaymentStep3 from '../../../../_snippets/_redirect-payment-flows-step-3.mdx';
 
 <RedirectPaymentStep3 />
 
-### Upsells
+## Upsells
 
 One-click post-purchase upsells are not supported with Swish payments.
 
-### Recurring
+## Recurring
 
 Swish cannot be used as the payment method for subscription items.

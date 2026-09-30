@@ -17,20 +17,20 @@ import IntroTheme from '../../../../_snippets/_view-intro-theme.mdx';
 Ensure your template paths match with expected template paths for built-in storefront views. Use the public themes on [GitHub](https://github.com/NextCommerceCo/) as a reference guide and starting point. All URL paths are automatically localized to the users language following your store's Localization settings.
 </Callout>
 
-### Homepage
+## Homepage
 
 | URL Name | URL Path | Template Path |
 | --- | --- | --- |
 | N/A | / | templates/index.html |
 
-### Blog
+## Blog
 
 | URL Name | URL Path & Arguments | Template Path |
 | --- | --- | --- |
 | blog:blog-list | /blog/ | templates/blog/index.html |
 | blog:blog-detail | /blog/detail/:post_slug/ | templates/blog/post.html |
 
-### Cart
+## Cart
 
 | URL Name | URL Path | Template Path |
 | --- | --- | --- |
@@ -40,7 +40,7 @@ Ensure your template paths match with expected template paths for built-in store
 | cart:vouchers-add | POST /cart/vouchers/add/ | N/A (action endpoint) |
 | cart:vouchers-remove | POST /cart/vouchers/remove/:voucher_id/ | N/A (action endpoint) |
 
-### Catalogue
+## Catalogue
 
 | URL Name | URL Path & Arguments | Template Path |
 | --- | --- | --- |
@@ -50,33 +50,33 @@ Ensure your template paths match with expected template paths for built-in store
 
 
 
-### Checkout
+## Checkout
 
 | URL Name | URL Path & Arguments | Template Path |
 | --- | --- | --- |
 | checkout:shipping-address | checkout/* | checkout/checkout.html |
 
-### Pages
+## Pages
 
 | URL Name | URL Path & Arguments | Template Path |
 | --- | --- | --- |
 | N/A | /:page_slug | templates/pages/page.html |
 
 
-### Reviews
+## Reviews
 | URL Name | URL Path & Arguments | Template Path |
 | --- | --- | --- |
 | catalogue:reviews-list | /catalogue/:product_slug/reviews/ | templates/reviews/index.html |
 | catalogue:reviews-detail | /catalogue/:product_slug/reviews/:id/ | templates/reviews/review.html |
 | catalogue:reviews-add | /catalogue/:product_slug/reviews/add/ | templates/reviews/form.html |
 
-### Search
+## Search
 
 | URL Name | URL Path | Template Path |
 | --- | --- | --- |
 | search:search | /search/ | templates/search.html |
 
-### Support
+## Support
 
 | URL Name | URL Path | Template Path |
 | --- | --- | --- |
@@ -84,7 +84,7 @@ Ensure your template paths match with expected template paths for built-in store
 | support:article-list | /support/categories/:category_slug/ | templates/support/category.html |
 | support:article-detail | /support/articles/:article_slug/ | templates/support/article.html |
 
-### Customer / Authentication
+## Customer / Authentication
 
 | URL Name | URL Path | Template Path |
 | --- | --- | --- |
@@ -93,7 +93,7 @@ Ensure your template paths match with expected template paths for built-in store
 | customer:summary | /accounts/ | N/A (platform-managed) |
 | customer:support-ticket-create | /accounts/support/create/ | N/A (platform-managed) |
 
-### Localization
+## Localization
 
 These are POST action endpoints used in forms for switching language, currency, or storefront geo.
 
@@ -103,13 +103,13 @@ These are POST action endpoints used in forms for switching language, currency, 
 | core:set-currency | POST | Change the active currency. |
 | core:set-storefront | POST | Change the active storefront geo (country, language, currency). |
 
-### API
+## API
 
 | URL Name | URL Path | Description |
 | --- | --- | --- |
 | storefrontapi:graphql | /api/graphql/ | [Storefront GraphQL API](/docs/storefront/graphql) endpoint. |
 
-### Error Pages
+## Error Pages
 
 | URL Name | URL Path | Template Path |
 | --- | --- | --- |

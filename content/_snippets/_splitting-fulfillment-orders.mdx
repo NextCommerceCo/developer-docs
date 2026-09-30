@@ -4,7 +4,7 @@ Splitting a fulfillment order moves some items onto a second fulfillment order a
 
 Use it when a location can ship part of what it was sent but not all of it. Split off items that cannot be shipped and then fulfill the remaining items. The split items become their own fulfillment order, which can be moved, held, or cancelled separately. The alternative is rejecting the whole request, which sends the order back to the merchant to amend and request fulfillment again.
 
-#### Split a Fulfillment Order
+### Split a Fulfillment Order
 
 Use the [fulfillmentOrdersSplit](/docs/admin-api/reference/fulfillment/fulfillmentOrdersSplit) endpoint, passing the line items and quantities to move onto the new fulfillment order. Both `id` and `quantity` are required for each entry.
 
@@ -37,7 +37,7 @@ The response returns both fulfillment orders, so you can see the resulting split
 
 The split fulfillment order inherits the original's status, request status, shipping address, shipping method, and assigned location. A `fulfillment_order_split` event is added to the order timeline.
 
-#### Split Rules
+### Split Rules
 
 - Each line must belong to the fulfillment order being split.
 - `quantity` cannot exceed that line's `fulfillable_quantity`.

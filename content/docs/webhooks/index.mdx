@@ -8,7 +8,7 @@ Use webhooks to be notified about events that happen in your store.
 
 Stores can send webhooks that notify your application anytime an event happens. This is especially useful for building custom reporting solutions that need to receive data on order or customer activity.
 
-### Why Webhooks
+## Why Webhooks
 
 Webhooks are an efficient way to sync data from a store in near real time, keeping your app up to date without the overhead of traditional polling. See the example below for subscribing to `order.created` events.
 
@@ -20,7 +20,7 @@ sequenceDiagram
   Store->>App: Sends order.created event payload
 ```
 
-### Use Cases
+## Use Cases
 
 Common use cases include, but are not limited to:
 
@@ -30,7 +30,7 @@ Common use cases include, but are not limited to:
 - Integrating with dispute management services
 
 
-### Setting Up Webhooks
+## Setting Up Webhooks
 
 You can register new webhooks through **Settings > Webhooks** or the Admin API to send event data to your application endpoint. For each webhook, you can subscribe to all events or select specific events to send to your endpoint. See a list of all events and example event data below.
 
@@ -44,7 +44,7 @@ Webhook handlers should also complete within about 20 seconds. Longer-running en
 Returning a `410` response code indicates the target resource is no longer available and will automatically disable the webhook.
 </Callout>
 
-### Delivery Guarantees
+## Delivery Guarantees
 
 Webhooks are delivered at least once. Every event is queued and retried until your endpoint returns a `200`. The `event_id` stays the same across retries of the same event, so you can use it to skip events you've already processed.
 
@@ -56,7 +56,7 @@ Because events can arrive out of order, use the timestamps in the payload data t
 
 We also recommend processing events asynchronously so that spikes in delivery volume don't overwhelm your endpoint.
 
-### Webhook Events
+## Webhook Events
 
 | Event                     | Description                          | Reference |
 | -----------               | ------------------------------------ | ----- |
@@ -95,7 +95,7 @@ There is no renewal-specific event. A renewal charge arrives as `transaction.cre
 Chargebacks and pre-chargeback alerts both arrive as `dispute.created` and `dispute.updated`; the dispute's `type` field says which it is. See the [Disputes guide](https://docs.nextcommerce.com/docs/features/payments/disputes-guide).
 </Callout>
 
-### Webhook Data Structure
+## Webhook Data Structure
 
 Webhook payloads follow the same structure as Admin API data serializers, which makes them predictable. In general, the data in a webhook payload matches the data you would get by retrieving the same resource through the API. You can set up test webhooks and view the webhook logs in the dashboard to help build and verify your receiver.
 
@@ -148,16 +148,16 @@ Below is a full example of a webhook payload for a `customer.created` event to d
 }
 ```
 
-### Webhook API Versions
+## Webhook API Versions
 
 Webhook object data structure follows the [Admin API](/docs/admin-api) and Admin API versioning to ensure predictable data structure for existing webhook receiver endpoints with a path for upgrades.
 
-**Handling Webhook API Versions**
+### Handling Webhook API Versions
 
 Your app can add handling logic using the `api_version` key when receiving and processing data to handle multiple webhook data structures while upgrading to a newer webhook api version.
 
 
-### Verifying Webhook Requests
+## Verifying Webhook Requests
 
 Webhook endpoints are generally open to the internet and therefore it's a best practice to verify the payload data.
 

@@ -7,7 +7,7 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 Session tokens are a method your app can use to authenticate users and requests from Next Commerce and your App.
 
-### How Session Tokens Work
+## How Session Tokens Work
 
 Session tokens follow the [JSON Web Tokens](https://jwt.io/introduction) standard. JWT tokens are signed objects your app can use to authenticate users to your app, see the example decoded token below. The JWT token is appended to requests to your app in the `token` parameter.
 
@@ -41,11 +41,11 @@ print(token)
 Tokens include details of the store and the store user (id & email) making the request. A valid token can be trusted as a verified request from a store with your app installed.
 
 
-### Token Expiration
+## Token Expiration
 
 Tokens are shortlived with an expiration of 30 seconds, meaning they quickly expire and cannot be reused. It is recommended that you authenticate the users into your App with every request.
 
-### Session Token Flow
+## Session Token Flow
 
 Session tokens are generated from the store dashboard and can be used by your App to verify request authenticity before authenticating the user to your app.
 

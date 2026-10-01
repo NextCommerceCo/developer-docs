@@ -1,6 +1,6 @@
 <!--
 title: Customer and Shipping Fields
-description: The customer's name, email and phone written by hand, then a shipping address the SDK builds for the selected country with data-next-address.
+description: The customer's name, email and phone written by hand, then a shipping and a billing address the SDK builds for the selected country with data-next-address.
 order: 1
 layout: center
 -->
@@ -25,6 +25,14 @@ layout: center
     postcode, and a field the country does not collect is left out. City,
     state and postcode stay hidden until the street address has a value.
 
+  BILLING ADDRESS  (data-next-address="billing")
+    A second block inside the different-billing-address section. It builds the
+    same fields as the shipping block, named billing-address1, billing-city
+    and so on, and asks for a name and phone of its own: the name on a bill
+    can differ from the one on the parcel. The checkbox named
+    use_shipping_address opens and closes the section. Checked means billing
+    matches shipping, and the SDK collapses it.
+
   ADDRESS SUGGESTIONS  (addressConfig.enableAutocomplete)
     Typing a street address offers whole addresses; picking one fills the
     city, state, postcode and country. They attach to the address1 field by
@@ -37,7 +45,7 @@ layout: center
 
   STYLING
     The SDK ships no styling for the block. The <style> below has two parts:
-    the page (card, headings, contact fields, button), then the address block's
+    the page (card, alert, headings, contact fields, checkbox, button), then the address block's
     rules copied unchanged from the checkout guide's "Styling" section. The
     contact fields follow the block's markup (a wrapper holding the input, then
     its label) so both look the same.
@@ -72,6 +80,16 @@ layout: center
     color: #111827;
     color-scheme: light;
     font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+  .checkout-demo .alert {
+    margin-bottom: 24px;
+    padding: 12px 14px;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    background: #eff6ff;
+    color: #1e3a8a;
+    font-size: 14px;
+    line-height: 1.5;
   }
   .checkout-demo h2 {
     margin: 0 0 16px;
@@ -133,6 +151,60 @@ layout: center
     margin-top: 4px;
     color: #dc2626;
     font-size: 12px;
+  }
+  /* Placeholder rows while an address block has no fields yet: before the SDK
+     has loaded, then while it fetches the country's layout. */
+  .checkout-demo [data-next-address]:empty {
+    position: relative;
+    min-height: 192px;
+    overflow: hidden;
+  }
+  /* Three field-sized bars: the first, and two copies of it as shadows. */
+  .checkout-demo [data-next-address]:empty::before {
+    content: '';
+    display: block;
+    height: 48px;
+    border-radius: 8px;
+    background: #e9ecef;
+    box-shadow: 0 64px #e9ecef, 0 128px #e9ecef;
+  }
+  .checkout-demo [data-next-address]:empty::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -55%;
+    width: 55%;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.12) 35%,
+      rgba(255, 255, 255, 0.55) 50%,
+      rgba(255, 255, 255, 0.12) 65%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: checkout-demo-shimmer 0.95s linear infinite;
+  }
+  @keyframes checkout-demo-shimmer {
+    0% {
+      left: -55%;
+    }
+    100% {
+      left: 100%;
+    }
+  }
+  /* Keeps the billing section shut before the SDK loads. The SDK then holds
+     it shut itself while the box is ticked. */
+  .checkout-demo .checkbox:has(:checked) + [data-next-component='different-billing-address'] {
+    height: 0;
+    overflow: hidden;
+  }
+  .checkout-demo .checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: 15px;
   }
   .checkout-demo button[type='submit'] {
     width: 100%;
@@ -219,6 +291,10 @@ layout: center
 </style>
 
 <form data-next-checkout="form" class="checkout-demo">
+  <div class="alert" role="note">
+    Contact fields, plus shipping and billing addresses the SDK builds for the
+    selected country.
+  </div>
   <section>
     <h2 data-next-i18n="checkout.contact.title">Contact</h2>
     <div class="row">
@@ -283,6 +359,19 @@ layout: center
   <section>
     <h2 data-next-i18n="checkout.shipping.title">Shipping address</h2>
     <div data-next-address="shipping"></div>
+  </section>
+
+  <section>
+    <label class="checkbox">
+      <input type="checkbox" name="use_shipping_address" checked />
+      <span data-next-i18n="checkout.billing.same_as_shipping">
+        Use shipping address as billing address
+      </span>
+    </label>
+    <div data-next-component="different-billing-address">
+      <h2 data-next-i18n="checkout.billing.title">Billing address</h2>
+      <div data-next-address="billing"></div>
+    </div>
   </section>
 
   <button type="submit">Continue</button>

@@ -1,0 +1,498 @@
+<!--
+title: Payment Methods
+description: Express buttons, a card form with hosted card fields, and a list of other payment methods the shopper pays with at the provider.
+order: 2
+layout: center
+-->
+
+<!--
+  HOW THIS WORKS:
+  ─────────────────────────────────────────────────────────────────────────────
+  EXPRESS BUTTONS  (data-next-express-checkout)
+    Two containers. The SDK injects one button per express method the
+    campaign lists (PayPal, Apple Pay, Google Pay, Link) into the "buttons"
+    one. Apple Pay is left out on Android. The buttons are disabled while the
+    cart is empty, as it is on this page.
+
+  ONE SECTION PER METHOD  (data-next-payment-method)
+    Each section holds the radio the shopper presses and a
+    data-next-payment-form body with the same name. The SDK opens the body of
+    the chosen method, closes the others, and puts next-selected on the
+    chosen section. All radios share name="payment_method".
+
+  CARD  (credit)
+    cc-number and cvv are empty <div>s: the SDK mounts hosted card fields into
+    them, so no card number passes through the page. exp-month and exp-year
+    are empty <select>s the SDK fills.
+
+  OTHER METHODS  (paypal, klarna, ideal, bancontact, twint, sepa_debit)
+    Nothing is collected on the page. The shopper pays at the provider, so the
+    form body only says where they are sent.
+
+  METHODS THE CAMPAIGN DOES NOT OFFER
+    The SDK hides every radio the campaign cannot charge. The card is never
+    hidden. A campaign that lists no methods hides nothing.
+
+  ERRORS
+    A refused payment is written into the method's own container,
+    data-next-component="<method>-error".
+
+  STYLING
+    The SDK ships no styling for the buttons or the list. The classes are the
+    starter templates' (payment-btn, payment-method, payment-method__form and
+    so on). The SDK sets payment-btn and cc-<method> on the buttons it
+    injects, and payment-method__form--expanded and
+    payment-method__form--collapsed on the form bodies.
+  ─────────────────────────────────────────────────────────────────────────────
+-->
+
+<meta name="next-api-key" content="Lj41tZAXbaw9H6ZEruZ36w8ExL5sdhkCznBsS5mq" />
+<meta name="next-page-type" content="checkout" />
+
+<style>
+  /* ── The page: card, alert, heading, button ──────────────────────────── */
+  .checkout-demo {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 560px;
+    margin: 24px 16px;
+    padding: 28px 24px;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    color: #111827;
+    color-scheme: light;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+  .checkout-demo .alert {
+    margin-bottom: 24px;
+    padding: 12px 14px;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    background: #eff6ff;
+    color: #1e3a8a;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .checkout-demo h2 {
+    margin: 0 0 16px;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .checkout-demo button[type='submit'] {
+    width: 100%;
+    height: 48px;
+    margin-top: 24px;
+    border: 0;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* ── The express buttons ─────────────────────────────────────────────── */
+  .express-checkout__buttons {
+    display: flex;
+    gap: 16px;
+  }
+  .payment-btn {
+    position: relative;
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    border: 0;
+    border-radius: 8px;
+    background: #000;
+    color: #fff;
+    cursor: pointer;
+  }
+  .payment-btn.cc-paypal {
+    background: #ffc439;
+  }
+  .payment-btn[disabled] {
+    cursor: not-allowed;
+  }
+  .payment-btn__logo {
+    height: 24px;
+  }
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 16px 0;
+    color: #4b5563;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .divider::before,
+  .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #c9ccd1;
+  }
+
+  /* ── The method list ─────────────────────────────────────────────────── */
+  .payment-methods {
+    border: 1px solid #c9ccd1;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .payment-method + .payment-method {
+    border-top: 1px solid #c9ccd1;
+  }
+  .payment-method.next-selected {
+    background: #f9fafb;
+  }
+  .payment-method__label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .payment-method__input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #2563eb;
+  }
+  .payment-method__icons {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+  }
+  .payment-method__icons img {
+    display: block;
+    height: 24px;
+  }
+  .payment-method__form {
+    transition: height 0.2s;
+  }
+  .payment-method__form--collapsed {
+    height: 0;
+    overflow: hidden;
+  }
+  .payment-method__content {
+    padding: 16px;
+    border-top: 1px solid #c9ccd1;
+  }
+  .payment-method__info {
+    margin: 0;
+    color: #4b5563;
+    font-size: 14px;
+    line-height: 1.5;
+    text-align: center;
+  }
+  /* The SDK shows a method's error container itself. */
+  [data-next-component$='-error'] {
+    display: none;
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-size: 14px;
+  }
+
+  /* ── The card fields ─────────────────────────────────────────────────── */
+  .card-row {
+    display: flex;
+    gap: 16px;
+  }
+  .card-row + .card-row {
+    margin-top: 16px;
+  }
+  .card-row > * {
+    flex: 1;
+    min-width: 0;
+  }
+  .card-field {
+    box-sizing: border-box;
+    width: 100%;
+    height: 48px;
+    padding: 12px;
+    border: 1px solid #c9ccd1;
+    border-radius: 8px;
+    background: #fff;
+    color: inherit;
+    font: inherit;
+    font-size: 15px;
+  }
+  select.card-field {
+    appearance: none;
+    padding-right: 36px;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='2 4.75 7 9.25 12 4.75'/%3E%3C/svg%3E")
+      no-repeat right 12px center / 14px;
+  }
+  .card-field.has-error {
+    border-color: #dc2626;
+  }
+  .checkout-demo .next-error-label {
+    display: block;
+    margin-top: 4px;
+    color: #dc2626;
+    font-size: 12px;
+  }
+</style>
+
+<form data-next-checkout="form" class="checkout-demo">
+  <div class="alert" role="note">
+    Express buttons, a card form with hosted card fields, and payment methods
+    the shopper pays with at the provider.
+  </div>
+
+  <h2>Payment</h2>
+  <div data-next-express-checkout="container">
+    <div data-next-component="express-error">
+      <div data-next-component="express-error-text"></div>
+    </div>
+    <div
+      data-next-express-checkout="buttons"
+      class="express-checkout__buttons"
+    ></div>
+    <div class="divider">OR</div>
+  </div>
+  <div class="payment-methods">
+    <div data-next-payment-method="credit" class="payment-method next-selected">
+      <label class="payment-method__label">
+        <input
+          type="radio"
+          name="payment_method"
+          value="credit"
+          class="payment-method__input"
+          checked
+        />
+        Credit Card
+        <span class="payment-method__icons">
+          <img src="/assets/pm/cards/visa.svg" alt="Visa" />
+          <img src="/assets/pm/cards/mastercard.svg" alt="Mastercard" />
+          <img src="/assets/pm/cards/american-express.svg" alt="Amex" />
+          <img src="/assets/pm/cards/discover.svg" alt="Discover" />
+        </span>
+      </label>
+      <div
+        data-next-payment-form="credit"
+        class="payment-method__form payment-method__form--expanded"
+      >
+        <div class="payment-method__content">
+          <div data-next-component="credit-error">
+            <div data-next-component="credit-error-text"></div>
+          </div>
+          <div class="card-row">
+            <div class="form-group">
+              <div data-next-checkout-field="cc-number" class="card-field"></div>
+            </div>
+          </div>
+          <div class="card-row">
+            <div class="form-group">
+              <select
+                data-next-checkout-field="exp-month"
+                autocomplete="cc-exp-month"
+                class="card-field"
+              >
+                <option value="">Exp. Month</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <select
+                data-next-checkout-field="exp-year"
+                autocomplete="cc-exp-year"
+                class="card-field"
+              >
+                <option value="">Exp. Year</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <div data-next-checkout-field="cvv" class="card-field"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div data-next-payment-method="paypal" class="payment-method">
+      <label class="payment-method__label">
+        <input
+          type="radio"
+          name="payment_method"
+          value="paypal"
+          class="payment-method__input"
+        />
+        PayPal
+        <span class="payment-method__icons">
+          <img src="/assets/pm/apm/paypal.svg" alt="" />
+        </span>
+      </label>
+      <div
+        data-next-payment-form="paypal"
+        class="payment-method__form payment-method__form--collapsed"
+      >
+        <div class="payment-method__content">
+          <div data-next-component="paypal-error">
+            <div data-next-component="paypal-error-text"></div>
+          </div>
+          <p class="payment-method__info">
+            Complete your transaction via PayPal. PayPal will open in a new
+            tab.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div data-next-payment-method="klarna" class="payment-method">
+      <label class="payment-method__label">
+        <input
+          type="radio"
+          name="payment_method"
+          value="klarna"
+          class="payment-method__input"
+        />
+        Klarna
+        <span class="payment-method__icons">
+          <img src="/assets/pm/apm/klarna.svg" alt="" />
+        </span>
+      </label>
+      <div
+        data-next-payment-form="klarna"
+        class="payment-method__form payment-method__form--collapsed"
+      >
+        <div class="payment-method__content">
+          <div data-next-component="klarna-error">
+            <div data-next-component="klarna-error-text"></div>
+          </div>
+          <p class="payment-method__info">
+            After clicking "Complete Purchase", you will be redirected to
+            Klarna to complete your purchase securely.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div data-next-payment-method="ideal" class="payment-method">
+      <label class="payment-method__label">
+        <input
+          type="radio"
+          name="payment_method"
+          value="ideal"
+          class="payment-method__input"
+        />
+        iDEAL
+        <span class="payment-method__icons">
+          <img src="/assets/pm/apm/ideal.svg" alt="" />
+        </span>
+      </label>
+      <div
+        data-next-payment-form="ideal"
+        class="payment-method__form payment-method__form--collapsed"
+      >
+        <div class="payment-method__content">
+          <div data-next-component="ideal-error">
+            <div data-next-component="ideal-error-text"></div>
+          </div>
+          <p class="payment-method__info">
+            After clicking "Complete Purchase", you will be redirected to
+            iDEAL to complete your purchase securely.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div data-next-payment-method="bancontact" class="payment-method">
+      <label class="payment-method__label">
+        <input
+          type="radio"
+          name="payment_method"
+          value="bancontact"
+          class="payment-method__input"
+        />
+        Bancontact
+        <span class="payment-method__icons">
+          <img src="/assets/pm/apm/bancontact.svg" alt="" />
+        </span>
+      </label>
+      <div
+        data-next-payment-form="bancontact"
+        class="payment-method__form payment-method__form--collapsed"
+      >
+        <div class="payment-method__content">
+          <div data-next-component="bancontact-error">
+            <div data-next-component="bancontact-error-text"></div>
+          </div>
+          <p class="payment-method__info">
+            After clicking "Complete Purchase", you will be redirected to
+            Bancontact to complete your purchase securely.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div data-next-payment-method="twint" class="payment-method">
+      <label class="payment-method__label">
+        <input
+          type="radio"
+          name="payment_method"
+          value="twint"
+          class="payment-method__input"
+        />
+        TWINT
+        <span class="payment-method__icons">
+          <img src="/assets/pm/apm/twint.svg" alt="" />
+        </span>
+      </label>
+      <div
+        data-next-payment-form="twint"
+        class="payment-method__form payment-method__form--collapsed"
+      >
+        <div class="payment-method__content">
+          <div data-next-component="twint-error">
+            <div data-next-component="twint-error-text"></div>
+          </div>
+          <p class="payment-method__info">
+            After clicking "Complete Purchase", you will be redirected to
+            TWINT to complete your purchase securely.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div data-next-payment-method="sepa_debit" class="payment-method">
+      <label class="payment-method__label">
+        <input
+          type="radio"
+          name="payment_method"
+          value="sepa_debit"
+          class="payment-method__input"
+        />
+        SEPA Direct Debit
+        <span class="payment-method__icons">
+          <img src="/assets/pm/apm/sepa.svg" alt="" />
+        </span>
+      </label>
+      <div
+        data-next-payment-form="sepa_debit"
+        class="payment-method__form payment-method__form--collapsed"
+      >
+        <div class="payment-method__content">
+          <div data-next-component="sepa_debit-error">
+            <div data-next-component="sepa_debit-error-text"></div>
+          </div>
+          <p class="payment-method__info">
+            After clicking "Complete Purchase", you will be redirected to SEPA
+            Direct Debit to complete your purchase securely.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button type="submit">Complete Purchase</button>
+</form>

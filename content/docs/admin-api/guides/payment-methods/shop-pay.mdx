@@ -1,0 +1,65 @@
+---
+title: Shop Pay Admin API Guide
+description: Create Admin API orders paid with Shop Pay using the redirect payment flow, including standard and one-click checkout options
+sidebar_label: Shop Pay
+sidebar_position: 3
+tags:
+ - Guide
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+
+**Shop Pay** is a fully integrated payment method, supported both in the storefront checkout and via the Admin API. Shop Pay transactions send the customer through a Shop Pay redirect flow, with the resulting order information provided back to your application. Below are the steps needed to get Shop Pay set up and working on the Admin API.
+
+For custom Shop Pay checkouts, there are two checkout flows available, the standard method where a user enters their shipping address, chooses products, and then checks out via Shop Pay; and the "One-Click" method, where the user is not required to enter shipping information before being redirected to Shop Pay checkout.
+
+<Callout type="info">
+Your store must have an active Shop Pay account to use the Shop Pay payment method.
+</Callout>
+## API Payment Redirect Flow
+
+
+import RedirectPaymentFlow from '../../../../_snippets/_redirect-payment-flow.mdx';
+
+<RedirectPaymentFlow />
+
+## Create Order on Admin API
+
+When creating a new order using Shop Pay, you must specify the `payment_method=shop_pay` as well as provide a `payment_return_url`. The `payment_return_url` is your endpoint that will receive a POST request containing the final order data.
+
+```json title="Payment Details for Order with Shop Pay"
+{
+    "payment_method": "shop_pay",
+    "payment_details": {
+        "payment_return_url": "<external checkout url>",
+        "shop_pay_account": "<shop pay account id>" // optional
+    }
+}
+```
+
+<Callout type="idea">
+You can optionally provide a `shop_pay_account` when creating the order to use a Shop Pay account other than the store default Shop Pay account.
+</Callout>
+## Redirect Customer to Payment Complete URL
+The response when creating the order will provide a `payment_complete_url`. Your application should redirect the customer to this URL for completing the payment on the store's Shop Pay Checkout page.
+
+```json title="Response with Payment Complete URL"
+{
+    "reference_transaction_id": null,
+    "payment_complete_url": "https://<domain>/shop-pay/checkout/<session id>/"
+}
+```
+
+## Receiving Order Data
+
+
+import RedirectPaymentStep3 from '../../../../_snippets/_redirect-payment-flows-step-3.mdx';
+
+<RedirectPaymentStep3 />
+
+## Upsells
+
+Shop Pay does not support one-click upsells through the [ordersAddLineItemsCreate](/docs/admin-api/reference/orders/ordersAddLineItemsCreate) API.
+
+## Recurring
+
+Shop Pay does not support recurring transactions and cannot be used as a payment method for an order with subscription items.

@@ -12,6 +12,7 @@
     "generate-stats": "node scripts/generate-stats.mjs",
     "generate-capability-map": "node scripts/generate-capability-map.mjs",
     "generate-agent-setup": "node scripts/generate-agent-setup.mjs",
+    "generate-template-screenshots": "node scripts/generate-template-screenshots.mjs",
     "build:preview": "node scripts/build-preview.mjs",
     "validate-links": "npm run generate && node scripts/validate-links.mjs",
     "check-agent-surfaces": "node scripts/check-agent-surfaces.mjs",

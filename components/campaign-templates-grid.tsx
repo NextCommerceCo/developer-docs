@@ -148,10 +148,6 @@ const TEMPLATES: CampaignTemplate[] = [
   },
 ];
 
-function screenshotUrl(target: string): string {
-  return `https://v1.screenshot.11ty.dev/${encodeURIComponent(target)}/large/_wait:2/`;
-}
-
 function CampaignTemplateCard({ template }: { template: CampaignTemplate }) {
   return (
     <div className="rounded-xl border bg-fd-card overflow-hidden flex flex-col">
@@ -159,10 +155,10 @@ function CampaignTemplateCard({ template }: { template: CampaignTemplate }) {
         href={template.link}
         target="_blank"
         rel="noopener"
-        className="block aspect-square bg-fd-muted overflow-hidden"
+        className="block aspect-[4/3] bg-fd-muted overflow-hidden"
       >
         <img
-          src={screenshotUrl(template.link)}
+          src={`/assets/templates/${template.slug}.png`}
           alt={`${template.name} preview`}
           className="w-full h-full object-cover object-top"
           loading="lazy"

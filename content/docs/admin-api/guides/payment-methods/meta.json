@@ -5,6 +5,7 @@
     "apple-pay",
     "google-pay",
     "paypal",
+    "shop-pay",
     "klarna",
     "link",
     "twint",

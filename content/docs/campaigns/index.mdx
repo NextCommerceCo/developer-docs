@@ -181,7 +181,7 @@ Packages can also be **recurring** for subscription products. When you reference
 - **Offer** — automatic, applies when the cart matches the rule (checkout page only)
 - **Code** — voucher-based, applies when the customer enters a code. Codes stack **on top of** automatic offers, and codes are also the mechanism for applying discounts on **upsell pages** (where automatic offers don't run).
 
-Only one automatic offer of each benefit type applies to an order. When several match, the offer with the larger minimum quantity wins, then a `count_equal` condition, then the larger discount, then the oldest offer. Codes apply after the automatic offers and compound on the price they left: a 10% code on a line already 50% off charges 45% of the original price. Package benefits apply before shipping, and shipping before order benefits.
+Only one automatic offer of each benefit type applies to an order. When several match, the offer with the larger minimum quantity wins. Among offers with the same minimum, a `count_equal` condition beats a `count` condition, then the larger discount wins, then the oldest offer. Codes apply after the automatic offers and compound on the price they left: a 10% code on a line already 50% off charges 45% of the original price. Package benefits apply before shipping, and shipping before order benefits.
 
 In Campaigns App, the offer editor's **Offer Preview** shows the price exactly as the Campaigns API will charge it, including any codes you add with **Preview with additional coupons**.
 

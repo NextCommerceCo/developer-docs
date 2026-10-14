@@ -46,7 +46,7 @@ Standing up a campaign end to end is a 5 step process:
 
 1. Retrieve the payment gateway group using the [gatewayGroupsList](/docs/admin-api/reference/payments/gatewayGroupsList) endpoint to get its `id` and the payment methods it supports.
 2. Create the campaign using the [campaignsCreate](/docs/admin-api/reference/campaigns/campaignsCreate) endpoint.
-3. Add a package for each sellable item using the [campaignsPackagesCreate](/docs/admin-api/reference/campaigns/campaignsPackagesCreate) endpoint.
+3. Add a package for each sellable item using the [campaignsPackagesCreate](/docs/admin-api/reference/campaigns/campaignsPackagesCreate) endpoint. If the campaign was started in the dashboard, list its packages with [campaignsPackagesList](/docs/admin-api/reference/campaigns/campaignsPackagesList) first: saving an offer there creates packages for the products it selects.
 4. Add offers for the packages using the [campaignsOffersCreate](/docs/admin-api/reference/campaigns/campaignsOffersCreate) endpoint.
 5. Read the campaign's `api_key` from the create response and configure your funnel pages with it.
 

@@ -163,7 +163,7 @@ A **campaign** bundles everything needed for a checkout: packages, offers, shipp
 
 A **package** is the campaign's sellable reference to a product or product variant. In SDK 0.4.x-compatible builds, keep packages focused on identity and base price:
 
-- Create one package for the product or variant customers can buy.
+- Keep one package for each product or variant customers can buy. In Campaigns App, selecting a store product in an offer creates its package (one per variant, at the store price), and later offers reuse it. Use **Add Products** on the campaign's **Products** tab for a product no offer discounts.
 - Use the package's base list price as the anchor price.
 - Send the selected package ID and quantity from the page.
 - Use **offers** to discount checkout quantity tiers and **Code** offers for upsells, downsells, and exit-pop incentives.
@@ -172,7 +172,7 @@ For bundle-based quantity discounts (e.g. "buy 3 for $21" or "buy 5 for $30"), u
 
 Package-level Quantity and Retail Price are legacy compatibility fields in Campaigns App. They may still appear when the campaign setting **Enable Package Retail Price & Quantity** is enabled, but new builds should prefer Offer-based price mutation.
 
-Packages can also be **recurring** for subscription products. When you reference a package in HTML (`data-next-package-id="…"`), the ID comes from your campaign's package list in the Campaigns App.
+Packages can also be **recurring** for subscription products. When you reference a package in HTML (`data-next-package-id="…"`), the ID is the one shown on the product's row in the campaign's **Products** tab.
 
 ### Offers
 
@@ -180,6 +180,10 @@ Packages can also be **recurring** for subscription products. When you reference
 
 - **Offer** — automatic, applies when the cart matches the rule (checkout page only)
 - **Code** — voucher-based, applies when the customer enters a code. Codes stack **on top of** automatic offers, and codes are also the mechanism for applying discounts on **upsell pages** (where automatic offers don't run).
+
+Only one automatic offer of each benefit type applies to an order. When several match, the offer with the larger minimum quantity wins, then a `count_equal` condition, then the larger discount, then the oldest offer. Codes apply after the automatic offers and compound on the price they left: a 10% code on a line already 50% off charges 45% of the original price. Package benefits apply before shipping, and shipping before order benefits.
+
+In Campaigns App, the offer editor's **Offer Preview** shows the price exactly as the Campaigns API will charge it, including any codes you add with **Preview with additional coupons**.
 
 The API returns adjusted before/after pricing so you can show savings. In modern Campaigns App setup, this replaces package-level compare-at pricing for most campaigns.
 
@@ -191,8 +195,9 @@ Every offer has a **condition** that decides when it applies and a **benefit** t
 | --- | --- | --- |
 | `any` | Always. No quantity requirement. | A code that takes 10% off any cart |
 | `count` | The quantity of a matching package is at or above `value` | Buy 2 or more Widgets |
+| `count_equal` | The quantity of a matching package is exactly `value` | Exactly 2 Widgets |
 
-A condition targets either every package on the campaign (`all_packages: true`, which also covers packages added later) or a specific list of `package_ids`.
+A condition targets either every package on the campaign (`all_packages: true`, which also covers packages added later) or a specific list of `package_ids`. In the Campaigns App dashboard, this is the offer's **Products** selection or **All Products**.
 
 #### Benefit types
 
@@ -204,7 +209,7 @@ All benefits are percentage based. `value` is the percentage off.
 | `shipping_percentage` | The shipping price | 50% off shipping when buying 3 or more |
 | `order_percentage` | The entire order | 10% off everything with a welcome code |
 
-A benefit can also set `price_rounding` so each discounted unit price ends in `.00`, `.95`, `.97`, or `.99`. Without it, the discounted price is not rounded.
+A benefit can also set `price_rounding` so each discounted unit price ends in `.00`, `.95`, `.97`, or `.99`. Without it, the discounted price is floored to the cent. Rounding never raises a price above its price before the offer.
 
 Create and manage offers with the [Campaigns Admin API](/docs/campaigns/admin-api#add-offers-to-a-campaign). The Cart API returns the same condition and benefit fields on each offer from [campaignRetrieve](/docs/campaigns/api/campaigns/campaignRetrieve).
 

@@ -5,6 +5,7 @@
     "[Campaigns Create](/docs/admin-api/reference/campaigns/campaignsCreate)",
     "[Campaigns Retrieve](/docs/admin-api/reference/campaigns/campaignsRetrieve)",
     "[Campaigns Partial Update](/docs/admin-api/reference/campaigns/campaignsPartialUpdate)",
+    "[Campaigns Clone](/docs/admin-api/reference/campaigns/campaignsCloneCreate)",
     "[Campaigns Destroy](/docs/admin-api/reference/campaigns/campaignsDestroy)"
   ]
 }

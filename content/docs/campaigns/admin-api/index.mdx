@@ -42,12 +42,13 @@ Campaign endpoints exist on the `2024-04-01` API version and above. They are not
 
 ## Campaign Provisioning Flow
 
-Standing up a campaign end to end is a 4 step process:
+Standing up a campaign end to end is a 5 step process:
 
 1. Retrieve the payment gateway group using the [gatewayGroupsList](/docs/admin-api/reference/payments/gatewayGroupsList) endpoint to get its `id` and the payment methods it supports.
 2. Create the campaign using the [campaignsCreate](/docs/admin-api/reference/campaigns/campaignsCreate) endpoint.
-3. Add a package for each sellable item using the [campaignsPackagesCreate](/docs/admin-api/reference/campaigns/campaignsPackagesCreate) endpoint.
-4. Read the campaign's `api_key` from the create response and configure your funnel pages with it.
+3. Add a package for each sellable item using the [campaignsPackagesCreate](/docs/admin-api/reference/campaigns/campaignsPackagesCreate) endpoint. If the campaign was started in the dashboard, list its packages with [campaignsPackagesList](/docs/admin-api/reference/campaigns/campaignsPackagesList) first: saving an offer there creates packages for the products it selects.
+4. Add offers for the packages using the [campaignsOffersCreate](/docs/admin-api/reference/campaigns/campaignsOffersCreate) endpoint.
+5. Read the campaign's `api_key` from the create response and configure your funnel pages with it.
 
 ### Create a Campaign
 
@@ -73,9 +74,19 @@ The response returns the campaign `id` you use for every package call, and the `
 
 The payment methods you enable have to be ones the gateway group supports. [gatewayGroupsList](/docs/admin-api/reference/payments/gatewayGroupsList) returns each group on the store with its `id`, `available_payment_methods`, `available_express_payment_methods`, and `available_currencies`.
 
+### Clone a Campaign
+
+To start a new campaign from one that already sells, clone it. The request takes no body. The response is the new campaign, with its own `id` and `api_key`, named after the source with `-COPY` appended. It copies the settings, packages and prices, shipping methods, and active offers with their codes, and package and shipping method IDs stay the same, so pages built for the source work once you swap in the new `api_key`. Rename it with [campaignsPartialUpdate](/docs/admin-api/reference/campaigns/campaignsPartialUpdate).
+
+```json title="Clone Campaign" http-method="POST" http-target="https://{store}.29next.store/api/admin/campaigns/{id}/clone/"
+{}
+```
+
 ### Add Packages to a Campaign
 
 A package is the campaign's sellable reference to a product or variant, and its `id` is what your funnel markup passes as `data-next-package-id`. Only `name` and `product_id` are required.
+
+Over the Admin API, create packages before the offers that reference them. The Campaigns App dashboard does this step itself: selecting store products in an offer creates one package per variant at its store price, and reuses a variant's existing package. List a campaign's packages with [campaignsPackagesList](/docs/admin-api/reference/campaigns/campaignsPackagesList) before creating more, so an API flow doesn't duplicate packages the dashboard already made.
 
 ```json title="Create Package" http-method="POST" http-target="https://{store}.29next.store/api/admin/campaigns/{id}/packages/"
 {
@@ -179,9 +190,11 @@ An offer discounts the order once its condition is met. `name`, `condition`, and
 }
 ```
 
-Create one offer per quantity tier to control the price the customer pays at each quantity. See [Concepts → Offers](/docs/campaigns#offers) for a worked example.
+Create one offer per quantity tier to control the price the customer pays at each quantity. Only one automatic offer of each benefit type applies to an order; see [Concepts → Offers](/docs/campaigns#offers) for which one wins and a worked example.
 
-Use a code offer for discounts on upsell, downsell, and exit-pop pages. Automatic offers run only at checkout, so a code offer is the only way to discount an upsell or an exit-pop incentive. Set `offer_type` to `voucher` to create one. The code offer applies when the customer enters its `code`, or when your page submits the code through the `vouchers` array on the cart, order, or upsell-create request (see [Campaigns API → Offers](/docs/campaigns/api#offers)). Set `all_packages` to `true` with an `any` condition to make it valid on anything in the cart.
+Send `"available": false` to create an offer switched off, then enable it with [campaignsOffersPartialUpdate](/docs/admin-api/reference/campaigns/campaignsOffersPartialUpdate) when it should reach shoppers. Omitted, `available` defaults to `true`.
+
+Use a code offer for discounts on upsell, downsell, and exit-pop pages. Automatic offers run only at checkout, so a code offer is the only way to discount an upsell or an exit-pop incentive. Set `offer_type` to `voucher` to create one. The code offer applies when the customer enters its `code`, or when your page submits the code through the `vouchers` array on the cart, order, or upsell-create request (see [Campaigns API → Offers](/docs/campaigns/api#offers)). Set `all_packages` to `true` with an `any` condition to make it valid on anything in the cart. A `code` must be unique within the campaign, ignoring case; a duplicate is rejected with a `400` and an error on `code`.
 
 ```json title="Create Code Offer" http-method="POST" http-target="https://{store}.29next.store/api/admin/campaigns/{id}/offers/"
 {
@@ -286,6 +299,7 @@ Full request and response detail lives in the Admin API reference.
 | [Campaigns Retrieve](/docs/admin-api/reference/campaigns/campaignsRetrieve) | `GET /api/admin/campaigns/{id}/` |
 | [Campaigns Partial Update](/docs/admin-api/reference/campaigns/campaignsPartialUpdate) | `PATCH /api/admin/campaigns/{id}/` |
 | [Campaigns Destroy](/docs/admin-api/reference/campaigns/campaignsDestroy) | `DELETE /api/admin/campaigns/{id}/` |
+| [Campaigns Clone](/docs/admin-api/reference/campaigns/campaignsCloneCreate) | `POST /api/admin/campaigns/{id}/clone/` |
 
 ### Offers
 

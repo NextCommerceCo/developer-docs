@@ -1977,8 +1977,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/CartSummary'
           description: ''
-      security:
-      - API Authentication: []
       tags:
       - carts
   /api/v1/orders/:

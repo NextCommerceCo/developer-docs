@@ -12949,7 +12949,7 @@ paths:
           - unstable
           type: string
       responses:
-        '200':
+        '201':
           content:
             application/json:
               schema:

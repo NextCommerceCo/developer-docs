@@ -13,7 +13,7 @@ import { Callout } from 'fumadocs-ui/components/callout';
 For custom Shop Pay checkouts, there are two checkout flows available, the standard method where a user enters their shipping address, chooses products, and then checks out via Shop Pay; and the "One-Click" method, where the user is not required to enter shipping information before being redirected to Shop Pay checkout.
 
 <Callout type="info">
-Your store must have an active Shop Pay account to use the Shop Pay payment method.
+Your store must have an active Shop Pay account to use the Shop Pay payment method. Merchants connect one under **Settings > Payments > Shop Pay**; see [Shop Pay](https://docs.nextcommerce.com/docs/features/payments/shop-pay) in the merchant docs for setup.
 </Callout>
 ## API Payment Redirect Flow
 
@@ -63,3 +63,17 @@ Shop Pay does not support one-click upsells through the [ordersAddLineItemsCreat
 ## Recurring
 
 Shop Pay does not support recurring transactions and cannot be used as a payment method for an order with subscription items.
+
+## Capture and Refunds
+
+Shop Pay orders are always authorized at checkout and captured later. Shopify holds the authorization for 7 days; capture before then or the funds are released to the customer.
+
+- **Capture** is full amount only. Partial captures aren't supported.
+- **Refunds** can be full or partial once the payment is captured. Refunds can return as pending until Shopify confirms them.
+- **Refunding an uncaptured order** voids the whole authorization, whatever amount you request.
+- **Disputes** are handled in the merchant's Shop Pay store in Shopify admin, not in NEXT.
+
+## Campaigns API
+
+Campaigns built on the [Campaigns API](/docs/campaigns/api) accept `shop_pay` as a payment method and follow the same redirect flow. Shop Pay must be enabled as a payment method on each campaign.
+

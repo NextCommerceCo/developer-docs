@@ -6240,9 +6240,10 @@ components:
             - integer
             - 'null'
         enable_3ds2:
-          description: Transactions are attempted with 3DS authentication.
+          description: Derived from `three_ds_mode`. True when the mode is `smart` or `always`.
           title: Enable 3D Secure Transactions
           type: boolean
+          readOnly: true
         gateway_groups:
           items:
             $ref: '#/components/schemas/PaymentGatewayGroup'
@@ -6291,6 +6292,19 @@ components:
           type:
             - boolean
             - 'null'
+        three_ds_mode:
+          description: |-
+            3DS mode for the gateway.
+
+            * `off` - Off
+            * `smart` - Smart
+            * `always` - Always On
+          enum:
+            - 'off'
+            - smart
+            - always
+          title: 3DS Mode
+          type: string
       required:
         - card_types
         - currencies
@@ -21676,6 +21690,7 @@ webhooks:
                   is_default: false
                   name: string
                 re_attemp_intitial_charge: null
+                three_ds_mode: 'off'
               event_id: a7a26ff2-e851-45b6-9634-d595f45458b7
               event_type: gateway.created
               object: gateway
@@ -21732,9 +21747,10 @@ webhooks:
                       minimum: 1
                       type: integer
                     enable_3ds2:
-                      description: Transactions are attempted with 3DS authentication.
+                      description: Derived from `three_ds_mode`. True when the mode is `smart` or `always`.
                       title: Enable 3D Secure Transactions
                       type: boolean
+                      readOnly: true
                     gateway_groups:
                       items:
                         properties:
@@ -21891,6 +21907,19 @@ webhooks:
                       description: Reattempt soft declines with another gateway.
                       title: Re-attempt declined initial charge attempts
                       type: boolean
+                    three_ds_mode:
+                      description: |-
+                        3DS mode for the gateway.
+
+                        * `off` - Off
+                        * `smart` - Smart
+                        * `always` - Always On
+                      enum:
+                        - 'off'
+                        - smart
+                        - always
+                      title: 3DS Mode
+                      type: string
                   required:
                     - card_types
                     - currencies
@@ -22014,6 +22043,7 @@ webhooks:
                   is_default: false
                   name: string
                 re_attemp_intitial_charge: null
+                three_ds_mode: 'off'
               event_id: a7a26ff2-e851-45b6-9634-d595f45458b7
               event_type: gateway.updated
               object: gateway
@@ -22070,9 +22100,10 @@ webhooks:
                       minimum: 1
                       type: integer
                     enable_3ds2:
-                      description: Transactions are attempted with 3DS authentication.
+                      description: Derived from `three_ds_mode`. True when the mode is `smart` or `always`.
                       title: Enable 3D Secure Transactions
                       type: boolean
+                      readOnly: true
                     gateway_groups:
                       items:
                         properties:
@@ -22229,6 +22260,19 @@ webhooks:
                       description: Reattempt soft declines with another gateway.
                       title: Re-attempt declined initial charge attempts
                       type: boolean
+                    three_ds_mode:
+                      description: |-
+                        3DS mode for the gateway.
+
+                        * `off` - Off
+                        * `smart` - Smart
+                        * `always` - Always On
+                      enum:
+                        - 'off'
+                        - smart
+                        - always
+                      title: 3DS Mode
+                      type: string
                   required:
                     - card_types
                     - currencies

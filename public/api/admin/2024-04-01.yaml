@@ -6616,8 +6616,8 @@ components:
             * `always` - Always On
           enum:
             - 'off'
-            - smart
-            - always
+            - 'smart'
+            - 'always'
           title: 3DS Mode
           type: string
       required:
@@ -27123,7 +27123,6 @@ webhooks:
                       description: Derived from `three_ds_mode`. True when the mode is `smart` or `always`.
                       title: Enable 3D Secure Transactions
                       type: boolean
-                      readOnly: true
                     gateway_groups:
                       items:
                         properties:
@@ -27289,8 +27288,8 @@ webhooks:
                         * `always` - Always On
                       enum:
                         - 'off'
-                        - smart
-                        - always
+                        - 'smart'
+                        - 'always'
                       title: 3DS Mode
                       type: string
                   required:
@@ -27476,7 +27475,6 @@ webhooks:
                       description: Derived from `three_ds_mode`. True when the mode is `smart` or `always`.
                       title: Enable 3D Secure Transactions
                       type: boolean
-                      readOnly: true
                     gateway_groups:
                       items:
                         properties:
@@ -27642,8 +27640,8 @@ webhooks:
                         * `always` - Always On
                       enum:
                         - 'off'
-                        - smart
-                        - always
+                        - 'smart'
+                        - 'always'
                       title: 3DS Mode
                       type: string
                   required:

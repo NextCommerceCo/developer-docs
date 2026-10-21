@@ -474,7 +474,7 @@ Your store must have a 3DS2-enabled gateway to process 3DS2 transactions. A gate
 
 A gateway in `smart` mode decides per order whether to use 3DS. Orders with a billing address in the United States, Canada, Australia or New Zealand skip 3DS unless they score above the store's risk tolerance. All other orders use 3DS. See [3DS2 Payments](https://docs.nextcommerce.com/docs/features/payments/3ds2-payments#smart-mode) for the full rules.
 
-Send a `payment_return_url` on every order to a `smart` gateway, and handle both responses:
+`payment_return_url` is required on every order to a `smart` gateway, including orders that end up skipping 3DS, because the gateway decides per order. Handle both responses:
 
 - **3DS used:** the response carries a `payment_complete_url`. Continue with the redirect flow below.
 - **3DS skipped:** the order is charged directly and the response is the created order, the same as a gateway with 3DS off.

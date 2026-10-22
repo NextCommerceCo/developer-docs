@@ -8,65 +8,50 @@ For storefront themes, apps, or other platform work, use the [developer index](h
 
 ## Before writing
 
-Inspect the supplied files and current directory. Identify the intended change, source URL/design, existing repo, campaign identity if known, build command, output directory, hosting method, and any saved brief, spec, Map or evidence. Preserve existing work and user choices; do not scaffold over an existing project.
+Inspect the supplied files and current directory. Identify the intended change, the source URL or design, any existing repo, the campaign identity if known, the build command, output directory, hosting method, and any saved brief, spec, Map or evidence. Preserve existing work; do not scaffold over an existing project.
 
-Ask together for missing business decisions that affect the result, such as target products, offer changes or which source design to follow. Continue source inspection and local planning while those answers or credentials are missing. Do not ask the user to choose internal tool names.
+Ask for missing business decisions together, such as target products, offer changes or which source design to follow. Continue source inspection and local planning while those answers or credentials are missing. Do not ask the user to choose internal tool names.
 
-Record actual installed versions and the source commit of a reused template/repo. For work that includes Campaigns OS, use its [runtime preparation guidance](https://github.com/NextCommerceCo/campaigns-os/blob/main/docs/runtime-readiness.md); Node.js 22 is a common supported choice. The Page Kit-only minimum and the Campaigns OS supported runtime range are different. Read the installed CLI help and package documentation before using flags. If an installed documentation link is missing, use the corresponding public repository file at that package's release tag and record the mismatch.
+Record installed versions and the source commit of a reused template or repo. Read the installed CLI help before using flags. For work that includes Campaigns OS, follow its [runtime guidance](https://github.com/NextCommerceCo/campaigns-os/blob/main/docs/runtime-readiness.md); its supported Node.js range differs from the Page Kit minimum.
 
-Store access, repository publishing, deployment, test orders, and analytics sends are separate effects. A source URL or API key does not authorize all of them. Use existing authority from the user's request; never print credentials or put them in the brief, handoff, committed files or command output. With no store-write authority, keep work local and leave provisioning and payment checks pending.
+Store access, repository publishing, deployment, test orders and analytics sends are separate effects. A source URL or API key does not authorize all of them. Never print credentials or put them in the brief, handoff, committed files or command output. Without store-write authority, keep work local and leave provisioning and payment checks pending.
 
 ## Choose the entry point
 
 | Supplied input | First action | Continue with |
 | --- | --- | --- |
-| Funnel/store URL or design | Read the source and distinguish observed facts from proposed behavior | A build brief, commerce dependency plan and local concept preview |
+| Funnel/store URL or design | Read the source and distinguish observed facts from proposed behavior | A build brief, commerce dependency plan and local preview |
 | Existing or cloned campaign repo | Read its instructions, build/configuration and retained evidence | Inspect current behavior and change only what the task requires |
 | Existing external build | Inspect its own source, build and deployment conventions | The relevant Campaign Cart checks; retain its framework and host |
-| Local CampaignSpec, saved Map or Build Packet | Identify the selected campaign and read existing intent/status | The supported Campaigns OS continuation command for that artifact |
+| Local CampaignSpec, saved Map or Build Packet | Identify the selected campaign and read existing intent/status | The Campaigns OS continuation command for that artifact |
 
-These entries can join the same work at different points. Do not replay provisioning or scaffolding merely because a new session starts.
+These entries can join the same work at different points. Do not replay provisioning or scaffolding because a new session starts.
 
 ## From a source URL to a proposal
 
-Read public HTML or user-provided source without submitting forms or using cart/checkout endpoints. Record source URLs and capture dates. Describe observed products, variants, displayed prices/currency, offer wording, page structure and visible navigation. Mark checkout rules, shipping, subscriptions and post-purchase behavior unknown when the source does not establish them. A source site's displayed price is not proof of a NEXT package or offer configuration.
+Read public HTML or user-provided source without submitting forms or using cart or checkout endpoints. Record source URLs and capture dates. Describe observed products, variants, displayed prices and currency, offer wording, page structure and visible navigation. Mark checkout rules, shipping, subscriptions and post-purchase behavior unknown when the source does not establish them. A displayed price is not proof of a NEXT package or offer.
 
-Save presentation intent in the existing [Campaign Build Brief](https://github.com/NextCommerceCo/campaigns-os/blob/main/docs/campaign-build-brief.md) format, using its [v1 schema](https://github.com/NextCommerceCo/campaigns-os/blob/main/schemas/campaign-build-brief.v1.schema.json). Start with `schema_version: campaigns-os-build-brief/v1`, `brief_mode: guided`, and `status: needs_answers`. Keep source observations, proposed changes and unresolved questions distinct; use `_meta` for provenance. Do not label unapproved business choices complete.
+Save presentation intent in the [Campaign Build Brief](https://github.com/NextCommerceCo/campaigns-os/blob/main/docs/campaign-build-brief.md) format, using its [v1 schema](https://github.com/NextCommerceCo/campaigns-os/blob/main/schemas/campaign-build-brief.v1.schema.json): `schema_version: campaigns-os-build-brief/v1`, `brief_mode: guided`, `status: needs_answers`. Keep observations, proposed changes and open questions distinct.
 
-In the project's existing README or handoff note, record the proposed page journey and commerce dependencies:
-
-- Catalogue products, variants, base prices and currencies that must exist on the target store.
-- Campaign packages, quantity selections, offers/codes and shipping that must reference that catalogue.
-- Page behavior: selection, information/shipping steps, payment, offer acceptance/decline and receipt.
-- Required domains, payment linking and analytics configuration, with their current evidence or unknown status.
-
-Do not invent package IDs, campaign keys or a saved Map to make validation pass. Without real commerce bindings, retain the brief and dependency plan; a complete operational CampaignSpec comes later. Importing visual source does not automatically migrate checkout behavior.
+In the project's README or handoff note, record the proposed page journey and the commerce dependencies: catalogue products, variants and prices that must exist on the store; the packages, offers and shipping that must reference them; the page behavior (selection, form steps, payment, offer accept/decline, receipt); and the domains, payment linking and analytics configuration still needed. Do not invent package IDs, campaign keys or a saved Map to make validation pass.
 
 ## Inspect an existing or cloned build
 
-Read the repository's current brief, spec and generated records before deriving new intent from code. Code establishes implemented behavior; it does not establish what the merchant wanted. If Campaign Cart is present, use the existing [standardization report](https://github.com/NextCommerceCo/campaigns-os/blob/main/docs/campaign-standardization-report.md). Reuse the project's pinned toolkit and run from the directory that owns its installation. If none exists, follow the source review and release selection in the [published-package installation instructions](https://github.com/NextCommerceCo/campaigns-os#quick-start), then install that exact release in a separate empty inspection directory:
+Read the repository's brief, spec and generated records before deriving intent from code. Code shows what was implemented, not what the merchant wanted. If Campaign Cart is present, use the [standardization report](https://github.com/NextCommerceCo/campaigns-os/blob/main/docs/campaign-standardization-report.md). Run the project's pinned toolkit from the directory that owns it. If there is none, install the reviewed release in a separate empty inspection directory, following the [published-package instructions](https://github.com/NextCommerceCo/campaigns-os#quick-start):
 
 ```bash
 npm init -y
 npm install --save-dev --save-exact @nextcommerce/campaigns-os@<reviewed-version>
-```
-
-An inspection alone does not require adding Campaigns OS to the application. From the directory containing the chosen local installation, verify the installed package, record its version/status, read its help, and inspect the target:
-
-```bash
 npm ls @nextcommerce/campaigns-os --depth=0
-npx --no-install campaigns-os tooling status --json
 npx --no-install campaigns-os --help
 npx --no-install campaigns-os standardize --target /path/to/existing-campaign --no-doctor --json
 ```
 
-If the package is absent or the installed version differs from the reviewed pin, resolve that before running the CLI. Keep `--no-install`: `campaigns-os` is the executable name of the scoped package, not a package to download implicitly. `tooling status` can report attention needed for missing agent skills; retain its version and invocation report, and use that release's setup guidance for any required preparation. Do not assume a global binary is available or points at the same version.
+`campaigns-os` is the executable of the scoped package; keep `--no-install` so nothing is downloaded implicitly. The report inspects source without modifying the target. It does not migrate the project, prove checkout or certify a launch. If the application is not recognized, record that and inspect its own integration rather than changing frameworks to satisfy the detector.
 
-This inspects source without modifying the target. Retain its report and exact command outside generated stage records. A report does not migrate the project, prove checkout, or certify a launch. If the application is not recognized, record that limit and inspect its own integration; do not change frameworks to satisfy the detector.
+For a clone, record the source commit and list the bindings that need replacement: campaign and store identity, packages, offers, domains, analytics IDs, URLs and custom business logic. Prior QA applies to the source campaign; new bindings need their own proof.
 
-For a clone, record the source commit and list bindings that need replacement: campaign/store identity, packages, offers, domains, analytics IDs, URLs and custom business logic. Inspect names and locations without exposing secret values. Do not execute inherited scripts or open a connected clone before those effects are understood. Prior QA applies to the source campaign; the new bindings and changed behavior need their own proof.
-
-For a maintenance task, compare the requested business change with the existing brief/spec, authoritative commerce and implementation. Follow the [existing reconciliation and handoff procedure](https://github.com/NextCommerceCo/campaigns-os/blob/main/docs/build-packet.md) where it applies. Preserve the builder's deployment method and unchanged work.
+For a maintenance task, compare the requested change with the existing brief, spec and commerce configuration, and follow the [reconciliation and handoff procedure](https://github.com/NextCommerceCo/campaigns-os/blob/main/docs/build-packet.md) where it applies.
 
 ## Build a local preview before connecting commerce
 
@@ -75,11 +60,10 @@ For a new Page Kit workspace, read the [Page Kit guide](https://developers.nextc
 ```bash
 npm init -y
 npm install next-campaign-page-kit
-npm ls next-campaign-page-kit --depth=0
 npx --no-install campaign-init --help
 ```
 
-Use the current [template catalog](https://github.com/NextCommerceCo/campaign-cart-starter-templates/blob/main/templates.json) and its selection guidance. Preserve a chosen template; otherwise recommend one for the product/variant and page requirements. Record the choice and why. Use the user's supplied name/slug, or propose them while continuing source work.
+Choose a family from the [template catalog](https://github.com/NextCommerceCo/campaign-cart-starter-templates/blob/main/templates.json). Preserve a template the user already chose; otherwise recommend one for the product, variant and page requirements and record why. Use the user's name and slug, or propose them.
 
 For a non-interactive run, replace the placeholders with the selected values:
 
@@ -100,40 +84,30 @@ npm run build
 | GitHub Copilot | `copilot` |
 | Other agents | `none` |
 
-The CLI owns scaffolding and conflict handling. Preserve failure output instead of recreating the scaffold by hand. A successful build writes `_site/`; it does not prove that opening those pages is safe or that commerce works.
+The CLI owns scaffolding and conflict handling; preserve its failure output instead of recreating the scaffold by hand. A successful build writes `_site/`.
 
-**Do not open an unconfigured scaffold just because init accepted no key.** Page Kit 0.3.0 can retain the template's demo key and enabled analytics. Inspect the installed version reported above, its documented behavior and generated output. Use a documented static-preview mode only when that installed version actually provides it, and verify it disables scripts, form submissions, embedded child frames and external resource requests before browser inspection. Check navigation destinations separately. A pending PR is not a released capability.
-
-If that protection is unavailable, leave the scaffold unopened. Make a separate local visual concept in a directory containing only authored static HTML, local CSS and local assets. Include no SDK/config scripts, forms, embedded frames, event handlers or remote assets. Remove external/payment links and redirect markup; navigation may only link to authored pages within the concept. Put this policy first in each page's `<head>`, and label every page **Commerce unconfigured — visual concept only**:
-
-```html
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'none'; connect-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; form-action 'none'; base-uri 'none'; frame-src 'none'; object-src 'none'">
-```
-
-The policy blocks resource requests and form submissions; it does not restrict ordinary link navigation, which must be removed or kept local in the authored markup. `frame-src` prevents this page from embedding frames. Preventing another site from embedding this page requires hosting response headers: `frame-ancestors` is [not supported in a meta policy](https://www.w3.org/TR/CSP3/#meta-element). Media and manifest requests fall back to `default-src 'none'`; worker requests fall back to `script-src 'none'`. Keep the concept self-contained: CDN styles/fonts and remote images will be blocked, so use local assets for visual review.
-
-Serve only that concept directory on loopback. Inspect its source before opening, then check rendered output and network activity at desktop and mobile widths. Record visual defects and limitations. This concept can communicate design and proposed navigation; it is not the connected campaign or payment QA. Do not remove runtime wiring from an existing campaign to make this separate preview.
+Without a campaign key, init clears the template's demo key and reports `runtime_mode: "unconfigured"`. The Campaign Cart SDK does not boot without a key, so the pages render for visual review with placeholder prices and nothing is fetched or sent. `npm run dev` is safe to open in that state. It shows design and proposed navigation; it is not the connected campaign and proves nothing about checkout, prices, shipping or tracking.
 
 ## Connect the approved implementation when ready
 
-The public [next-campaigns-create skill](https://github.com/NextCommerceCo/skills/tree/main/next-campaigns-create) owns campaign creation, edit, adopt/diff/update and campaign cloning through its existing plan/approval boundaries. It reads existing catalogue products and creates campaign configuration; it does not create catalogue products or CampaignSpec. Missing products/prices require the appropriate [Admin API product procedure](https://developers.nextcommerce.com/docs/admin-api) or dashboard work with its own access and authority. The Campaign Cart key and Admin API token are different credentials.
+The [next-campaigns-create skill](https://github.com/NextCommerceCo/skills/tree/main/next-campaigns-create) creates, edits, adopts and clones Campaigns App configuration behind its plan-approval gate. It reads existing catalogue products; missing products or prices need the [Admin API](https://developers.nextcommerce.com/docs/admin-api) or dashboard work with its own authority. The Campaign Cart key and the Admin API token are different credentials.
 
-Use [next-campaigns-setup](https://github.com/NextCommerceCo/skills/tree/main/next-campaigns-setup) for Page Kit configuration. The [AI skills guide](https://developers.nextcommerce.com/docs/skills?ref=agent-setup) explains installation and version checks. Existing projects keep their own build procedure. Record Allowed Domains and payment-account linking as dependencies at their actual dashboard/API boundary.
+Use [next-campaigns-setup](https://github.com/NextCommerceCo/skills/tree/main/next-campaigns-setup) for Page Kit configuration; the [skills guide](https://developers.nextcommerce.com/docs/skills?ref=agent-setup) covers installation. Existing projects keep their own build procedure. Record Allowed Domains and payment-account linking as dependencies at their dashboard or API boundary.
 
-When real references and intended behavior are known, use the installed Campaigns OS [agent entry](https://github.com/NextCommerceCo/campaigns-os/blob/main/AGENTS.md) and [quick start](https://github.com/NextCommerceCo/campaigns-os#quick-start) to choose local-spec or saved-Map intake. Keep the same `npx --no-install campaigns-os` invocation from its installation directory. Its installed `--help` lists `start` intake and `next` continuation; follow that release's documented arguments for the artifact you actually have. Current authoring uses CampaignSpec v5: `select` chooses before payment, `checkout_step` collects a form step, and `checkout` takes payment. v4.2/v4.3 read compatibility does not make those old versions the authoring target. The [public multi-step examples](https://github.com/NextCommerceCo/campaign-cart-starter-templates/tree/main/docs/fixtures/campaign-specs) illustrate the roles; use the installed toolkit's routing projection rather than treating every example hint as an implemented runtime guarantee.
+When real references and intended behavior are known, use the installed Campaigns OS [agent entry](https://github.com/NextCommerceCo/campaigns-os/blob/main/AGENTS.md) and [quick start](https://github.com/NextCommerceCo/campaigns-os#quick-start) to choose local-spec or saved-Map intake, invoking `npx --no-install campaigns-os` from its installation directory. Its `--help` lists `start` for intake and `next` for continuation. Current authoring is CampaignSpec v5: `select` chooses before payment, `checkout_step` collects a form step, and `checkout` takes payment. The [public multi-step examples](https://github.com/NextCommerceCo/campaign-cart-starter-templates/tree/main/docs/fixtures/campaign-specs) show those roles.
 
-Keep any saved-Map requirement that applies to the user's delivery process. Do not save a Map, publish a repo, deploy, submit an order or send analytics as a side effect of this local-preview procedure. Record what is authorized, then invoke the appropriate existing capability. A doctor/static pass, intercepted analytics request and vendor receipt are different evidence. State which was actually obtained.
+Do not save a Map, publish a repo, deploy, submit an order or send analytics as a side effect of this procedure. Record what is authorized, then invoke the matching capability. A doctor pass, an intercepted analytics request and a vendor receipt are different evidence; state which was obtained.
 
 ## Leave work another session can continue
 
-Use the repository's existing README or handoff note. Link the existing artifacts rather than creating a second lifecycle record. Include:
+Use the repository's README or existing handoff note and link the artifacts that exist rather than creating a second record. Include:
 
-1. The user's requested outcome, chosen implementation/host, source URLs or clone commit, and unresolved business questions.
-2. Brief/spec/Map/Build Packet paths or IDs that really exist; list absent artifacts as absent. Keep credentials out of the note.
-3. Installed tool/skill versions, working directory, build command and output directory; identify the separate concept preview when used.
+1. The requested outcome, chosen implementation and host, source URLs or clone commit, and unresolved business questions.
+2. Brief, spec, Map or Build Packet paths that exist; list absent artifacts as absent. Keep credentials out.
+3. Installed tool and skill versions, working directory, build command and output directory.
 4. Which commerce bindings are verified, missing or inherited, and which actions remain unauthorized.
-5. Exact checks and output paths, what those checks prove, outstanding defects, and the next executable local action or specific missing input.
+5. The checks run, what they prove, outstanding defects, and the next local action or the specific missing input.
 
-A returning session reads that note and the linked artifacts, checks the current revision and installed versions, and resumes the next action. It does not reset the project or replay completed writes. Let Campaigns OS commands create their own stage/evidence records; never hand-write a passing Assembly Report or reuse a source campaign's QA as acceptance for a clone.
+A returning session reads that note, checks the current revision and installed versions, and resumes. It does not reset the project or replay completed writes. Let Campaigns OS commands create their own stage records; never hand-write a passing Assembly Report or reuse a source campaign's QA for a clone.
 
-Report the result in plain language: what can be reviewed now, what is still unconfigured or unproved, and what is needed to continue. Stop at the user's requested boundary.
+Report in plain language: what can be reviewed now, what is still unconfigured or unproved, and what is needed to continue. Stop at the user's requested boundary.

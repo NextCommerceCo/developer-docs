@@ -56,9 +56,7 @@ npx --no-install campaign-init --help
 
 #### Installed version compatibility
 
-Run the commands below from this project's package root. The `campaign-*` executables come from its installed `next-campaign-page-kit` dependency; `--no-install` prevents an implicit package download. For an existing project, keep its pinned dependency and lockfile.
-
-Check the installed release's documentation before using these commands in an older project. JSON build output requires Page Kit **0.1.4 or later**. Older pins can use their documented plain build (`npm run build` when configured) and retain its logs; leave any JSON-dependent check pending until a planned upgrade. Do not upgrade the pin or pass unsupported flags just to follow an example. `npx --no-install` does not change the installed version.
+Run the commands below from the project's package root. The `campaign-*` executables come from its installed `next-campaign-page-kit` dependency; `--no-install` prevents an implicit package download. For an existing project, keep its pinned dependency and lockfile. JSON build output requires Page Kit **0.1.4 or later**; older pins use the plain build.
 
 ### 3. Run the setup script
 
@@ -78,12 +76,10 @@ npx --no-install campaign-init
 8. Optionally installs an **AI context doc** for your editor or agent
 
 <Callout type="info">
-Get your Campaign API key from the Campaigns App in your store. You can skip it during init and run `npm run config` later, but Page Kit 0.3.0 may retain demo commerce credentials and enabled tracking. Leave unconfigured output unopened and follow the [local preview procedure](/docs/agent-setup#build-a-local-preview-before-connecting-commerce), which uses a separate static concept when the installed release has no verified inert-preview capability.
+Get your Campaign API key from the Campaigns App in your store. You can skip it during init and run `npm run config` later: init clears the template's demo key, and the SDK does not boot without one, so the pages render for visual review and nothing is fetched or sent.
 </Callout>
 
 ### 4. Start the dev server
-
-Run this only when the intended campaign binding and tracking configuration are verified and preview is authorized, or when the installed release's documented inert-preview protection has been verified through the procedure above. The command opens a browser automatically.
 
 ```bash
 npm run dev
@@ -115,14 +111,14 @@ npm run dev -c my-campaign -p 8080     # specific campaign and port
 
 `campaign-init` can run with no prompts. Pass every value as a flag and add `--non-interactive`:
 
-These configured-setup examples use `apollo` for a single-step checkout. Select the actual family from the [current template catalog](https://github.com/NextCommerceCo/campaign-cart-starter-templates/blob/main/templates.json). Load `CAMPAIGN_API_KEY` through your approved local mechanism in each invocation: it must be the selected campaign's browser-visible Campaign Cart key, never an Admin API token. Do not echo the key. The required-value expansion stops the command if it is missing.
+These examples use `apollo` for a single-step checkout; pick the family from the [template catalog](https://github.com/NextCommerceCo/campaign-cart-starter-templates/blob/main/templates.json). `CAMPAIGN_API_KEY` is the campaign's browser-visible Campaign Cart key, never an Admin API token.
 
 ```bash
 npx --no-install campaign-init --non-interactive \
     --template apollo \
     --slug grounding-mat-v2 \
     --name "Grounding Mat V2" \
-    --api-key "${CAMPAIGN_API_KEY:?Load the selected public campaign key in this invocation}" \
+    --api-key "$CAMPAIGN_API_KEY" \
     --ai-context claude
 ```
 
@@ -131,7 +127,7 @@ Add `--json` for agent-friendly automation — a single structured object on std
 ```bash
 npx --no-install campaign-init --json \
     --template apollo --slug grounding-mat-v2 --name "Grounding Mat V2" \
-    --api-key "${CAMPAIGN_API_KEY:?Load the selected public campaign key in this invocation}" \
+    --api-key "$CAMPAIGN_API_KEY" \
     --ai-context claude
 ```
 

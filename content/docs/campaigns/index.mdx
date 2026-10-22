@@ -36,7 +36,7 @@ npx --no-install campaign-init --help
 npx --no-install campaign-init
 ```
 
-Run the commands below from this project's package root. The `campaign-*` executables come from its installed `next-campaign-page-kit` dependency; `--no-install` prevents an implicit package download. For an existing project, keep its pinned dependency and lockfile, and follow the [installed-version guidance](/docs/campaigns/page-kit#installed-version-compatibility) before using flags from these examples.
+Run the commands below from the project's package root. The `campaign-*` executables come from its installed `next-campaign-page-kit` dependency; `--no-install` prevents an implicit package download. For an existing project, keep its pinned dependency and lockfile.
 
 `campaign-init` walks you through everything in one prompt-driven flow:
 
@@ -52,12 +52,10 @@ The `--ai-context` step writes the right context file to the right path for your
 </Callout>
 
 <Callout type="info">
-You can build without supplying a key, but Page Kit 0.3.0 may retain demo commerce credentials and enabled tracking. Before opening unconfigured output, follow the [local preview procedure](/docs/agent-setup#build-a-local-preview-before-connecting-commerce). Run `npm run config` when ready to bind the intended campaign.
+Skipping the API key is fine: init clears the template's demo key, and the SDK does not boot without one, so the pages render for visual review and nothing is fetched or sent. Run `npm run config` when ready to bind the intended campaign.
 </Callout>
 
 ### 3. Start the dev server
-
-Run this only when the intended campaign binding and tracking configuration are verified and preview is authorized, or when the installed release's documented inert-preview protection has been verified through the local preview procedure above. The command opens a browser automatically.
 
 ```bash
 npm run dev
@@ -293,14 +291,14 @@ Two mechanisms skip tracking entirely — including the always-on internal `next
 
 `campaign-init` can run with no prompts — pass every value as a flag:
 
-This configured-setup example uses `apollo` for a single-step checkout; select the actual family from the [current template catalog](https://github.com/NextCommerceCo/campaign-cart-starter-templates/blob/main/templates.json). Load `CAMPAIGN_API_KEY` through your approved local mechanism in this invocation. It must be the selected campaign's browser-visible Campaign Cart key, never an Admin API token; do not echo it. The required-value expansion stops the command if it is missing.
+This example uses `apollo` for a single-step checkout; pick the family from the [template catalog](https://github.com/NextCommerceCo/campaign-cart-starter-templates/blob/main/templates.json). `CAMPAIGN_API_KEY` is the campaign's browser-visible Campaign Cart key, never an Admin API token.
 
 ```bash
 npx --no-install campaign-init --non-interactive \
     --template apollo \
     --slug my-campaign \
     --name "My Campaign" \
-    --api-key "${CAMPAIGN_API_KEY:?Load the selected public campaign key in this invocation}" \
+    --api-key "$CAMPAIGN_API_KEY" \
     --ai-context claude
 ```
 

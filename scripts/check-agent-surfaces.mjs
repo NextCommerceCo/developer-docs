@@ -122,10 +122,12 @@ if (capabilityMap) {
 }
 
 // Agent setup: raw Markdown and human guide are generated from one source.
+const setupSource = read(join(ROOT, 'content', 'agent-setup.md'));
+check(setupSource !== null, 'content/agent-setup.md does not exist');
 const setupPrompt = read(join(OUT, 'agent-setup', 'prompt.md'));
 check(setupPrompt !== null, 'out/agent-setup/prompt.md does not exist');
 if (setupPrompt !== null) {
-  check(setupPrompt === readFileSync(join(ROOT, 'content', 'agent-setup.md'), 'utf8').trimEnd() + '\n', 'agent setup prompt differs from its canonical source');
+  if (setupSource !== null) check(setupPrompt === setupSource.trimEnd() + '\n', 'agent setup prompt differs from its canonical source');
   check(setupPrompt.startsWith('<!-- next-commerce-agent-setup version='), 'agent setup prompt has no version marker');
   check(!/\]\(\//.test(setupPrompt), 'agent setup prompt contains a relative Markdown link');
   for (const needle of [
@@ -139,8 +141,8 @@ if (setupPrompt !== null) {
     'campaigns-os-build-brief/v1',
     'select',
     'checkout_step',
-    'npx campaign-init --help',
-    'npx campaign-init --non-interactive --json',
+    'npx --no-install campaign-init --help',
+    'npx --no-install campaign-init --non-interactive --json',
     '--template <selected-template>',
     '| GitHub Copilot |',
     '_site/',

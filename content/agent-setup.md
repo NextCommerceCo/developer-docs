@@ -44,11 +44,23 @@ Do not invent package IDs, campaign keys or a saved Map to make validation pass.
 
 ## Inspect an existing or cloned build
 
-Read the repository's current brief, spec and generated records before deriving new intent from code. Code establishes implemented behavior; it does not establish what the merchant wanted. If Campaign Cart is present, use the existing [standardization report](https://github.com/NextCommerceCo/campaigns-os/blob/main/docs/campaign-standardization-report.md). Reuse the project's pinned toolkit, or follow the [published-package installation instructions](https://github.com/NextCommerceCo/campaigns-os#quick-start) in a separate inspection directory; an inspection alone does not require adding Campaigns OS to the application:
+Read the repository's current brief, spec and generated records before deriving new intent from code. Code establishes implemented behavior; it does not establish what the merchant wanted. If Campaign Cart is present, use the existing [standardization report](https://github.com/NextCommerceCo/campaigns-os/blob/main/docs/campaign-standardization-report.md). Reuse the project's pinned toolkit and run from the directory that owns its installation. If none exists, follow the source review and release selection in the [published-package installation instructions](https://github.com/NextCommerceCo/campaigns-os#quick-start), then install that exact release in a separate empty inspection directory:
 
 ```bash
-campaigns-os standardize --target /path/to/existing-campaign --no-doctor --json
+npm init -y
+npm install --save-dev --save-exact @nextcommerce/campaigns-os@<reviewed-version>
 ```
+
+An inspection alone does not require adding Campaigns OS to the application. From the directory containing the chosen local installation, verify the installed package, record its version/status, read its help, and inspect the target:
+
+```bash
+npm ls @nextcommerce/campaigns-os --depth=0
+npx --no-install campaigns-os tooling status --json
+npx --no-install campaigns-os --help
+npx --no-install campaigns-os standardize --target /path/to/existing-campaign --no-doctor --json
+```
+
+If the package is absent or the installed version differs from the reviewed pin, resolve that before running the CLI. Keep `--no-install`: `campaigns-os` is the executable name of the scoped package, not a package to download implicitly. `tooling status` can report attention needed for missing agent skills; retain its version and invocation report, and use that release's setup guidance for any required preparation. Do not assume a global binary is available or points at the same version.
 
 This inspects source without modifying the target. Retain its report and exact command outside generated stage records. A report does not migrate the project, prove checkout, or certify a launch. If the application is not recognized, record that limit and inspect its own integration; do not change frameworks to satisfy the detector.
 
@@ -63,7 +75,8 @@ For a new Page Kit workspace, read the [Page Kit guide](https://developers.nextc
 ```bash
 npm init -y
 npm install next-campaign-page-kit
-npx campaign-init --help
+npm ls next-campaign-page-kit --depth=0
+npx --no-install campaign-init --help
 ```
 
 Use the current [template catalog](https://github.com/NextCommerceCo/campaign-cart-starter-templates/blob/main/templates.json) and its selection guidance. Preserve a chosen template; otherwise recommend one for the product/variant and page requirements. Record the choice and why. Use the user's supplied name/slug, or propose them while continuing source work.
@@ -71,7 +84,7 @@ Use the current [template catalog](https://github.com/NextCommerceCo/campaign-ca
 For a non-interactive run, replace the placeholders with the selected values:
 
 ```bash
-npx campaign-init --non-interactive --json \
+npx --no-install campaign-init --non-interactive --json \
   --template <selected-template> \
   --slug <selected-route-slug> \
   --name "<selected-campaign-name>" \
@@ -89,13 +102,15 @@ npm run build
 
 The CLI owns scaffolding and conflict handling. Preserve failure output instead of recreating the scaffold by hand. A successful build writes `_site/`; it does not prove that opening those pages is safe or that commerce works.
 
-**Do not open an unconfigured scaffold just because init accepted no key.** Page Kit 0.3.0 can retain the template's demo key and enabled analytics. Inspect the installed version's behavior and generated output. Use a documented static-preview mode only when that installed version actually provides it, and verify it disables scripts, forms, frames and external requests before browser inspection. A pending PR is not a released capability.
+**Do not open an unconfigured scaffold just because init accepted no key.** Page Kit 0.3.0 can retain the template's demo key and enabled analytics. Inspect the installed version reported above, its documented behavior and generated output. Use a documented static-preview mode only when that installed version actually provides it, and verify it disables scripts, form submissions, embedded child frames and external resource requests before browser inspection. Check navigation destinations separately. A pending PR is not a released capability.
 
-If that protection is unavailable, leave the scaffold unopened. Make a separate local visual concept in a directory containing only authored static HTML, local CSS and local assets. Include no SDK/config scripts, forms, frames, event handlers, remote assets or payment navigation. Put this policy first in each page's `<head>`, and label every page **Commerce unconfigured — visual concept only**:
+If that protection is unavailable, leave the scaffold unopened. Make a separate local visual concept in a directory containing only authored static HTML, local CSS and local assets. Include no SDK/config scripts, forms, embedded frames, event handlers or remote assets. Remove external/payment links and redirect markup; navigation may only link to authored pages within the concept. Put this policy first in each page's `<head>`, and label every page **Commerce unconfigured — visual concept only**:
 
 ```html
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'none'; connect-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; form-action 'none'; base-uri 'none'; frame-src 'none'; object-src 'none'">
 ```
+
+The policy blocks resource requests and form submissions; it does not restrict ordinary link navigation, which must be removed or kept local in the authored markup. `frame-src` prevents this page from embedding frames. Preventing another site from embedding this page requires hosting response headers: `frame-ancestors` is [not supported in a meta policy](https://www.w3.org/TR/CSP3/#meta-element). Media and manifest requests fall back to `default-src 'none'`; worker requests fall back to `script-src 'none'`. Keep the concept self-contained: CDN styles/fonts and remote images will be blocked, so use local assets for visual review.
 
 Serve only that concept directory on loopback. Inspect its source before opening, then check rendered output and network activity at desktop and mobile widths. Record visual defects and limitations. This concept can communicate design and proposed navigation; it is not the connected campaign or payment QA. Do not remove runtime wiring from an existing campaign to make this separate preview.
 
@@ -105,7 +120,7 @@ The public [next-campaigns-create skill](https://github.com/NextCommerceCo/skill
 
 Use [next-campaigns-setup](https://github.com/NextCommerceCo/skills/tree/main/next-campaigns-setup) for Page Kit configuration. The [AI skills guide](https://developers.nextcommerce.com/docs/skills?ref=agent-setup) explains installation and version checks. Existing projects keep their own build procedure. Record Allowed Domains and payment-account linking as dependencies at their actual dashboard/API boundary.
 
-When real references and intended behavior are known, use the installed Campaigns OS [agent entry](https://github.com/NextCommerceCo/campaigns-os/blob/main/AGENTS.md) to choose local-spec or saved-Map intake. Current authoring uses CampaignSpec v5: `select` chooses before payment, `checkout_step` collects a form step, and `checkout` takes payment. v4.2/v4.3 read compatibility does not make those old versions the authoring target. The [public multi-step examples](https://github.com/NextCommerceCo/campaign-cart-starter-templates/tree/main/docs/fixtures/campaign-specs) illustrate the roles; use the installed toolkit's routing projection rather than treating every example hint as an implemented runtime guarantee.
+When real references and intended behavior are known, use the installed Campaigns OS [agent entry](https://github.com/NextCommerceCo/campaigns-os/blob/main/AGENTS.md) and [quick start](https://github.com/NextCommerceCo/campaigns-os#quick-start) to choose local-spec or saved-Map intake. Keep the same `npx --no-install campaigns-os` invocation from its installation directory. Its installed `--help` lists `start` intake and `next` continuation; follow that release's documented arguments for the artifact you actually have. Current authoring uses CampaignSpec v5: `select` chooses before payment, `checkout_step` collects a form step, and `checkout` takes payment. v4.2/v4.3 read compatibility does not make those old versions the authoring target. The [public multi-step examples](https://github.com/NextCommerceCo/campaign-cart-starter-templates/tree/main/docs/fixtures/campaign-specs) illustrate the roles; use the installed toolkit's routing projection rather than treating every example hint as an implemented runtime guarantee.
 
 Keep any saved-Map requirement that applies to the user's delivery process. Do not save a Map, publish a repo, deploy, submit an order or send analytics as a side effect of this local-preview procedure. Record what is authorized, then invoke the appropriate existing capability. A doctor/static pass, intercepted analytics request and vendor receipt are different evidence. State which was actually obtained.
 

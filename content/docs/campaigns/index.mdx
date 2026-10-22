@@ -36,7 +36,7 @@ npx --no-install campaign-init --help
 npx --no-install campaign-init
 ```
 
-Run the commands below from this project's package root. The `campaign-*` executables come from its installed `next-campaign-page-kit` dependency; `--no-install` prevents an implicit package download. For an existing project, keep its pinned dependency and lockfile.
+Run the commands below from this project's package root. The `campaign-*` executables come from its installed `next-campaign-page-kit` dependency; `--no-install` prevents an implicit package download. For an existing project, keep its pinned dependency and lockfile, and follow the [installed-version guidance](/docs/campaigns/page-kit#installed-version-compatibility) before using flags from these examples.
 
 `campaign-init` walks you through everything in one prompt-driven flow:
 
@@ -57,11 +57,13 @@ You can build without supplying a key, but Page Kit 0.3.0 may retain demo commer
 
 ### 3. Start the dev server
 
+Run this only when the intended campaign binding and tracking configuration are verified and preview is authorized, or when the installed release's documented inert-preview protection has been verified through the local preview procedure above. The command opens a browser automatically.
+
 ```bash
 npm run dev
 ```
 
-For a configured campaign you are authorized to preview, this opens your campaign's first page (e.g. `/<slug>/presell/`) in the browser and hot-reloads as you edit. If you have multiple campaigns in the project, you'll get a picker.
+This opens your campaign's first page (e.g. `/<slug>/presell/`) in the browser and hot-reloads as you edit. If you have multiple campaigns in the project, you'll get a picker.
 
 <Callout type="success" title="🎉 You did it!">
 The local server renders the starter pages. Store connection and checkout behavior still depend on the correct campaign binding, packages, offers and allowed domain. A local build alone does not verify those dependencies.

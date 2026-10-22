@@ -44,7 +44,7 @@ Do not invent package IDs, campaign keys or a saved Map to make validation pass.
 
 ## Inspect an existing or cloned build
 
-Read the repository's current brief, spec and generated records before deriving new intent from code. Code establishes implemented behavior; it does not establish what the merchant wanted. If Campaign Cart is present, use the existing [standardization report](https://github.com/NextCommerceCo/campaigns-os/blob/main/docs/campaign-standardization-report.md) after preparing the toolkit:
+Read the repository's current brief, spec and generated records before deriving new intent from code. Code establishes implemented behavior; it does not establish what the merchant wanted. If Campaign Cart is present, use the existing [standardization report](https://github.com/NextCommerceCo/campaigns-os/blob/main/docs/campaign-standardization-report.md). Reuse the project's pinned toolkit, or follow the [published-package installation instructions](https://github.com/NextCommerceCo/campaigns-os#quick-start) in a separate inspection directory; an inspection alone does not require adding Campaigns OS to the application:
 
 ```bash
 campaigns-os standardize --target /path/to/existing-campaign --no-doctor --json

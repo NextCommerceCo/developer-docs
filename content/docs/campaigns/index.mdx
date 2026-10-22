@@ -293,12 +293,14 @@ Two mechanisms skip tracking entirely — including the always-on internal `next
 
 `campaign-init` can run with no prompts — pass every value as a flag:
 
+This configured-setup example uses `apollo` for a single-step checkout; select the actual family from the [current template catalog](https://github.com/NextCommerceCo/campaign-cart-starter-templates/blob/main/templates.json). Load `CAMPAIGN_API_KEY` through your approved local mechanism in this invocation. It must be the selected campaign's browser-visible Campaign Cart key, never an Admin API token; do not echo it. The required-value expansion stops the command if it is missing.
+
 ```bash
 npx --no-install campaign-init --non-interactive \
-    --template olympus \
+    --template apollo \
     --slug my-campaign \
     --name "My Campaign" \
-    --api-key "$CAMPAIGN_API_KEY" \
+    --api-key "${CAMPAIGN_API_KEY:?Load the selected public campaign key in this invocation}" \
     --ai-context claude
 ```
 

@@ -115,12 +115,14 @@ npm run dev -c my-campaign -p 8080     # specific campaign and port
 
 `campaign-init` can run with no prompts. Pass every value as a flag and add `--non-interactive`:
 
+These configured-setup examples use `apollo` for a single-step checkout. Select the actual family from the [current template catalog](https://github.com/NextCommerceCo/campaign-cart-starter-templates/blob/main/templates.json). Load `CAMPAIGN_API_KEY` through your approved local mechanism in each invocation: it must be the selected campaign's browser-visible Campaign Cart key, never an Admin API token. Do not echo the key. The required-value expansion stops the command if it is missing.
+
 ```bash
 npx --no-install campaign-init --non-interactive \
-    --template olympus \
+    --template apollo \
     --slug grounding-mat-v2 \
     --name "Grounding Mat V2" \
-    --api-key "$CAMPAIGN_API_KEY" \
+    --api-key "${CAMPAIGN_API_KEY:?Load the selected public campaign key in this invocation}" \
     --ai-context claude
 ```
 
@@ -128,8 +130,8 @@ Add `--json` for agent-friendly automation — a single structured object on std
 
 ```bash
 npx --no-install campaign-init --json \
-    --template olympus --slug grounding-mat-v2 --name "Grounding Mat V2" \
-    --api-key "$CAMPAIGN_API_KEY" \
+    --template apollo --slug grounding-mat-v2 --name "Grounding Mat V2" \
+    --api-key "${CAMPAIGN_API_KEY:?Load the selected public campaign key in this invocation}" \
     --ai-context claude
 ```
 

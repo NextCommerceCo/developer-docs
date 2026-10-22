@@ -1,23 +1,64 @@
-<!-- next-commerce-agent-setup version=2 date=2026-09-04 -->
+<!-- next-commerce-agent-setup version=3 date=2026-10-22 -->
 
-# Start a Campaign Page Kit project with an AI agent
+# Start or continue a NEXT campaign with an AI agent
 
-Use this quickstart only when the user wants a new Campaign Page Kit workspace. It is an optional agent-friendly wrapper around the current Campaigns documentation and `campaign-init`; it is not a general Next Commerce development environment, a production architecture decision, or a replacement for the developer's chosen workflow.
+Use this procedure when the user supplies a funnel URL, design, existing campaign repository, or saved Map and wants to build, change, preview, or resume a campaign. Keep their build and hosting choices. Campaign Page Kit is the reference path for a new static campaign; an existing application does not need to become a Page Kit project.
 
-If the user wants to understand the platform, work in an existing project, build a storefront theme or app, or use the Admin API, do not scaffold a campaign. Read the [developer index](https://developers.nextcommerce.com/llms.txt?ref=agent-setup) and [platform capability map](https://developers.nextcommerce.com/capabilities.json?ref=agent-setup), identify the relevant documentation, and respond to that task instead.
+For storefront themes, apps, or other platform work, use the [developer index](https://developers.nextcommerce.com/llms.txt?ref=agent-setup) and [capability map](https://developers.nextcommerce.com/capabilities.json?ref=agent-setup) to find the relevant procedure instead.
 
 ## Before writing
 
-- Confirm that the user's request calls for a new Campaign Page Kit project. If it is unclear, ask one concise question before installing packages or creating files.
-- Inspect the current directory. If it contains an existing project, do not add a second project or replace its configuration. Ask whether to use that project or create a new subdirectory.
-- Use the Node.js version required by the current [Campaigns quick start](https://developers.nextcommerce.com/docs/campaigns?ref=agent-setup). Do not impose a stricter version or relax the documented requirement.
-- Preserve any template, source, project name, route slug, package manager, and agent-context choice the user has already made. The commands below use the docs' npm path for an empty project; do not replace an existing project's package-manager convention.
-- Do not request, print, copy, or invent credentials. A workspace can be scaffolded and built without a Campaign API key.
-- Do not call a live store or place an order unless the user has identified the store, authorized the action, and provided suitable test access.
+Inspect the supplied files and current directory. Identify the intended change, source URL/design, existing repo, campaign identity if known, build command, output directory, hosting method, and any saved brief, spec, Map or evidence. Preserve existing work and user choices; do not scaffold over an existing project.
 
-## Use the current Campaign Page Kit workflow
+Ask together for missing business decisions that affect the result, such as target products, offer changes or which source design to follow. Continue source inspection and local planning while those answers or credentials are missing. Do not ask the user to choose internal tool names.
 
-Read the [Campaign Page Kit guide](https://developers.nextcommerce.com/docs/campaigns/page-kit?ref=agent-setup), then inspect the installed CLI contract before constructing a command:
+Record actual installed versions and the source commit of a reused template/repo. For work that includes Campaigns OS, use its [runtime preparation guidance](https://github.com/NextCommerceCo/campaigns-os/blob/main/docs/runtime-readiness.md); Node.js 22 is a common supported choice. The Page Kit-only minimum and the Campaigns OS supported runtime range are different. Read the installed CLI help and package documentation before using flags. If an installed documentation link is missing, use the corresponding public repository file at that package's release tag and record the mismatch.
+
+Store access, repository publishing, deployment, test orders, and analytics sends are separate effects. A source URL or API key does not authorize all of them. Use existing authority from the user's request; never print credentials or put them in the brief, handoff, committed files or command output. With no store-write authority, keep work local and leave provisioning and payment checks pending.
+
+## Choose the entry point
+
+| Supplied input | First action | Continue with |
+| --- | --- | --- |
+| Funnel/store URL or design | Read the source and distinguish observed facts from proposed behavior | A build brief, commerce dependency plan and local concept preview |
+| Existing or cloned campaign repo | Read its instructions, build/configuration and retained evidence | Inspect current behavior and change only what the task requires |
+| Existing external build | Inspect its own source, build and deployment conventions | The relevant Campaign Cart checks; retain its framework and host |
+| Local CampaignSpec, saved Map or Build Packet | Identify the selected campaign and read existing intent/status | The supported Campaigns OS continuation command for that artifact |
+
+These entries can join the same work at different points. Do not replay provisioning or scaffolding merely because a new session starts.
+
+## From a source URL to a proposal
+
+Read public HTML or user-provided source without submitting forms or using cart/checkout endpoints. Record source URLs and capture dates. Describe observed products, variants, displayed prices/currency, offer wording, page structure and visible navigation. Mark checkout rules, shipping, subscriptions and post-purchase behavior unknown when the source does not establish them. A source site's displayed price is not proof of a NEXT package or offer configuration.
+
+Save presentation intent in the existing [Campaign Build Brief](https://github.com/NextCommerceCo/campaigns-os/blob/main/docs/campaign-build-brief.md) format, using its [v1 schema](https://github.com/NextCommerceCo/campaigns-os/blob/main/schemas/campaign-build-brief.v1.schema.json). Start with `schema_version: campaigns-os-build-brief/v1`, `brief_mode: guided`, and `status: needs_answers`. Keep source observations, proposed changes and unresolved questions distinct; use `_meta` for provenance. Do not label unapproved business choices complete.
+
+In the project's existing README or handoff note, record the proposed page journey and commerce dependencies:
+
+- Catalogue products, variants, base prices and currencies that must exist on the target store.
+- Campaign packages, quantity selections, offers/codes and shipping that must reference that catalogue.
+- Page behavior: selection, information/shipping steps, payment, offer acceptance/decline and receipt.
+- Required domains, payment linking and analytics configuration, with their current evidence or unknown status.
+
+Do not invent package IDs, campaign keys or a saved Map to make validation pass. Without real commerce bindings, retain the brief and dependency plan; a complete operational CampaignSpec comes later. Importing visual source does not automatically migrate checkout behavior.
+
+## Inspect an existing or cloned build
+
+Read the repository's current brief, spec and generated records before deriving new intent from code. Code establishes implemented behavior; it does not establish what the merchant wanted. If Campaign Cart is present, use the existing [standardization report](https://github.com/NextCommerceCo/campaigns-os/blob/main/docs/campaign-standardization-report.md) after preparing the toolkit:
+
+```bash
+campaigns-os standardize --target /path/to/existing-campaign --no-doctor --json
+```
+
+This inspects source without modifying the target. Retain its report and exact command outside generated stage records. A report does not migrate the project, prove checkout, or certify a launch. If the application is not recognized, record that limit and inspect its own integration; do not change frameworks to satisfy the detector.
+
+For a clone, record the source commit and list bindings that need replacement: campaign/store identity, packages, offers, domains, analytics IDs, URLs and custom business logic. Inspect names and locations without exposing secret values. Do not execute inherited scripts or open a connected clone before those effects are understood. Prior QA applies to the source campaign; the new bindings and changed behavior need their own proof.
+
+For a maintenance task, compare the requested business change with the existing brief/spec, authoritative commerce and implementation. Follow the [existing reconciliation and handoff procedure](https://github.com/NextCommerceCo/campaigns-os/blob/main/docs/build-packet.md) where it applies. Preserve the builder's deployment method and unchanged work.
+
+## Build a local preview before connecting commerce
+
+For a new Page Kit workspace, read the [Page Kit guide](https://developers.nextcommerce.com/docs/campaigns/page-kit?ref=agent-setup). In an empty task directory:
 
 ```bash
 npm init -y
@@ -25,9 +66,9 @@ npm install next-campaign-page-kit
 npx campaign-init --help
 ```
 
-If the user has not supplied a template, route slug, campaign name, and agent-context preference, ask for the missing choices together. Do not silently select a starter template or context file. Use the current template picker or catalog described by the CLI and docs rather than copying a fixed list from this prompt.
+Use the current [template catalog](https://github.com/NextCommerceCo/campaign-cart-starter-templates/blob/main/templates.json) and its selection guidance. Preserve a chosen template; otherwise recommend one for the product/variant and page requirements. Record the choice and why. Use the user's supplied name/slug, or propose them while continuing source work.
 
-For a non-interactive agent run, replace every placeholder below with the developer-confirmed value:
+For a non-interactive run, replace the placeholders with the selected values:
 
 ```bash
 npx campaign-init --non-interactive --json \
@@ -35,9 +76,8 @@ npx campaign-init --non-interactive --json \
   --slug <selected-route-slug> \
   --name "<selected-campaign-name>" \
   --ai-context <claude|codex|cursor|copilot|none>
+npm run build
 ```
-
-Choose the context value that matches the current tool, or `none` when the tool is unsupported or the developer does not want a generated context file:
 
 | Tool | `--ai-context` value |
 | --- | --- |
@@ -47,36 +87,38 @@ Choose the context value that matches the current tool, or `none` when the tool 
 | GitHub Copilot | `copilot` |
 | Other agents | `none` |
 
-`campaign-init` is the authority for scaffold behavior, supported flags, conflict handling, and exit codes. Do not reproduce the scaffold manually if it fails. Preserve its output and follow the troubleshooting guidance in the Campaign Page Kit guide.
+The CLI owns scaffolding and conflict handling. Preserve failure output instead of recreating the scaffold by hand. A successful build writes `_site/`; it does not prove that opening those pages is safe or that commerce works.
 
-The [Next Commerce AI skills guide](https://developers.nextcommerce.com/docs/skills?ref=agent-setup) describes optional reusable skills. Installing `next-campaigns-setup` is not required for this quickstart. Use it only when the developer asks for the fuller guided setup/configuration workflow or another official tool routes the task to it.
+**Do not open an unconfigured scaffold just because init accepted no key.** Page Kit 0.3.0 can retain the template's demo key and enabled analytics. Inspect the installed version's behavior and generated output. Use a documented static-preview mode only when that installed version actually provides it, and verify it disables scripts, forms, frames and external requests before browser inspection. A pending PR is not a released capability.
 
-## Verify only what was requested
+If that protection is unavailable, leave the scaffold unopened. Make a separate local visual concept in a directory containing only authored static HTML, local CSS and local assets. Include no SDK/config scripts, forms, frames, event handlers, remote assets or payment navigation. Put this policy first in each page's `<head>`, and label every page **Commerce unconfigured — visual concept only**:
 
-Run the static build:
-
-```bash
-npm run build
+```html
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'none'; connect-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; form-action 'none'; base-uri 'none'; frame-src 'none'; object-src 'none'">
 ```
 
-Use the JSON emitted by `campaign-init` and the generated project files to confirm that:
+Serve only that concept directory on loopback. Inspect its source before opening, then check rendered output and network activity at desktop and mobile widths. Record visual defects and limitations. This concept can communicate design and proposed navigation; it is not the connected campaign or payment QA. Do not remove runtime wiring from an existing campaign to make this separate preview.
 
-- the selected campaign is registered in `_data/campaigns.json`;
-- its source directory exists under `src/`;
-- the requested agent context file was created, or no context file was requested;
-- the build exits successfully and writes the campaign to `_site/`.
+## Connect the approved implementation when ready
 
-Inspect one generated entry page and briefly describe what the selected starter contains. Treat that as proof of a local scaffold only. Do not claim the project is connected to a store, production-ready, or tested end to end without the corresponding evidence.
+The public [next-campaigns-create skill](https://github.com/NextCommerceCo/skills/tree/main/next-campaigns-create) owns campaign creation, edit, adopt/diff/update and campaign cloning through its existing plan/approval boundaries. It reads existing catalogue products and creates campaign configuration; it does not create catalogue products or CampaignSpec. Missing products/prices require the appropriate [Admin API product procedure](https://developers.nextcommerce.com/docs/admin-api) or dashboard work with its own access and authority. The Campaign Cart key and Admin API token are different credentials.
 
-If the user explicitly wants to continue, follow the current Campaigns and testing documentation for configuration and test-store work. Otherwise stop after the verified local build; do not turn a quickstart into an unsolicited production setup.
+Use [next-campaigns-setup](https://github.com/NextCommerceCo/skills/tree/main/next-campaigns-setup) for Page Kit configuration. The [AI skills guide](https://developers.nextcommerce.com/docs/skills?ref=agent-setup) explains installation and version checks. Existing projects keep their own build procedure. Record Allowed Domains and payment-account linking as dependencies at their actual dashboard/API boundary.
 
-## Report back
+When real references and intended behavior are known, use the installed Campaigns OS [agent entry](https://github.com/NextCommerceCo/campaigns-os/blob/main/AGENTS.md) to choose local-spec or saved-Map intake. Current authoring uses CampaignSpec v5: `select` chooses before payment, `checkout_step` collects a form step, and `checkout` takes payment. v4.2/v4.3 read compatibility does not make those old versions the authoring target. The [public multi-step examples](https://github.com/NextCommerceCo/campaign-cart-starter-templates/tree/main/docs/fixtures/campaign-specs) illustrate the roles; use the installed toolkit's routing projection rather than treating every example hint as an implemented runtime guarantee.
 
-Tell the user:
+Keep any saved-Map requirement that applies to the user's delivery process. Do not save a Map, publish a repo, deploy, submit an order or send analytics as a side effect of this local-preview procedure. Record what is authorized, then invoke the appropriate existing capability. A doctor/static pass, intercepted analytics request and vendor receipt are different evidence. State which was actually obtained.
 
-1. Which directory and existing/new project path you used.
-2. Which developer-provided template, slug, name, and agent-context value you used.
-3. Which official docs and CLI contract you followed.
-4. Whether `campaign-init` and the static build passed.
-5. What you verified in the generated output.
-6. What remains unconfigured or untested, and the next step relevant to the user's stated goal.
+## Leave work another session can continue
+
+Use the repository's existing README or handoff note. Link the existing artifacts rather than creating a second lifecycle record. Include:
+
+1. The user's requested outcome, chosen implementation/host, source URLs or clone commit, and unresolved business questions.
+2. Brief/spec/Map/Build Packet paths or IDs that really exist; list absent artifacts as absent. Keep credentials out of the note.
+3. Installed tool/skill versions, working directory, build command and output directory; identify the separate concept preview when used.
+4. Which commerce bindings are verified, missing or inherited, and which actions remain unauthorized.
+5. Exact checks and output paths, what those checks prove, outstanding defects, and the next executable local action or specific missing input.
+
+A returning session reads that note and the linked artifacts, checks the current revision and installed versions, and resumes the next action. It does not reset the project or replay completed writes. Let Campaigns OS commands create their own stage/evidence records; never hand-write a passing Assembly Report or reuse a source campaign's QA as acceptance for a clone.
+
+Report the result in plain language: what can be reviewed now, what is still unconfigured or unproved, and what is needed to continue. Stop at the user's requested boundary.

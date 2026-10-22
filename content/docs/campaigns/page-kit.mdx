@@ -50,12 +50,16 @@ mkdir my-campaigns && cd my-campaigns
 ```bash
 npm init -y
 npm install next-campaign-page-kit
+npm ls next-campaign-page-kit --depth=0
+npx --no-install campaign-init --help
 ```
+
+Run the commands below from this project's package root. The `campaign-*` executables come from its installed `next-campaign-page-kit` dependency; `--no-install` prevents an implicit package download. For an existing project, keep its pinned dependency and lockfile.
 
 ### 3. Run the setup script
 
 ```bash
-npx campaign-init
+npx --no-install campaign-init
 ```
 
 `campaign-init` walks you through everything in one flow:
@@ -106,7 +110,7 @@ npm run dev -c my-campaign -p 8080     # specific campaign and port
 `campaign-init` can run with no prompts. Pass every value as a flag and add `--non-interactive`:
 
 ```bash
-npx campaign-init --non-interactive \
+npx --no-install campaign-init --non-interactive \
     --template olympus \
     --slug grounding-mat-v2 \
     --name "Grounding Mat V2" \
@@ -117,7 +121,7 @@ npx campaign-init --non-interactive \
 Add `--json` for agent-friendly automation — a single structured object on stdout, all human UI suppressed:
 
 ```bash
-npx campaign-init --json \
+npx --no-install campaign-init --json \
     --template olympus --slug grounding-mat-v2 --name "Grounding Mat V2" \
     --api-key "$CAMPAIGN_API_KEY" \
     --ai-context claude
@@ -427,9 +431,9 @@ Make sure the host's domain is listed under your campaign's **authorized domains
 Stdout carries exactly one JSON document and nothing else; warnings, errors, and debug lines go to stderr. Pipe or redirect it without any filtering:
 
 ```bash
-npm run build -- --json                          # the -- forwards the flag through npm
-npx campaign-build --json | jq '.pages'          # query it with jq
-npx campaign-build --json > build-output.json    # save to a file
+npm run build -- --json                                      # the -- forwards the flag through npm
+npx --no-install campaign-build --json | jq '.pages'          # query it with jq
+npx --no-install campaign-build --json > build-output.json    # save to a file
 ```
 
 ```json
@@ -485,7 +489,7 @@ npx campaign-build --json > build-output.json    # save to a file
 | `errors` | Why the page failed, each `{ code, message }`. Error codes name the failed step: `READ_ERROR`, `FRONTMATTER_ERROR`, `RESOLVE_ERROR`, `RENDER_ERROR`, `WRITE_ERROR` |
 
 <Callout type="info">
-Filter the report to one campaign with jq: `npx campaign-build --json | jq '.pages[] | select(.campaignSlug == "my-campaign")'`
+Filter the report to one campaign with jq: `npx --no-install campaign-build --json | jq '.pages[] | select(.campaignSlug == "my-campaign")'`
 </Callout>
 
 ### Build warnings

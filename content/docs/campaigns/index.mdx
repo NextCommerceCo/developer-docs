@@ -31,8 +31,12 @@ In a fresh directory:
 mkdir my-campaigns && cd my-campaigns
 npm init -y
 npm install next-campaign-page-kit
-npx campaign-init
+npm ls next-campaign-page-kit --depth=0
+npx --no-install campaign-init --help
+npx --no-install campaign-init
 ```
+
+Run the commands below from this project's package root. The `campaign-*` executables come from its installed `next-campaign-page-kit` dependency; `--no-install` prevents an implicit package download. For an existing project, keep its pinned dependency and lockfile.
 
 `campaign-init` walks you through everything in one prompt-driven flow:
 
@@ -288,7 +292,7 @@ Two mechanisms skip tracking entirely — including the always-on internal `next
 `campaign-init` can run with no prompts — pass every value as a flag:
 
 ```bash
-npx campaign-init --non-interactive \
+npx --no-install campaign-init --non-interactive \
     --template olympus \
     --slug my-campaign \
     --name "My Campaign" \

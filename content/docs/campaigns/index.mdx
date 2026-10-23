@@ -48,7 +48,7 @@ The `--ai-context` step writes the right context file to the right path for your
 </Callout>
 
 <Callout type="info">
-Skipping the API key is fine: the starter templates ship with an empty `apiKey`, and the SDK does not boot without one, so the pages render for visual review with no commerce calls and no SDK analytics events. Vendor snippets set through `_data/campaigns.json` keys load independently of the SDK key; the `providers.*.enabled` flags govern only what the SDK forwards to them (see [Analytics & Tracking](#analytics--tracking)). A new slug has none; leave an existing slug's keys untouched. Run `npm run config` when ready to bind the intended campaign.
+Skipping the API key is fine for a look around: the scaffold runs against the starter templates' demo campaign, so the prices and checkout you see are the demo store's. Run `npm run config` to bind your campaign before testing anything that counts.
 </Callout>
 
 ### 3. Start the dev server

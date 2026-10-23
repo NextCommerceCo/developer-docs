@@ -136,7 +136,7 @@ if (setupPrompt !== null) {
     '## Choose the entry point',
     '## Leave work another session can continue',
     'campaigns-os standardize --target',
-    'ship with an empty `apiKey`',
+    'demo campaign',
     'campaigns-os-build-brief/v1',
     'select',
     'checkout_step',

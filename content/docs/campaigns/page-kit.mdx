@@ -72,7 +72,7 @@ npx campaign-init
 8. Optionally installs an **AI context doc** for your editor or agent
 
 <Callout type="info">
-Get your Campaign API key from the Campaigns App in your store. You can skip it during init and run `npm run config` later: the starter templates ship with an empty `apiKey`, and the SDK does not boot without one, so the pages render for visual review with no commerce calls and no SDK analytics events. Vendor snippets set through `_data/campaigns.json` keys load independently of the SDK key; the `providers.*.enabled` flags govern only what the SDK forwards to them (see [Analytics & Tracking](/docs/campaigns#analytics--tracking)). A new slug has none; leave an existing slug's keys untouched.
+Get your Campaign API key from the Campaigns App in your store. You can skip it during init and run `npm run config` later. Until then the scaffold runs against the starter templates' demo campaign, so the prices and checkout you see are the demo store's.
 </Callout>
 
 ### 4. Start the dev server

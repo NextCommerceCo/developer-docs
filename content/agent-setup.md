@@ -74,7 +74,7 @@ npm run build
 
 The CLI owns scaffolding and conflict handling; preserve its failure output instead of recreating the scaffold by hand. A successful build writes `_site/`.
 
-The starter templates ship with an empty `apiKey`, and the Campaign Cart SDK does not boot without one, so a scaffold made without a campaign key renders for visual review with placeholder prices, no commerce calls and no SDK analytics events. Vendor snippets that templates load from `_data/campaigns.json` keys (GTM, pixels; see the [analytics key table](https://github.com/NextCommerceCo/campaign-cart-starter-templates/blob/main/_shared/analytics/README.md)) do not depend on the SDK key: a fresh scaffold has none, and an existing slug keeps its tracking configuration, so treat its preview as live for those vendors rather than editing the registry. Before `npm run dev`, confirm the top-level `apiKey` in `assets/config.js` is empty; a configured campaign talks to the selected store and needs the authorization steps below. The preview shows the stock template, not a rebuild of the source funnel, and proves nothing about checkout, prices, shipping or tracking.
+A scaffold made without a campaign key runs against the starter templates' demo campaign: the prices, cart and checkout it shows are the demo store's. Use it to review layout and flow, place no orders against it, and record in the handoff that the preview is demo-bound; it is not evidence about the merchant's campaign. Bind the real campaign with `npm run config` before any check that is meant to count, which needs the authorization steps below. The preview shows the stock template, not a rebuild of the source funnel.
 
 ## Connect the approved implementation when ready
 

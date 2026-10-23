@@ -33,24 +33,24 @@ mkdirSync(generatedDir, { recursive: true });
 writeFileSync(join(generatedDir, 'agent-setup.json'), JSON.stringify({ prompt: source }, null, 2) + '\n');
 writeFileSync(join(generatedDir, 'evaluation-prompt.json'), JSON.stringify({ prompt: evaluationSource }, null, 2) + '\n');
 
-const promptHeading = /^# Start a Campaign Page Kit project with an AI agent$/m;
+const promptHeading = /^# Start or continue a NEXT campaign with an AI agent$/m;
 const humanSource = source.replace(/^<!--[^\n]+-->\n+/, '');
 if (!promptHeading.test(humanSource)) {
   throw new Error('content/agent-setup.md must contain the expected setup heading');
 }
 const humanInstructions = humanSource.replace(promptHeading, '## Instructions your agent receives');
 const guide = `---
-title: Campaign agent quickstart
-description: An optional agent-friendly wrapper around the current Campaign Page Kit docs and CLI that preserves the developer's workflow choices
+title: Start or continue a campaign with an agent
+description: Start from a funnel URL, existing repository or Map, prepare a local preview, and leave a handoff another agent can continue
 ---
 
 Give your coding agent this instruction:
 
 \`\`\`text
-Read https://developers.nextcommerce.com/agent-setup/prompt.md and use it to start a new Campaign Page Kit project for this task. Preserve my existing choices. If the template, route slug, campaign name, or agent-context preference is missing, ask me before creating files.
+Read https://developers.nextcommerce.com/agent-setup/prompt.md and help me start or continue this campaign from the URL, repository or Map I provide. Preserve my build and hosting choices. Prepare a local preview and resumable handoff; keep live merchant state untouched.
 \`\`\`
 
-The fetched file is plain Markdown at a stable URL. It uses the same source as the instructions below, contains no credentials, and keeps the current CLI and Campaigns docs authoritative. It is a campaign-specific quickstart, not general setup for every kind of Next Commerce development.
+The fetched file is plain Markdown at a stable URL. It uses the same source as the instructions below, contains no credentials, and keeps the current CLI and Campaigns docs authoritative. It covers campaign intake, existing builds and continuation. It does not require a new project or store credentials before source inspection and local planning.
 
 ${humanInstructions}`;
 

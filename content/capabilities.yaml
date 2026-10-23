@@ -266,8 +266,9 @@ capabilities:
     title: Campaigns
     summary: >-
       Campaigns are custom checkout funnels (landing, checkout, upsell, receipt pages)
-      backed by the CORS-enabled Campaigns API, built with the Campaign Page Kit and
-      starter templates. A campaign's checkout is separate from the storefront checkout,
+      backed by the CORS-enabled Campaigns API. Campaign Page Kit and starter templates
+      provide a reference build path; existing Campaign Cart applications retain their
+      tooling. A campaign's checkout is separate from the storefront checkout,
       but its orders are ordinary store orders that share the orders list, inventory,
       and subscriptions.
     audiences: [merchant, developer]
@@ -279,6 +280,7 @@ capabilities:
     developer_docs:
       - /docs/campaigns
       - /docs/campaigns/page-kit
+      - /docs/agent-setup
       - /docs/campaigns/templates
       - /docs/campaigns/api
       - /docs/campaigns/admin-api
@@ -286,7 +288,7 @@ capabilities:
     webhooks: []
     skills: [next-campaigns-create, next-campaigns-setup]
     status: available
-    last_verified: 2026-09-14
+    last_verified: 2026-10-22
 
   - id: storefront-themes
     title: Storefront themes

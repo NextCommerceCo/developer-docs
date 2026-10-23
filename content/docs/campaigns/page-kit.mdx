@@ -52,6 +52,8 @@ npm init -y
 npm install next-campaign-page-kit
 ```
 
+The `campaign-*` commands come from this installed dependency; run them from the project root, and in an existing project keep its pinned version.
+
 ### 3. Run the setup script
 
 ```bash
@@ -70,7 +72,7 @@ npx campaign-init
 8. Optionally installs an **AI context doc** for your editor or agent
 
 <Callout type="info">
-Get your Campaign API key from the Campaigns App in your store. You can skip this step during init and run `npm run config` later.
+Get your Campaign API key from the Campaigns App in your store. You can skip it during init and run `npm run config` later. Until then the scaffold runs against the starter templates' demo campaign, so the prices and checkout you see are the demo store's.
 </Callout>
 
 ### 4. Start the dev server
@@ -105,12 +107,14 @@ npm run dev -c my-campaign -p 8080     # specific campaign and port
 
 `campaign-init` can run with no prompts. Pass every value as a flag and add `--non-interactive`:
 
+These examples use `apollo` for a single-step checkout; pick the family from the [template catalog](https://github.com/NextCommerceCo/campaign-cart-starter-templates/blob/main/templates.json). `CAMPAIGN_API_KEY` is the campaign's browser-visible Campaign Cart key, never an Admin API token.
+
 ```bash
 npx campaign-init --non-interactive \
-    --template olympus \
+    --template apollo \
     --slug grounding-mat-v2 \
     --name "Grounding Mat V2" \
-    --api-key "$CAMPAIGN_API_KEY" \
+    --api-key "${CAMPAIGN_API_KEY:?set CAMPAIGN_API_KEY first}" \
     --ai-context claude
 ```
 
@@ -118,8 +122,8 @@ Add `--json` for agent-friendly automation — a single structured object on std
 
 ```bash
 npx campaign-init --json \
-    --template olympus --slug grounding-mat-v2 --name "Grounding Mat V2" \
-    --api-key "$CAMPAIGN_API_KEY" \
+    --template apollo --slug grounding-mat-v2 --name "Grounding Mat V2" \
+    --api-key "${CAMPAIGN_API_KEY:?set CAMPAIGN_API_KEY first}" \
     --ai-context claude
 ```
 

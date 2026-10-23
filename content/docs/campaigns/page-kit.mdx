@@ -76,7 +76,7 @@ npx --no-install campaign-init
 8. Optionally installs an **AI context doc** for your editor or agent
 
 <Callout type="info">
-Get your Campaign API key from the Campaigns App in your store. You can skip it during init and run `npm run config` later: init clears the template's demo key, and the SDK does not boot without one, so the pages render for visual review and nothing is fetched or sent.
+Get your Campaign API key from the Campaigns App in your store. You can skip it during init and run `npm run config` later. On releases after 0.3.0, init clears the template's demo key, and the SDK does not boot without one, so the pages render for visual review with no commerce calls and no analytics events. On 0.3.0, set the `apiKey` in `assets/config.js` to `''` by hand first.
 </Callout>
 
 ### 4. Start the dev server

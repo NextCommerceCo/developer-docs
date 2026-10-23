@@ -86,7 +86,7 @@ npm run build
 
 The CLI owns scaffolding and conflict handling; preserve its failure output instead of recreating the scaffold by hand. A successful build writes `_site/`.
 
-Without a campaign key, init clears the template's demo key and reports `runtime_mode: "unconfigured"`. The Campaign Cart SDK does not boot without a key, so the pages render for visual review with placeholder prices and nothing is fetched or sent. `npm run dev` is safe to open in that state. It shows design and proposed navigation; it is not the connected campaign and proves nothing about checkout, prices, shipping or tracking.
+Without a campaign key, Page Kit releases after 0.3.0 clear the template's demo key and report `runtime_mode: "unconfigured"`. The Campaign Cart SDK does not boot without a key, so the pages render for visual review with placeholder prices, no commerce calls and no `dl_*` analytics events; it still fetches locale and country rules. If the init JSON has no `runtime_mode`, the installed release predates the fix: set the top-level `apiKey` in `assets/config.js` to `''` by hand before opening. Vendor tracking keys in `_data/campaigns.json` load independently of the SDK key, so on an existing slug check them against the starter templates' [analytics key table](https://github.com/NextCommerceCo/campaign-cart-starter-templates/blob/main/_shared/analytics/README.md). The preview shows the stock template's design and proposed navigation; it is not a rebuild of the source funnel or the connected campaign, and proves nothing about checkout, prices, shipping or tracking.
 
 ## Connect the approved implementation when ready
 

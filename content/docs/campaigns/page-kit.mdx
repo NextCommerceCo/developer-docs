@@ -50,18 +50,14 @@ mkdir my-campaigns && cd my-campaigns
 ```bash
 npm init -y
 npm install next-campaign-page-kit
-npm ls next-campaign-page-kit --depth=0
-npx --no-install campaign-init --help
 ```
 
-#### Installed version compatibility
-
-Run the commands below from the project's package root. The `campaign-*` executables come from its installed `next-campaign-page-kit` dependency; `--no-install` prevents an implicit package download. For an existing project, keep its pinned dependency and lockfile. JSON build output requires Page Kit **0.1.4 or later**; older pins use the plain build.
+The `campaign-*` commands come from this installed dependency; run them from the project root, and in an existing project keep its pinned version. `npx --no-install campaign-init` runs the pinned copy without ever downloading one.
 
 ### 3. Run the setup script
 
 ```bash
-npx --no-install campaign-init
+npx campaign-init
 ```
 
 `campaign-init` walks you through everything in one flow:
@@ -114,7 +110,7 @@ npm run dev -c my-campaign -p 8080     # specific campaign and port
 These examples use `apollo` for a single-step checkout; pick the family from the [template catalog](https://github.com/NextCommerceCo/campaign-cart-starter-templates/blob/main/templates.json). `CAMPAIGN_API_KEY` is the campaign's browser-visible Campaign Cart key, never an Admin API token.
 
 ```bash
-npx --no-install campaign-init --non-interactive \
+npx campaign-init --non-interactive \
     --template apollo \
     --slug grounding-mat-v2 \
     --name "Grounding Mat V2" \
@@ -125,7 +121,7 @@ npx --no-install campaign-init --non-interactive \
 Add `--json` for agent-friendly automation — a single structured object on stdout, all human UI suppressed:
 
 ```bash
-npx --no-install campaign-init --json \
+npx campaign-init --json \
     --template apollo --slug grounding-mat-v2 --name "Grounding Mat V2" \
     --api-key "${CAMPAIGN_API_KEY:?set CAMPAIGN_API_KEY first}" \
     --ai-context claude
@@ -435,9 +431,9 @@ Make sure the host's domain is listed under your campaign's **authorized domains
 Stdout carries exactly one JSON document and nothing else; warnings, errors, and debug lines go to stderr. Pipe or redirect it without any filtering:
 
 ```bash
-npm run build -- --json                                      # the -- forwards the flag through npm
-npx --no-install campaign-build --json | jq '.pages'          # query it with jq
-npx --no-install campaign-build --json > build-output.json    # save to a file
+npm run build -- --json                          # the -- forwards the flag through npm
+npx campaign-build --json | jq '.pages'          # query it with jq
+npx campaign-build --json > build-output.json    # save to a file
 ```
 
 ```json
@@ -493,7 +489,7 @@ npx --no-install campaign-build --json > build-output.json    # save to a file
 | `errors` | Why the page failed, each `{ code, message }`. Error codes name the failed step: `READ_ERROR`, `FRONTMATTER_ERROR`, `RESOLVE_ERROR`, `RENDER_ERROR`, `WRITE_ERROR` |
 
 <Callout type="info">
-Filter the report to one campaign with jq: `npx --no-install campaign-build --json | jq '.pages[] | select(.campaignSlug == "my-campaign")'`
+Filter the report to one campaign with jq: `npx campaign-build --json | jq '.pages[] | select(.campaignSlug == "my-campaign")'`
 </Callout>
 
 ### Build warnings

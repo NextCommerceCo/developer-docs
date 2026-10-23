@@ -136,7 +136,7 @@ if (setupPrompt !== null) {
     '## Choose the entry point',
     '## Leave work another session can continue',
     'campaigns-os standardize --target',
-    'runtime_mode: "unconfigured"',
+    'ship with an empty `apiKey`',
     'campaigns-os-build-brief/v1',
     'select',
     'checkout_step',

@@ -52,7 +52,7 @@ The `--ai-context` step writes the right context file to the right path for your
 </Callout>
 
 <Callout type="info">
-Skipping the API key is fine on Page Kit releases after 0.3.0: init clears the template's demo key, and the SDK does not boot without one, so the pages render for visual review with no commerce calls and no SDK analytics events. Vendor snippets set through `_data/campaigns.json` keys (see [Analytics & Tracking](#analytics--tracking)) load regardless, so leave those empty until the campaign is configured. On 0.3.0, set the `apiKey` in `assets/config.js` to `''` by hand first. Run `npm run config` when ready to bind the intended campaign.
+Skipping the API key is fine: the starter templates ship with an empty `apiKey`, and the SDK does not boot without one, so the pages render for visual review with no commerce calls and no SDK analytics events. Vendor snippets set through `_data/campaigns.json` keys (see [Analytics & Tracking](#analytics--tracking)) load regardless, so leave those empty until the campaign is configured. Run `npm run config` when ready to bind the intended campaign.
 </Callout>
 
 ### 3. Start the dev server

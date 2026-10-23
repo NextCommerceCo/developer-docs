@@ -48,7 +48,7 @@ The `--ai-context` step writes the right context file to the right path for your
 </Callout>
 
 <Callout type="info">
-Skipping the API key is fine: the starter templates ship with an empty `apiKey`, and the SDK does not boot without one, so the pages render for visual review with no commerce calls and no SDK analytics events. Vendor snippets set through `_data/campaigns.json` keys (see [Analytics & Tracking](#analytics--tracking)) load regardless, so leave those empty until the campaign is configured. Run `npm run config` when ready to bind the intended campaign.
+Skipping the API key is fine: the starter templates ship with an empty `apiKey`, and the SDK does not boot without one, so the pages render for visual review with no commerce calls and no SDK analytics events. Vendor snippets set through `_data/campaigns.json` keys load independently of the SDK key; the `providers.*.enabled` flags govern only what the SDK forwards to them (see [Analytics & Tracking](#analytics--tracking)). A new slug has none; leave an existing slug's keys untouched. Run `npm run config` when ready to bind the intended campaign.
 </Callout>
 
 ### 3. Start the dev server

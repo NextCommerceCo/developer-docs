@@ -52,7 +52,7 @@ npm init -y
 npm install next-campaign-page-kit
 ```
 
-The `campaign-*` commands come from this installed dependency; run them from the project root, and in an existing project keep its pinned version. `npx --no-install campaign-init` runs the pinned copy without ever downloading one.
+The `campaign-*` commands come from this installed dependency; run them from the project root, and in an existing project keep its pinned version.
 
 ### 3. Run the setup script
 
@@ -72,7 +72,7 @@ npx campaign-init
 8. Optionally installs an **AI context doc** for your editor or agent
 
 <Callout type="info">
-Get your Campaign API key from the Campaigns App in your store. You can skip it during init and run `npm run config` later: the starter templates ship with an empty `apiKey`, and the SDK does not boot without one, so the pages render for visual review with no commerce calls and no SDK analytics events. Vendor snippets set through `_data/campaigns.json` keys (see [Analytics & Tracking](/docs/campaigns#analytics--tracking)) load regardless, so leave those empty until the campaign is configured.
+Get your Campaign API key from the Campaigns App in your store. You can skip it during init and run `npm run config` later: the starter templates ship with an empty `apiKey`, and the SDK does not boot without one, so the pages render for visual review with no commerce calls and no SDK analytics events. Vendor snippets set through `_data/campaigns.json` keys load independently of the SDK key; the `providers.*.enabled` flags govern only what the SDK forwards to them (see [Analytics & Tracking](/docs/campaigns#analytics--tracking)). A new slug has none; leave an existing slug's keys untouched.
 </Callout>
 
 ### 4. Start the dev server

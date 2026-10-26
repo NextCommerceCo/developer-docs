@@ -159,9 +159,7 @@ Use the version selector on that site to read the docs for the SDK version your 
 
 A **campaign** bundles everything needed for a checkout: packages, offers, shipping options, payment methods, and localization. Each campaign has a unique **API key** used by the SDK to authenticate requests.
 
-- A campaign has one language. To sell in another language, create a separate campaign.
-- The default currency is fixed once the campaign is created. Additional currencies can change.
-- The API key is meant for browser code. The [authorized domains](#domains) decide where it works, so it needs no secret handling. Keep Admin API tokens off your pages.
+A campaign has one language, so another language needs its own campaign. The default currency can't change after create. The API key is safe in browser code; the [authorized domains](#domains) limit where it works.
 
 ### Packages
 
@@ -201,9 +199,7 @@ Every offer has a **condition** that decides when it applies and a **benefit** t
 | `count` | The quantity of a matching package is at or above `value` | Buy 2 or more Widgets |
 | `count_equal` | The quantity of a matching package is exactly `value` | Exactly 2 Widgets |
 
-A condition targets either every package on the campaign (`all_packages: true`, which also covers packages added later) or a specific list of `package_ids`. In the Campaigns App dashboard, this is the offer's **Products** selection or **All Products**.
-
-Give quantity tier offers a `package_ids` list. If the checkout sells full-price add-ons, `all_packages` discounts them too.
+A condition targets either every package on the campaign (`all_packages: true`, which also covers packages added later) or a specific list of `package_ids`. In the Campaigns App dashboard, this is the offer's **Products** selection or **All Products**. Use `package_ids` for tier offers, since `all_packages` would also discount full-price add-ons.
 
 #### Benefit types
 
@@ -235,7 +231,7 @@ The package's list price stays at $49.95/unit. Each tier is a `count` condition 
 
 A **shipping method** in a campaign is a virtual link to a shipping method configured on the store, with campaign-specific custom pricing. This lets you charge a different shipping rate (e.g. a flat $4.95 or free shipping) per campaign without changing the underlying store-level shipping method.
 
-To discount shipping only when an order qualifies, such as free shipping at 3 or more, keep the campaign price and add an offer with a `shipping_percentage` benefit. Don't add a second, cheaper shipping method for it.
+For conditional shipping discounts, such as free shipping at 3 or more, use a `shipping_percentage` offer instead of a second shipping method.
 
 ### Domains
 

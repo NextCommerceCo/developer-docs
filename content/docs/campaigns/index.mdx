@@ -159,6 +159,10 @@ Use the version selector on that site to read the docs for the SDK version your 
 
 A **campaign** bundles everything needed for a checkout: packages, offers, shipping options, payment methods, and localization. Each campaign has a unique **API key** used by the SDK to authenticate requests.
 
+- A campaign has one language. To sell in another language, create a separate campaign.
+- The default currency is fixed once the campaign is created. Additional currencies can change.
+- The API key is meant for browser code. The [authorized domains](#domains) decide where it works, so it needs no secret handling. Keep Admin API tokens off your pages.
+
 ### Packages
 
 A **package** is the campaign's sellable reference to a product or product variant. In SDK 0.4.x-compatible builds, keep packages focused on identity and base price:
@@ -199,6 +203,8 @@ Every offer has a **condition** that decides when it applies and a **benefit** t
 
 A condition targets either every package on the campaign (`all_packages: true`, which also covers packages added later) or a specific list of `package_ids`. In the Campaigns App dashboard, this is the offer's **Products** selection or **All Products**.
 
+Give quantity tier offers a `package_ids` list. If the checkout sells full-price add-ons, `all_packages` discounts them too.
+
 #### Benefit types
 
 All benefits are percentage based. `value` is the percentage off.
@@ -228,6 +234,8 @@ The package's list price stays at $49.95/unit. Each tier is a `count` condition 
 ### Shipping methods
 
 A **shipping method** in a campaign is a virtual link to a shipping method configured on the store, with campaign-specific custom pricing. This lets you charge a different shipping rate (e.g. a flat $4.95 or free shipping) per campaign without changing the underlying store-level shipping method.
+
+To discount shipping only when an order qualifies, such as free shipping at 3 or more, keep the campaign price and add an offer with a `shipping_percentage` benefit. Don't add a second, cheaper shipping method for it.
 
 ### Domains
 

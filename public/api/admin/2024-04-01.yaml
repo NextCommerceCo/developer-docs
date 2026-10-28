@@ -1548,6 +1548,11 @@ components:
       type: object
     CreateGiftCardRequest:
       properties:
+        code:
+          maxLength: 18
+          minLength: 4
+          pattern: ^[A-Za-z0-9_-]+$
+          type: string
         currency:
           maxLength: 3
           minLength: 1
@@ -1561,6 +1566,10 @@ components:
           format: decimal
           pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
           type: string
+        send_email:
+          default: true
+          type: boolean
+          writeOnly: true
         user:
           $ref: '#/components/schemas/CreateUserRequest'
       required:
@@ -6555,8 +6564,7 @@ components:
             - integer
             - 'null'
         enable_3ds2:
-          description: Transactions are attempted with 3DS authentication.
-          title: Enable 3D Secure Transactions
+          readOnly: true
           type: boolean
         gateway_groups:
           items:
@@ -6606,9 +6614,22 @@ components:
           type:
             - boolean
             - 'null'
+        three_ds_mode:
+          description: |-
+            * `off` - Off
+            * `smart` - Smart
+            * `always` - Always On
+          enum:
+            - 'off'
+            - smart
+            - always
+          title: 3DS Mode
+          type: string
+          x-spec-enum-id: 01a6e8274c41131f
       required:
         - card_types
         - currencies
+        - enable_3ds2
         - gateway_groups
         - gateway_type
         - id
@@ -8260,11 +8281,6 @@ components:
           title: Number in stock
           type:
             - integer
-            - 'null'
-        partner_sku:
-          title: SKU
-          type:
-            - string
             - 'null'
         price:
           format: decimal
@@ -27049,6 +27065,7 @@ webhooks:
                   is_default: false
                   name: string
                 re_attemp_intitial_charge: null
+                three_ds_mode: string
               event_id: a7a26ff2-e851-45b6-9634-d595f45458b7
               event_type: gateway.created
               object: gateway
@@ -27105,8 +27122,6 @@ webhooks:
                       minimum: 1
                       type: integer
                     enable_3ds2:
-                      description: Transactions are attempted with 3DS authentication.
-                      title: Enable 3D Secure Transactions
                       type: boolean
                     gateway_groups:
                       items:
@@ -27264,9 +27279,22 @@ webhooks:
                       description: Reattempt soft declines with another gateway.
                       title: Re-attempt declined initial charge attempts
                       type: boolean
+                    three_ds_mode:
+                      description: |-
+                        * `off` - Off
+                        * `smart` - Smart
+                        * `always` - Always On
+                      enum:
+                        - 'off'
+                        - smart
+                        - always
+                      title: 3DS Mode
+                      type: string
+                      x-spec-enum-id: 01a6e8274c41131f
                   required:
                     - card_types
                     - currencies
+                    - enable_3ds2
                     - gateway_groups
                     - gateway_type
                     - id
@@ -27387,6 +27415,7 @@ webhooks:
                   is_default: false
                   name: string
                 re_attemp_intitial_charge: null
+                three_ds_mode: string
               event_id: a7a26ff2-e851-45b6-9634-d595f45458b7
               event_type: gateway.updated
               object: gateway
@@ -27443,8 +27472,6 @@ webhooks:
                       minimum: 1
                       type: integer
                     enable_3ds2:
-                      description: Transactions are attempted with 3DS authentication.
-                      title: Enable 3D Secure Transactions
                       type: boolean
                     gateway_groups:
                       items:
@@ -27602,9 +27629,22 @@ webhooks:
                       description: Reattempt soft declines with another gateway.
                       title: Re-attempt declined initial charge attempts
                       type: boolean
+                    three_ds_mode:
+                      description: |-
+                        * `off` - Off
+                        * `smart` - Smart
+                        * `always` - Always On
+                      enum:
+                        - 'off'
+                        - smart
+                        - always
+                      title: 3DS Mode
+                      type: string
+                      x-spec-enum-id: 01a6e8274c41131f
                   required:
                     - card_types
                     - currencies
+                    - enable_3ds2
                     - gateway_groups
                     - gateway_type
                     - id

@@ -66,7 +66,7 @@ Shop Pay does not support recurring transactions and cannot be used as a payment
 
 Shop Pay payments are captured automatically once the customer completes payment on the Shop Pay checkout page, whatever capture method is set in the merchant's Shop Pay store in Shopify. NEXT captures the payment itself, so you don't need to call the capture endpoint for Shop Pay orders.
 
-- **Refunds** can be full or partial, using [ordersRefundCalculateCreate](/docs/admin-api/reference/orders/ordersRefundCalculateCreate) and [ordersRefundCreate](/docs/admin-api/reference/orders/ordersRefundCreate) as for other payment methods. A refund can stay pending until Shopify confirms it.
+- **Refunds** can be full or partial, using [ordersRefundCalculateCreate](/docs/admin-api/reference/orders/ordersRefundCalculateCreate) and [ordersRefundCreate](/docs/admin-api/reference/orders/ordersRefundCreate) as for other payment methods (see [Order Refunds](/docs/admin-api/guides/order-management#order-refunds)). A refund can stay pending until Shopify confirms it.
 - **Disputes** are handled in the merchant's Shop Pay store in Shopify admin. They aren't created as NEXT disputes, so they don't appear in `disputesList`, and the [dispute.created](/docs/webhooks/reference/payments/dispute.created) and [dispute.updated](/docs/webhooks/reference/payments/dispute.updated) webhooks don't fire for `shop_pay` transactions.
 
 ## Campaigns API

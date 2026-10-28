@@ -467,8 +467,15 @@ Older integrations load `iframe-v1.min.js` and call `Spreedly` directly. Replace
 3DS2 payments are fully supported via the Admin API to process the customer through an authentication flow, with the final transaction information and results provided back to your application.
 
 <Callout type="info">
-Your store must have a 3DS2-enabled gateway to process 3DS2 transactions.
+Your store must have a 3DS2-enabled gateway to process 3DS2 transactions. A gateway is 3DS2-enabled when its `three_ds_mode` is `smart` or `always`.
 </Callout>
+
+### Smart mode gateways
+
+A `smart` gateway decides per order whether to use 3DS ([how Smart mode works](https://docs.nextcommerce.com/docs/features/payments/3ds2-payments#smart-mode)). You can't know in advance which, so always send `payment_return_url` and handle both responses:
+
+- **3DS used:** the response has a `payment_complete_url` instead of an order. Continue with the redirect flow below.
+- **3DS skipped:** the outcome comes back in the response: the created order, or a [failed payment response](#transaction-response-codes). Nothing is posted to `payment_return_url`.
 
 ### API payment redirect flow
 
@@ -476,7 +483,7 @@ Your store must have a 3DS2-enabled gateway to process 3DS2 transactions.
 
 ### Create the order
 
-When creating an order using a 3DS2-enabled gateway, use `payment_method=card_token` and provide a `payment_return_url`. The `payment_return_url` is your endpoint that will receive a POST request containing the final order data.
+When creating an order using a 3DS2-enabled gateway, use `payment_method=card_token` and provide a `payment_return_url`. When 3DS is used, `payment_return_url` receives a POST request containing the final order data.
 
 ```json title="Payment Details for Order with 3DS2 Payment"
 "payment_method": "card_token",

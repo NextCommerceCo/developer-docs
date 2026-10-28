@@ -1,6 +1,6 @@
 ---
 title: Getting Started
-description: Scaffold a campaign funnel with Campaign Page Kit, place a test order, and understand campaigns, packages, offers, domains, analytics, and hosting
+description: Start or continue a campaign, preview locally, and connect products, offers, domains, analytics and hosting
 ---
 import { Callout } from 'fumadocs-ui/components/callout';
 import { CampaignFunnelFlow, CampaignAnatomy } from '@/components/campaign-concepts-flow';
@@ -10,7 +10,7 @@ Campaigns are fully custom checkout funnels — landing, checkout, upsell, and r
 Orders created through a campaign are regular store orders. They appear in the store's Orders list alongside storefront orders and are available through the Admin API and webhooks like any other order.
 
 <Callout type="info" title="Campaigns OS Start">
-Start in the [Campaigns OS Start guide](https://campaigns.nextcommerce.com/start/): configure products and offers in the NEXT dashboard, use Workspace to map and save the plan and copy its Handoff, then give that Handoff to a developer or agent to build, preview, and run QA. The Page Kit quick start below remains the manual path for starting a project.
+Give an agent a funnel URL, existing repo or saved Map using the [campaign agent guide](/docs/agent-setup). It can inspect, plan and prepare a local concept before store access is available. The [Campaigns OS Start guide](https://campaigns.nextcommerce.com/start/) also provides the Workspace/Map route. Keep your existing builder and host; the Page Kit quick start below is the reference path for a new static project.
 </Callout>
 
 For direct project scaffolding, use the **[Campaign Page Kit](https://github.com/NextCommerceCo/campaign-page-kit)**: a CLI that scaffolds an SDK-ready starter template, runs a hot-reload dev server, and outputs a static site you can deploy to Netlify, Cloudflare Pages, Vercel, or any static host.
@@ -19,9 +19,9 @@ For direct project scaffolding, use the **[Campaign Page Kit](https://github.com
 
 ### 1. Prerequisites
 
-- **Node.js 18+**
-- A **Next Commerce store** with a campaign created in the Campaigns App
-- Your **Campaign API key**: select **Developer** in the campaign header to open the Developer workspace, then copy the key from the **Campaigns API** section
+- **Node.js 18+** for Page Kit alone. If using Campaigns OS too, follow its [runtime guidance](https://github.com/NextCommerceCo/campaigns-os/blob/main/docs/runtime-readiness.md); Node.js 22 is a common supported choice.
+- To connect commerce: a **Next Commerce store** with a campaign created in the Campaigns App
+- To connect commerce: your **Campaign API key**: select **Developer** in the campaign header to open the Developer workspace, then copy the key from the **Campaigns API** section
 
 ### 2. Initialize a new project
 
@@ -48,7 +48,7 @@ The `--ai-context` step writes the right context file to the right path for your
 </Callout>
 
 <Callout type="info">
-Skipping the API key during init is fine — run `npm run config` later to set it.
+Skipping the API key is fine for a look around: the scaffold runs against the starter templates' demo campaign, so the prices and checkout you see are the demo store's. Run `npm run config` to bind your campaign before testing anything that counts.
 </Callout>
 
 ### 3. Start the dev server
@@ -60,12 +60,12 @@ npm run dev
 This opens your campaign's first page (e.g. `/<slug>/presell/`) in the browser and hot-reloads as you edit. If you have multiple campaigns in the project, you'll get a picker.
 
 <Callout type="success" title="🎉 You did it!">
-You now have a **complete campaign funnel** running on your local machine — presell, landing, checkout, upsells, and receipt — all wired up to your live store data through the SDK. Click through it and create a test order using the test card below.
+The local server renders the starter pages. Store connection and checkout behavior still depend on the correct campaign binding, packages, offers and allowed domain. A local build alone does not verify those dependencies.
 </Callout>
 
 ### 4. Place a test order
 
-Run the full funnel end-to-end on your local dev server. At checkout, pay with the test card below — it processes without a real transaction so you can verify presell → checkout → upsell(s) → receipt all wire up correctly.
+After the target store and test-order effects are authorized, run the configured funnel on your local dev server. The card below avoids a real payment, but submitting it creates a test order and may trigger downstream integrations. Follow [Testing](/docs/testing) for the applicable controls before checking checkout and post-purchase behavior.
 
 | Card number | Expiry | CVV | What it does |
 | --- | --- | --- | --- |
@@ -100,9 +100,9 @@ my-campaigns/
 
 ## Starter templates
 
-Pick one at the `campaign-init` template prompt. Each template ships with SDK-ready checkout, upsell, and receipt surfaces, plus the supporting presell and landing pages for that family. Start from a maintained template, then replace campaign-specific copy, assets, package IDs, offer codes, shipping methods, tracking, and routes with values from Campaigns App and your build brief. The two Olympus templates are a good starting point for your first campaign.
+Pick one at the `campaign-init` template prompt. Each template ships with SDK-ready checkout, upsell, and receipt surfaces, plus the supporting presell and landing pages for that family. Start from a maintained template, then replace campaign-specific copy, assets, package IDs, offer codes, shipping methods, tracking, and routes with values from Campaigns App and your build brief. Use the [current catalog](https://github.com/NextCommerceCo/campaign-cart-starter-templates/blob/main/templates.json) recommendations: Apollo for a standard tiered checkout, or Apollo MV for configurable variant slots. Preserve an existing family when it fits the project.
 
-<CampaignTemplatesGrid slugs={['olympus', 'olympus-mv-single-step']} />
+<CampaignTemplatesGrid slugs={['apollo', 'apollo-mv-single-step']} />
 
 [See all available templates →](/docs/campaigns/templates)
 
@@ -159,6 +159,8 @@ Use the version selector on that site to read the docs for the SDK version your 
 
 A **campaign** bundles everything needed for a checkout: packages, offers, shipping options, payment methods, and localization. Each campaign has a unique **API key** used by the SDK to authenticate requests.
 
+A campaign serves one language at a time, so another language needs its own campaign. The default currency can't change after create. The API key is safe in browser code; the [authorized domains](#domains) limit where it works.
+
 ### Packages
 
 A **package** is the campaign's sellable reference to a product or product variant. In SDK 0.4.x-compatible builds, keep packages focused on identity and base price:
@@ -197,7 +199,7 @@ Every offer has a **condition** that decides when it applies and a **benefit** t
 | `count` | The quantity of a matching package is at or above `value` | Buy 2 or more Widgets |
 | `count_equal` | The quantity of a matching package is exactly `value` | Exactly 2 Widgets |
 
-A condition targets either every package on the campaign (`all_packages: true`, which also covers packages added later) or a specific list of `package_ids`. In the Campaigns App dashboard, this is the offer's **Products** selection or **All Products**.
+A condition targets either every package on the campaign (`all_packages: true`, which also covers packages added later) or a specific list of `package_ids`. In the Campaigns App dashboard, this is the offer's **Products** selection or **All Products**. Use `package_ids` for tier offers, since `all_packages` would also discount full-price add-ons.
 
 #### Benefit types
 
@@ -228,6 +230,8 @@ The package's list price stays at $49.95/unit. Each tier is a `count` condition 
 ### Shipping methods
 
 A **shipping method** in a campaign is a virtual link to a shipping method configured on the store, with campaign-specific custom pricing. This lets you charge a different shipping rate (e.g. a flat $4.95 or free shipping) per campaign without changing the underlying store-level shipping method.
+
+For conditional shipping discounts, such as free shipping at 3 or more, use a `shipping_percentage` offer instead of a second shipping method.
 
 ### Domains
 
@@ -287,12 +291,14 @@ Two mechanisms skip tracking entirely — including the always-on internal `next
 
 `campaign-init` can run with no prompts — pass every value as a flag:
 
+This example uses `apollo` for a single-step checkout; pick the family from the [template catalog](https://github.com/NextCommerceCo/campaign-cart-starter-templates/blob/main/templates.json). `CAMPAIGN_API_KEY` is the campaign's browser-visible Campaign Cart key, never an Admin API token.
+
 ```bash
 npx campaign-init --non-interactive \
-    --template olympus \
+    --template apollo \
     --slug my-campaign \
     --name "My Campaign" \
-    --api-key "$CAMPAIGN_API_KEY" \
+    --api-key "${CAMPAIGN_API_KEY:?set CAMPAIGN_API_KEY first}" \
     --ai-context claude
 ```
 

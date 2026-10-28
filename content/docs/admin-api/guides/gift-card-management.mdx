@@ -1,0 +1,101 @@
+---
+title: API Gift Card Management
+description: Create, import, update, deactivate, and redeem gift cards through the Admin API
+sidebar_label: Gift Card Management
+sidebar_position: 1
+tags:
+ - Guide
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Manage gift cards and redeem them on orders through the Admin API.
+
+## Create a Gift Card
+
+Create a gift card with the [giftCardsCreate](/docs/admin-api/reference/gift-cards/giftCardsCreate) endpoint. If you don't pass a `code`, a unique code is generated for the gift card.
+
+```json title="Create Gift Card" http-method="POST" http-target="https://{store}.29next.store/api/admin/gift-cards/"
+{
+  "code": "KATE-123_ABC", // optional, generated if not passed
+  "initial": "100.00", // gift card amount
+  "currency": "USD",
+  "user": {
+    "email": "testuser@example.com" // optional, customer receives the gift card email
+  },
+  "expired_at": "2027-10-28T00:00:00Z" // optional, must be in the future
+}
+```
+
+<Callout type="warn">
+The create response is the only response that includes the full gift card `code`. Save it if you want to send the gift card to the customer yourself.
+</Callout>
+
+## Set an Expiration Date
+
+Set `expired_at` when you create the gift card, or change it later with the [giftCardsPartialUpdate](/docs/admin-api/reference/gift-cards/giftCardsPartialUpdate) endpoint. The date must be in the future. A gift card without `expired_at` never expires. An expired gift card can't be redeemed on orders.
+
+```json title="Change Gift Card Expiration Date" http-method="PATCH" http-target="https://{store}.29next.store/api/admin/gift-cards/{id}/"
+{
+  "expired_at": "2027-12-28T00:00:00Z" // new expiration date
+}
+```
+
+## Import Gift Cards
+
+To move gift cards from another platform, pass the existing `code` and set `send_email` to `false` so the customer is not emailed again. Codes are 4 to 18 characters and can contain letters, numbers, hyphens, and underscores.
+
+```json title="Import Gift Card" http-method="POST" http-target="https://{store}.29next.store/api/admin/gift-cards/"
+{
+  "code": "KATE-123_ABC", // existing gift card code
+  "initial": "100.00",
+  "currency": "USD",
+  "user": {
+    "email": "testuser@example.com"
+  },
+  "send_email": false // skip the gift card email
+}
+```
+
+## Update a Gift Card
+
+Assign a `user` to a gift card that has no customer yet with the [giftCardsPartialUpdate](/docs/admin-api/reference/gift-cards/giftCardsPartialUpdate) endpoint. The customer receives the gift card email.
+
+```json title="Assign Customer to Gift Card" http-method="PATCH" http-target="https://{store}.29next.store/api/admin/gift-cards/{id}/"
+{
+  "user": {
+    "email": "testuser@example.com"
+  }
+}
+```
+
+## Deactivate a Gift Card
+
+Deactivate a gift card with the [giftCardsDeactivate](/docs/admin-api/reference/gift-cards/giftCardsDeactivate) endpoint.
+
+```json title="Deactivate Gift Card" http-method="POST" http-target="https://{store}.29next.store/api/admin/gift-cards/{id}/deactivate/"
+{}
+```
+
+<Callout type="warn">
+Deactivating a gift card cannot be undone.
+</Callout>
+
+## Redeem a Gift Card on an Order
+
+Pass the gift card code in the `vouchers` field, the same field used for coupon codes. This works on [ordersCreate](/docs/admin-api/reference/orders/ordersCreate), [cartsCreate](/docs/admin-api/reference/carts/cartsCreate), and [cartsUpdate](/docs/admin-api/reference/carts/cartsUpdate).
+
+```json title="Create Order with Gift Card" http-method="POST" http-target="https://{store}.29next.store/api/admin/orders/"
+{
+  "lines": [
+    {
+      "product_id": 184, // product variant id
+      "quantity": 1
+    }
+  ],
+  "user": {
+    "email": "test@29next.store"
+  },
+  // shipping address and payment fields
+  "vouchers": ["MARIA45"] // gift card or coupon codes
+}
+```

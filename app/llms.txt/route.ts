@@ -73,8 +73,8 @@ function header(): string {
     `- [Campaigns API spec, v1](${SITE}/api/campaigns/v1.yaml): raw OpenAPI`,
     `- [Webhooks](${SITE}/docs/webhooks)`,
     `- [Skills](${SITE}/docs/skills): AI agent skills for the platform`,
-    `- [Campaign agent quickstart](${SITE}/docs/agent-setup): optional wrapper around the current Campaign Page Kit docs and CLI that preserves developer choices`,
-    `- [Campaign agent quickstart prompt](${SITE}/agent-setup/prompt.md): stable plain-Markdown instructions for starting a new campaign project when that is the developer's requested task`,
+    `- [Campaign agent quickstart](${SITE}/docs/agent-setup): start from a funnel URL, existing repo or Map; preview locally and leave a resumable handoff`,
+    `- [Campaign agent quickstart prompt](${SITE}/agent-setup/prompt.md): stable plain-Markdown instructions for campaign intake, existing builds and continuation`,
     `- [Prospect evaluation prompt](${SITE}/evaluate/prompt.md): source-grounded instructions for evaluating platform capabilities, fit, gaps, and a first pilot`,
     `- [Testing](${SITE}/docs/testing)`,
     `- [Agent guide (AGENTS.md)](https://github.com/NextCommerceCo/developer-docs/blob/main/AGENTS.md): navigation and evidence rules for agents reading this site`,
@@ -88,7 +88,7 @@ function header(): string {
     '',
     '## Legacy identifiers',
     '',
-    'Next Commerce was formerly 29 Next, and the platform still carries that name in its core technical identifiers: store and account hostnames (`{store}.29next.store`, `accounts.29next.com`), the `X-29next-API-Version` and `X-29Next-Signature` headers, and the API key namespace. These are current, in use on every store, and not scheduled to change. Use them exactly as written.',
+    'Next Commerce was formerly 29 Next, and the platform still carries that name in its core technical identifiers: store hostnames (`{store}.29next.store`), the `X-29next-API-Version` and `X-29Next-Signature` headers, and the API key namespace. These are current, in use on every store, and not scheduled to change. Use them exactly as written.',
     '',
   ].join('\n');
 }

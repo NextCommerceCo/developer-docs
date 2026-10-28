@@ -1205,6 +1205,11 @@ components:
       type: object
     CreateGiftCardRequest:
       properties:
+        code:
+          maxLength: 18
+          minLength: 4
+          pattern: ^[A-Za-z0-9_-]+$
+          type: string
         currency:
           maxLength: 3
           minLength: 1
@@ -1218,6 +1223,10 @@ components:
           format: decimal
           pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
           type: string
+        send_email:
+          default: true
+          type: boolean
+          writeOnly: true
         user:
           $ref: '#/components/schemas/CreateUserRequest'
       required:
@@ -6240,10 +6249,8 @@ components:
             - integer
             - 'null'
         enable_3ds2:
-          description: Derived from `three_ds_mode`. True when the mode is `smart` or `always`.
-          title: Enable 3D Secure Transactions
-          type: boolean
           readOnly: true
+          type: boolean
         gateway_groups:
           items:
             $ref: '#/components/schemas/PaymentGatewayGroup'
@@ -6294,20 +6301,20 @@ components:
             - 'null'
         three_ds_mode:
           description: |-
-            3DS mode for the gateway.
-
             * `off` - Off
             * `smart` - Smart
             * `always` - Always On
           enum:
             - 'off'
-            - 'smart'
-            - 'always'
+            - smart
+            - always
           title: 3DS Mode
           type: string
+          x-spec-enum-id: 01a6e8274c41131f
       required:
         - card_types
         - currencies
+        - enable_3ds2
         - gateway_groups
         - gateway_type
         - id
@@ -7830,10 +7837,8 @@ components:
             - integer
             - 'null'
         partner_sku:
-          title: SKU
-          type:
-            - string
-            - 'null'
+          readOnly: true
+          type: string
         price:
           format: decimal
           pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
@@ -7854,6 +7859,7 @@ components:
             - 'null'
       required:
         - id
+        - partner_sku
       type: object
     StockrecordLocation:
       properties:
@@ -7949,11 +7955,6 @@ components:
           title: Number in stock
           type:
             - integer
-            - 'null'
-        partner_sku:
-          title: SKU
-          type:
-            - string
             - 'null'
         price:
           format: decimal
@@ -19320,7 +19321,7 @@ webhooks:
                       low_stock_threshold: 0
                       num_allocated: null
                       num_in_stock: null
-                      partner_sku: null
+                      partner_sku: string
                       price: null
                       price_currency: null
                       price_retail: null
@@ -19555,7 +19556,6 @@ webhooks:
                                 title: Number in stock
                                 type: integer
                               partner_sku:
-                                title: SKU
                                 type: string
                               price:
                                 format: decimal
@@ -21690,7 +21690,7 @@ webhooks:
                   is_default: false
                   name: string
                 re_attemp_intitial_charge: null
-                three_ds_mode: 'off'
+                three_ds_mode: string
               event_id: a7a26ff2-e851-45b6-9634-d595f45458b7
               event_type: gateway.created
               object: gateway
@@ -21747,8 +21747,6 @@ webhooks:
                       minimum: 1
                       type: integer
                     enable_3ds2:
-                      description: Derived from `three_ds_mode`. True when the mode is `smart` or `always`.
-                      title: Enable 3D Secure Transactions
                       type: boolean
                     gateway_groups:
                       items:
@@ -21908,20 +21906,20 @@ webhooks:
                       type: boolean
                     three_ds_mode:
                       description: |-
-                        3DS mode for the gateway.
-
                         * `off` - Off
                         * `smart` - Smart
                         * `always` - Always On
                       enum:
                         - 'off'
-                        - 'smart'
-                        - 'always'
+                        - smart
+                        - always
                       title: 3DS Mode
                       type: string
+                      x-spec-enum-id: 01a6e8274c41131f
                   required:
                     - card_types
                     - currencies
+                    - enable_3ds2
                     - gateway_groups
                     - gateway_type
                     - id
@@ -22042,7 +22040,7 @@ webhooks:
                   is_default: false
                   name: string
                 re_attemp_intitial_charge: null
-                three_ds_mode: 'off'
+                three_ds_mode: string
               event_id: a7a26ff2-e851-45b6-9634-d595f45458b7
               event_type: gateway.updated
               object: gateway
@@ -22099,8 +22097,6 @@ webhooks:
                       minimum: 1
                       type: integer
                     enable_3ds2:
-                      description: Derived from `three_ds_mode`. True when the mode is `smart` or `always`.
-                      title: Enable 3D Secure Transactions
                       type: boolean
                     gateway_groups:
                       items:
@@ -22260,20 +22256,20 @@ webhooks:
                       type: boolean
                     three_ds_mode:
                       description: |-
-                        3DS mode for the gateway.
-
                         * `off` - Off
                         * `smart` - Smart
                         * `always` - Always On
                       enum:
                         - 'off'
-                        - 'smart'
-                        - 'always'
+                        - smart
+                        - always
                       title: 3DS Mode
                       type: string
+                      x-spec-enum-id: 01a6e8274c41131f
                   required:
                     - card_types
                     - currencies
+                    - enable_3ds2
                     - gateway_groups
                     - gateway_type
                     - id
@@ -22416,7 +22412,7 @@ webhooks:
                       low_stock_threshold: 0
                       num_allocated: null
                       num_in_stock: null
-                      partner_sku: null
+                      partner_sku: string
                       price: null
                       price_currency: null
                       price_retail: null
@@ -22965,7 +22961,6 @@ webhooks:
                                 title: Number in stock
                                 type: integer
                               partner_sku:
-                                title: SKU
                                 type: string
                               price:
                                 format: decimal
@@ -22981,6 +22976,7 @@ webhooks:
                                 type: string
                             required:
                               - id
+                              - partner_sku
                             type: object
                           tax_lines:
                             items:
@@ -23964,7 +23960,7 @@ webhooks:
                       low_stock_threshold: 0
                       num_allocated: null
                       num_in_stock: null
-                      partner_sku: null
+                      partner_sku: string
                       price: null
                       price_currency: null
                       price_retail: null
@@ -24513,7 +24509,6 @@ webhooks:
                                 title: Number in stock
                                 type: integer
                               partner_sku:
-                                title: SKU
                                 type: string
                               price:
                                 format: decimal
@@ -24529,6 +24524,7 @@ webhooks:
                                 type: string
                             required:
                               - id
+                              - partner_sku
                             type: object
                           tax_lines:
                             items:
@@ -26752,7 +26748,7 @@ webhooks:
                       low_stock_threshold: 0
                       num_allocated: null
                       num_in_stock: null
-                      partner_sku: null
+                      partner_sku: string
                       price: null
                       price_currency: null
                       price_retail: null
@@ -27065,7 +27061,6 @@ webhooks:
                                 title: Number in stock
                                 type: integer
                               partner_sku:
-                                title: SKU
                                 type: string
                               price:
                                 format: decimal
@@ -27355,7 +27350,7 @@ webhooks:
                       low_stock_threshold: 0
                       num_allocated: null
                       num_in_stock: null
-                      partner_sku: null
+                      partner_sku: string
                       price: null
                       price_currency: null
                       price_retail: null
@@ -27668,7 +27663,6 @@ webhooks:
                                 title: Number in stock
                                 type: integer
                               partner_sku:
-                                title: SKU
                                 type: string
                               price:
                                 format: decimal

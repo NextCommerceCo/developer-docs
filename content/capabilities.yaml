@@ -266,8 +266,9 @@ capabilities:
     title: Campaigns
     summary: >-
       Campaigns are custom checkout funnels (landing, checkout, upsell, receipt pages)
-      backed by the CORS-enabled Campaigns API, built with the Campaign Page Kit and
-      starter templates. A campaign's checkout is separate from the storefront checkout,
+      backed by the CORS-enabled Campaigns API. Campaign Page Kit and starter templates
+      provide a reference build path; existing Campaign Cart applications retain their
+      tooling. A campaign's checkout is separate from the storefront checkout,
       but its orders are ordinary store orders that share the orders list, inventory,
       and subscriptions.
     audiences: [merchant, developer]
@@ -279,6 +280,7 @@ capabilities:
     developer_docs:
       - /docs/campaigns
       - /docs/campaigns/page-kit
+      - /docs/agent-setup
       - /docs/campaigns/templates
       - /docs/campaigns/api
       - /docs/campaigns/admin-api
@@ -286,7 +288,7 @@ capabilities:
     webhooks: []
     skills: [next-campaigns-create, next-campaigns-setup]
     status: available
-    last_verified: 2026-09-14
+    last_verified: 2026-10-22
 
   - id: storefront-themes
     title: Storefront themes
@@ -417,10 +419,10 @@ capabilities:
     title: Legacy identifiers (29next)
     summary: >-
       Next Commerce was formerly 29 Next, and the platform still carries that name in its
-      core technical identifiers: store and account hostnames ({store}.29next.store,
-      accounts.29next.com), the X-29next-API-Version and X-29Next-Signature headers, and
-      the API key namespace. These are current, in use on every store, and not scheduled
-      to change. Use them exactly as written.
+      core technical identifiers: store hostnames ({store}.29next.store), the
+      X-29next-API-Version and X-29Next-Signature headers, and the API key namespace.
+      These are current, in use on every store, and not scheduled to change. Use them
+      exactly as written.
     audiences: [developer]
     operator_docs: []
     developer_docs:
@@ -430,7 +432,7 @@ capabilities:
     webhooks: []
     skills: []
     status: available
-    last_verified: 2026-09-03
+    last_verified: 2026-10-23
     notes:
       - Never rewrite 29next identifiers to nextcommerce; the requests would fail.
 

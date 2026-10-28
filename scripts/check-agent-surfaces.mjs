@@ -122,14 +122,24 @@ if (capabilityMap) {
 }
 
 // Agent setup: raw Markdown and human guide are generated from one source.
+const setupSource = read(join(ROOT, 'content', 'agent-setup.md'));
+check(setupSource !== null, 'content/agent-setup.md does not exist');
 const setupPrompt = read(join(OUT, 'agent-setup', 'prompt.md'));
 check(setupPrompt !== null, 'out/agent-setup/prompt.md does not exist');
 if (setupPrompt !== null) {
+  if (setupSource !== null) check(setupPrompt === setupSource.trimEnd() + '\n', 'agent setup prompt differs from its canonical source');
   check(setupPrompt.startsWith('<!-- next-commerce-agent-setup version='), 'agent setup prompt has no version marker');
   check(!/\]\(\//.test(setupPrompt), 'agent setup prompt contains a relative Markdown link');
   for (const needle of [
-    '# Start a Campaign Page Kit project with an AI agent',
+    '# Start or continue a NEXT campaign with an AI agent',
     '## Before writing',
+    '## Choose the entry point',
+    '## Leave work another session can continue',
+    'campaigns-os standardize --target',
+    'demo campaign',
+    'campaigns-os-build-brief/v1',
+    'select',
+    'checkout_step',
     'npx campaign-init --help',
     'npx campaign-init --non-interactive --json',
     '--template <selected-template>',
@@ -182,6 +192,9 @@ if (capabilityMap) {
     const text = read(path);
     check(text !== null, `out/llms/${b.id}.txt does not exist`);
     if (text === null) continue;
+    if (b.capabilities.includes('campaigns')) {
+      check(text.includes('## Leave work another session can continue'), `llms/${b.id}.txt omits the campaign continuation procedure`);
+    }
     const bytes = Buffer.byteLength(text, 'utf8');
     check(bytes <= BUNDLE_BUDGET_BYTES, `llms/${b.id}.txt is ${bytes} bytes, over the ${BUNDLE_BUDGET_BYTES} byte budget`);
     check(text.startsWith(`# Next Commerce: ${b.title}`), `llms/${b.id}.txt first line is not the bundle title`);

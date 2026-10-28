@@ -6,7 +6,7 @@
     "dev": "npm run generate && npm run build:preview && next dev --turbopack",
     "build": "npm run generate && npm run build:preview && next build",
     "start": "next start",
-    "generate": "node scripts/generate-api-docs.mjs && node scripts/generate-stats.mjs && node scripts/generate-graphql-docs.mjs && node scripts/generate-capability-map.mjs && node scripts/generate-agent-setup.mjs",
+    "generate": "node scripts/generate-api-docs.mjs && node scripts/generate-stats.mjs && node scripts/generate-graphql-docs.mjs && node scripts/generate-agent-setup.mjs && node scripts/generate-capability-map.mjs",
     "generate-api-docs": "node scripts/generate-api-docs.mjs",
     "generate-graphql-docs": "node scripts/generate-graphql-docs.mjs",
     "generate-stats": "node scripts/generate-stats.mjs",

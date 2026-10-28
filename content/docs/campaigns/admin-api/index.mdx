@@ -60,7 +60,7 @@ Campaign endpoints need API version `2024-04-01` or later.
 
 ### Clone a Campaign
 
-- Copies settings, packages and prices, shipping methods, and offers.
+- Copies settings, packages and prices, shipping methods, and offers, including their codes.
 - Package and shipping method IDs stay the same, so existing pages only need the new `api_key`.
 - The copy is named `<source>-COPY`. Rename it with [campaignsPartialUpdate](/docs/admin-api/reference/campaigns/campaignsPartialUpdate).
 
@@ -74,6 +74,8 @@ A package is the campaign's sellable reference to a product or variant. Its `id`
 
 - Only `name` and `product_id` are required.
 - Create packages before the offers that use them.
+- The response is a list with one package per variant, even for a single variant. Read each `id` from the list; the reference shows a single object.
+- A variant can be in only one package per campaign. A duplicate returns `400`. Sell it at another price with an offer.
 - The dashboard creates packages when you pick products in an offer. Call [campaignsPackagesList](/docs/admin-api/reference/campaigns/campaignsPackagesList) first to avoid duplicates.
 
 ```json title="Create Package" http-method="POST" http-target="https://{store}.29next.store/api/admin/campaigns/{id}/packages/"
@@ -203,6 +205,7 @@ flowchart TD
 ```
 
 - Create one offer per quantity tier.
+- Scope tier offers with `package_ids`. `all_packages` would also discount add-ons.
 - Only one automatic offer of each benefit type applies. [Concepts → Offers](/docs/campaigns#offers) explains which one wins.
 - `"available": false` creates the offer switched off. Turn it on with [campaignsOffersPartialUpdate](/docs/admin-api/reference/campaigns/campaignsOffersPartialUpdate).
 
@@ -228,8 +231,15 @@ Automatic offers run only at checkout. Upsell, downsell, and exit-pop discounts 
 ```
 
 <Callout type="info" title="Package IDs Read Back as Packages">
-`package_ids` is write-only. The response returns a `packages` array instead.
+`package_ids` is write-only. [campaignsOffersRetrieve](/docs/admin-api/reference/campaigns/campaignsOffersRetrieve) returns a `packages` array instead. [campaignsOffersList](/docs/admin-api/reference/campaigns/campaignsOffersList) omits `packages` and `all_packages`, so retrieve an offer to see its scope.
 </Callout>
+
+### Update an Offer
+
+With [campaignsOffersPartialUpdate](/docs/admin-api/reference/campaigns/campaignsOffersPartialUpdate):
+
+- `condition` replaces the whole condition, so resend `type`, `value` when the type needs one, and `package_ids` or `all_packages: true`.
+- `benefit` needs `type` and `value`. An omitted `price_rounding` is kept; `null` clears it.
 
 ### Add Shipping Methods to a Campaign
 
@@ -245,7 +255,7 @@ A campaign shipping method sets a campaign price for a shipping method configure
 }
 ```
 
-The campaign's other currencies are converted from this price. To change prices later, [campaignsShippingMethodsPartialUpdate](/docs/admin-api/reference/campaigns/campaignsShippingMethodsPartialUpdate) takes the same `prices` array and `recalculate_prices` flag as [packages](#repricing-across-currencies).
+The campaign's other currencies are converted from this price. To change prices later, [campaignsShippingMethodsPartialUpdate](/docs/admin-api/reference/campaigns/campaignsShippingMethodsPartialUpdate) takes the same `prices` array and `recalculate_prices` flag as [packages](#repricing-across-currencies). A bare `price` is ignored.
 
 ```json title="Update Shipping Prices" http-method="PATCH" http-target="https://{store}.29next.store/api/admin/campaigns/{id}/shipping-methods/{shippingMethodId}/"
 {
@@ -288,6 +298,10 @@ Check `product_purchase_availability` and `product_inventory_availability` on ea
 
 <Callout type="warn" title="Check What Still Points at the Campaign First">
 Live funnel pages use the campaign's `api_key` and package IDs. Take them down or repoint them before you delete either.
+</Callout>
+
+<Callout type="info" title="IDs Are Numbered per Campaign">
+Package, offer, and shipping method `id`s start at 1 in each campaign. Always pair one with its campaign `id`.
 </Callout>
 
 <Callout type="info" title="Domains Are Configured in the Dashboard">

@@ -17,7 +17,6 @@ Your store must have an active Shop Pay account to use the Shop Pay payment meth
 </Callout>
 ## API Payment Redirect Flow
 
-
 import RedirectPaymentFlow from '../../../../_snippets/_redirect-payment-flow.mdx';
 
 <RedirectPaymentFlow />
@@ -51,7 +50,6 @@ The response when creating the order will provide a `payment_complete_url`. Your
 
 ## Receiving Order Data
 
-
 import RedirectPaymentStep3 from '../../../../_snippets/_redirect-payment-flows-step-3.mdx';
 
 <RedirectPaymentStep3 />
@@ -66,11 +64,9 @@ Shop Pay does not support recurring transactions and cannot be used as a payment
 
 ## Capture and Refunds
 
-Capture timing follows the **Payment capture method** set in the merchant's Shop Pay store in Shopify. With **Automatically at checkout**, which is the recommended setting, payments are captured when the customer pays. With **Manually**, payments are only authorized: Shopify holds them for 7 days, and NEXT's auto-capture (on fulfillment or after a delay) doesn't apply to `shop_pay` yet, so capture them through the [capture API](/docs/admin-api/reference/orders/ordersCaptureCreate) or the dashboard.
+Shop Pay payments are captured as soon as NEXT creates the order, whatever capture method is set in the merchant's Shop Pay store in Shopify.
 
-- **Capture** is full amount only. Partial captures aren't supported.
-- **Refunds** can be full or partial once the payment is captured. Refunds can return as pending until Shopify confirms them.
-- **Refunding an uncaptured order** voids the whole authorization, whatever amount you request.
+- **Refunds** can be full or partial. Refunds can return as pending until Shopify confirms them.
 - **Disputes** are handled in the merchant's Shop Pay store in Shopify admin, not in NEXT.
 
 ## Campaigns API

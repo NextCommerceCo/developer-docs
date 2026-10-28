@@ -13,7 +13,7 @@ import { Callout } from 'fumadocs-ui/components/callout';
 For custom Shop Pay checkouts, there are two checkout flows available, the standard method where a user enters their shipping address, chooses products, and then checks out via Shop Pay; and the "One-Click" method, where the user is not required to enter shipping information before being redirected to Shop Pay checkout.
 
 <Callout type="info">
-Your store must have an active Shop Pay account to use the Shop Pay payment method. Merchants connect one under **Settings > Payments > Shop Pay**; see [Shop Pay](https://docs.nextcommerce.com/docs/features/payments/shop-pay) in the merchant docs for setup.
+Your store must have an active Shop Pay account to use the Shop Pay payment method. Merchants connect one in the NEXT dashboard under **Settings > Payments > Shop Pay**; see [Shop Pay](https://docs.nextcommerce.com/docs/features/payments/shop-pay) in the merchant docs for setup.
 </Callout>
 ## API Payment Redirect Flow
 
@@ -64,12 +64,12 @@ Shop Pay does not support recurring transactions and cannot be used as a payment
 
 ## Capture and Refunds
 
-Shop Pay payments are captured as soon as NEXT creates the order, whatever capture method is set in the merchant's Shop Pay store in Shopify.
+Shop Pay payments are captured automatically once the customer completes payment on the Shop Pay checkout page, whatever capture method is set in the merchant's Shop Pay store in Shopify. You don't need to call the capture endpoint for Shop Pay orders.
 
-- **Refunds** can be full or partial. Refunds can return as pending until Shopify confirms them.
-- **Disputes** are handled in the merchant's Shop Pay store in Shopify admin, not in NEXT.
+- **Refunds** can be full or partial, using [ordersRefundCalculateCreate](/docs/admin-api/reference/orders/ordersRefundCalculateCreate) and [ordersRefundCreate](/docs/admin-api/reference/orders/ordersRefundCreate) as for other payment methods. A refund can stay pending until Shopify confirms it.
+- **Disputes** are handled in the merchant's Shop Pay store in Shopify admin. They aren't created as NEXT disputes, so `dispute.created` and `dispute.updated` webhooks don't fire for `shop_pay` transactions.
 
 ## Campaigns API
 
-Campaigns built on the [Campaigns API](/docs/campaigns/api) accept `shop_pay` as a payment method and follow the same redirect flow. Shop Pay must be enabled as a payment method on each campaign.
+The [Campaigns API](/docs/campaigns/api) accepts `shop_pay` as `payment_detail.payment_method`. Its request differs from the Admin API one above: the customer returns to your `success_url`, or to `payment_failed_url` if payment fails, and there's no `payment_return_url` or `shop_pay_account` field. Shop Pay must also be enabled on each campaign, in its payment methods or express payment methods.
 

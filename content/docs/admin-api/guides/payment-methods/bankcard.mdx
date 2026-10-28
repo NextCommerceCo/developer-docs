@@ -475,7 +475,7 @@ Your store must have a 3DS2-enabled gateway to process 3DS2 transactions. A gate
 A `smart` gateway decides per order whether to use 3DS ([how Smart mode works](https://docs.nextcommerce.com/docs/features/payments/3ds2-payments#smart-mode)). You can't know in advance which, so always send `payment_return_url` and handle both responses:
 
 - **3DS used:** the response has a `payment_complete_url` instead of an order. Continue with the redirect flow below.
-- **3DS skipped:** the outcome comes back in the response: the created order, or a [failed payment response](#transaction-response-codes) you can retry with the returned `card_token`. Nothing is posted to `payment_return_url`.
+- **3DS skipped:** the outcome comes back in the response: the created order, or a [failed payment response](#transaction-response-codes). Nothing is posted to `payment_return_url`.
 
 ### API payment redirect flow
 

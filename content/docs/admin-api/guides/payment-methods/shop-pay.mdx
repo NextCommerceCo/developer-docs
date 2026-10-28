@@ -64,10 +64,10 @@ Shop Pay does not support recurring transactions and cannot be used as a payment
 
 ## Capture and Refunds
 
-Shop Pay payments are captured automatically once the customer completes payment on the Shop Pay checkout page, whatever capture method is set in the merchant's Shop Pay store in Shopify. NEXT captures the payment itself, so you don't need to call the capture endpoint for Shop Pay orders.
+Shop Pay payments are captured automatically once the customer completes payment on the Shop Pay checkout page, whatever capture method is set in the merchant's Shop Pay store in Shopify; that setting has no effect on NEXT orders. NEXT captures the payment itself, so you don't need to call [ordersCaptureCreate](/docs/admin-api/reference/orders/ordersCaptureCreate) for Shop Pay orders.
 
 - **Refunds** can be full or partial, using [ordersRefundCalculateCreate](/docs/admin-api/reference/orders/ordersRefundCalculateCreate) and [ordersRefundCreate](/docs/admin-api/reference/orders/ordersRefundCreate) as for other payment methods (see [Order Refunds](/docs/admin-api/guides/order-management#order-refunds)). A refund can stay pending until Shopify confirms it.
-- **Disputes** are handled in the merchant's Shop Pay store in Shopify admin. They aren't created as NEXT disputes, so they don't appear in `disputesList`, and the [dispute.created](/docs/webhooks/reference/payments/dispute.created) and [dispute.updated](/docs/webhooks/reference/payments/dispute.updated) webhooks don't fire for `shop_pay` transactions.
+- **Disputes** are handled in the merchant's Shop Pay store in Shopify admin. They aren't created as NEXT disputes, so they don't appear in [disputesList](/docs/admin-api/reference/payments/disputesList), and the [dispute.created](/docs/webhooks/reference/payments/dispute.created) and [dispute.updated](/docs/webhooks/reference/payments/dispute.updated) webhooks don't fire for `shop_pay` transactions.
 
 ## Campaigns API
 
@@ -77,5 +77,5 @@ The [Campaigns API](/docs/campaigns/api) accepts `shop_pay` as `payment_detail.p
 2. Redirect the customer to the `payment_complete_url` in the response, where they pay with Shop Pay.
 3. The customer returns to your `success_url`, or to `payment_failed_url` if payment fails.
 
-Shop Pay must also be enabled on each campaign, in `available_payment_methods` or `available_express_payment_methods` on [campaignsCreate](/docs/admin-api/reference/campaigns/campaignsCreate). It has to be a method the campaign's gateway group supports.
+Shop Pay must also be enabled on each campaign, in `available_payment_methods` or `available_express_payment_methods` on [campaignsCreate](/docs/admin-api/reference/campaigns/campaignsCreate). Use the list that contains `shop_pay` for the campaign's gateway group in [gatewayGroupsList](/docs/admin-api/reference/payments/gatewayGroupsList).
 

@@ -12,7 +12,7 @@ Orders created through a campaign are regular store orders. They appear in the s
 <Callout type="info" title="Start or continue with your coding agent">
 Start with the [campaign agent guide](/docs/agent-setup). Give your agent a funnel URL, design, existing repository or saved Map. It can inspect, plan and prepare a local preview before store access is available, while preserving your builder and host.
 
-For a new Page Kit campaign with commerce already configured, use the [Campaigns OS setup recipe](https://campaigns.nextcommerce.com/start/). Workspace is optional. The quick start below covers direct Page Kit scaffolding.
+For a new Page Kit campaign with commerce already configured, use the [Page Kit setup recipe](https://campaigns.nextcommerce.com/start/). The optional [Workspace](https://campaign-map.nextcommerce.com/) lets you plan visually and save a Map. The quick start below covers direct Page Kit scaffolding.
 </Callout>
 
 For direct project scaffolding, use the **[Campaign Page Kit](https://github.com/NextCommerceCo/campaign-page-kit)**: a CLI that scaffolds an SDK-ready starter template, runs a hot-reload dev server, and outputs a static site you can deploy to Netlify, Cloudflare Pages, Vercel, or any static host.
@@ -180,7 +180,7 @@ Packages can also be **recurring** for subscription products. When you reference
 
 ### Offers
 
-Configure campaign discounts in [Campaigns App Offers & Discounts](https://docs.nextcommerce.com/docs/apps/campaigns-app/campaigns-offers-and-discounts). These are the rules the SDK and campaign templates use for pricing and savings. Two flavours:
+Configure campaign discounts in [Campaigns App Offers & Discounts](https://docs.nextcommerce.com/docs/apps/campaigns-app/campaigns-offers-and-discounts). Use this setup when building with the SDK and campaign templates. Two flavours:
 
 - **Offer** — automatic, applies when the cart matches the rule (checkout page only)
 - **Code** — voucher-based, applies when the customer enters a code. Codes stack **on top of** automatic offers, and codes are also the mechanism for applying discounts on **upsell pages** (where automatic offers don't run).

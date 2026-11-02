@@ -56,9 +56,9 @@ The fetched file is plain Markdown at a stable URL. It uses the same source as t
 
 Choose the continuation that fits your project:
 
-- **New campaign:** inspect the source and prepare a local preview. Use the [Page Kit guide](/docs/campaigns/page-kit) for a new static project, or the [configured-campaign setup recipe](https://campaigns.nextcommerce.com/start/) when your campaign and offers are ready.
+- **New campaign:** inspect the source and prepare a local preview. Use the [Page Kit guide](/docs/campaigns/page-kit) for a new static project, or the [Page Kit setup recipe](https://campaigns.nextcommerce.com/start/) for a new static project with its campaign and offers already configured.
 - **Existing campaign:** keep its build and host, inspect the current revision, and follow the [maintenance procedure](https://github.com/NextCommerceCo/campaigns-os/blob/main/docs/build-packet.md#changing-a-campaign-after-handoff) when it uses Campaigns OS.
-- **Saved Map:** open its Handoff in the optional [Workspace](https://campaign-map.nextcommerce.com/) and give the saved plan to your agent.
+- **Saved Map:** open its Handoff in the [Workspace](https://campaign-map.nextcommerce.com/), the optional visual planning tool, and give the saved plan to your agent.
 
 ${humanInstructions}`;
 

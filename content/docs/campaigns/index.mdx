@@ -9,8 +9,10 @@ Campaigns are fully custom checkout funnels — landing, checkout, upsell, and r
 
 Orders created through a campaign are regular store orders. They appear in the store's Orders list alongside storefront orders and are available through the Admin API and webhooks like any other order.
 
-<Callout type="info" title="Campaigns OS Start">
-Give an agent a funnel URL, existing repo or saved Map using the [campaign agent guide](/docs/agent-setup). It can inspect, plan and prepare a local concept before store access is available. The [Campaigns OS Start guide](https://campaigns.nextcommerce.com/start/) also provides the Workspace/Map route. Keep your existing builder and host; the Page Kit quick start below is the reference path for a new static project.
+<Callout type="info" title="Start or continue with your coding agent">
+Start with the [campaign agent guide](/docs/agent-setup). Give your agent a funnel URL, design, existing repository or saved Map. It can inspect, plan and prepare a local preview before store access is available, while preserving your builder and host.
+
+For a new Page Kit campaign with commerce already configured, use the [Page Kit setup recipe](https://campaigns.nextcommerce.com/start/). The optional [Workspace](https://campaign-map.nextcommerce.com/) lets you plan visually and save a Map. The quick start below covers direct Page Kit scaffolding.
 </Callout>
 
 For direct project scaffolding, use the **[Campaign Page Kit](https://github.com/NextCommerceCo/campaign-page-kit)**: a CLI that scaffolds an SDK-ready starter template, runs a hot-reload dev server, and outputs a static site you can deploy to Netlify, Cloudflare Pages, Vercel, or any static host.
@@ -178,7 +180,7 @@ Packages can also be **recurring** for subscription products. When you reference
 
 ### Offers
 
-**Offers** are price mutation rules that apply when an order meets a condition. Two flavours:
+Configure campaign discounts in [Campaigns App Offers & Discounts](https://docs.nextcommerce.com/docs/apps/campaigns-app/campaigns-offers-and-discounts). Use this setup when building with the SDK and campaign templates. Two flavours:
 
 - **Offer** — automatic, applies when the cart matches the rule (checkout page only)
 - **Code** — voucher-based, applies when the customer enters a code. Codes stack **on top of** automatic offers, and codes are also the mechanism for applying discounts on **upsell pages** (where automatic offers don't run).

@@ -20,7 +20,7 @@ const TEMPLATES: CampaignTemplate[] = [
     name: 'olympus',
     slug: 'olympus',
     description:
-      'Default pick. Single-step single-product checkout — lowest-friction conversion, used in most campaigns.',
+      'Single-step checkout with the original Olympus tiered card layout. Use when it matches your existing design.',
     link: `${BASE}/olympus/checkout/`,
     page_links: [
       { label: 'Presell', url: `${BASE}/olympus/presell/` },

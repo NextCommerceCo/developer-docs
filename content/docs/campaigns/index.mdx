@@ -271,14 +271,14 @@ To also forward those events to **Google Tag Manager** or **Facebook Pixel**, ad
 ```
 
 <Callout type="info">
-Whether the SDK **forwards events** to each vendor is set under `analytics.destinations` in `assets/config.js`: `destinations.gtm.enabled` and `destinations.meta.enabled` (Campaign Cart SDK 0.5 and later). Templates built for 0.4.x set the older `providers.gtm.enabled` and `providers.facebook.enabled` flags to `false`; 0.5 still reads them, so flip them to `true` once your IDs are in place. See [Destinations](https://cart-sdk.nextcommerce.com/latest/analytics-reference/destinations/overview/) for every destination and its config.
+The IDs above load the GTM container and Meta Pixel on your pages. Whether the SDK also **forwards its events** to them is a separate switch in `assets/config.js`. On Campaign Cart SDK 0.5, set `analytics.destinations.gtm.enabled` and `analytics.destinations.meta.enabled` to `true`; the Meta destination sends to the Pixel your page loads from `fb_pixel_id`. Templates built for 0.4.x use the older `analytics.providers.gtm` and `analytics.providers.facebook` flags instead. 0.5 still reads them, but when both are set, `destinations` wins. See [Destinations](https://cart-sdk.nextcommerce.com/latest/analytics-reference/destinations/overview/) for every destination and its config.
 </Callout>
 
 <Callout type="idea" title="Keep your campaign analytics clean">
 Two mechanisms skip tracking entirely — including the always-on internal `nextCampaign` provider — so your campaign dashboards reflect **real customer conversions**, not internal QA or test traffic:
 
 - **Development domains** — any domain marked *development* in your store's Campaign Settings suppresses all events. Add `localhost`, staging URLs, and preview hosts here.
-- **`?ignore=true` URL parameter** — append it to any URL to silence tracking for the entire session, useful for one-off testing on a production domain. Turn tracking back on with `?ignore=false` (or `?reset=1`).
+- **`?ignore=true` URL parameter** — append it to any URL to silence tracking for the rest of that browser tab, useful for one-off testing on a production domain. Turn tracking back on with `?ignore=false`.
 </Callout>
 
 

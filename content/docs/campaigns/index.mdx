@@ -131,25 +131,26 @@ The pages above are wired up by the **Campaign Cart SDK**. Its documentation is 
 
 | Reference | What it covers |
 | --- | --- |
-| [Quickstart](https://cart-sdk.nextcommerce.com/latest/quickstart) | Loading the SDK and configuring it |
-| [Migrating from 0.4.x](https://cart-sdk.nextcommerce.com/latest/migrating-from-0-4) | What changed for pages built on 0.4.x: removed, deprecated, unchanged |
-| [Attributes](https://cart-sdk.nextcommerce.com/latest/attributes) | Every `data-next-*` attribute |
-| [JavaScript API](https://cart-sdk.nextcommerce.com/latest/javascript-api) | The `window.next` methods |
-| [Events](https://cart-sdk.nextcommerce.com/latest/events) | Every `next.on` event and its payload |
-| [Analytics](https://cart-sdk.nextcommerce.com/latest/analytics) | Tracking events, the `dl_*` pushes and the GTM, GA4, Meta and RudderStack destinations |
-| [URL parameters](https://cart-sdk.nextcommerce.com/latest/attribute-reference/setup/url-parameters) | Parameters the SDK reads from the page URL |
-| [Debugging](https://cart-sdk.nextcommerce.com/latest/javascript-api#debugging-with-debug1) | The debug panel opened with `?debug=1` |
+| [Getting started](https://cart-sdk.nextcommerce.com/latest/quickstart/) | Loading the SDK and configuring it |
+| [Migrating from 0.4.x](https://cart-sdk.nextcommerce.com/latest/migrating-from-0-4/) | What changed for pages built on 0.4.x: removed, deprecated, unchanged |
+| [Data attributes](https://cart-sdk.nextcommerce.com/latest/attributes/) | Every `data-next-*` attribute |
+| [JavaScript API](https://cart-sdk.nextcommerce.com/latest/javascript-api/) | The `window.next` methods |
+| [Events](https://cart-sdk.nextcommerce.com/latest/events/) | Every `next.on` event and its payload |
+| [Analytics events](https://cart-sdk.nextcommerce.com/latest/analytics/) | Every tracking event and its payload |
+| [URL parameters](https://cart-sdk.nextcommerce.com/latest/attribute-reference/setup/url-parameters/) | Parameters the SDK reads at boot |
+| [Loader script](https://cart-sdk.nextcommerce.com/latest/attribute-reference/setup/loader-script/) | Attributes the loader script reads (`data-campaign`, `data-funnel`) |
+| [Debugger](https://cart-sdk.nextcommerce.com/latest/javascript-api/#debugging-with-debug1) | The `?debug=1` debug panel |
 
 Building a specific funnel page:
 
 | Page | What it covers |
 | --- | --- |
-| [Landing and presell](https://cart-sdk.nextcommerce.com/latest/building-pages/landing-and-presell) | Selectors, bundles, add to cart |
-| [Checkout page](https://cart-sdk.nextcommerce.com/latest/building-pages/checkout-page) | Form fields, payment, express checkout |
-| [Upsell page](https://cart-sdk.nextcommerce.com/latest/building-pages/upsell-page) | Post-purchase offers, accept and skip |
-| [Receipt page](https://cart-sdk.nextcommerce.com/latest/building-pages/receipt-page) | Order data rendering |
+| [Landing and presell](https://cart-sdk.nextcommerce.com/latest/building-pages/landing-and-presell/) | Selectors, bundles, add to cart |
+| [Checkout page](https://cart-sdk.nextcommerce.com/latest/building-pages/checkout-page/) | Form fields, payment, express checkout |
+| [Upsell page](https://cart-sdk.nextcommerce.com/latest/building-pages/upsell-page/) | Accept and decline flows |
+| [Receipt page](https://cart-sdk.nextcommerce.com/latest/building-pages/receipt-page/) | Order data rendering |
 
-Use the version selector on that site to read the docs for the SDK version your campaign loads. A campaign that still loads 0.4.x keeps working on it; its reference is the [0.4.43 docs](https://cart-sdk.nextcommerce.com/v0.4.43/), and [Migrating from 0.4.x](https://cart-sdk.nextcommerce.com/latest/migrating-from-0-4) lists what to change before moving it to 0.5.
+Use the version selector on that site to read the docs for the SDK version your campaign loads. A campaign that still loads 0.4.x keeps working on it; its reference is the [0.4.43 docs](https://cart-sdk.nextcommerce.com/v0.4.43/), and [Migrating from 0.4.x](https://cart-sdk.nextcommerce.com/latest/migrating-from-0-4/) lists what to change before moving it to 0.5.
 
 ---
 
@@ -270,7 +271,7 @@ To also forward those events to **Google Tag Manager** or **Facebook Pixel**, ad
 ```
 
 <Callout type="info">
-Whether the SDK **forwards events** to each vendor is set under `analytics.destinations` in `assets/config.js`: `destinations.gtm.enabled` and `destinations.meta.enabled` (Campaign Cart SDK 0.5 and later). Templates built for 0.4.x set the older `providers.gtm.enabled` and `providers.facebook.enabled` flags to `false`; 0.5 still reads them, so flip them to `true` once your IDs are in place. See [Destinations](https://cart-sdk.nextcommerce.com/latest/analytics-reference/destinations/overview) for every destination and its config.
+Whether the SDK **forwards events** to each vendor is set under `analytics.destinations` in `assets/config.js`: `destinations.gtm.enabled` and `destinations.meta.enabled` (Campaign Cart SDK 0.5 and later). Templates built for 0.4.x set the older `providers.gtm.enabled` and `providers.facebook.enabled` flags to `false`; 0.5 still reads them, so flip them to `true` once your IDs are in place. See [Destinations](https://cart-sdk.nextcommerce.com/latest/analytics-reference/destinations/overview/) for every destination and its config.
 </Callout>
 
 <Callout type="idea" title="Keep your campaign analytics clean">
@@ -283,7 +284,7 @@ Two mechanisms skip tracking entirely — including the always-on internal `next
 
 ### Event reference
 
-- [Analytics](https://cart-sdk.nextcommerce.com/latest/analytics) — every tracking event the SDK sends, the `dl_*` push each one makes, and what each destination receives
+- [Analytics events](https://cart-sdk.nextcommerce.com/latest/analytics/): every tracking event the SDK emits, what triggers it, and what each destination receives
 
 ---
 

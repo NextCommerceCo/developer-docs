@@ -17,22 +17,6 @@ const BASE = 'https://nextcommerce-campaign-templates.netlify.app';
 
 const TEMPLATES: CampaignTemplate[] = [
   {
-    name: 'olympus',
-    slug: 'olympus',
-    description:
-      'Default pick. Single-step single-product checkout — lowest-friction conversion, used in most campaigns.',
-    link: `${BASE}/olympus/checkout/`,
-    page_links: [
-      { label: 'Presell', url: `${BASE}/olympus/presell/` },
-      { label: 'Landing', url: `${BASE}/olympus/landing/` },
-      { label: 'Checkout', url: `${BASE}/olympus/checkout/` },
-      { label: 'Upsell — stepper', url: `${BASE}/olympus/upsell-bundle-stepper/` },
-      { label: 'pills', url: `${BASE}/olympus/upsell-bundle-tier-pills/` },
-      { label: 'cards', url: `${BASE}/olympus/upsell-bundle-tier-cards/` },
-      { label: 'Receipt', url: `${BASE}/olympus/receipt/` },
-    ],
-  },
-  {
     name: 'apollo',
     slug: 'apollo',
     description:
@@ -46,22 +30,6 @@ const TEMPLATES: CampaignTemplate[] = [
       { label: 'pills', url: `${BASE}/apollo/upsell-bundle-tier-pills/` },
       { label: 'cards', url: `${BASE}/apollo/upsell-bundle-tier-cards/` },
       { label: 'Receipt', url: `${BASE}/apollo/receipt/` },
-    ],
-  },
-  {
-    name: 'olympus-mv-single-step',
-    slug: 'olympus-mv-single-step',
-    description: 'Products with variants (size, flavor, color) on a single-step checkout.',
-    link: `${BASE}/olympus-mv-single-step/checkout/`,
-    page_links: [
-      { label: 'Presell', url: `${BASE}/olympus-mv-single-step/presell/` },
-      { label: 'Landing', url: `${BASE}/olympus-mv-single-step/landing/` },
-      { label: 'Checkout', url: `${BASE}/olympus-mv-single-step/checkout/` },
-      { label: 'Upsell — MV', url: `${BASE}/olympus-mv-single-step/upsell-mv/` },
-      { label: 'Upsell — stepper', url: `${BASE}/olympus-mv-single-step/upsell-bundle-stepper/` },
-      { label: 'pills', url: `${BASE}/olympus-mv-single-step/upsell-bundle-tier-pills/` },
-      { label: 'cards', url: `${BASE}/olympus-mv-single-step/upsell-bundle-tier-cards/` },
-      { label: 'Receipt', url: `${BASE}/olympus-mv-single-step/receipt/` },
     ],
   },
   {
@@ -79,6 +47,38 @@ const TEMPLATES: CampaignTemplate[] = [
       { label: 'pills', url: `${BASE}/apollo-mv-single-step/upsell-bundle-tier-pills/` },
       { label: 'cards', url: `${BASE}/apollo-mv-single-step/upsell-bundle-tier-cards/` },
       { label: 'Receipt', url: `${BASE}/apollo-mv-single-step/receipt/` },
+    ],
+  },
+  {
+    name: 'olympus',
+    slug: 'olympus',
+    description:
+      'Single-step checkout with the original Olympus tiered card layout. Use when it matches your existing design.',
+    link: `${BASE}/olympus/checkout/`,
+    page_links: [
+      { label: 'Presell', url: `${BASE}/olympus/presell/` },
+      { label: 'Landing', url: `${BASE}/olympus/landing/` },
+      { label: 'Checkout', url: `${BASE}/olympus/checkout/` },
+      { label: 'Upsell — stepper', url: `${BASE}/olympus/upsell-bundle-stepper/` },
+      { label: 'pills', url: `${BASE}/olympus/upsell-bundle-tier-pills/` },
+      { label: 'cards', url: `${BASE}/olympus/upsell-bundle-tier-cards/` },
+      { label: 'Receipt', url: `${BASE}/olympus/receipt/` },
+    ],
+  },
+  {
+    name: 'olympus-mv-single-step',
+    slug: 'olympus-mv-single-step',
+    description: 'Products with variants (size, flavor, color) on a single-step checkout.',
+    link: `${BASE}/olympus-mv-single-step/checkout/`,
+    page_links: [
+      { label: 'Presell', url: `${BASE}/olympus-mv-single-step/presell/` },
+      { label: 'Landing', url: `${BASE}/olympus-mv-single-step/landing/` },
+      { label: 'Checkout', url: `${BASE}/olympus-mv-single-step/checkout/` },
+      { label: 'Upsell — MV', url: `${BASE}/olympus-mv-single-step/upsell-mv/` },
+      { label: 'Upsell — stepper', url: `${BASE}/olympus-mv-single-step/upsell-bundle-stepper/` },
+      { label: 'pills', url: `${BASE}/olympus-mv-single-step/upsell-bundle-tier-pills/` },
+      { label: 'cards', url: `${BASE}/olympus-mv-single-step/upsell-bundle-tier-cards/` },
+      { label: 'Receipt', url: `${BASE}/olympus-mv-single-step/receipt/` },
     ],
   },
   {

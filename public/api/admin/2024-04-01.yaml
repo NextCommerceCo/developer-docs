@@ -9667,6 +9667,14 @@ components:
       type: object
     TransactionPaymentDetail:
       properties:
+        avs_code:
+          description: AVS result code returned by the gateway.
+          readOnly: true
+          type: string
+        avs_message:
+          description: Description of the AVS result.
+          readOnly: true
+          type: string
         bankcard_exp_month:
           readOnly: true
           type:
@@ -9697,6 +9705,14 @@ components:
         card_token:
           readOnly: true
           type: string
+        cvv_code:
+          description: CVV result code returned by the gateway.
+          readOnly: true
+          type: string
+        cvv_message:
+          description: Description of the CVV result.
+          readOnly: true
+          type: string
         gateway:
           allOf:
             - $ref: '#/components/schemas/TransactionPaymentDetailGateway'
@@ -9713,12 +9729,16 @@ components:
         sca_flow:
           type: string
       required:
+        - avs_code
+        - avs_message
         - bankcard_exp_month
         - bankcard_exp_year
         - bankcard_first_six
         - bankcard_last_four
         - bankcard_number
         - card_token
+        - cvv_code
+        - cvv_message
         - gateway
         - is_3ds
         - optimized_3ds
@@ -27982,12 +28002,16 @@ webhooks:
                     network_transaction_id: null
                     parent_id: null
                     payment_details:
+                      avs_code: string
+                      avs_message: string
                       bankcard_exp_month: null
                       bankcard_exp_year: null
                       bankcard_first_six: null
                       bankcard_last_four: null
                       bankcard_number: null
                       card_token: string
+                      cvv_code: string
+                      cvv_message: string
                       gateway:
                         id: null
                         is_next_payments: null
@@ -28882,6 +28906,12 @@ webhooks:
                                   type: integer
                                 payment_details:
                                   properties:
+                                    avs_code:
+                                      description: AVS result code returned by the gateway.
+                                      type: string
+                                    avs_message:
+                                      description: Description of the AVS result.
+                                      type: string
                                     bankcard_exp_month:
                                       type: integer
                                     bankcard_exp_year:
@@ -28895,6 +28925,12 @@ webhooks:
                                     bankcard_number:
                                       type: string
                                     card_token:
+                                      type: string
+                                    cvv_code:
+                                      description: CVV result code returned by the gateway.
+                                      type: string
+                                    cvv_message:
+                                      description: Description of the CVV result.
                                       type: string
                                     gateway:
                                       properties:
@@ -29253,6 +29289,12 @@ webhooks:
                             type: integer
                           payment_details:
                             properties:
+                              avs_code:
+                                description: AVS result code returned by the gateway.
+                                type: string
+                              avs_message:
+                                description: Description of the AVS result.
+                                type: string
                               bankcard_exp_month:
                                 type: integer
                               bankcard_exp_year:
@@ -29266,6 +29308,12 @@ webhooks:
                               bankcard_number:
                                 type: string
                               card_token:
+                                type: string
+                              cvv_code:
+                                description: CVV result code returned by the gateway.
+                                type: string
+                              cvv_message:
+                                description: Description of the CVV result.
                                 type: string
                               gateway:
                                 properties:
@@ -29766,12 +29814,16 @@ webhooks:
                     network_transaction_id: null
                     parent_id: null
                     payment_details:
+                      avs_code: string
+                      avs_message: string
                       bankcard_exp_month: null
                       bankcard_exp_year: null
                       bankcard_first_six: null
                       bankcard_last_four: null
                       bankcard_number: null
                       card_token: string
+                      cvv_code: string
+                      cvv_message: string
                       gateway:
                         id: null
                         is_next_payments: null
@@ -30666,6 +30718,12 @@ webhooks:
                                   type: integer
                                 payment_details:
                                   properties:
+                                    avs_code:
+                                      description: AVS result code returned by the gateway.
+                                      type: string
+                                    avs_message:
+                                      description: Description of the AVS result.
+                                      type: string
                                     bankcard_exp_month:
                                       type: integer
                                     bankcard_exp_year:
@@ -30679,6 +30737,12 @@ webhooks:
                                     bankcard_number:
                                       type: string
                                     card_token:
+                                      type: string
+                                    cvv_code:
+                                      description: CVV result code returned by the gateway.
+                                      type: string
+                                    cvv_message:
+                                      description: Description of the CVV result.
                                       type: string
                                     gateway:
                                       properties:
@@ -31037,6 +31101,12 @@ webhooks:
                             type: integer
                           payment_details:
                             properties:
+                              avs_code:
+                                description: AVS result code returned by the gateway.
+                                type: string
+                              avs_message:
+                                description: Description of the AVS result.
+                                type: string
                               bankcard_exp_month:
                                 type: integer
                               bankcard_exp_year:
@@ -31050,6 +31120,12 @@ webhooks:
                               bankcard_number:
                                 type: string
                               card_token:
+                                type: string
+                              cvv_code:
+                                description: CVV result code returned by the gateway.
+                                type: string
+                              cvv_message:
+                                description: Description of the CVV result.
                                 type: string
                               gateway:
                                 properties:
@@ -33990,12 +34066,16 @@ webhooks:
                 order: null
                 parent_id: null
                 payment_details:
+                  avs_code: string
+                  avs_message: string
                   bankcard_exp_month: null
                   bankcard_exp_year: null
                   bankcard_first_six: null
                   bankcard_last_four: null
                   bankcard_number: null
                   card_token: string
+                  cvv_code: string
+                  cvv_message: string
                   gateway:
                     id: 0
                     is_next_payments: false
@@ -34164,6 +34244,12 @@ webhooks:
                       type: integer
                     payment_details:
                       properties:
+                        avs_code:
+                          description: AVS result code returned by the gateway.
+                          type: string
+                        avs_message:
+                          description: Description of the AVS result.
+                          type: string
                         bankcard_exp_month:
                           type: integer
                         bankcard_exp_year:
@@ -34177,6 +34263,12 @@ webhooks:
                         bankcard_number:
                           type: string
                         card_token:
+                          type: string
+                        cvv_code:
+                          description: CVV result code returned by the gateway.
+                          type: string
+                        cvv_message:
+                          description: Description of the CVV result.
                           type: string
                         gateway:
                           properties:
@@ -34371,12 +34463,16 @@ webhooks:
                 order: null
                 parent_id: null
                 payment_details:
+                  avs_code: string
+                  avs_message: string
                   bankcard_exp_month: null
                   bankcard_exp_year: null
                   bankcard_first_six: null
                   bankcard_last_four: null
                   bankcard_number: null
                   card_token: string
+                  cvv_code: string
+                  cvv_message: string
                   gateway:
                     id: 0
                     is_next_payments: false
@@ -34545,6 +34641,12 @@ webhooks:
                       type: integer
                     payment_details:
                       properties:
+                        avs_code:
+                          description: AVS result code returned by the gateway.
+                          type: string
+                        avs_message:
+                          description: Description of the AVS result.
+                          type: string
                         bankcard_exp_month:
                           type: integer
                         bankcard_exp_year:
@@ -34558,6 +34660,12 @@ webhooks:
                         bankcard_number:
                           type: string
                         card_token:
+                          type: string
+                        cvv_code:
+                          description: CVV result code returned by the gateway.
+                          type: string
+                        cvv_message:
+                          description: Description of the CVV result.
                           type: string
                         gateway:
                           properties:

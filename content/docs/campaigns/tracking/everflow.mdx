@@ -93,7 +93,7 @@ EF.click({
     next.setMetadata({ everflow_transaction_id: id });
   };
   if (window.next && typeof window.next.setMetadata === 'function') apply(window.next);
-  else if (Array.isArray(window.nextReady)) window.nextReady.push(apply);
+  else (window.nextReady = window.nextReady || []).push(apply);
 });
 ```
 

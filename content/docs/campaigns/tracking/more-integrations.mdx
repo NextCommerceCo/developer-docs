@@ -30,7 +30,7 @@ Most platforms here are turned on with one line in `_data/campaigns.json`. Add t
 
 - **What it tracks:** page views, product views, add to cart, checkout started, payment details and purchases.
 - **Upsells:** each accepted upsell counts as another purchase, so an order with two upsells shows as three purchases. To count one purchase per order, add `"tiktok_blocked_events": "dl_upsell_purchase"`. Upsell revenue then does not reach TikTok.
-- **Shopper details:** add `"tiktok_advanced_matching_enabled": "true"` to send email and phone. Nothing is sent unless the marketing opt-in checkbox on your checkout is ticked.
+- **Shopper details:** add `"tiktok_advanced_matching_enabled": "true"` to send email and phone. If your checkout has a marketing opt-in checkbox, nothing is sent when it is unticked.
 
 The TikTok store app covers your NEXT storefront, not funnels.
 
@@ -42,7 +42,7 @@ The TikTok store app covers your NEXT storefront, not funnels.
 
 - **What it tracks:** page views, product views, add to cart, checkout started, payment details and purchases.
 - **Upsells:** each accepted upsell counts as another purchase.
-- **Shopper details:** add `"snap_advanced_matching_enabled": "true"` to send email and phone. Nothing is sent unless the marketing opt-in checkbox on your checkout is ticked.
+- **Shopper details:** add `"snap_advanced_matching_enabled": "true"` to send email and phone. If your checkout has a marketing opt-in checkbox, nothing is sent when it is unticked.
 
 ## Pinterest
 
@@ -52,7 +52,7 @@ The TikTok store app covers your NEXT storefront, not funnels.
 
 - **What it tracks:** page views, add to cart, and a `checkout` event for each order.
 - **Upsells:** each accepted upsell counts as another `checkout`.
-- **Shopper details:** add `"pinterest_enhanced_match_enabled": "true"` to send email. Nothing is sent unless the marketing opt-in checkbox on your checkout is ticked.
+- **Shopper details:** add `"pinterest_enhanced_match_enabled": "true"` to send email. If your checkout has a marketing opt-in checkbox, nothing is sent when it is unticked.
 
 ## Taboola
 

@@ -154,7 +154,7 @@ On a NEXT store without Shopify, Triple Whale attribution for funnel orders is n
 | --- | --- | --- |
 | Event | `Purchase` | `UpsellPurchase`, sent as `TriplePixel('custom', 'UpsellPurchase', ...)` |
 | `orderId` | The NEXT order number, for example `100041` | The order reference plus `-US1`, `-US2` and so on |
-| `value` | Item revenue, excluding tax and shipping | The upsell line only |
+| `value` | Item revenue without shipping (tax excluded on stores that show prices without tax, included on tax-inclusive stores) | The upsell line only |
 | `currency` | The order currency | The order currency |
 | `lineItems` | One entry per item: `i` (SKU), `q` (quantity), `v` (variant ID) | None. Custom events are kept to flat values |
 

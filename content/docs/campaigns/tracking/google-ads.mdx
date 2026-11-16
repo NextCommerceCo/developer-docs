@@ -56,7 +56,7 @@ The [Google Analytics 4 store app](https://docs.nextcommerce.com/docs/apps/googl
 ## Before you start
 
 - A Google Ads account with auto-tagging turned on. Without auto-tagging, ad clicks carry no `gclid`.
-- A funnel built from a starter template, with your funnel domain added in the Campaigns app under **Settings**, then **Allowed Domains**, as a **Production** domain. Analytics and event tracking are ignored on development domains.
+- A funnel built from a starter template, with your funnel domain added in the Campaigns app under **Settings**, then **Allowed Domains**, as a **Production** domain. On a development domain only NEXT campaign analytics ignores the events; vendor tags still fire.
 - For the GA4 import path:
   - GA4 set up on the funnel and working. Follow [Google Analytics 4](/docs/campaigns/tracking/google-analytics-4) first.
   - Your Google Analytics and Google Ads accounts linked.
@@ -136,7 +136,7 @@ Metafields are written once, when the Shopify order is created. This mapping is 
 | --- | --- | --- |
 | Event | `dl_purchase`, sent to GA4 as `purchase` | `dl_upsell_purchase`, sent to GA4 as `upsell_purchase` |
 | `transaction_id` | The NEXT order number, for example `100041` | The order reference plus `-US1`, `-US2` and so on |
-| `value` | Item revenue, excluding tax and shipping | The upsell line only |
+| `value` | Item revenue without shipping (tax excluded on stores that show prices without tax, included on tax-inclusive stores) | The upsell line only |
 | `currency` | The order currency | The order currency |
 
 Upsells are sent as separate events. If you import only `purchase`, or add only a `dl_purchase` tag, Google Ads counts the first sale and not the upsell revenue. Because `value` excludes tax and shipping, Google Ads conversion value will be lower than the order total.
@@ -194,7 +194,7 @@ More checks are in [Test and troubleshoot tracking](/docs/campaigns/tracking/tes
 | No `gclid` on the order | Auto-tagging is off, or the ad's URL drops the query string before the funnel loads | Turn on auto-tagging; check the landing URL in the browser carries `gclid` |
 | Every conversion counted twice | Both paths run for the same conversion, or a Shopify-side Google app also counts the synced order | Keep one sender per conversion |
 | Upsell revenue missing in Google Ads | `upsell_purchase` was not imported, or there is no `dl_upsell_purchase` tag | Import the key event or add the tag |
-| Conversion value lower than the order total | `value` excludes tax and shipping by design | Compare against item revenue in NEXT |
+| Conversion value lower than the order total | `value` is item revenue and leaves out shipping, and tax on tax-exclusive stores | Compare against item revenue in NEXT |
 | Imported conversion not used for bidding | It was created as a secondary conversion action | Change it in Google Ads |
 | Cannot create a conversion from GA4 | Missing access, unlinked accounts, or the feature is not available to the property | Check the prerequisites in [Google's help](https://support.google.com/google-ads/answer/10632359?hl=en) |
 | Google Ads settings in the Google Analytics 4 store app have no effect | That app runs on the storefront only | Use one of the two paths on this page |

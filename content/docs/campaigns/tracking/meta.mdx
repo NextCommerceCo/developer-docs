@@ -227,7 +227,7 @@ On a return visit the SDK refills the phone field after `InitiateCheckout` has b
 | When | The first page after payment | After the order is created; 10 minutes later when **Enable Delay Order Confirmation** is on |
 | Event ID | `{storeName}-{order number}`, for example `your-store-100041`. None when `storeName` is not set | `{store}-{order number}`, using the store subdomain |
 | `order_id` | The NEXT order number | The NEXT order number |
-| `value` | Item revenue, excluding tax and shipping, for the first sale | The order total including tax (`total_incl_tax`) |
+| `value` | Item revenue without shipping, for the first sale (tax excluded on stores that show prices without tax, included on tax-inclusive stores) | The order total including tax (`total_incl_tax`) |
 | `num_items` | Number of order lines | Sum of item quantities |
 | Other fields | `currency`, `content_type`, `content_ids`, `contents` | |
 | Upsells | Not included. Nothing is sent for an accepted upsell | With the delay on, the app re-reads the order before sending, so upsells accepted before then are expected to be included. Not confirmed |

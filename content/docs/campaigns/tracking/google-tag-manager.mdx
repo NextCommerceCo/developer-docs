@@ -39,7 +39,7 @@ The provider runs in the browser only. It covers every funnel page of the starte
 
 - A Google Tag Manager web container. Copy its ID, which has the form `GTM-XXXXXXX`.
 - A funnel built from a starter template.
-- Your funnel domain added under **Allowed Domains** in the Campaigns app, under **Settings**, as a **Production** domain. Analytics and event tracking are ignored for development domains.
+- Your funnel domain added under **Allowed Domains** in the Campaigns app, under **Settings**, as a **Production** domain. On a development domain only NEXT campaign analytics ignores the events; vendor tags still fire.
 - The NEXT Google Tag Manager app covers the storefront only. It does not run on campaign funnels, so the setup below is still needed. See the [app documentation](https://docs.nextcommerce.com/docs/apps/google-tag-manager).
 
 ## Set up
@@ -176,7 +176,7 @@ Keep every funnel page on one domain. The SDK keeps attribution in the browser f
 | --- | --- | --- |
 | When it fires | The first SDK page with a `ref_id` after payment | The next SDK page after the upsell is accepted |
 | `event_id` and `ecommerce.transaction_id` | The order number, for example `100041` | The order reference plus `-US1`, `-US2`, and so on |
-| `ecommerce.value` | Item revenue, excluding tax and shipping | The accepted upsell line, or the bundle total |
+| `ecommerce.value` | Item revenue without shipping. Tax is excluded on stores that show prices without tax and included on stores that show tax-inclusive prices, where `ecommerce.tax` is also sent, so do not add the two together | The accepted upsell line, or the bundle total |
 | `ecommerce.tax` and `ecommerce.shipping` | Order tax and shipping | `0` and `0` |
 | `ecommerce.affiliation` | `Online Store` | `Upsell` |
 | Other fields | `currency`, `coupon`, `discount`, `items` | `currency`, `coupon`, `items`, `upsell_metadata` with `original_order_id`, `upsell_number`, `package_id` and `package_name` |
@@ -234,7 +234,7 @@ More checks are in [Test and troubleshoot tracking](/docs/campaigns/tracking/tes
 | No `dl_purchase` after a test order | The order is unpaid, the shopper never reached a page with a `ref_id` after payment, or that order was already reported in this browser | Load the upsell or receipt page, and use a fresh browser profile for each test |
 | `dl_upsell_purchase` appears one page late | The SDK holds it until the next SDK page | Expected. Check the next page. |
 | Upsell revenue is higher than expected | Each bundle item pushes an event with the whole bundle total | Handle bundle totals in the tag or the report |
-| Purchase value is lower than the order total | `value` excludes tax and shipping | Read `ecommerce.tax` and `ecommerce.shipping` alongside it |
+| Purchase value is lower than the order total | `value` is item revenue and leaves out shipping, and tax on stores that show prices without tax | Read `ecommerce.shipping`, and `ecommerce.tax` on tax-exclusive stores, alongside it |
 | A `dl_page_view` trigger never fires | The SDK does not send `dl_page_view` at 0.4.43 | Trigger on `dl_user_data` for page loads |
 
 - The SDK does not skip test orders, so a test purchase reaches GTM and fires `dl_purchase`. Filter test data in GTM if your reports need it clean.

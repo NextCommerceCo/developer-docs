@@ -236,10 +236,12 @@ For conditional shipping discounts, such as free shipping at 3 or more, use a `s
 
 Domains are configured in your store's **Campaign Settings** and apply across all campaigns. They control which domains are authorized to use your campaign API keys.
 
-| Type | SDK Access | Analytics Tracking |
+| Type | SDK Access | NEXT campaign analytics |
 | --- | --- | --- |
-| **Production** | Yes | Yes — events tracked automatically |
-| **Development** | Yes | No — events suppressed |
+| **Production** | Yes | Yes, events recorded automatically |
+| **Development** | Yes | No, events ignored |
+
+The environment setting controls NEXT's own campaign analytics only. Vendor pixels and the SDK's event stream still run on development domains. See [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting).
 
 <Callout type="idea">
 Add `localhost` and any staging domains as **development** domains so you can test the full checkout flow without polluting analytics data.
@@ -253,7 +255,9 @@ Requests from domains not listed in either production or development will be rej
 
 ## Analytics & Tracking
 
-Every starter template ships with NEXT Campaign Analytics **on by default** in auto mode. The SDK automatically tracks the full funnel — page views, add-to-cart, begin checkout, shipping/payment info, purchase, and upsells — through the always-on internal `nextCampaign` provider. No code required.
+Every starter template ships with NEXT Campaign Analytics **on by default** in auto mode. The SDK automatically tracks the full funnel (page views, add-to-cart, begin checkout, shipping and payment info, purchase, and upsells) through the internal `nextCampaign` provider, which templates ship turned on. No code required.
+
+Setup guides for every supported platform (Triple Whale, Meta, TikTok, Google Ads, GA4, GTM and more), the event and attribution reference, and testing steps are in [Tracking](/docs/campaigns/tracking).
 
 To also forward those events to **Google Tag Manager** or **Facebook Pixel**, add your IDs in `_data/campaigns.json`:
 
@@ -269,14 +273,16 @@ To also forward those events to **Google Tag Manager** or **Facebook Pixel**, ad
 ```
 
 <Callout type="info">
-The matching `providers.gtm.enabled` and `providers.facebook.enabled` flags in `assets/config.js` control whether the SDK **forwards events** to each provider. Templates ship with these set to `false` — flip them to `true` once your IDs are in place. See the per-provider guides below for the full wiring.
+The matching `providers.gtm.enabled` and `providers.facebook.enabled` flags in `assets/config.js` control whether the SDK **forwards events** to each provider. Templates ship with these set to `false`. Flip them to `true` once your IDs are in place. The [Google Tag Manager](/docs/campaigns/tracking/google-tag-manager) and [Meta](/docs/campaigns/tracking/meta) guides cover the full wiring, and the other platforms use one key each in `_data/campaigns.json`.
 </Callout>
 
 <Callout type="idea" title="Keep your campaign analytics clean">
-Two mechanisms skip tracking entirely — including the always-on internal `nextCampaign` provider — so your campaign dashboards reflect **real customer conversions**, not internal QA or test traffic:
+Two mechanisms keep test traffic out of your campaign dashboards, so they reflect **real customer conversions**, not internal QA:
 
-- **Development domains** — any domain marked *development* in your store's Campaign Settings suppresses all events. Add `localhost`, staging URLs, and preview hosts here.
-- **`?ignore=true` URL parameter** — append it to any URL to silence tracking for the entire session, useful for one-off testing on a production domain. Clear it with `window.NextAnalyticsClearIgnore()`.
+- **Development domains**: NEXT campaign analytics ignores events from any domain marked *development* in your store's Campaign Settings. Add `localhost`, staging URLs, and preview hosts here. Vendor pixels on those pages still fire.
+- **`?ignore=true` URL parameter**: append it to any URL to silence all SDK tracking for the browser session, useful for one-off testing on a production domain. Clear it with `window.NextAnalyticsClearIgnore()`.
+
+Do not use `?ignore=true` when you are testing that a purchase event fires: it stops every event, including the purchase.
 </Callout>
 
 

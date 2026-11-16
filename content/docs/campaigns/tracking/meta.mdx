@@ -1,0 +1,371 @@
+---
+title: Meta Pixel and Conversions API
+description: Send NEXT Campaigns funnel events to a Meta pixel from the browser, send the order Purchase from the server with the Meta Pixel app, and set up both so Meta counts each purchase once.
+sidebar_label: Meta
+audience: [merchant, developer]
+last_verified: 2026-11-16
+tags:
+ - Guide
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Verification status
+
+| Claim | Status | How it was checked | Date | SDK |
+| --- | --- | --- | --- | --- |
+| Setting `fb_pixel_id` loads Meta's `fbevents.js` and runs `fbq('init')` on every funnel page | Verified | Starter template source, and requests to `www.facebook.com/tr` in a test order | 2026-11-16 | 0.4.43 |
+| The SDK's facebook provider sends `PageView`, `ViewContent`, `AddShippingInfo` (custom) and `Purchase` | Verified | Test order, Meta pixel requests observed in the browser | 2026-11-16 | 0.4.43 |
+| The browser `Purchase` carries the event ID `your-store-100041` (store subdomain, then order number), `order_id` and item revenue as `value` | Verified | Test order with `storeName` set, `eid`, `cd[order_id]` and `cd[value]` read from the Purchase request | 2026-11-16 | 0.4.43 |
+| No browser Meta event is sent for an accepted upsell; `ViewedUpsell` (custom) is sent on the upsell page | Verified | Test order with an accepted upsell | 2026-11-16 | 0.4.43 |
+| `AddToCart`, `InitiateCheckout` and `AddPaymentInfo` mappings | Unconfirmed | SDK source only; not recorded in the test order | | |
+| The Meta Pixel app sends one server `Purchase` per campaign order, with the event ID `{store}-{order number}` | Unconfirmed | App source and merchant docs; the app was not installed on the test store | | |
+| Meta deduplicates the browser and server `Purchase` | Unconfirmed | Meta's documentation only; Events Manager not checked | | |
+| The `_fbp` and `_fbc` cookies reach the order's attribution | Unconfirmed | SDK and template source only; the placeholder pixel never set the cookies | | |
+| Advanced matching with `meta_advanced_matching_enabled` | Unconfirmed | Template source and its tests | | |
+| SDK 0.5.0 `destinations.meta` config | Unconfirmed | SDK 0.5.0 source and docs | | |
+
+The browser side was checked with a placeholder pixel ID on a store without the Meta Pixel app, so the server Purchase, deduplication in Events Manager and cookie capture were not checked.
+
+## What it does
+
+Meta tracking on a funnel has two parts that you set up separately.
+
+| Part | Runs in | Sends | Set up in |
+| --- | --- | --- | --- |
+| Browser pixel | The shopper's browser, on every funnel page | `PageView`, product, checkout and upsell events, and the order `Purchase`, through the Campaign Cart SDK's facebook provider | `_data/campaigns.json` and `assets/config.js` |
+| Server Purchase (Conversions API) | NEXT's servers, after the order is created | One `Purchase` per order | The Meta Pixel app in your store dashboard |
+
+The starter template loads the pixel. The SDK sends the events through it. The Meta Pixel app sends the server Purchase for campaign orders as well as storefront orders. The app's browser scripts run on your NEXT storefront only and do not load on a funnel.
+
+When both parts send the order `Purchase`, they must use the same event ID so Meta can deduplicate them. NEXT builds that ID from your store subdomain and the order number, so `storeName` in `config.js` has to be your store subdomain.
+
+## Before you start
+
+- A Meta pixel and its ID. For the server Purchase you also need an access token for that pixel.
+- Your store subdomain: the lowercase part before `.29next.store`, for example `your-store` in `your-store.29next.store`.
+- A funnel built from a starter template. The Meta pixel code ships with every template family except `landing`.
+- Your funnel domain added in the Campaigns app under **Settings**, then **Allowed Domains**, as a **Production** domain.
+- The Meta Pixel app installed on your store, if you want the server Purchase. See the [Meta Pixel app merchant docs](https://docs.nextcommerce.com/docs/apps/meta-pixel).
+
+## Set up
+
+<Tabs items={['Starter template (Page Kit)', 'Hand-built funnel']}>
+<Tab value="Starter template (Page Kit)">
+
+### Part 1: browser pixel
+
+The browser pixel needs two settings. With only the first, the pixel loads but the SDK sends no events. With only the second, the SDK has no pixel to send through.
+
+1. Open `_data/campaigns.json`, find your campaign's entry and set `fb_pixel_id`. The key is already there with an empty value.
+
+```json title="_data/campaigns.json"
+{
+  "my-campaign": {
+    "name": "My Campaign",
+    "fb_pixel_id": "123456789012345"
+  }
+}
+```
+
+2. Open `assets/config.js`. Set `storeName` to your store subdomain, turn on the facebook provider and give it the same pixel ID.
+
+```js title="assets/config.js"
+window.nextConfig = {
+  // ...your existing settings
+  storeName: 'your-store',
+  analytics: {
+    enabled: true,
+    mode: 'auto',
+    providers: {
+      // ...other providers unchanged
+      facebook: {
+        enabled: true,
+        settings: {
+          pixelId: '123456789012345'
+        }
+      }
+    }
+  }
+};
+```
+
+The template ships with `storeName: 'store-name'` and the facebook provider turned off. Change both. The SDK only checks that `settings.pixelId` is not empty; the events go to the pixel that `fb_pixel_id` loads, so keep the two the same to avoid confusion.
+
+3. Do not add `fbq('track', 'PageView')` to your pages. The template's pixel code leaves it out on purpose because the SDK sends `PageView` on every page load. A manual call sends every page view twice.
+4. Build for production with `npm run build`. The analytics markup is left out of `npm run dev` builds.
+
+### Part 2: server Purchase
+
+5. In your store dashboard, open **Apps**, then **Meta Pixel**. Select **Add Pixel**, enter the **Pixel ID (Dataset ID)** and **Access Token**, and save. Add the same pixel you set as `fb_pixel_id`.
+6. Set **Default Meta Pixel**. Orders that do not say which pixel they came from go to this one.
+7. Check the app's other settings:
+
+| Setting | Default | What it does |
+| --- | --- | --- |
+| **Default Meta Pixel** | Required | The pixel that receives the server Purchase when the order has no `fb_pixel_id` in its attribution metadata |
+| **Enable Delay Order Confirmation** | On | Waits 10 minutes before sending, to wait for order updates |
+| **Enable Sending Test Data** | Off | Test orders are skipped unless this is on. The merchant docs call it **Enable Test Data** |
+| **Ignore Subscription Renewal Orders** | On | Renewal orders are not sent as conversions. Not listed in the merchant docs |
+
+8. Choose who sends the order Purchase to Meta, and set the matching config. See [Browser and server events](#browser-and-server-events).
+9. Deploy, then follow [Verify it works](#verify-it-works).
+
+</Tab>
+<Tab value="Hand-built funnel">
+
+The Meta setup is documented for starter templates only. It was not tested on a hand-built page, and a hand-built funnel does not get the template's `_fbp` and `_fbc` workaround. The closest supported path is to build the funnel from a [starter template](/docs/campaigns/templates); the Meta Pixel app's server Purchase does not depend on the funnel's pages.
+
+</Tab>
+</Tabs>
+
+### SDK 0.5.0
+
+The starter templates pin SDK 0.4.43, and everything else on this page describes 0.4.43. On SDK 0.5.0 the Meta settings move. This is from the 0.5.0 source and docs and has not been tested.
+
+<Tabs items={['SDK 0.4.x', 'SDK 0.5.0']}>
+<Tab value="SDK 0.4.x">
+
+```js title="assets/config.js"
+window.nextConfig = {
+  storeName: 'your-store',
+  analytics: {
+    enabled: true,
+    mode: 'auto',
+    providers: {
+      facebook: {
+        enabled: true,
+        settings: { pixelId: '123456789012345' }
+      }
+    }
+  }
+};
+```
+
+</Tab>
+<Tab value="SDK 0.5.0">
+
+```js title="assets/config.js"
+window.nextConfig = {
+  analytics: {
+    destinations: {
+      meta: {
+        enabled: true,
+        storeName: 'your-store'
+      }
+    }
+  }
+};
+```
+
+`destinations.meta.storeName` falls back to the top-level `storeName`, and the 0.4.x keys still turn Meta on. Other changes that affect Meta on 0.5.0:
+
+- `blockedEvents` is not read, so the server-only option below cannot be set in config.
+- The SDK does not send `PageView` and expects the page's own pixel code to. The template pixel code sends none, so check page views before you move a template to 0.5.0.
+- An accepted upsell is sent as its own `Purchase` with the event ID `<ref_id>-US<n>`, without the store name. It does not match a server event.
+- Prices are sent before tax.
+
+</Tab>
+</Tabs>
+
+## Events sent
+
+The SDK's facebook provider turns these SDK events into Meta events. Custom events are sent with `fbq('trackCustom')`, the rest with `fbq('track')`.
+
+| SDK event | Meta event | Type | When it fires | Seen in the test order |
+| --- | --- | --- | --- | --- |
+| `dl_user_data` | `PageView` | Standard | Every page load | Yes |
+| `dl_view_item` | `ViewContent` | Standard | A page shows a package | Yes |
+| `dl_add_to_cart` | `AddToCart` | Standard | An item is added to the cart | Not recorded |
+| `dl_remove_from_cart` | `RemoveFromCart` | Custom | An item is removed | Not recorded |
+| `dl_begin_checkout` | `InitiateCheckout` | Standard | The checkout form loads | Not recorded |
+| `dl_add_shipping_info` | `AddShippingInfo` | Custom | A valid shipping address is entered | Yes |
+| `dl_add_payment_info` | `AddPaymentInfo` | Standard | Payment details are complete | Not recorded |
+| `dl_purchase` | `Purchase` | Standard | The first page after payment | Yes |
+| `dl_viewed_upsell` | `ViewedUpsell` | Custom | An upsell page is shown | Yes |
+| `dl_skipped_upsell` | `SkippedUpsell` | Custom | The shopper declines an upsell | Not recorded |
+| `dl_upsell_purchase` | Nothing | | The page after an upsell is accepted | Yes, nothing sent |
+
+To stop one event going to Meta, add `blockedEvents` to the facebook provider with the SDK event names, for example `blockedEvents: ['dl_add_shipping_info']`. The names must match exactly. Meta names such as `PageView` or `Purchase` block nothing, even though the template's config comment shows `["PageView"]`. A blocked event still goes to every other provider.
+
+The SDK's facebook provider sends no customer data. Customer data reaches Meta only through advanced matching, below.
+
+## Attribution requirements
+
+Keep `fbclid` on the ad's landing URL. The SDK stores it in the order's attribution metadata and carries the query string through to the checkout, upsell and receipt pages.
+
+The Meta Pixel app reads these keys from the order's attribution metadata:
+
+| Metadata key | Set by | Used by the app for |
+| --- | --- | --- |
+| `fb_fbp` | The SDK, from the `_fbp` cookie | Matching the server Purchase to the browser |
+| `fb_fbc` | The SDK, from the `_fbc` cookie | Matching the server Purchase to the click |
+| `fb_pixel_id` | The SDK, from the template's `fbq('init')` call | Choosing which pixel receives the server Purchase |
+| `fb_test_code` | You, for testing only | Sending the server Purchase to Meta's Test Events |
+| `fb_event_source_url` | Not set by the SDK | The event source URL; the app falls back to your store's primary domain |
+
+The merchant docs list `fb_fbp` and `fb_fbc` as required for the server event.
+
+### The `_fbp` and `_fbc` cookies
+
+SDK 0.4.43 reads `_fbp` and `_fbc` when a page loads and again when the checkout form starts. It does not read them later. On a first visit the Meta pixel may not have set them yet, so the order can carry empty values. SDK 0.5.0 reads them once per tab and has the same gap.
+
+The starter templates include `meta.adapter.js`, which loads whenever `fb_pixel_id` is set. It reads the two cookies again every 500 ms for up to 10 seconds while they are missing, and after every cart update, and copies them into the attribution metadata with `next.addMetadata`. Hand-built funnels do not have it.
+
+### Advanced matching
+
+Add `"meta_advanced_matching_enabled": true` to the campaign entry in `_data/campaigns.json` to send the shopper's details to Meta through the pixel. `meta.adapter.js` collects the shopper's details from the checkout fields as they are typed, then calls `fbq('init')` once on the page with them, just before the first `InitiateCheckout`, `AddPaymentInfo` or `Purchase` that has an email or phone. It sends `em`, `ph`, `fn`, `ln`, `ct`, `st`, `zp`, `country` and `external_id` (the SDK's anonymous visitor ID). Phone is sent only when the field holds a valid international number.
+
+Advanced matching is not gated on the marketing opt-in checkbox. Turn it on only when your privacy policy and consent handling cover sending this data to Meta. If you use a consent banner, make it stop the pixel. See [Privacy and consent](/docs/campaigns/tracking#privacy-and-consent).
+
+On a return visit the SDK refills the phone field after `InitiateCheckout` has been sent, so that event goes without `ph`.
+
+## Purchases, revenue and upsells
+
+| Field | Browser `Purchase` (SDK) | Server `Purchase` (Meta Pixel app) |
+| --- | --- | --- |
+| When | The first page after payment | After the order is created; 10 minutes later when **Enable Delay Order Confirmation** is on |
+| Event ID | `{storeName}-{order number}`, for example `your-store-100041`. None when `storeName` is not set | `{store}-{order number}`, using the store subdomain |
+| `order_id` | The NEXT order number | The NEXT order number |
+| `value` | Item revenue, excluding tax and shipping, for the first sale | The order total including tax (`total_incl_tax`) |
+| `num_items` | Number of order lines | Sum of item quantities |
+| Other fields | `currency`, `content_type`, `content_ids`, `contents` | |
+| Upsells | Not included. Nothing is sent for an accepted upsell | With the delay on, the app re-reads the order before sending, so upsells accepted before then are expected to be included. Not confirmed |
+
+The SDK's facebook provider never sends upsell revenue to Meta from the browser. The upsell page sends `ViewedUpsell` as a custom event, and `dl_upsell_purchase` has no Meta mapping. If you want upsell revenue in Meta, it has to come from the server Purchase.
+
+When Meta deduplicates two events, its documentation says it generally keeps the first one received. With the delay on, the browser Purchase usually arrives first, so Meta may report the browser value (item revenue without upsells) rather than the server total. This was not checked in Events Manager.
+
+## Browser and server events
+
+Every purchase should reach Meta from one place, or from two places that share an event ID. See [Send each purchase from one place](/docs/campaigns/tracking#send-each-purchase-from-one-place).
+
+Meta deduplicates a browser and server event only when the browser `eventID` equals the server `event_id`, the event names match and both go to the same pixel, within 48 hours ([Meta: deduplicate pixel and server events](https://developers.facebook.com/documentation/ads-commerce/conversions-api/deduplicate-pixel-and-server-events)). Two server senders are never deduplicated.
+
+Choose one of these two options.
+
+### Option 1: browser events and server Purchase, deduplicated
+
+The browser sends every event, including `Purchase`. The Meta Pixel app also sends `Purchase`. Both use `your-store-{order number}`, so Meta keeps one. This needs `storeName` set to your store subdomain exactly.
+
+```js title="assets/config.js"
+window.nextConfig = {
+  storeName: 'your-store',
+  analytics: {
+    enabled: true,
+    mode: 'auto',
+    providers: {
+      facebook: {
+        enabled: true,
+        settings: { pixelId: '123456789012345' }
+      }
+    }
+  }
+};
+```
+
+### Option 2: server Purchase only
+
+The browser sends every event except `Purchase`, and the Meta Pixel app is the only Purchase sender. Use this if you cannot be sure the IDs match, or if you want the server value, which is expected to include upsells.
+
+```js title="assets/config.js"
+window.nextConfig = {
+  storeName: 'your-store',
+  analytics: {
+    enabled: true,
+    mode: 'auto',
+    providers: {
+      facebook: {
+        enabled: true,
+        settings: { pixelId: '123456789012345' },
+        blockedEvents: ['dl_purchase']
+      }
+    }
+  }
+};
+```
+
+<Callout type="warn" title="Do not send Meta events from GTM as well">
+Never send the same Meta event from a Google Tag Manager tag and from the SDK's facebook provider. If your GTM container also runs a Meta pixel on the funnel, its base code sends its own `PageView`, so add `'dl_user_data'` to the facebook provider's `blockedEvents` to stop a second `PageView`. A pixel loaded only through GTM is not detected by the SDK, so the order's `fb_pixel_id` is empty and the server Purchase goes to the **Default Meta Pixel**.
+</Callout>
+
+On Shop Sync stores, a Shopify-side Meta sender would be a third sender for the same order. See [Tracking on Shop Sync stores](/docs/campaigns/tracking/shop-sync).
+
+### Extra pixels and backup ad accounts
+
+Add every pixel you use in the Meta Pixel app with **Add Pixel**. A campaign's server Purchase goes to the pixel in that campaign's `fb_pixel_id`, which the SDK records on the order. To send a campaign to a different pixel or a backup ad account, set its `fb_pixel_id` and `settings.pixelId` to that pixel and add the pixel in the app.
+
+<Callout type="warn" title="An unknown pixel ID drops the server Purchase">
+If an order's `fb_pixel_id` is not one of the pixels added in the Meta Pixel app, the app sends nothing for that order. It does not fall back to the **Default Meta Pixel**. Add the pixel in the app before you point a campaign at it.
+</Callout>
+
+## Worked example
+
+A store at `your-store.29next.store` runs a campaign on pixel `123456789012345` with advanced matching on, and uses option 1.
+
+```json title="_data/campaigns.json"
+{
+  "summer-offer": {
+    "name": "Summer Offer",
+    "sdk_version": "0.4.43",
+    "fb_pixel_id": "123456789012345",
+    "meta_advanced_matching_enabled": true
+  }
+}
+```
+
+`assets/config.js` uses the option 1 config above, with `storeName: 'your-store'`. In the Meta Pixel app, pixel `123456789012345` is added and set as **Default Meta Pixel**.
+
+A shopper buys a $12 package, then accepts a $3 upsell. The order number is `100041`.
+
+| Sender | Event | Event ID | Value |
+| --- | --- | --- | --- |
+| Browser, on the upsell page | `Purchase` | `your-store-100041` | 12 |
+| Browser, on the upsell page | `ViewedUpsell` | | |
+| Browser, after the upsell is accepted | Nothing | | |
+| Meta Pixel app, 10 minutes after the order | `Purchase` | `your-store-100041` | The order total including tax, expected to include the upsell |
+
+The event IDs match, so Meta should keep one Purchase for order `100041`. The browser rows match what was observed in a test order; the server row is from the app's source.
+
+## Verify it works
+
+1. Open a funnel page on your production domain. Do not add `?ignore=true`, which turns all tracking off for the browser tab.
+2. In the browser console, run `NextAnalytics.getStatus()`. `providers` should include `facebook`.
+3. In Meta Events Manager, open **Test Events** for your pixel, or use the Meta Pixel Helper browser extension. Walk through the funnel. You should see `PageView` on each page, and `AddShippingInfo` once you enter a shipping address.
+4. Place a test order with a [test card](/docs/testing). On the first page after payment you should see `Purchase` with the event ID `your-store-` followed by your order number. In the browser's network panel this is the `eid` parameter on the request to `www.facebook.com/tr`.
+5. To test the server Purchase, turn on **Enable Sending Test Data** in the Meta Pixel app. The app skips test orders otherwise. Then add the test code from **Test Events** to the order's attribution metadata on a funnel page before checkout:
+
+```html
+<script>
+  window.nextReady = window.nextReady || [];
+  window.nextReady.push(function (next) {
+    next.addMetadata('fb_test_code', 'TEST12345');
+  });
+</script>
+```
+
+6. Place another test order. With **Enable Delay Order Confirmation** on, wait at least 10 minutes. Test Events should show a server `Purchase` with the same event ID as the browser one.
+7. Remove the snippet and turn **Enable Sending Test Data** off before launch. The app passes `fb_test_code` to Meta on every order that carries it.
+
+The app keeps a log of the events it sends for 30 days. Where that log appears in the dashboard was not confirmed for this guide.
+
+More checks are in [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting).
+
+## Troubleshooting and limits
+
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| No requests to Meta at all | Built with `npm run dev`, `fb_pixel_id` empty, or `?ignore=true` set earlier in the tab | Build with `npm run build`; check the key; open a new tab without `?ignore=true` |
+| The pixel loads but sends no events | The facebook provider is off, or `settings.pixelId` is empty, so the SDK skips the provider with a console warning | Turn the provider on and set `settings.pixelId` |
+| A console warning that `fbq` is missing, about 5 seconds after an event | The provider is on but no pixel is on the page | Set `fb_pixel_id` in `_data/campaigns.json` |
+| Two `PageView` events per page | A manual `fbq('track', 'PageView')`, or a Meta pixel in GTM | Remove the manual call, or block `dl_user_data` on the facebook provider |
+| Each purchase counted twice | `storeName` missing, left as `store-name`, or not your exact store subdomain, so the browser and server IDs differ | Set `storeName` to your store subdomain in lowercase, or use option 2 |
+| No server Purchase for a test order | **Enable Sending Test Data** is off | Turn it on while testing |
+| No server Purchase for a live order | The order's `fb_pixel_id` is not added in the app, no pixel is configured, the order is a subscription renewal, or the 10-minute delay has not passed | Add the pixel in the app; wait 10 minutes; check **Ignore Subscription Renewal Orders** |
+| Server Purchase goes to the wrong pixel | The pixel is loaded only by GTM, so `fb_pixel_id` is empty and the default pixel is used | Load the pixel with `fb_pixel_id`, or set **Default Meta Pixel** to the right pixel |
+| `blockedEvents` has no effect | Meta event names used, or SDK 0.5.0 | Use `dl_*` names; on 0.5.0 `blockedEvents` is not read |
+| `fb_fbp` or `fb_fbc` empty on orders | First visit before the pixel set its cookies, or a hand-built funnel without `meta.adapter.js` | Use a starter template; check the order's attribution metadata |
+
+- Browser and server Purchase values differ by design: the browser sends item revenue without tax or shipping, the server sends the order total including tax.
+- Meta receives no browser event for subscription renewals or other orders created without a funnel visit. The server Purchase skips renewals while **Ignore Subscription Renewal Orders** is on.
+- The Meta Pixel app's browser scripts run on your NEXT storefront only. On a funnel, browser events come from the SDK.

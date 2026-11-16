@@ -277,6 +277,8 @@ capabilities:
       - /docs/apps/campaigns-app/build-campaign-packages
       - /docs/apps/campaigns-app/campaigns-offers-and-discounts
       - /docs/apps/campaigns-app/campaign-analytics
+      - /docs/apps/meta-pixel
+      - /docs/features/offers/marketing-attribution
     developer_docs:
       - /docs/campaigns
       - /docs/campaigns/page-kit
@@ -284,11 +286,20 @@ capabilities:
       - /docs/campaigns/templates
       - /docs/campaigns/api
       - /docs/campaigns/admin-api
+      - /docs/campaigns/tracking
+      - /docs/campaigns/tracking/getting-started
+      - /docs/campaigns/tracking/triple-whale
+      - /docs/campaigns/tracking/meta
+      - /docs/campaigns/tracking/tiktok
+      - /docs/campaigns/tracking/google-ads
+      - /docs/campaigns/tracking/shop-sync
+      - /docs/campaigns/tracking/events-and-attribution
+      - /docs/campaigns/tracking/testing-and-troubleshooting
     api_operations: [tag:campaigns]
     webhooks: []
     skills: [next-campaigns-create, next-campaigns-setup]
     status: available
-    last_verified: 2026-10-22
+    last_verified: 2026-11-16
 
   - id: storefront-themes
     title: Storefront themes

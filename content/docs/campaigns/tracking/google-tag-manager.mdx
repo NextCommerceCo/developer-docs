@@ -1,0 +1,241 @@
+---
+title: Google Tag Manager
+description: Send the SDK's dl_* funnel events to your own Google Tag Manager container from starter template funnels, and check that each vendor tag receives every purchase once.
+sidebar_label: Google Tag Manager
+audience: [merchant, developer]
+last_verified: 2026-11-16
+tags:
+ - Guide
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Verification status
+
+| Claim | Status | How it was checked | Date | SDK |
+| --- | --- | --- | --- | --- |
+| The SDK pushes each `dl_*` event to `window.dataLayer` | Verified | Test order on a production build, with `window.dataLayer` read in the browser on checkout, upsell and receipt pages | 2026-11-16 | 0.4.43 |
+| `dl_purchase` fires once per order, on the first page after payment, and not again when the page is revisited | Verified | Test order, then a revisit of the upsell page | 2026-11-16 | 0.4.43 |
+| `dl_upsell_purchase` fires on the page after the upsell, with a `transaction_id` of the order reference plus `-US1` | Verified | Test order with an accepted upsell | 2026-11-16 | 0.4.43 |
+| Each `dl_*` push is preceded by `{ecommerce: null}` | Unconfirmed | Source read only; not checked in the browser | 2026-11-16 | 0.4.43 |
+| The container loads when `gtm_id` and the provider flag are both set | Unconfirmed | Starter template source read; the test order had no container | 2026-11-16 | 0.4.43 |
+| `npm run dev` builds leave out the analytics markup | Unconfirmed | Template source and repo docs; not walked | 2026-11-16 | 0.4.43 |
+| Attribution sits under `attribution`, with no root-level copy on `dl_*` events | Unconfirmed | Source read only | 2026-11-16 | 0.4.43 |
+| An accepted upsell bundle pushes one `dl_upsell_purchase` per bundle item, each valued at the bundle total | Unconfirmed | Source read only | 2026-11-16 | 0.4.43 |
+| `blockedEvents` on the `gtm` provider keeps a `dl_*` event out of `window.dataLayer` | Unconfirmed | Source read only | 2026-11-16 | 0.4.43 |
+| Tags in your container fire and deliver data to a vendor | Unconfirmed | Not walked: no container in the test | 2026-11-16 | 0.4.43 |
+| On 0.5.0, `window.ElevarDataLayer` is not written and `dl_*` `user_properties` carry only `visitor_type` | Unconfirmed | SDK 0.5.0 source and docs read; not walked | 2026-11-16 | 0.5.0 |
+| A Meta Purchase from the Meta Pixel app uses the same event ID as the browser Purchase | Unconfirmed | Not walked: the Meta Pixel app was not installed on the test store | 2026-11-16 | n/a |
+
+The test order had no GTM container, so tag firing in GTM, Tag Assistant results and what a vendor received through GTM were not checked.
+
+## What it does
+
+The Google Tag Manager provider in the SDK pushes every `dl_*` funnel event to `window.dataLayer` and to `window.ElevarDataLayer`. Each push is preceded by `{ecommerce: null}`. The SDK never loads GTM itself. On a starter template funnel, the template loads your container when you set `gtm_id`, and your GTM tags decide what reaches each platform.
+
+The provider runs in the browser only. It covers every funnel page of the starter template families except `landing`, which loads no SDK.
+
+## Before you start
+
+- A Google Tag Manager web container. Copy its ID, which has the form `GTM-XXXXXXX`.
+- A funnel built from a starter template.
+- Your funnel domain added under **Allowed Domains** in the Campaigns app, under **Settings**, as a **Production** domain. Analytics and event tracking are ignored for development domains.
+- The NEXT Google Tag Manager app covers the storefront only. It does not run on campaign funnels, so the setup below is still needed. See the [app documentation](https://docs.nextcommerce.com/docs/apps/google-tag-manager).
+
+## Set up
+
+<Tabs items={['Starter template (Page Kit)', 'Hand-built funnel']}>
+<Tab value="Starter template (Page Kit)">
+
+Setup has two parts, and both are required.
+
+1. Open `_data/campaigns.json` and find the entry for your campaign.
+2. Add your container ID:
+
+```json title="_data/campaigns.json"
+{
+  "my-campaign": {
+    "name": "My Campaign",
+    "gtm_id": "GTM-XXXXXXX"
+  }
+}
+```
+
+3. Open `assets/config.js` and turn the GTM provider on. The template ships it set to `false`. Leave `mode: 'auto'` as it is, because the purchase and cart events come from automatic tracking.
+
+```js title="assets/config.js"
+// Inside analytics.providers, change only the gtm entry:
+gtm: {
+  enabled: true
+},
+```
+
+4. Build with `npm run build`. The analytics markup is left out of `npm run dev` builds, so GTM does not load in the development server.
+5. Deploy, then follow [Verify it works](#verify-it-works).
+
+Each part does something on its own, which is why both are needed:
+
+| Set | What happens |
+| --- | --- |
+| Only `gtm_id` | The container loads, but the SDK sends it no `dl_*` events. Inferred from the template's config comment; not walked. |
+| Only the provider flag | The SDK pushes `dl_*` events to `window.dataLayer`, and no container loads to read them. Observed in the test order. |
+
+</Tab>
+<Tab value="Hand-built funnel">
+
+On a hand-built funnel you add your GTM container to every page yourself, then turn on the SDK's `gtm` provider in `window.nextConfig.analytics` as described in the [Campaign Cart SDK analytics docs](https://cart-sdk.nextcommerce.com/latest/analytics/). The events are the same as on a starter template. NEXT has not tested this on a hand-built page for this guide, so check it with GTM Preview before you rely on it.
+
+</Tab>
+</Tabs>
+
+The config key depends on the SDK version your template pins. The version comes from `sdk_version` in `_data/campaigns.json`, and the starter templates pin 0.4.43.
+
+<Tabs items={['SDK 0.4.x', 'SDK 0.5.0']}>
+<Tab value="SDK 0.4.x">
+
+The flag is `analytics.providers.gtm.enabled`, set as in step 3 above. You can also list `dl_*` names in `blockedEvents`:
+
+```js title="assets/config.js"
+gtm: {
+  enabled: true,
+  blockedEvents: ['dl_add_payment_info']
+},
+```
+
+`blockedEvents` matches exact, case-sensitive event names. A blocked event does not reach `window.dataLayer` for GTM. It still reaches `window.NextDataLayer` and the other providers.
+
+</Tab>
+<Tab value="SDK 0.5.0">
+
+<Callout type="warn" title="Not walked">
+Everything on this tab comes from SDK 0.5.0 source and docs. The test order ran on 0.4.43.
+</Callout>
+
+- The key is `analytics.destinations.gtm.enabled`. GTM is on by default on 0.5.0. Set it to `false` to stop the `window.dataLayer` writes. A 0.4.x `providers.gtm.enabled: false` also turns it off when the destination key is not set.
+- `window.ElevarDataLayer` is not written.
+- Every `dl_*` push carries `user_properties` with `visitor_type` only. Customer email and phone are not sent, so a tag that reads them gets nothing.
+- `blockedEvents` is not read.
+
+</Tab>
+</Tabs>
+
+## Events sent
+
+The SDK emits these `dl_*` events. Most need `mode: 'auto'`, which the template ships with.
+
+| Event | When it fires |
+| --- | --- |
+| `dl_user_data` | Each page load, before the other events on the page. Also on in-funnel navigation, login and logout. |
+| `dl_view_item_list` | A page with more than one product |
+| `dl_view_item` | A page that shows one product |
+| `dl_add_to_cart` | An item is added to the cart, once its price is final |
+| `dl_remove_from_cart` | An item is removed from the cart |
+| `dl_package_swapped` | A package is swapped |
+| `dl_cart_updated` | The cart changes |
+| `dl_begin_checkout` | The checkout form loads with items in the cart, once per form |
+| `dl_add_shipping_info` | A shipping method is chosen, or a valid address is entered |
+| `dl_add_payment_info` | Payment details are complete, an express payment button is pressed, or a redirect payment method is submitted |
+| `dl_purchase` | The first SDK page with a `ref_id` after payment |
+| `dl_viewed_upsell` | An upsell page is shown |
+| `dl_skipped_upsell` | An upsell is skipped |
+| `dl_upsell_purchase` | An upsell is accepted. It is pushed on the next SDK page. |
+| `dl_scroll_depth` | A scroll threshold set in the page's meta tag is reached |
+| `dl_exit_intent_shown`, `dl_exit_intent_accepted`, `dl_exit_intent_dismissed`, `dl_exit_intent_closed`, `dl_exit_intent_action` | Exit-intent pages |
+| `dl_sign_up`, `dl_login` | Only when the page calls `next.trackSignUp` or `next.trackLogin` |
+
+`dl_page_view` is defined in the SDK but never sent at 0.4.43, so a trigger on it never fires. Page loads reach GTM as `dl_user_data`. The same applies to `dl_route_changed`, `dl_view_cart`, `dl_select_item` and `dl_view_search_results`.
+
+Create one Custom Event trigger for each `dl_*` name you use, with the event name set to that name, for example `dl_purchase`. Each push has the event name in its `event` key, and the `event_id` at the top level. The ecommerce object follows the GA4 shape: `currency`, `transaction_id`, `value`, `tax`, `shipping`, `affiliation` and `items`, with `coupon` or `discount` when they apply. Each item carries `item_id` (the product SKU), `item_name`, `price` and `quantity`.
+
+The SDK does not copy `utm_*` or `gclid` to the top level of a `dl_*` event. Read them under `attribution`.
+
+## Attribution requirements
+
+Every `dl_*` event carries an `attribution` object. The keys that matter for tags:
+
+| Key | Holds |
+| --- | --- |
+| `attribution.utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term` | UTM parameters from the landing URL |
+| `attribution.gclid` | The Google click ID |
+| `attribution.affiliate`, `attribution.subaffiliate1` to `subaffiliate5` | Affiliate and sub-affiliate parameters |
+| `attribution.funnel` | The funnel name |
+| `attribution.metadata.fbclid` | The Meta click ID |
+| `attribution.metadata.clickid` | The `clickid` parameter |
+| `attribution.metadata.everflow_transaction_id` | The `evclid` parameter |
+| `attribution.metadata.fb_fbp`, `fb_fbc`, `fb_pixel_id` | Meta browser cookies and pixel ID |
+
+NEXT does not store `ttclid`, `msclkid`, `gbraid` or `wbraid`. A vendor pixel on the page can still read its own click ID cookie, as the TikTok pixel did in the test order.
+
+Each event also carries a `user_properties` object. In 0.4.43 it holds the shopper's email, phone, name and address fields in plain text. Decide which tags may read these fields, and see [Privacy and consent](/docs/campaigns/tracking#privacy-and-consent).
+
+Keep every funnel page on one domain. The SDK keeps attribution in the browser for the current tab and carries query parameters from page to page during SDK navigation, so a page on another domain gets attribution only when the parameters reach it. A new tab starts attribution again, except for the funnel name and `evclid`.
+
+## Purchases, revenue and upsells
+
+| Field | `dl_purchase` | `dl_upsell_purchase` |
+| --- | --- | --- |
+| When it fires | The first SDK page with a `ref_id` after payment | The next SDK page after the upsell is accepted |
+| `event_id` and `ecommerce.transaction_id` | The order number, for example `100041` | The order reference plus `-US1`, `-US2`, and so on |
+| `ecommerce.value` | Item revenue, excluding tax and shipping | The accepted upsell line, or the bundle total |
+| `ecommerce.tax` and `ecommerce.shipping` | Order tax and shipping | `0` and `0` |
+| `ecommerce.affiliation` | `Online Store` | `Upsell` |
+| Other fields | `currency`, `coupon`, `discount`, `items` | `currency`, `coupon`, `items`, `upsell_metadata` with `original_order_id`, `upsell_number`, `package_id` and `package_name` |
+| Repeat pushes | Suppressed per browser by transaction ID, for the last 20 IDs | Not suppressed |
+
+`dl_purchase` waits for payment. An order that still has a payment step does not fire, and a payment failure landing does not fire.
+
+<Callout type="warn" title="Bundles">
+When a bundle of upsell items is accepted, the SDK pushes one `dl_upsell_purchase` per item, and each carries the whole bundle total. Summing those events overstates upsell revenue.
+</Callout>
+
+<Callout type="warn" title="Counted twice">
+A tag that listens to both `window.dataLayer` and `window.ElevarDataLayer` counts every event twice. Listen to one array.
+</Callout>
+
+## Browser and server events
+
+GTM runs in the browser only, and NEXT sends nothing from the server for it. Send each purchase from one place per vendor, so a single purchase is counted once. [Send each purchase from one place](/docs/campaigns/tracking#send-each-purchase-from-one-place).
+
+The Meta Pixel app in the NEXT Dashboard sends a server Purchase for new orders. If your GTM container also sends a Meta Purchase, both need the same event ID, `{store}-{order number}`, so Meta can deduplicate them, as described in [Meta's deduplication guide](https://developers.facebook.com/documentation/ads-commerce/conversions-api/deduplicate-pixel-and-server-events). `dl_purchase` carries the order number but not your store name, so build the prefix in the tag. Not walked: the Meta Pixel app was not installed on the test store, so the server Purchase and its event ID were not checked.
+
+## Worked example
+
+A campaign that pins SDK 0.4.43 and sends purchases to GTM:
+
+```json title="_data/campaigns.json"
+{
+  "summer-offer": {
+    "name": "Summer Offer",
+    "sdk_version": "0.4.43",
+    "gtm_id": "GTM-XXXXXXX"
+  }
+}
+```
+
+The same campaign needs the `gtm` entry set to `enabled: true` in `assets/config.js`, as in Set up.
+
+In GTM, add a Custom Event trigger that fires only on `dl_purchase`, and attach it to the tag that sends your purchase conversion. That tag reads `ecommerce.transaction_id` for the order number, `ecommerce.value` for item revenue and `ecommerce.currency` for the currency. If the tag is a Meta Purchase, build its event ID as `{store}-{order number}` from `event_id`.
+
+## Verify it works
+
+1. Build with `npm run build`, deploy, and open a funnel page on your Production domain. Do not add `?ignore=true`. It turns off every provider in that tab, so GTM receives nothing and a purchase test proves nothing.
+2. Open GTM Preview for your container and load the funnel page. You should see `dl_user_data` first, then the events for that page. `window.dataLayer` in the browser console holds the same pushes.
+3. Place a test order with a [test card](/docs/testing). In GTM Preview, `dl_purchase` appears on the upsell or receipt page, with `transaction_id` set to the order number. Accept an upsell, and `dl_upsell_purchase` appears on the next page.
+
+More checks are in [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting).
+
+## Troubleshooting and limits
+
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| No `dl_*` events in the container | The GTM flag is `false` (0.4.x), the build was `npm run dev`, or `?ignore=true` is set in the tab | Set the flag, build with `npm run build`, and open a new tab without `?ignore=true` |
+| The container loads, but tags do not fire | `gtm_id` is empty, so no container loads, or the trigger name does not match the `dl_*` name | Set both parts of the setup, and check the trigger name against the event in GTM Preview |
+| Every event counted twice | A tag listens to both `dataLayer` and `ElevarDataLayer`, or a second path sends the same vendor | Keep one listener and one path per vendor |
+| No `dl_purchase` after a test order | The order is unpaid, the shopper never reached a page with a `ref_id` after payment, or that order was already reported in this browser | Load the upsell or receipt page, and use a fresh browser profile for each test |
+| `dl_upsell_purchase` appears one page late | The SDK holds it until the next SDK page | Expected. Check the next page. |
+| Upsell revenue is higher than expected | Each bundle item pushes an event with the whole bundle total | Handle bundle totals in the tag or the report |
+| Purchase value is lower than the order total | `value` excludes tax and shipping | Read `ecommerce.tax` and `ecommerce.shipping` alongside it |
+| A `dl_page_view` trigger never fires | The SDK does not send `dl_page_view` at 0.4.43 | Trigger on `dl_user_data` for page loads |
+
+- The SDK does not skip test orders, so a test purchase reaches GTM and fires `dl_purchase`. Filter test data in GTM if your reports need it clean.
+- An order that never loads a funnel page with a `ref_id` after payment produces no `dl_purchase` in the browser.

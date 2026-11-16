@@ -1,0 +1,172 @@
+---
+title: Test and troubleshoot tracking
+description: Place a safe test order on a NEXT Campaigns funnel, check what the SDK, template adapters and store apps sent at each step, and fix the tracking problems that come up most often.
+sidebar_label: Testing and troubleshooting
+audience: [merchant, developer]
+last_verified: 2026-11-16
+tags:
+ - Guide
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Use this page to test a funnel's tracking without polluting your reports, see what each part sent, and fix common problems. It describes a starter template funnel on SDK 0.4.43. The browser behaviour was checked with a test order on 2026-11-16. Vendor dashboards, the Meta Pixel app's server Purchase and Shop Sync were not checked, and the page says so where they come up.
+
+## Test safely
+
+### Build for production
+
+Build with `npm run build`. A `npm run dev` build leaves out all of the template's analytics markup: no vendor base pixels, no template analytics adapters and no noscript fallbacks. Testing tracking on a dev build shows nothing.
+
+### Choose the domain
+
+Every domain that serves the funnel must be added in the Campaigns app: open **Settings**, then **Global Settings**, then **Allowed Domains**, then **Add Domain**, and pick an **Environment**. Requests from a domain that is not on the list are not allowed. Both environments accept live orders.
+
+| Environment | NEXT campaign analytics | Vendor pixels and SDK providers | Use it for |
+| --- | --- | --- | --- |
+| **Production** | Recorded | Fire | The final check before launch, and any test that needs NEXT campaign analytics |
+| **Development** | Ignored ("Analytics and event tracking are ignored for development domains") | Still fire. The SDK has no development-domain check, so Meta, GA4, TikTok, Triple Whale and the rest receive your test events | Building and checking pages without adding sessions to NEXT campaign analytics |
+
+A development domain does not protect your ad accounts. Treat every test on either domain as traffic the vendors will see.
+
+### Pay with a test card
+
+Pay with a [test card](/docs/testing). Test cards create **Test Orders** with no transactions, so no money moves. Store apps decide for themselves whether to send a test order:
+
+| Store app | Sends test orders? | Setting |
+| --- | --- | --- |
+| Meta Pixel (server Purchase) | Only when the setting is on | **Enable Sending Test Data** (the [merchant docs](https://docs.nextcommerce.com/docs/apps/meta-pixel) call it Enable Test Data) |
+| Everflow | Only when both settings are on | **Enable Everflow S2S Postback** and **Enable S2S Postback for test orders**. See the [Everflow docs](https://docs.nextcommerce.com/docs/apps/everflow) |
+| Klaviyo | Only when the setting is on | **Enable Sending Test Data**. See the [Klaviyo docs](https://docs.nextcommerce.com/docs/apps/klaviyo) |
+| AppLovin AXON | No. **Skip Test Orders** is on by default | This app runs on the NEXT storefront only and does not load on funnels |
+| Shop Sync | Creates the Shopify order flagged as a test, with the `NEXT` tag | Not checked in the 2026-11-16 test |
+
+The browser side does not look at test status. The SDK fires `dl_purchase` for any paid order, test or not, and the template analytics adapters forward it. A test order therefore sends a real-looking purchase, with its value, to every pixel on the funnel. Use each vendor's test tools where it has them (see [Debug tools](#debug-tools)), or exclude your own test traffic in the vendor's reports.
+
+### Turning tracking off with `?ignore=true`
+
+Adding `?ignore=true` to a funnel URL turns off all SDK analytics for that browser tab: no `dl_*` events, no SDK providers, no template analytics adapter traffic and no NEXT campaign analytics script. It is stored for the tab session and the SDK carries the parameter onto the next pages, so it stays on as you move through the funnel. Attribution is still captured and still sent on the order.
+
+To turn it back on, remove `ignore=true` from the URL and run `window.NextAnalyticsClearIgnore()` in the console, or open a new tab. `?reset=true` does not clear it.
+
+<Callout type="warn" title="Never use ?ignore=true to prove a purchase">
+With the flag on, the purchase event is never sent, so the test proves nothing. Use it only to browse your own funnel without creating events.
+</Callout>
+
+### Use a fresh browser profile or private window for each test
+
+The SDK remembers in the browser what it has already done, so a second test in the same browser behaves differently from a shopper's first visit:
+
+- It keeps the last 20 reported order numbers in `localStorage` (`nextDataLayer_reportedPurchases`) and never sends a purchase for those orders again. In the 2026-11-16 test, revisiting the upsell page sent no second `dl_purchase`.
+- It keeps the shopper's email, phone and name in a cookie for 365 days, so later tests start with the checkout already filled in.
+- It keeps the `evclid` value and the funnel name in `localStorage`, so they carry into later tabs.
+- `?reset=true` clears less than its name suggests: stored `utm_*`, `gclid` and `evclid` values survive it, and so does the `?ignore=true` flag.
+
+Open a new private window or a clean browser profile for every test order, and close it when you are done.
+
+## Debug tools
+
+These tools apply to SDK 0.4.43 and the starter template analytics adapters.
+
+<Callout type="info" title="SDK 0.5.0 differs">
+SDK 0.5.0 has no `window.NextAnalytics.getStatus()`. Open its debug panel with `?debug=1` instead: the Analytics tab lists each event sent and the destinations it reached, and the Providers tab shows whether `?ignore=true` is on. On 0.5.0, `?ignore=false` turns tracking back on for the tab. This was not tested by NEXT.
+</Callout>
+
+### In the browser console
+
+| Tool | How to use | What it shows |
+| --- | --- | --- |
+| `window.NextDataLayer` | Type it in the console on any funnel page | Every `dl_*` event the SDK pushed on this page, with its `ecommerce`, `attribution`, `user_properties` and `campaign_*` fields. It fills up even when no provider is turned on |
+| `window.NextAnalytics.getStatus()` | Run it in the console | `initialized`, `debugMode`, `providers` (the SDK providers that started: `nextCampaign`, `gtm`, `facebook`, `rudderstack`, `custom`), `eventsTracked` (the length of `window.NextDataLayer`) and `ignored` (`true` when `?ignore=true` is in force) |
+| `next.getAttribution()` | Run it in the console on any funnel page | The attribution that will be sent with the order: the non-empty `utm_*` fields, `gclid`, `affiliate`, `subaffiliate1` to `subaffiliate5`, `funnel`, and `metadata` with `fbclid`, `fb_fbp`, `fb_fbc`, `fb_pixel_id`, `landing_page`, `sdk_version`, `user_ip` and the other captured keys |
+| `next.debugAttribution()` | Run it in the console | The same attribution, printed as a grouped console summary |
+| `?debugger=true` | Add it to the funnel URL | Opens the SDK debug overlay, whose Analytics panel shows delivery for each SDK provider. It also turns on verbose logging and the SDK's test mode (test card fill helpers). It is kept across the checkout redirect |
+| `?debug=true` | Add it to the funnel URL | Prints the SDK's info, warning and debug log lines in the console. It does not open the overlay |
+| `analytics.debug: true` | Set it in `window.nextConfig.analytics` in `assets/config.js` | Logs event validation in the console. Delivery does not change. The setting is saved in that browser's `localStorage`, so debug mode stays on after you remove it; clear the site data to turn it off |
+| `?nfdebug=true`, then `NextForwarder.getStatus()` | Add the parameter to the URL, then run the call in the console | `[NextForwarder]` log lines, and one entry per template analytics adapter with `name`, `active`, `sent`, `contacts`, `allowed`, `blocked` and `contact`. Logging is on automatically on `localhost` and `127.0.0.1`. The `meta` entry appears only when `meta_advanced_matching_enabled` is on |
+| `TriplePixel('State')` | Run it in the console | `Ready` when the Triple Whale pixel is installed. `TriplePixelData` shows `TripleName`, `plat` and `isHeadless`. See Triple Whale's [custom sales platform guide](https://triplewhale.readme.io/reference/pixel-setup-guide-for-custom-sales-platform) |
+
+### In the network panel
+
+Open your browser's developer tools, choose the network panel, and filter on the host for the platform you are checking.
+
+| Platform | Filter on | What you see |
+| --- | --- | --- |
+| NEXT Campaigns API | `campaigns.apps.29next.com` | Cart, prospect cart and order requests, and the NEXT campaign analytics script when the `nextCampaign` provider is on |
+| Meta | `facebook.com/tr` | One request per event. On the purchase, `eid` is the event ID and `cd[order_id]` and `cd[value]` carry the order number and value |
+| TikTok | `analytics.tiktok.com` | Pixel requests on each page |
+| GA4 | `google-analytics.com/g/collect` | GA4 event requests |
+| Triple Whale | `api.config-security.com` | Event requests sent to `/event` |
+| Google Tag Manager | `googletagmanager.com/gtm.js` | The container load only. Events reach GTM as `window.dataLayer` pushes, not network requests |
+| AppLovin Axon | `s.axon.ai` | The pixel script load |
+| Taboola | `cdn.taboola.com` | The pixel script load |
+| Northbeam | `j.northbeam.io` | The script load |
+| RudderStack | `cdn.rudderlabs.com` | The SDK loader |
+
+### In the vendor's tools
+
+NEXT did not check any vendor dashboard in the 2026-11-16 test. These are the vendor tools to use.
+
+| Tool | How to use | What it shows |
+| --- | --- | --- |
+| Meta Pixel Helper | Meta's browser extension, open on a funnel page | The browser events the Meta pixel sent from that page. It does not show the server Purchase |
+| Meta Events Manager Test Events | Open **Test Events** for your pixel in Events Manager | The events Meta receives while you test. The Meta Pixel app's server Purchase reaches Test Events only when **Enable Sending Test Data** is on and the order's attribution metadata carries `fb_test_code`, which the app passes as the test event code. You can add it before paying with, for example, `next.addMetadata('fb_test_code', 'TEST12345')`. This path was not tested |
+| GA4 DebugView | In GA4, open **Admin**, then **DebugView**, or use Google Tag Assistant | The events GA4 received from your test session |
+| GTM Preview | Start Preview mode in your GTM container and open the funnel URL | Each `dl_*` push to `window.dataLayer` and the tags that fired on it |
+| Triple Whale Pixel Helper | Triple Whale's Chrome extension (beta). Use a real browser: the pixel does not send events from headless browsers | Whether the pixel is detected, the events it fires and their payloads |
+| TikTok Events Manager | Open your pixel in TikTok Events Manager | The events TikTok received for the pixel |
+
+## Step-by-step check
+
+Run this on a production build in a fresh private window. On each page, check `window.NextDataLayer` and `NextForwarder.getStatus()` in the console and keep the network panel open. The expected results below are what the 2026-11-16 test order showed with Meta, GA4, TikTok and Triple Whale turned on.
+
+1. Open your first funnel page with UTM parameters and click IDs on the URL, for example `?utm_source=test&utm_medium=cpc&utm_campaign=tracking-test&utm_content=a&utm_term=b&gclid=TEST&fbclid=TEST&aff=AFF1&sub1=S1&nfdebug=true`. Expected: `next.getAttribution()` shows all five `utm_*` fields, `gclid`, `affiliate` set to `AFF1`, `subaffiliate1` set to `S1`, `funnel` (the campaign name when the URL has no `funnel` parameter), and `metadata.fbclid`. `fb_pixel_id` is filled when the Meta pixel is on the page. `ttclid` is not captured on SDK 0.4.43.
+2. Go to checkout. Expected: the query string is still on the URL. `window.NextDataLayer` holds `dl_user_data`, `dl_cart_updated` and `dl_begin_checkout`, and the GA4, Meta and TikTok requests appear. A checkout that opens with a package already selected sends `dl_cart_updated` and no `dl_add_to_cart`.
+3. Type an email, then a phone number. Expected: with `triplewhale_contact_enabled` on, Triple Whale receives a `Contact` event for each, before any purchase, and the `contacts` count for `triplewhale` in `NextForwarder.getStatus()` goes up.
+4. Enter the shipping address and choose a shipping method. Expected: `dl_add_shipping_info`, a GA4 `add_shipping_info` request with `item_id` set to the product SKU, and a Meta `AddShippingInfo` custom event.
+5. Pay with a test card. Expected: the checkout page itself sends no purchase. The browser moves to the next page with `ref_id` on the URL.
+6. On the first page after payment (an upsell page, or the receipt if there is no upsell). Expected: `dl_purchase` with `transaction_id` and `event_id` set to the order number, for example `100041`, and `value` set to the item revenue with tax and shipping excluded. The Meta purchase request carries `eid=your-store-100041` when `storeName` is set to your store subdomain, plus `cd[order_id]` and `cd[value]`. TikTok and Triple Whale send their purchase on this page too. Reload the page: no second `dl_purchase`, and `localStorage` key `nextDataLayer_reportedPurchases` lists the order number.
+7. Accept the upsell. Expected: on the next page, `dl_upsell_purchase` with `transaction_id` set to the order reference plus `-US1` and `value` set to the upsell line only. Triple Whale sends `UpsellPurchase` and TikTok sends another `Purchase`. Meta receives no event for the accepted upsell.
+8. Open the order in the store dashboard, or fetch it from the Admin API. Expected: the order is marked as a Test Order and its attribution has the `utm_*` fields, `gclid`, `affiliate`, `subaffiliate1`, `funnel`, and `metadata.fbclid`. `metadata.landing_page` is the checkout URL, not your first funnel page, because checkout overwrites it. `fb_fbp` and `fb_fbc` are filled only when a real Meta pixel has set its cookies.
+9. If the Meta Pixel app is installed and **Enable Sending Test Data** is on, wait about 10 minutes (**Enable Delay Order Confirmation**, on by default, holds the event to wait for order updates such as upsells) and look for the server Purchase in Meta. This step was not tested by NEXT.
+
+## Common problems
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| No vendor requests on any page | The funnel was built with `npm run dev`, which leaves out the analytics markup | Build with `npm run build` and deploy that build |
+| No events at all, and `NextAnalytics.getStatus()` shows `ignored: true` | `?ignore=true` was used earlier in this tab | Remove it from the URL and run `window.NextAnalyticsClearIgnore()`, or open a new private window |
+| `NextAnalytics.getStatus()` shows `initialized: false` and no `dl_user_data` | `window.nextConfig.analytics.enabled` is not `true`, or the `analytics` block is missing | Set `enabled: true` in `assets/config.js` |
+| Checkout events appear but no `dl_user_data` or `dl_purchase` | `analytics.mode` is not `'auto'`. Any other value, including `'disabled'` or no value, starts no automatic tracking; `'disabled'` does not turn analytics off | Set `mode: 'auto'`. To turn analytics off, set `enabled: false` |
+| GTM container loads but receives no `dl_*` events, or the Meta pixel loads but sends no events | The SDK provider is off. `analytics.providers.gtm.enabled` and `analytics.providers.facebook.enabled` are `false` in the template's `config.js`. The Meta provider is also skipped when `settings.pixelId` is empty | Set the provider's `enabled: true`. For Meta, also set `settings.pixelId` to the same ID as `fb_pixel_id`. See [Google Tag Manager](/docs/campaigns/tracking/google-tag-manager) and [Meta](/docs/campaigns/tracking/meta#set-up) |
+| One vendor sends nothing | Its ID key in `_data/campaigns.json` is missing or empty | Add the ID to the campaign entry and rebuild |
+| Requests go to a vendor you have not set up | A placeholder value was left in a vendor key. Any non-empty value turns the vendor on | Set the key to `""` or remove it |
+| Cart and order requests to `campaigns.apps.29next.com` are rejected | The funnel domain is not in **Allowed Domains** | Add it in the Campaigns app under **Settings**, **Global Settings**, **Allowed Domains** |
+| NEXT campaign analytics show no sessions or sales from the funnel | The domain is set to **Development**, where NEXT campaign analytics are ignored | Set the domain to **Production** before launch |
+| Meta shows two PageView events per page | The pixel is also loaded through GTM with its own PageView tag, or a manual `fbq('track', 'PageView')` was added, while the SDK's Meta provider sends PageView from `dl_user_data` | Remove the extra PageView tag, or add `blockedEvents: ["dl_user_data"]` to `analytics.providers.facebook`. `blockedEvents` matches `dl_*` names exactly, so `"PageView"` blocks nothing. SDK 0.5.0 does not read `blockedEvents` |
+| Meta counts each purchase twice | `storeName` is not set, so the browser Purchase has no event ID; or it is still the template's `'store-name'` or another value, so the ID does not match the Meta Pixel app's `your-store-100041` format; or a second server sender, such as a Shopify-side app, sends the same order to the same pixel | Set `window.nextConfig.storeName` to your store subdomain. Keep one server sender per pixel: Meta never deduplicates two server events. See [Send each purchase from one place](/docs/campaigns/tracking#send-each-purchase-from-one-place) |
+| Meta never receives the server Purchase | The Meta Pixel app is not installed or has no pixel added; the order is a test order and **Enable Sending Test Data** is off; the order's `fb_pixel_id` does not match any pixel added in the app, in which case nothing is sent and there is no fallback; or the 10-minute delay has not passed | Install the app and add the pixel. Turn on **Enable Sending Test Data** for tests. Add every pixel your funnels load to the app. An empty `fb_pixel_id`, for example when the pixel is loaded through GTM, routes to the app's default pixel. Not tested by NEXT |
+| Purchase value is lower than the order total | `dl_purchase` `value` is item revenue. Tax and shipping are sent separately and upsells arrive as separate events. The Meta Pixel app's server Purchase uses the order total including tax, so platforms report different revenue for the same order | Report on item revenue, or add `tax` and `shipping` from the event. See [Events and attribution](/docs/campaigns/tracking/events-and-attribution) |
+| Upsell revenue is missing | Each platform receives `dl_upsell_purchase` differently: GA4 as a custom `upsell_purchase` event, Triple Whale as a custom `UpsellPurchase` event, TikTok as another `Purchase`. The SDK's Meta provider sends nothing for it | Follow the upsell section of each platform guide, for example [GA4](/docs/campaigns/tracking/google-analytics-4#purchases-revenue-and-upsells) and [Meta](/docs/campaigns/tracking/meta#purchases-revenue-and-upsells) |
+| No purchase event after a test order | The shopper never loaded a page after payment, so `dl_purchase` was never built; or the order was already reported in this browser; or the page loaded with `payment_failed=true` | Load the upsell or receipt page. Use a fresh private window for every test |
+| `fb_fbp` or `fb_fbc` is empty on orders | The SDK reads the `_fbp` and `_fbc` cookies once when a page loads and again when the checkout form starts. On a first visit the Meta pixel may not have set them yet, and on SDK 0.4.38 to 0.4.43 a cart update can put the empty value back. The SDK does not build `_fbc` from `fbclid`. A placeholder pixel ID never sets the cookies | Set `fb_pixel_id` in `_data/campaigns.json`: the template's Meta adapter then copies the cookies onto the attribution after they appear and on cart updates. Hand-built funnels have no workaround. Test with your real pixel ID. SDK 0.5.0 has the same limit |
+| `ttclid`, `msclkid`, `gbraid` or `wbraid` is missing on orders | SDK 0.4.x does not store them. It only carries them on the URL to later pages | SDK 0.5.0 stores them in the order's attribution metadata. TikTok's own pixel also sets a first-party `ttclid` cookie, so TikTok can read the click ID in the browser |
+| Triple Whale shows no attributed sales | Triple Whale attributes an order only when it gets both a pixel purchase and a matching order record. A store without Shopify sends it no order record. On Shop Sync stores the result depends on how the Shopify connection and the funnel purchase are set up | See [Triple Whale](/docs/campaigns/tracking/triple-whale#attribution-requirements) |
+| A store app you installed does nothing on the funnel | The TikTok Pixel Events, Google Analytics 4, Google Tag Manager, AppLovin AXON and Taboola apps load on the NEXT storefront only | Use the template analytics adapter keys or the SDK providers. See [Supported integrations](/docs/campaigns/tracking#supported-integrations) |
+| Attribution is lost when the shopper moves between domains or tabs | The SDK keeps attribution in the tab's session storage, which pages on another domain cannot read, and a new tab starts over. Only `evclid` and the funnel name are kept across tabs | Keep every funnel page on one domain. If you must link to another domain, turn on `window.nextConfig.utmTransfer` with `enabled: true` and `applyToExternalLinks: true`, which copies the URL parameters onto links when they are clicked |
+| GTM tags built for a Shopify or Elevar data layer read empty values | The SDK pushes its own `dl_*` events unchanged to `window.dataLayer` and `window.ElevarDataLayer`. The event names look familiar but the payload is the SDK's: attribution sits under `attribution` (for example `attribution.utm_source`), not at the root | Rebuild the tags on the SDK's payload. Listen to one array only: a tag on both sees every event twice. See [Google Tag Manager](/docs/campaigns/tracking/google-tag-manager) |
+| Every GA4 event is counted twice | GA4 is loaded by the template adapter and also by GTM or a page script | Send GA4 from one place. See [Google Analytics 4](/docs/campaigns/tracking/google-analytics-4#browser-and-server-events) |
+| The order's attribution shows `utm_source` `konami_code` | The order was placed with the SDK's debug test-order tool, which replaces the real attribution with test values | Place test orders through the normal checkout form with a test card |
+
+## Get help
+
+Before you ask for help, collect:
+
+- The order number of the test order.
+- The full funnel URL you opened first, including its query string.
+- The SDK version: `sdk_version` in `_data/campaigns.json`, or `metadata.sdk_version` from `next.getAttribution()`.
+- Whether the domain is set to **Development** or **Production** in **Allowed Domains**.
+- The output of `NextForwarder.getStatus()` and `window.NextAnalytics.getStatus()` on the page where the problem shows.
+- A network capture from the browser's network panel, covering the page where the event should have fired.
+- For server events, which store apps are installed and how their test-order settings are set.
+
+`window.NextDataLayer` events and network captures include the shopper's email, phone, name and address. Use test details when you reproduce a problem, and remove real customer data before you share a capture.

@@ -1,0 +1,148 @@
+---
+title: Set up tracking
+description: The first steps for tracking a NEXT Campaigns funnel. What NEXT does for you, what you configure, how to turn vendors on in a starter template, and how to run your first test order.
+sidebar_label: Getting started
+audience: [merchant, developer]
+last_verified: 2026-11-16
+tags:
+ - Guide
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+
+This page gets a funnel ready to track and walks you through your first test. Do it once per funnel, then open the guide for each platform you use. How the parts fit together is explained in the [Tracking overview](/docs/campaigns/tracking#how-tracking-works).
+
+## What NEXT handles and what you configure
+
+| NEXT handles | You configure |
+| --- | --- |
+| The Campaign Cart SDK captures UTM parameters and click IDs from the landing URL and attaches them to the order | Your vendor IDs, one key per vendor in `_data/campaigns.json` |
+| The SDK emits an ecommerce event stream (`dl_*` events in `window.NextDataLayer`) on every funnel page | Turning on the SDK providers for Google Tag Manager, Meta and RudderStack in `assets/config.js` |
+| NEXT campaign analytics (session tracking) is on by default through the `nextCampaign` provider | Your funnel domain, added as a **Production** domain in the Campaigns app |
+| Once you install the Meta Pixel app, it sends a server-side Purchase for campaign orders | Installing the Meta Pixel app, adding your pixel ID and access token, and setting `storeName` in `assets/config.js` |
+| On Shop Sync stores, Shop Sync pushes campaign orders to Shopify | Choosing one purchase sender for each platform |
+| | Consent handling. NEXT Campaigns has no built-in consent banner; see [Privacy and consent](/docs/campaigns/tracking#privacy-and-consent) |
+| | Testing with a test order before you launch |
+
+The Meta Pixel app's server Purchase and the Shop Sync order push were not part of NEXT's test order on 2026-11-16. Treat them as unconfirmed until you check them on your own store.
+
+## Before you start
+
+- A NEXT store with a campaign in the Campaigns app. See [NEXT Campaigns](/docs/campaigns).
+- A funnel built from a [starter template](/docs/campaigns/templates) with the [Page Kit](/docs/campaigns/page-kit), or a funnel you built by hand with the Campaign Cart SDK. The `landing` template family loads no SDK and no analytics, so it cannot be tracked as shipped.
+- Your funnel domain added in the Campaigns app. Open **Settings**, then **Allowed Domains**, click **Add Domain**, enter the **Domain** and set **Environment** to **Production** or **Development**. Requests from a domain that is not listed are rejected.
+- An account with each ad or analytics platform you plan to use, and the ID each guide asks for.
+
+<Callout type="warn" title="What a development domain does and does not stop">
+The Campaigns app says "Analytics and event tracking are ignored for development domains." That applies to NEXT's own campaign analytics: it ignores events from a development domain. The SDK has no domain check, so on a development domain the `dl_*` events still fire and vendor pixels still send to your ad accounts. The starter templates leave out their tracking markup only when you build with `npm run dev`, whatever the domain. If test traffic must stay out of a vendor's data, leave that vendor's key empty in builds you deploy to a development domain.
+</Callout>
+
+## Choose your path
+
+- Starter template funnel: add one key per vendor to the campaign's entry in `_data/campaigns.json`. For Google Tag Manager and Meta, also turn on the matching provider flag in `assets/config.js`. Follow [Configure a starter template funnel](#configure-a-starter-template-funnel).
+- Hand-built funnel: you can use the SDK providers for Google Tag Manager, Meta and RudderStack, set in `window.nextConfig.analytics`, and send everything else from your own GTM container. The SDK does not load the GTM container, the Meta pixel or the RudderStack SDK, so your pages must include them. The template analytics adapters for GA4, Triple Whale, TikTok and the others are not packaged for hand-built funnels, and no hand-built page was tested. See [Known gaps](/docs/campaigns/tracking#known-gaps) and the [Google Tag Manager](/docs/campaigns/tracking/google-tag-manager) guide.
+- Shop Sync store: read [Tracking on Shop Sync stores](/docs/campaigns/tracking/shop-sync) first. Some Shopify-side tools already see the synced orders, which changes where each purchase should come from.
+
+## Configure a starter template funnel
+
+1. Open `_data/campaigns.json` and find the entry for your campaign.
+2. Add the key for each vendor you use. A missing or empty key leaves that vendor off. Any other value, including a placeholder, turns it on.
+
+| Vendor | Key in `_data/campaigns.json` | Guide |
+| --- | --- | --- |
+| Google Tag Manager | `gtm_id` | [Google Tag Manager](/docs/campaigns/tracking/google-tag-manager) |
+| Meta pixel | `fb_pixel_id` | [Meta](/docs/campaigns/tracking/meta) |
+| Google Analytics 4 | `ga4_id` | [Google Analytics 4](/docs/campaigns/tracking/google-analytics-4) |
+| Triple Whale | `triplewhale_name` | [Triple Whale](/docs/campaigns/tracking/triple-whale) |
+| TikTok | `tiktok_pixel_id` | [TikTok](/docs/campaigns/tracking/tiktok) |
+| Google Ads and YouTube | No key of its own | [Google Ads and YouTube](/docs/campaigns/tracking/google-ads) |
+| Northbeam | `northbeam_client_id` | [Northbeam](/docs/campaigns/tracking/more-integrations#northbeam) |
+| Snapchat | `snap_pixel_id` | [Snapchat](/docs/campaigns/tracking/more-integrations#snapchat) |
+| Pinterest | `pinterest_tag_id` | [Pinterest](/docs/campaigns/tracking/more-integrations#pinterest) |
+| Taboola | `taboola_account_id` (numbers only) | [Taboola](/docs/campaigns/tracking/more-integrations#taboola) |
+| AppLovin Axon | `axon_event_key` | [AppLovin Axon](/docs/campaigns/tracking/more-integrations#applovin-axon) |
+| RudderStack | `rudderstack_write_key` and `rudderstack_dataplane_url` (both required) | [RudderStack](/docs/campaigns/tracking/more-integrations#rudderstack) |
+
+Each guide lists the optional keys for its vendor, such as event filters and identity settings.
+
+```json title="_data/campaigns.json"
+{
+  "my-campaign": {
+    "name": "My Campaign",
+    "sdk_version": "0.4.43",
+    "gtm_id": "GTM-XXXXXXX",
+    "fb_pixel_id": "123456789012345",
+    "ga4_id": "G-XXXXXXXXXX",
+    "tiktok_pixel_id": "CXXXXXXXXXXXXXXXXXXX",
+    "triplewhale_name": "your-store.myshopify.com"
+  }
+}
+```
+
+If you set both `gtm_id` and `ga4_id`, do not also add a GA4 tag for the same property inside your GTM container. Two paths send every GA4 event twice.
+
+3. For Google Tag Manager, Meta and RudderStack, also turn on the provider in `assets/config.js`. The key in `_data/campaigns.json` loads the vendor's script; the provider flag makes the SDK send its events to it. With only the key set, the GTM container loads but receives no `dl_*` events from the SDK, and the Meta pixel loads but sends no events.
+   - Google Tag Manager: set `analytics.providers.gtm.enabled` to `true`.
+   - Meta: set `analytics.providers.facebook.enabled` to `true`, and set `settings.pixelId` to the same ID as `fb_pixel_id`.
+   - RudderStack: set `analytics.providers.rudderstack.enabled` to `true`.
+4. Set `storeName` to your store subdomain, for example `your-store`. The templates ship with `'store-name'`. The SDK's Meta provider uses it to give the browser Purchase the event ID `your-store-<order number>`, the same format the Meta Pixel app uses for its server Purchase. Without it, the browser Purchase has no event ID.
+5. Keep `analytics.enabled: true` and `mode: 'auto'`. Only `'auto'` starts the SDK's automatic tracking. Any other value, including `'manual'`, `'disabled'` or no `mode` at all, sends no `dl_user_data` and no `dl_purchase`. To turn analytics off, set `enabled: false`; `mode: 'disabled'` does not do it.
+6. Build for production with `npm run build`. The tracking markup is left out of `npm run dev` builds.
+7. Deploy to the domain you added as **Production**.
+
+The `analytics` block with Google Tag Manager and Meta turned on looks like this. Leave the other entries as they ship.
+
+```js title="assets/config.js (excerpt)"
+  storeName: 'your-store',
+  analytics: {
+    enabled: true,
+    mode: 'auto',
+    providers: {
+      nextCampaign: {
+        enabled: true
+      },
+      gtm: {
+        enabled: true
+      },
+      facebook: {
+        enabled: true,
+        settings: {
+          pixelId: "123456789012345"
+        }
+      },
+      rudderstack: {
+        enabled: false,
+        settings: {}
+      }
+    }
+  },
+```
+
+<Callout type="info" title="SDK version">
+The starter templates pin SDK 0.4.43 through `sdk_version`, and this page describes that version. SDK 0.5.0 reads these settings from `analytics.destinations` and still maps the 0.4.x `providers` keys and `storeName`. That mapping was not tested.
+</Callout>
+
+## Pick one purchase sender
+
+A campaign order can reach the same platform from the funnel's browser pixel, from a NEXT store app on the server, and on Shop Sync stores from a Shopify-side app that reads the synced order. Decide which one sends the purchase for each platform before you launch. For Meta, the browser Purchase and the Meta Pixel app's server Purchase are built to share the event ID `your-store-<order number>` when `storeName` is set, so Meta can deduplicate them. For any other platform, send the purchase from one place only. The rules are in [Send each purchase from one place](/docs/campaigns/tracking#send-each-purchase-from-one-place).
+
+## Run your first test
+
+1. Open a fresh browser profile, then open your first funnel page on the production domain with UTM parameters and `nfdebug=true` on the URL:
+
+```text
+https://funnel.example.com/?utm_source=test&utm_medium=cpc&utm_campaign=launch-test&nfdebug=true
+```
+
+2. In the browser console, run `next.getAttribution()`. You should see your `utm_*` values, and any click ID you added, such as `gclid` or `metadata.fbclid`. SDK 0.4.43 does not store `ttclid`.
+3. Move through checkout and place a test order with a [test card](/docs/testing).
+4. On the first page after payment (the upsell page, or the receipt if there is no upsell), check `window.NextDataLayer`. It should contain one `dl_purchase` with your order number as `transaction_id`. If you accept an upsell, the next page should show `dl_upsell_purchase` with a `transaction_id` ending in `-US1`.
+5. Run `NextForwarder.getStatus()`. Each template adapter you turned on should show `active: true`, and its `sent` count should rise as you move through the funnel. `NextForwarder` exists only on starter templates with at least one adapter vendor set. Google Tag Manager and RudderStack never appear in it, and Meta appears only when `meta_advanced_matching_enabled` is on.
+6. Open the **Verify it works** section of each platform guide, for example [Meta](/docs/campaigns/tracking/meta#verify-it-works), and check the vendor's own tools.
+
+<Callout type="warn" title="Do not use ?ignore=true to prove a purchase">
+`?ignore=true` turns off every analytics event for the browser tab, including `dl_purchase`, and the SDK carries it to the next pages. If you used it earlier, open a new tab or run `window.NextAnalyticsClearIgnore()` before you test.
+</Callout>
+
+Test orders still fire the browser events. The Meta Pixel app skips test orders unless **Enable Sending Test Data** is on in its settings. The SDK sends `dl_purchase` once per order in each browser, so use a fresh browser profile for each test order.
+
+More checks and fixes are in [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting).

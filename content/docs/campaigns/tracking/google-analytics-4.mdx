@@ -1,0 +1,140 @@
+---
+title: Google Analytics 4
+description: Send NEXT Campaigns funnel page views, checkout steps, purchases and upsells to a GA4 property with the starter template GA4 adapter, and check the events arrive.
+sidebar_label: Google Analytics 4
+audience: [merchant, developer]
+last_verified: 2026-11-16
+tags:
+ - Guide
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Verification status
+
+| Claim | Status | How it was checked | Date | SDK |
+| --- | --- | --- | --- | --- |
+| Setting `ga4_id` loads `gtag.js` and the GA4 adapter on every funnel page | Verified | Starter template source, and a production build of the Olympus template | 2026-11-16 | 0.4.43 |
+| Funnel events reach `gtag` with the names below | Verified | Test order, `gtag` calls and `/g/collect` requests observed in the browser | 2026-11-16 | 0.4.43 |
+| Accepted upsells arrive as a separate `upsell_purchase` event | Verified | Test order with an accepted upsell | 2026-11-16 | 0.4.43 |
+| Events appear in GA4 reports and DebugView | Unconfirmed | Not checked: the test used a placeholder measurement ID | | |
+
+The browser side was checked with a placeholder measurement ID, so what GA4 does with the events after it receives them was not checked.
+
+## What it does
+
+The GA4 adapter loads Google's `gtag.js` with your measurement ID on every funnel page and sends the SDK's funnel events to GA4 as GA4 ecommerce events. It covers presell, landing, checkout, upsell and receipt pages. It runs in the browser only. NEXT does not send GA4 events from the server, and the Google Analytics 4 store app does not load on campaign funnels.
+
+## Before you start
+
+- A GA4 property and a web data stream. Copy its measurement ID (it starts with `G-`).
+- A funnel built from a starter template. The adapter ships with every template family except `landing`.
+- Your funnel domain added in the Campaigns app under **Settings**, then **Allowed Domains**, as a **Production** domain.
+- Match the property's currency and time zone to your NEXT store so reports line up.
+
+## Set up
+
+<Tabs items={['Starter template (Page Kit)', 'Hand-built funnel']}>
+<Tab value="Starter template (Page Kit)">
+
+1. Open `_data/campaigns.json` and find the entry for your campaign.
+2. Add your measurement ID:
+
+```json title="_data/campaigns.json"
+{
+  "my-campaign": {
+    "name": "My Campaign",
+    "ga4_id": "G-XXXXXXXXXX"
+  }
+}
+```
+
+3. Build for production with `npm run build`. The analytics markup is left out of `npm run dev` builds, so tracking does not load in the development server.
+4. Deploy, then follow [Verify it works](#verify-it-works).
+
+Do not also add a GA4 tag in Google Tag Manager or in the page for the same property. Two paths send every event twice.
+
+</Tab>
+<Tab value="Hand-built funnel">
+
+The GA4 adapter is documented for starter templates only. It was not tested on a hand-built page, and it is not published as a standalone package. On a hand-built funnel, send the SDK's `dl_*` events to GA4 from your own Google Tag Manager container instead. See [Google Tag Manager](/docs/campaigns/tracking/google-tag-manager).
+
+</Tab>
+</Tabs>
+
+## Events sent
+
+By default the adapter forwards eight SDK events. The table shows what each becomes in GA4.
+
+| SDK event | GA4 event | When it fires |
+| --- | --- | --- |
+| `dl_user_data` | `page_view` | Every page load |
+| `dl_view_item` | `view_item` | A page shows a package |
+| `dl_add_to_cart` | `add_to_cart` | An item is added to the cart |
+| `dl_begin_checkout` | `begin_checkout` | The checkout form loads |
+| `dl_add_shipping_info` | `add_shipping_info` | A valid shipping address is entered |
+| `dl_add_payment_info` | `add_payment_info` | Payment details are complete |
+| `dl_purchase` | `purchase` | The first page after payment |
+| `dl_upsell_purchase` | `upsell_purchase` | The page after an upsell is accepted |
+
+`gtag` is configured with `send_page_view: false`, so the adapter's `page_view` is the only one.
+
+To send fewer events, add `ga4_blocked_events` with a comma-separated list, for example `"ga4_blocked_events": "dl_add_shipping_info, dl_add_payment_info"`. To send more, list them in `ga4_allowed_events`, or use `"all"` to send every event the adapter can map, including `view_item_list`, `select_item`, `remove_from_cart`, `view_cart`, `sign_up` and `login`.
+
+## Attribution requirements
+
+GA4 reads campaign source from the page URL, so keep your UTM parameters on the ad's landing URL. The SDK carries the query string through to the checkout, upsell and receipt pages. Every page should be on the same domain, or on subdomains of one domain, so the GA4 cookie is shared across the funnel. If your funnel spans two different domains, set up GA4 cross-domain measurement in your Google tag settings.
+
+## Purchases, revenue and upsells
+
+| Field | Order purchase | Upsell |
+| --- | --- | --- |
+| Event | `purchase` | `upsell_purchase` (custom event) |
+| `transaction_id` | The NEXT order number, for example `100041` | The order reference plus `-US1`, `-US2` and so on |
+| `value` | Item revenue without shipping. Tax is excluded on stores that show prices without tax and included on stores that show tax-inclusive prices | The upsell line only |
+| Other fields | `currency`, `tax`, `shipping`, `coupon`, `affiliation`, `items` | `currency`, `affiliation`, `coupon`, `upsell_number`, `package_id`, `package_name`, `original_order_id` |
+
+Upsells are kept out of the `purchase` event so purchase counts and average order value describe the first sale. To report upsell revenue in GA4, mark `upsell_purchase` as a key event and include it in your revenue explorations. If you import GA4 key events into Google Ads, import `upsell_purchase` too when you want upsell revenue to count there. See [Google Ads and YouTube](/docs/campaigns/tracking/google-ads).
+
+`items[].item_id` is the product SKU.
+
+## Browser and server events
+
+GA4 receives browser events only. There is no NEXT server event to deduplicate against, so the only duplicate risk is a second GA4 tag on the same pages. Send each GA4 event from one place: this adapter, or your own GTM container, not both.
+
+## Worked example
+
+A campaign that sends GA4 and keeps upsells out of the default set, for a property that only wants checkout and purchase data:
+
+```json title="_data/campaigns.json"
+{
+  "summer-offer": {
+    "name": "Summer Offer",
+    "sdk_version": "0.4.43",
+    "ga4_id": "G-XXXXXXXXXX",
+    "ga4_blocked_events": "dl_upsell_purchase"
+  }
+}
+```
+
+## Verify it works
+
+1. Open a funnel page on your production domain with `?nfdebug=true` added to the URL. Do not add `?ignore=true`, which turns all tracking off for the browser tab.
+2. In the browser console, run `NextForwarder.getStatus()`. The `ga4` entry should show `active: true`, and `sent` should increase as you move through the funnel.
+3. In GA4, open **Admin**, then **DebugView**, or use Google Tag Assistant, and walk through checkout. You should see `page_view`, `begin_checkout`, `add_shipping_info` and `add_payment_info`.
+4. Place a test order with a [test card](/docs/testing). On the upsell or receipt page you should see `purchase` with your order number as the transaction ID. Accept an upsell and you should see `upsell_purchase` on the next page.
+
+More checks are in [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting).
+
+## Troubleshooting and limits
+
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| No GA4 requests at all | Built with `npm run dev`, `ga4_id` empty, or `?ignore=true` set earlier in the tab | Build with `npm run build`; check the key; open a new tab without `?ignore=true` |
+| Every event counted twice | GA4 also loaded by GTM or a page script | Remove the other GA4 tag |
+| Purchase revenue lower than the order total | `value` is item revenue and leaves out shipping (and tax, on stores that show prices without tax) | Use `tax` and `shipping` from the event, or report on item revenue |
+| Upsell revenue missing | `upsell_purchase` is a separate event | Mark it as a key event and include it in reports |
+| No `purchase` after a test order | The shopper never reached a page after payment, or the order was already reported in that browser | Load the upsell or receipt page; use a fresh browser profile for each test |
+
+- GA4 receives no event for subscription renewals or other orders created without a funnel visit.
+- The adapter needs SDK 0.4.28 or later.

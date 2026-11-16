@@ -1,6 +1,6 @@
 ---
 title: Tracking overview
-description: How ad and analytics tracking works on NEXT Campaigns funnels, which integrations are supported and how well each is verified, and which guide to follow for Triple Whale, Meta, TikTok, Google Ads, GA4 and GTM.
+description: How ad and analytics tracking works on NEXT Campaigns funnels, which platforms are supported, and which guide to follow for Google, Meta, Everflow, Triple Whale, TikTok and more.
 sidebar_label: Overview
 audience: [merchant, developer]
 last_verified: 2026-11-16
@@ -9,98 +9,75 @@ tags:
 ---
 import { Callout } from 'fumadocs-ui/components/callout';
 
-A NEXT Campaigns funnel is a set of your own pages (presell, landing, checkout, upsells, receipt) that load the Campaign Cart SDK and talk to the Campaigns API. Because the funnel is not a Shopify or storefront checkout, the tracking apps you may already use elsewhere do not see it automatically. This section explains what tracks a funnel today, how to set each platform up, and how to prove it works.
+Tracking tells your ad platforms which clicks turned into sales. A NEXT Campaigns funnel is made of your own pages, so tracking is something you turn on for each platform you advertise on. This section shows you how.
 
 Start with [Set up tracking](/docs/campaigns/tracking/getting-started), then open the guide for your platform.
 
 ## How tracking works
 
-Three parts can send tracking data for a campaign order. Each guide says which part it configures.
-
-| Part | Where it runs | What it does | Where you configure it |
-| --- | --- | --- | --- |
-| Campaign Cart SDK | The shopper's browser | Captures UTM parameters and click IDs from the landing URL, emits an ecommerce event stream (`dl_*` events in `window.NextDataLayer`), and forwards it to GTM, the Meta pixel and RudderStack through built-in providers | `assets/config.js` (`window.nextConfig.analytics`) |
-| Starter template analytics adapters | The shopper's browser | Load a vendor's pixel on every page and translate the SDK's `dl_*` events into that vendor's events: GA4, Triple Whale, TikTok, Northbeam, Snapchat, Pinterest, Taboola and AppLovin Axon | One key per vendor on the campaign entry in `_data/campaigns.json` |
-| Store apps | NEXT's servers | Send order events server to server after the order exists. For campaign orders this covers the Meta Pixel app's Conversions API Purchase, Everflow postbacks and Klaviyo order events | The store dashboard, under **Apps** |
+1. **A shopper clicks your ad.** The link carries details about the ad, such as UTM parameters and a click ID.
+2. **Your funnel remembers where they came from.** It keeps those details as the shopper moves from page to page, and saves them on the order.
+3. **Your funnel tells each platform what happened.** Page views, checkout steps and purchases are sent to the platforms you have turned on.
 
 ```mermaid
 flowchart LR
-  A[Ad click with UTMs and click IDs] --> B[Funnel pages: SDK + vendor pixels]
-  B -->|attribution on cart and order| C[Campaigns API order]
-  B -->|browser events| V[Ad and analytics platforms]
-  C --> D[Store apps: Meta Pixel app, Everflow, Klaviyo]
-  D -->|server events| V
-  C -->|Shop Sync stores only| S[Shopify order tagged NEXT]
-  S --> T[Shopify-side tools such as Triple Whale]
+  A[Ad click] --> B[Your funnel pages]
+  B -->|page views, checkout, purchase| C[Ad and analytics platforms]
+  B -->|order with ad details| D[NEXT order]
 ```
 
-<Callout type="warn" title="Storefront tracking apps do not reach funnels">
-The TikTok Pixel Events, Google Analytics 4, Google Tag Manager, AppLovin AXON and Taboola apps inject their scripts into your NEXT storefront only. They do not load on a campaign funnel. On a funnel, use the template adapters or the SDK providers instead. The Meta Pixel app is the exception for one event: its server-side Purchase is sent for campaign orders too.
+You turn a platform on by adding its ID to your funnel. For a few platforms a NEXT store app also sends the purchase from NEXT's servers. Each guide tells you exactly what to add and where.
+
+<Callout type="warn" title="Storefront tracking apps do not cover funnels">
+Tracking apps you installed for your NEXT storefront, such as TikTok Pixel Events, Google Analytics 4 or Google Tag Manager, only run on the storefront. Set tracking up for your funnel with the guides below.
 </Callout>
-
-## What happens at each step of a funnel
-
-This is the behaviour of a starter template funnel on SDK 0.4.43 with the vendors turned on. It was checked with a test order on 2026-11-16.
-
-| Step | What NEXT records | What the browser sends |
-| --- | --- | --- |
-| Shopper clicks your ad | The SDK stores `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `gclid`, `aff` or `affid`, `sub1` to `sub5` and `fbclid` from the landing URL for the browser tab session | Each vendor's page view |
-| Presell and landing pages | Nothing new unless a parameter changes. A new value for a parameter replaces the old one | Page views; product views where a page shows packages |
-| Checkout loads | The cart | `dl_begin_checkout` and the vendor's checkout-started event |
-| Shopper types email or phone | A prospect cart once name, email and items are present | Triple Whale `Contact` (when turned on), and identity calls for vendors whose identity setting is on |
-| Shipping and payment entered | | `dl_add_shipping_info`, `dl_add_payment_info` |
-| Payment succeeds | The order, with the stored attribution (see [Events and attribution](/docs/campaigns/tracking/events-and-attribution)) | Nothing on the checkout page itself |
-| First page after payment (upsell or receipt) | | `dl_purchase` with the order number as `transaction_id` and the item revenue as `value`. Shipping is never included; tax is excluded on stores that show prices without tax and included on stores that show tax-inclusive prices. Sent once per order; a reload or revisit does not send it again |
-| Shopper accepts an upsell | The upsell line is added to the same order | `dl_upsell_purchase` on the next page, with `transaction_id` set to the order reference plus `-US1`, `-US2` and so on, and `value` set to the upsell line only |
-| After the order | Store apps run server side: Meta Pixel app Purchase, Everflow postback, Klaviyo events. On Shop Sync stores the order is pushed to Shopify | |
-
-Upsells reach each platform differently. Some count an accepted upsell as another purchase, some receive it as a separate custom event, and the SDK's Meta provider sends nothing for it. Each platform guide states which.
 
 ## Supported integrations
 
-Each integration has two ratings. **Setup and events** says whether NEXT has confirmed the funnel sends the right events. **Platform reporting** says whether NEXT has confirmed the events arrive and report correctly inside the vendor's own dashboard.
+| Platform | Guide |
+| --- | --- |
+| Google Tag Manager | [Google Tag Manager](/docs/campaigns/tracking/google-tag-manager) |
+| Google Analytics 4 | [Google Analytics 4](/docs/campaigns/tracking/google-analytics-4) |
+| Google Ads and YouTube | [Use GA4 purchases in Google Ads](/docs/campaigns/tracking/google-analytics-4#use-ga4-purchases-in-google-ads) |
+| Meta (Facebook and Instagram) | [Meta Pixel and Conversions API](/docs/campaigns/tracking/meta) |
+| Everflow | [Everflow](/docs/campaigns/tracking/everflow) |
+| Triple Whale | [Triple Whale](/docs/campaigns/tracking/triple-whale) |
+| AppLovin Axon | [AppLovin Axon](/docs/campaigns/tracking/applovin-axon) |
+| TikTok, Snapchat, Pinterest, Taboola, Northbeam, RudderStack, Klaviyo | [More integrations](/docs/campaigns/tracking/more-integrations) |
 
-- **Verified**: checked against the current source and observed in a test order.
-- **Partial**: some of the path is verified and some is not, or it needs a workaround. The guide says which part.
-- **Unconfirmed**: documented from source code or vendor documentation only. Treat it as untested.
-- **Not supported**: no setup exists today.
-
-| Integration | Setup and events | Platform reporting | Guide |
-| --- | --- | --- | --- |
-| Triple Whale | Verified | Unconfirmed; not supported on stores without Shopify | [Triple Whale](/docs/campaigns/tracking/triple-whale) |
-| Meta pixel and Conversions API | Verified for browser events; server Purchase Unconfirmed | Unconfirmed | [Meta](/docs/campaigns/tracking/meta) |
-| TikTok | Verified for browser events; no server event | Unconfirmed | [TikTok](/docs/campaigns/tracking/tiktok) |
-| Google Ads and YouTube | Partial | Unconfirmed | [Google Ads and YouTube](/docs/campaigns/tracking/google-ads) |
-| Google Analytics 4 | Verified | Unconfirmed | [Google Analytics 4](/docs/campaigns/tracking/google-analytics-4) |
-| Google Tag Manager | Verified | Not applicable (your tags decide) | [Google Tag Manager](/docs/campaigns/tracking/google-tag-manager) |
-| Northbeam, Snapchat, Pinterest, Taboola, AppLovin Axon, RudderStack, Everflow, Klaviyo | Unconfirmed | Unconfirmed | [More integrations](/docs/campaigns/tracking/more-integrations) |
-
-Every guide opens with a **Verification status** table that lists exactly what was checked, how, on which SDK version and when.
+If your orders sync to Shopify through Shop Sync, also read [Tracking on Shop Sync stores](/docs/campaigns/tracking/shop-sync).
 
 ## Send each purchase from one place
 
-Every ad platform needs to receive a purchase once. A campaign order can reach a platform from up to three places: the funnel's browser pixel, a NEXT store app on the server, and, on Shop Sync stores, a Shopify-side app that reads the synced Shopify order. Decide which one sends the purchase for each platform before you launch.
+Each platform should hear about a sale once. If two things report the same sale to the same platform, it is counted twice.
 
-- If the browser and the server both send it, they must share the same event ID so the platform can deduplicate. The Meta guide shows how NEXT does this for Meta.
-- If a Shopify-side app also sends the synced order to the same platform, exclude orders tagged `NEXT` in that app, or block the purchase in the funnel.
-- Meta deduplicates a browser and server event only when the event name and event ID match within 48 hours. Two server senders are never deduplicated.
+A sale can be reported by your funnel pages, by a NEXT store app, and, on Shop Sync stores, by a Shopify app that sees the synced order. For each platform, pick one of them to report the purchase and turn the others off. The platform guides show how.
 
-[Tracking on Shop Sync stores](/docs/campaigns/tracking/shop-sync) has a table of which Shopify-side tools see synced orders.
+Meta is the one exception: the funnel and the Meta Pixel app can both report the purchase, because they label it with the same ID and Meta merges the two. See the [Meta](/docs/campaigns/tracking/meta#count-each-purchase-once) guide.
 
 ## Privacy and consent
 
-NEXT Campaigns has no built-in consent banner, consent mode, regional blocking or opt-out link. If your funnel needs them, build them into your pages and make sure they also stop the vendor scripts. The identity settings in the template adapters (for example `triplewhale_contact_enabled` and `meta_advanced_matching_enabled`) send the shopper's email and phone to that vendor. Turn them on only when your privacy policy and consent handling cover it. The SDK also stores the shopper's details in a first-party cookie and includes them in its `dl_*` events, so any tag you add in GTM can read them.
+NEXT Campaigns does not include a cookie banner or consent tool. If your funnel needs one, add it to your pages and make sure it also stops the tracking scripts.
 
-## Known gaps
+Some platforms can receive the shopper's email and phone to improve matching. Those settings are off unless you turn them on. Turn them on only when your privacy policy covers it.
 
-These are the main limits today. Each guide lists its own.
+## Next steps
 
-- The SDK reads the Meta `_fbp` and `_fbc` cookies once when a page loads. On a first visit the Meta pixel may not have set them yet. The starter templates include a workaround; hand-built funnels do not.
-- SDK 0.4.x does not store `ttclid`, `msclkid`, `gbraid` or `wbraid`. SDK 0.5.0 does.
-- No NEXT app sends TikTok, Google Ads or Triple Whale events from the server for campaign orders.
-- Triple Whale attributes an order only when it receives both a pixel purchase and a matching order record. On a store without Shopify, Triple Whale receives no order record.
-- The template adapters are not packaged for hand-built funnels.
+- [Set up tracking](/docs/campaigns/tracking/getting-started): turn platforms on and run your first test.
+- [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting): check what was sent and fix common problems.
 
-## Maintenance
+## For developers
 
-This section is maintained by the NEXT Campaigns team. It is re-checked when a Campaign Cart SDK minor version is released, when the starter template analytics adapters change, and when the Meta Pixel app changes. Each page shows the date it was last verified.
+The funnel's own events, their fields, and the ad details saved on each order are documented in the Campaign Cart SDK reference. The starter templates use SDK 0.4.43, so use the 0.4.43 pages:
+
+| What you need | SDK reference |
+| --- | --- |
+| Every event and when it is sent | [Analytics events: event names](https://cart-sdk.nextcommerce.com/v0.4.43/reference/analytics-events#event-names) |
+| The fields on each event | [Analytics events: payload reference](https://cart-sdk.nextcommerce.com/v0.4.43/reference/analytics-events#payload-reference) |
+| What GTM, Meta and RudderStack each receive | [Analytics events: providers](https://cart-sdk.nextcommerce.com/v0.4.43/reference/analytics-events#providers) |
+| Which link parameters are saved on the order | [URL parameters: attribution](https://cart-sdk.nextcommerce.com/v0.4.43/reference/url-parameters#attribution) |
+| Adding your own values to the order, with examples | [JavaScript API: attribution and metadata](https://cart-sdk.nextcommerce.com/v0.4.43/reference/javascript-api#attribution-and-metadata) |
+| Sending your own events, with examples | [JavaScript API: analytics](https://cart-sdk.nextcommerce.com/v0.4.43/reference/javascript-api#analytics) |
+| Checking events in the browser | [Debugger](https://cart-sdk.nextcommerce.com/v0.4.43/reference/debugger) |
+
+To read the saved ad details from an order, see [Marketing attribution](/docs/apps/guides/marketing-attribution).

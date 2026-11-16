@@ -1,6 +1,6 @@
 ---
 title: More integrations
-description: Short entries for Northbeam, Snapchat, Pinterest, Taboola, AppLovin Axon, RudderStack, Everflow and Klaviyo, with the settings, events and limits each one has today. None of them has been walked end to end yet.
+description: How to turn on TikTok, Snapchat, Pinterest, Taboola, Northbeam, RudderStack and Klaviyo for a NEXT Campaigns funnel.
 sidebar_label: More integrations
 audience: [merchant, developer]
 last_verified: 2026-11-16
@@ -8,127 +8,105 @@ tags:
  - Guide
 ---
 
-These integrations exist in the starter templates or as store apps, but NEXT has not walked a test order through them end to end. Each entry is Unconfirmed unless it says otherwise, and a vendor gets its own full guide once it has been tested. Before you add a second sender for a purchase, read [Send each purchase from one place](/docs/campaigns/tracking#send-each-purchase-from-one-place).
+Most platforms here are turned on with one line in `_data/campaigns.json`. Add the line to your campaign, then build with `npm run build` and deploy. See [Set up tracking](/docs/campaigns/tracking/getting-started) for the full steps.
 
-## Northbeam
-
-| Item | Details |
+| Platform | Line to add |
 | --- | --- |
-| Status | Unconfirmed. Built into the starter templates; not walked end to end. |
-| Turn it on | Set `northbeam_client_id` on the campaign entry in `_data/campaigns.json`. NEXT has no Northbeam app, so the template snippet is the only path. |
-| Optional keys | `northbeam_identity_enabled` (`true`, `1` or `yes`), `northbeam_allowed_events`, `northbeam_blocked_events` |
-| Events sent | A page view from the base snippet on load. By default, `purchase` for each order, sent with `Northbeam.firePurchaseEvent`. With identity on, an email identify on the prospect cart and when the shopper enters an email. |
-| Upsells | Each accepted upsell is sent as another `firePurchaseEvent`, with the order reference plus `-US1`, `-US2` and so on as the ID, and the upsell amount as the total. |
-| Customer data | With `northbeam_identity_enabled` on, the email only. Phone is not sent. Not gated on accepts_marketing. |
-| Limits | NEXT has no Northbeam app or server feed. The adapter rebuilds Northbeam's total as value plus tax plus shipping, because the SDK's `value` is product revenue only. |
+| [TikTok](#tiktok) | `tiktok_pixel_id` |
+| [Snapchat](#snapchat) | `snap_pixel_id` |
+| [Pinterest](#pinterest) | `pinterest_tag_id` |
+| [Taboola](#taboola) | `taboola_account_id` |
+| [Northbeam](#northbeam) | `northbeam_client_id` |
+| [RudderStack](#rudderstack) | Two lines and a setting |
+| [Klaviyo](#klaviyo) | A store app |
 
-On a Shop Sync store, the funnel purchase cannot match the order that Northbeam receives through its Shopify connector, so it creates an unmatched or double-counted order. Block the pixel purchase and rely on identity instead. See [Tracking on Shop Sync stores](/docs/campaigns/tracking/shop-sync).
+[Everflow](/docs/campaigns/tracking/everflow) and [AppLovin Axon](/docs/campaigns/tracking/applovin-axon) have their own guides.
 
-```json title="_data/campaigns.json"
-{
-  "my-campaign": {
-    "northbeam_client_id": "your-client-id",
-    "northbeam_identity_enabled": "true",
-    "northbeam_blocked_events": "dl_purchase, dl_upsell_purchase"
-  }
-}
+## TikTok
+
+```json
+"tiktok_pixel_id": "your-pixel-id"
 ```
+
+- **What it tracks:** page views, product views, add to cart, checkout started, payment details and purchases.
+- **Upsells:** each accepted upsell counts as another purchase, so an order with two upsells shows as three purchases. To count one purchase per order, add `"tiktok_blocked_events": "dl_upsell_purchase"`. Upsell revenue then does not reach TikTok.
+- **Shopper details:** add `"tiktok_advanced_matching_enabled": "true"` to send email and phone. Nothing is sent unless the marketing opt-in checkbox on your checkout is ticked.
+
+The TikTok store app covers your NEXT storefront, not funnels.
 
 ## Snapchat
 
-| Item | Details |
-| --- | --- |
-| Status | Unconfirmed. Built into the starter templates; not walked end to end. |
-| Turn it on | Set `snap_pixel_id` on the campaign entry in `_data/campaigns.json`. |
-| Optional keys | `snap_advanced_matching_enabled` (`true`, `1` or `yes`), `snap_allowed_events`, `snap_blocked_events` |
-| Events sent | Uppercase names. By default: `VIEW_CONTENT` for product views, `ADD_CART`, `START_CHECKOUT`, `ADD_BILLING` for payment details, and `PURCHASE` for each order. |
-| Upsells | Sent as another `PURCHASE`, with `transaction_id` set to the order reference plus `-US1`, `-US2` and so on. Snapchat counts each one as a purchase. |
-| Customer data | With advanced matching on, the raw email and phone, sent from the prospect cart. The adapter gates this on accepts_marketing. |
-| Limits | The purchase value is sent in the `price` field and is product revenue, without tax and shipping. The source notes that adding tax and shipping would give total-paid ROAS, but the adapter does not do that by default. Advanced matching works through a re-initialisation of the pixel, which the source asks to be checked. That check has not been run. |
+```json
+"snap_pixel_id": "your-pixel-id"
+```
+
+- **What it tracks:** page views, product views, add to cart, checkout started, payment details and purchases.
+- **Upsells:** each accepted upsell counts as another purchase.
+- **Shopper details:** add `"snap_advanced_matching_enabled": "true"` to send email and phone. Nothing is sent unless the marketing opt-in checkbox on your checkout is ticked.
 
 ## Pinterest
 
-| Item | Details |
-| --- | --- |
-| Status | Unconfirmed. Built into the starter templates; not walked end to end. |
-| Turn it on | Set `pinterest_tag_id` on the campaign entry in `_data/campaigns.json`. |
-| Optional keys | `pinterest_enhanced_match_enabled` (`true`, `1` or `yes`), `pinterest_allowed_events`, `pinterest_blocked_events` |
-| Events sent | Lowercase conversion events. By default: `addtocart` for add to cart and `checkout` for each order. The adapter sends no product-view, begin-checkout or payment-info event. |
-| Upsells | Sent as another `checkout`, with its own event ID and an `order_id` of the order reference plus `-US1`, `-US2` and so on. |
-| Customer data | With enhanced match on, the raw email in a `pintrk('load')` call on the prospect cart. Pinterest hashes it in the browser. The adapter gates this on accepts_marketing. |
-| Limits | Enhanced match is marked UNVERIFIED in the adapter source. The source notes that a second `load` call may do nothing. This has not been tested. |
+```json
+"pinterest_tag_id": "your-tag-id"
+```
+
+- **What it tracks:** page views, add to cart, and a `checkout` event for each order.
+- **Upsells:** each accepted upsell counts as another `checkout`.
+- **Shopper details:** add `"pinterest_enhanced_match_enabled": "true"` to send email. Nothing is sent unless the marketing opt-in checkbox on your checkout is ticked.
 
 ## Taboola
 
-| Item | Details |
-| --- | --- |
-| Status | Unconfirmed. Built into the starter templates; not walked end to end. |
-| Turn it on | Set `taboola_account_id` in `_data/campaigns.json` to your numeric Taboola account ID. The Taboola store app tracks the storefront only and does not load on funnels. |
-| Optional keys | `taboola_allowed_events`, `taboola_blocked_events` |
-| Events sent | By default: `view_content`, `add_to_cart`, `start_checkout`, `add_payment_info` and `make_purchase`. The base pixel sends `page_view`. |
-| Upsells | Sent as the custom event `upsell_purchase`, with `orderid` set to the order reference plus `-US1`, `-US2` and so on, and the revenue for that upsell only. |
-| Customer data | None. Hashed-email enhanced matching is not sent. |
-| Limits | The account ID is written into the page without quotes, so a value that is not numeric breaks the page script. |
+```json
+"taboola_account_id": "1234567"
+```
 
-## AppLovin Axon
+Use your numeric account ID.
 
-| Item | Details |
-| --- | --- |
-| Status | Unconfirmed. Built into the starter templates; not walked end to end. |
-| Turn it on | Set `axon_event_key` in `_data/campaigns.json`. The AppLovin AXON store app is storefront-only and does not load on funnels. |
-| Optional keys | `axon_item_category_id` (positive integer), `axon_send_user_data` (`true`), `axon_allowed_events`, `axon_blocked_events` |
-| Events sent | By default: `page_view`, `view_item`, `add_to_cart`, `begin_checkout`, `add_payment_info` and `purchase`. Axon accepts only its standard event names, so there are no custom events. |
-| Upsells | Sent as a second `purchase`, with `transaction_id` set to the order reference plus `-US1`, `-US2` and so on, and tax and shipping set to 0. Axon counts each upsell as a purchase. |
-| Customer data | With `axon_send_user_data` set to `true`, the purchase event carries `user_data`: the email, the phone digits without the plus sign, and the user ID. The adapter does not gate this on accepts_marketing. |
-| Limits | `item_category_id` must be a positive integer. The SDK's item category is the campaign name, and Axon rejects it with HTTP 400. Images are sent only for `.png`, `.jpg` and `.jpeg` URLs. Without `user_data`, Axon still records the revenue and transaction ID. |
+- **What it tracks:** page views, product views, add to cart, checkout started, payment details and purchases.
+- **Upsells:** sent as a separate `upsell_purchase` event. Create a Taboola conversion for it to count upsell revenue.
+
+The **Taboola Pixel Events** store app covers your NEXT storefront, not funnels.
+
+## Northbeam
+
+```json
+"northbeam_client_id": "your-client-id"
+```
+
+- **What it tracks:** page views, and a purchase for each order.
+- **Upsells:** each accepted upsell counts as another purchase.
+- **Shopper details:** add `"northbeam_identity_enabled": "true"` to send the shopper's email, which helps Northbeam match orders.
+
+### Northbeam on a Shop Sync store
+
+Northbeam already receives your orders from Shopify. Stop the funnel sending them too, and turn identity on:
+
+```json
+"northbeam_client_id": "your-client-id",
+"northbeam_identity_enabled": "true",
+"northbeam_blocked_events": "dl_purchase, dl_upsell_purchase"
+```
 
 ## RudderStack
 
-| Item | Details |
-| --- | --- |
-| Status | Unconfirmed. Built into the starter templates; not walked end to end. |
-| Turn it on | Set both `rudderstack_write_key` and `rudderstack_dataplane_url` in `_data/campaigns.json`. The loader is added only when both are set. Then set `analytics.providers.rudderstack.enabled` to `true` in `assets/config.js`. On SDK 0.5.0 the flag is `destinations.rudderstack.enabled`, and the 0.4.x key still maps to it. That change has not been walked. |
-| Optional keys | None in `campaigns.json`. `blockedEvents` in `assets/config.js` applies to this provider as well. |
-| Events sent | `Product Viewed`, `Product Added`, `Product Removed`, `Cart Viewed`, `Checkout Started`, `Checkout Step Completed` (shipping), `Payment Info Entered`, `Order Completed`, `Upsell Viewed`, `Upsell Skipped`, `Signed Up` and `Logged In`. `identify` calls use the email as the user ID. |
-| Upsells | Each accepted upsell sends another `Order Completed`, with the order ID set to the order reference plus `-US1`, `-US2` and so on. |
-| Customer data | Identify traits include email, first name, last name, phone, city, state, country, postal code and `acceptsMarketing`. The `state` trait is sent on purchase only. |
-| Limits | `Order Completed` `total` is value plus tax plus shipping. On a store that shows VAT, `value` already includes tax, so RudderStack counts tax twice. This is inferred from the code paths and has not been run. On SDK 0.4.43 the adapter never calls `page()`. |
+RudderStack needs two lines and one setting.
 
-```json title="_data/campaigns.json"
-{
-  "my-campaign": {
-    "rudderstack_write_key": "your-write-key",
-    "rudderstack_dataplane_url": "https://your-dataplane-url"
-  }
-}
+```json
+"rudderstack_write_key": "your-write-key",
+"rudderstack_dataplane_url": "https://your-dataplane-url"
 ```
 
-With the flag off, the loader still runs and the SDK sends nothing. This is inferred from the source and has not been run.
+Then switch `rudderstack` on in `assets/config.js`:
 
-## Everflow
+```js title="assets/config.js"
+// Inside analytics.providers:
+rudderstack: {
+  enabled: true
+},
+```
 
-| Item | Details |
-| --- | --- |
-| Status | Unconfirmed (source only). Store app; not walked end to end. |
-| Turn it on | In the store dashboard, go to Apps, then Everflow. Set **Everflow Postback URL** and **Everflow Network ID**, and keep **Enable Everflow S2S Postback** on. |
-| Optional keys | **Everflow Verification Token** (up to 32 characters), **Everflow Postback Delay Minutes** (0 to 10, default 0), **Include Tax in Conversion Value** (off by default). |
-| Events sent | One server-side postback to Everflow when an order is placed, and another when its status changes. The fields are the network ID, verification token, transaction ID, currency, amount and order number. |
-| Upsells | Not confirmed. The source sends one postback per order, and the amount is the order total when the postback fires, so an upsell added before then should be included. This is inferred and has not been tested. |
-| Customer data | None. The postback has no customer fields. |
-| Limits | A postback is sent only when the order's attribution has `everflow_transaction_id`, only for open orders that are not on hold, and never for a canceled order. Test orders are skipped unless **Enable S2S Postback for test orders** is on. The configured URL keeps only its scheme and host, so custom query parameters cannot be added. |
-
-The SDK copies the `evclid` URL parameter into `everflow_transaction_id`, so keep `evclid` on the funnel's landing URL. Merchant docs: [Everflow app](https://docs.nextcommerce.com/docs/apps/everflow).
+RudderStack is a pipe, like Google Tag Manager. It reports nothing by itself; the destinations you connect in RudderStack do. It receives the shopper's details along with the events, and each accepted upsell arrives as another `Order Completed`.
 
 ## Klaviyo
 
-| Item | Details |
-| --- | --- |
-| Status | Unconfirmed. Store app; source and merchant docs only, not walked end to end. |
-| Turn it on | Install the Klaviyo app from the Apps menu in the NEXT dashboard, and connect your existing Klaviyo account through OAuth. Settings are under Actions, then Settings. |
-| Optional keys | **Delay Order Confirmation Events**, **Enable Sending Test Data**, **Default Subscription List** and **SMS Consent**, among the other settings on the app page. |
-| Events sent | The onsite events (Active on Site, Viewed Product, Added to Cart, Started Checkout) fire on the NEXT storefront only, not on funnel pages. Server events come from store webhooks: Placed Order and one Ordered Product per line on order creation; Fulfilled Order, Canceled Order and Refunded Order on order updates; Started Subscription and Cancelled Subscription on subscription changes. Started Checkout from abandoned carts is sent only when its store setting is on. |
-| Upsells | With **Delay Order Confirmation Events** on, Placed Order waits 10 minutes. The merchant docs describe this hold as the window that lets upsells join the order. |
-| Customer data | The server events are built from the store's order webhooks. This page does not list the fields Klaviyo receives. |
-| Limits | Campaign reach is inferred, not tested. The router does not filter by order source, so a campaign order that fires `order.created` should be sent. Test orders are skipped unless **Enable Sending Test Data** is on. |
-
-Merchant docs: [Klaviyo app](https://docs.nextcommerce.com/docs/apps/klaviyo).
+Klaviyo is a store app, not a line in your funnel. Once installed, it sends order events to Klaviyo from NEXT's servers for funnel orders and storefront orders alike. See the [Klaviyo app docs](https://docs.nextcommerce.com/docs/apps/klaviyo).

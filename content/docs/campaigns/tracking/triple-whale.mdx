@@ -1,6 +1,6 @@
 ---
 title: Triple Whale
-description: Load the Triple Whale pixel on NEXT Campaigns funnel pages with the starter template adapter, see exactly which events it sends, and learn why Triple Whale can show no sales for funnel orders on stores with Shop Sync and on stores without Shopify.
+description: Track a NEXT Campaigns funnel in Triple Whale. Turn on the Triple Whale pixel in a starter template, on a store that syncs orders to Shopify or one that does not.
 sidebar_label: Triple Whale
 audience: [merchant, developer]
 last_verified: 2026-11-16
@@ -8,183 +8,36 @@ tags:
  - Guide
 ---
 import { Callout } from 'fumadocs-ui/components/callout';
-import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
-## Verification status
+The starter templates include the Triple Whale pixel. Add your Triple Whale details and the pixel loads on every funnel page, so Triple Whale can see the visit.
 
-| Claim | Status | How it was checked | Date | SDK |
-| --- | --- | --- | --- | --- |
-| Setting `triplewhale_name` loads the headless Triple Pixel on every funnel page; `TriplePixel('State')` returns `Ready` | Verified | Starter template source, and a production build of the Olympus template with a placeholder TripleName | 2026-11-16 | 0.4.43 |
-| With `triplewhale_contact_enabled` on, `Contact` fires when an email is entered and again when a phone number is entered | Verified | Test order, adapter counts and console checks in the browser | 2026-11-16 | 0.4.43 |
-| `Purchase` is sent on the first page after payment, and `UpsellPurchase` on the page after an accepted upsell | Verified | Test order with an accepted upsell; adapter `sent` counts and requests to `api.config-security.com` observed | 2026-11-16 | 0.4.43 |
-| The `Purchase` and `UpsellPurchase` fields listed in [Events sent](#events-sent) | Partial | The SDK purchase values (order number, value) were observed in the test order. The field names come from source; the Triple Whale request bodies were not inspected | 2026-11-16 | 0.4.43 |
-| `AddToCart` is sent once per cart item | Unconfirmed | Source only. The test checkout opened with a preselected bundle, which sends no add-to-cart event | 2026-11-16 | 0.4.43 |
-| `triplewhale_blocked_events` stops the funnel purchase events | Unconfirmed | Source only, not tested | 2026-11-16 | 0.4.43 |
-| Triple Whale attributes funnel orders on a Shop Sync store with funnel purchases blocked and Contact on | Unconfirmed | Not checked: no Shop Sync store or Triple Whale account was used | | |
-| Triple Whale attributes funnel orders on a Shop Sync store with the pixel `Purchase` left on | Unconfirmed | Not checked: no Shop Sync store or Triple Whale account was used | | |
-| Triple Whale attributes funnel orders on a store without Shopify | Not supported | Triple Whale requires an order record, and NEXT sends none to Triple Whale | | |
-| Triple Whale Sonar and the Meta Pixel app both send the order to Meta | Unconfirmed | Triple Whale documentation and NEXT app source only | | |
+Most of this guide is for stores that sync their orders to Shopify with Shop Sync, where Triple Whale gets the sale from Shopify. If your store does not use Shopify, see [Stores without Shopify](#stores-without-shopify).
 
-The test used a placeholder TripleName and no Triple Whale account, so nothing inside Triple Whale was checked: not whether it accepted the events, not attribution, and not Sonar.
+## How it works on a Shop Sync store
 
-## What it does
+1. The pixel on your funnel records the shopper's visit and where they came from.
+2. When the shopper enters their email or phone at checkout, the funnel sends it to Triple Whale.
+3. Shop Sync creates the order in Shopify, and Triple Whale picks it up from there.
+4. Triple Whale uses the email or phone to connect the Shopify order to the funnel visit.
 
-The Triple Whale adapter in the starter templates loads Triple Whale's headless Triple Pixel on every funnel page (presell, landing, checkout, upsell and receipt) and sends add-to-cart, purchase and upsell events from the shopper's browser. With one setting turned on it also sends the shopper's email and phone as a `Contact` event. NEXT sends nothing to Triple Whale from its servers.
-
-<Callout type="warn" title="Why Triple Whale can show no sales for funnel orders">
-Triple Whale attributes an order only when it receives both a pixel purchase and a matching order record, according to its [guide for custom sales platforms](https://triplewhale.readme.io/reference/pixel-setup-guide-for-custom-sales-platform). The funnel supplies the pixel events. The order record has to come from somewhere else.
-
-- On a store with Shop Sync, where Triple Whale is connected to that Shopify store, the synced Shopify order is the order record. NEXT has not confirmed which funnel configuration makes Triple Whale match it. See [Attribution requirements](#attribution-requirements).
-- On a store without Shopify, Triple Whale receives the pixel events but no order record, because NEXT does not send orders to Triple Whale's Orders API. Triple Whale attribution for funnel orders is not supported on these stores today.
-</Callout>
+The funnel does not send the purchase itself. If it did, Triple Whale would see the same sale twice: once from the funnel and once from Shopify.
 
 ## Before you start
 
-- A Triple Whale account. Know whether it is connected to a Shopify store that receives your orders through Shop Sync, because the setup and the outcome differ.
-- A funnel built from a starter template. The adapter ships with every template family except `landing`.
-- Your funnel domain added in the Campaigns app under **Settings**, then **Allowed Domains**, as a **Production** domain.
-- On a Shop Sync store, Shop Sync set up so that campaign orders reach Shopify with the `NEXT` tag. See the [Shop Sync onboarding guide](https://guides.nextcommerce.com/guides/shop-sync-onboarding) and [Tracking on Shop Sync stores](/docs/campaigns/tracking/shop-sync).
-- If your funnel sends a Content Security Policy, allow `api.config-security.com` and `conf.config-security.com` and allow `eval()`. The Triple Pixel needs both.
+- A Triple Whale account connected to the Shopify store your orders sync to.
+- Shop Sync set up, so funnel orders reach Shopify with the `NEXT` tag. See the [Shop Sync onboarding guide](https://guides.nextcommerce.com/guides/shop-sync-onboarding).
+- A funnel that is ready for tracking. See [Set up tracking](/docs/campaigns/tracking/getting-started).
 
 ## Set up
 
-<Tabs items={['Starter template (Page Kit)', 'Hand-built funnel']}>
-<Tab value="Starter template (Page Kit)">
-
-1. In Triple Whale, open **Settings**, then **Business Configurations**, then **Pixel Settings**, and select the **Pixel Installation** tab.
-2. Save a **Shopify Headless** Account Setup. Triple Whale's [headless installation guide](https://kb.triplewhale.com/en/articles/6266255-how-to-add-the-triple-pixel-to-a-headless-business-or-custom-website) requires this before it shows the **Headless Installation** snippet under **Recommended installation for your business**. NEXT has not checked which Account Setup to choose for a Triple Whale account without Shopify.
-3. In the **Headless Installation** snippet, find `TriplePixelData` and copy the `TripleName` value. For an account connected to Shopify it is your myshopify.com domain, for example `your-store.myshopify.com`. Note the `plat` value in the same object.
-4. Do not paste the snippet into your pages. The template already contains the headless snippet and fills in your values. Pixel Settings also offers a Third-Party Landing Page script and a Third-Party/Custom Checkout script for thank-you pages. Do not add either one to the funnel.
-5. Open `_data/campaigns.json` and add the keys to your campaign's entry:
+1. In Triple Whale, open **Settings**, then **Business Configurations**, then **Pixel Settings**, and select the **Pixel Installation** tab. Save a **Shopify Headless** Account Setup to see the **Headless Installation** snippet.
+2. In the snippet, find `TripleName`. It is your `myshopify.com` domain, for example `your-store.myshopify.com`. Copy it. Do not paste the snippet into your pages; the template already includes it.
+3. In `_data/campaigns.json`, add these four lines to your campaign:
 
 ```json title="_data/campaigns.json"
 {
   "my-campaign": {
     "name": "My Campaign",
-    "triplewhale_name": "your-store.myshopify.com",
-    "triplewhale_platform": "SHOPIFY",
-    "triplewhale_contact_enabled": "true"
-  }
-}
-```
-
-6. On a Shop Sync store, decide whether to block the funnel purchases. See [Stores with Shop Sync](#attribution-requirements) and test both options with the [Worked example](#worked-example).
-7. Build for production with `npm run build`. The analytics markup is left out of `npm run dev` builds.
-8. Deploy, then follow [Verify it works](#verify-it-works).
-
-| Key | Value | What it does |
-| --- | --- | --- |
-| `triplewhale_name` | Your TripleName | Turns the adapter on. Empty or missing turns it off. Any non-empty value goes live, including a placeholder |
-| `triplewhale_platform` | `SHOPIFY` for a Triple Whale account connected to Shopify. Leave it out on other stores to use the template default, `custom-msp` | Sets `plat` in `TriplePixelData`. Triple Whale says `plat` defaults to Shopify when it is missing and that a wrong value may send data to the wrong shop. Match the `plat` in your Triple Whale snippet |
-| `triplewhale_contact_enabled` | `"true"` (`1` and `yes` are also accepted) | Sends `Contact` with the shopper's email or phone. Off unless set |
-| `triplewhale_allowed_events` | Comma-separated event names | Sends only these events. Empty means the default set |
-| `triplewhale_blocked_events` | Comma-separated event names, for example `"dl_purchase, dl_upsell_purchase"` | Stops these events. Applied after the allowed list |
-
-<Callout type="info" title="Contact sends personal data">
-With `triplewhale_contact_enabled` on, the adapter sends the shopper's email and phone to Triple Whale unhashed, as soon as each is entered. It is not tied to the newsletter checkbox on the checkout. Turn it on only when your privacy policy and consent handling cover it. See [Privacy and consent](/docs/campaigns/tracking#privacy-and-consent). With it off, the adapter reads no personal data.
-</Callout>
-
-</Tab>
-<Tab value="Hand-built funnel">
-
-The Triple Whale adapter is documented for starter templates only. It was not tested on a hand-built page and is not published as a standalone package. NEXT has no tested Triple Whale path for hand-built funnels; the tested path is a [starter template](/docs/campaigns/templates).
-
-</Tab>
-</Tabs>
-
-## Events sent
-
-| Triple Whale event | When it is sent | Sent by | Fields |
-| --- | --- | --- | --- |
-| Page load | Every page load | The headless snippet itself. Triple Whale has no page view call, so the adapter does not send one | Captured by Triple Whale |
-| `AddToCart` | An item is added to the cart (`dl_add_to_cart`) | Adapter, one call per cart item | `item` = product SKU, `q` = quantity, `v` = NEXT variant ID (the SKU when there is none) |
-| `Contact` | A valid email or phone is entered at checkout, and when the prospect cart is created. Only with `triplewhale_contact_enabled` on | Adapter | `email` or `phone`, or both |
-| `Purchase` | The first page after payment (`dl_purchase`) | Adapter | `orderId`, `value`, `currency`, `lineItems` |
-| `UpsellPurchase` (custom event) | The page after an upsell is accepted (`dl_upsell_purchase`) | Adapter | `orderId`, `value`, `currency` |
-
-- `Contact` is sent once per email address and once per phone number on each page load. The phone is sent in international format starting with `+` when the checkout knows the country code. The adapter never guesses a dial code; without one, no phone is sent.
-- A checkout that opens with a package already in the cart sends no `dl_add_to_cart`, so no `AddToCart` is sent for that package.
-- The adapter maps only these three events from the SDK (`AddToCart`, `Purchase`, `UpsellPurchase`), and all three are in the default set. Setting `triplewhale_allowed_events` to `"all"` adds nothing; the allowed and blocked lists are only useful for sending fewer. Use the `dl_` names in both lists.
-- Triple Whale also documents checkout events (`checkoutStarted`, `contactSubmitted`, `addressSubmitted`, `shippingSubmitted`, `paymentSubmitted`) and a `NewSubscription` event. The template sends none of them.
-
-## Attribution requirements
-
-Triple Whale's documentation treats `Purchase` as the event that drives attribution, and says a purchase event alone is not enough: Triple Whale must also receive a matching order record. Stores on Shopify get that record through Shopify; custom sales platforms send it through Triple Whale's Orders API. See the [guide for custom sales platforms](https://triplewhale.readme.io/reference/pixel-setup-guide-for-custom-sales-platform) and the [headless installation guide](https://kb.triplewhale.com/en/articles/6266255-how-to-add-the-triple-pixel-to-a-headless-business-or-custom-website).
-
-The template's `Purchase` does not carry everything Triple Whale lists:
-
-| Triple Whale documents for `Purchase` | The template sends |
-| --- | --- |
-| `orderId`, required | The NEXT order number |
-| Email or phone, required | Neither. Identity comes only from the separate `Contact` event, when it is turned on |
-| `lineItems`, required, with product and variant IDs (Triple Whale's examples use Shopify IDs) | `lineItems` with the NEXT SKU as `i` and the NEXT variant ID as `v` |
-| `address`, required in the help center guide and optional in the developer guide | Not sent |
-| `eventId` and `cotkn`, optional | Not sent |
-| A matching order record | Nothing from NEXT. On a Shop Sync store, the synced Shopify order |
-
-NEXT has not tested what Triple Whale does with a purchase that lacks these fields. Triple Whale's own troubleshooting advice for missing attribution is to make sure the purchase event includes every required field.
-
-### Stores with Shop Sync
-
-Shop Sync creates a Shopify order for each campaign order when the order is sent to fulfillment. The Shopify order carries the `NEXT` tag, the buyer's email and phone, and the NEXT order number as its PO number. It carries no UTM parameters or click IDs. If your Triple Whale account is connected to that Shopify store, Triple Whale receives this order as its order record.
-
-Two funnel configurations exist. NEXT has not confirmed which one gives correct attribution, so neither is a default.
-
-| | Funnel purchases blocked, Contact on | Pixel `Purchase` left on |
-| --- | --- | --- |
-| Keys | `"triplewhale_platform": "SHOPIFY"`, `"triplewhale_contact_enabled": "true"`, `"triplewhale_blocked_events": "dl_purchase, dl_upsell_purchase"` | `"triplewhale_platform": "SHOPIFY"`, `"triplewhale_contact_enabled": "true"`, no blocked events |
-| How the order is meant to reach the ad | Triple Whale ingests the Shopify order, and the `Contact` event ties the shopper's session to it by email or phone | The pixel `Purchase` plus the Shopify order, as Triple Whale's guides describe |
-| Why you might choose it | The starter template notes recommend it, to avoid counting each order twice | It follows Triple Whale's statement that `Purchase` is required for attribution |
-| Risk | Triple Whale's documentation does not describe this pattern. Buyers who never type an email or phone into the form send no `Contact` | The pixel `orderId` is the NEXT order number and its line items carry NEXT IDs, so it may not match the Shopify order. Triple Whale may record a second, unmatched order |
-| Status | Unconfirmed | Unconfirmed |
-
-Test both in your own Triple Whale account before you rely on either. The [Worked example](#worked-example) shows how.
-
-<Callout type="warn" title="Express wallet buyers may send no Contact">
-`Contact` fires when the shopper types an email or phone into the checkout form, or when a prospect cart is created from those fields. A buyer who pays with Apple Pay, Google Pay or PayPal may never type either one, so no `Contact` is sent for them. The template does not handle express wallets for Triple Whale. With funnel purchases blocked, Triple Whale then has nothing from the funnel that ties that order to the session.
-</Callout>
-
-### Stores without Shopify
-
-On a NEXT store without Shopify, Triple Whale attribution for funnel orders is not supported. Triple Whale receives the page loads, `AddToCart`, `Contact`, `Purchase` and `UpsellPurchase` from the funnel, but no order record, because NEXT does not send orders to Triple Whale's Orders API. Expect Triple Whale to show no attributed sales for these orders. NEXT has not documented or tested a way to send NEXT orders to that API.
-
-## Purchases, revenue and upsells
-
-| Field | Order purchase | Upsell |
-| --- | --- | --- |
-| Event | `Purchase` | `UpsellPurchase`, sent as `TriplePixel('custom', 'UpsellPurchase', ...)` |
-| `orderId` | The NEXT order number, for example `100041` | The order reference plus `-US1`, `-US2` and so on |
-| `value` | Item revenue without shipping (tax excluded on stores that show prices without tax, included on tax-inclusive stores) | The upsell line only |
-| `currency` | The order currency | The order currency |
-| `lineItems` | One entry per item: `i` (SKU), `q` (quantity), `v` (variant ID) | None. Custom events are kept to flat values |
-
-The upsell is a custom event so that Triple Whale's purchase count stays at one per order. Triple Whale lets you mark custom events as conversion events in its settings. NEXT has not confirmed how Triple Whale reports `UpsellPurchase` revenue.
-
-On a Shop Sync store, an accepted upsell is added to the same NEXT order, so it is part of the Shopify order Shop Sync creates. Triple Whale's order record for that sale therefore includes the upsell. On a store without Shopify there is no order record, for the first sale or the upsell.
-
-## Browser and server events
-
-The funnel sends Triple Whale browser events only. No NEXT app sends Triple Whale events from the server. On a Shop Sync store, Triple Whale also receives the synced Shopify order through its Shopify connection, which is a second source for the same sale.
-
-Every platform should receive each purchase from one place. Decide which sender reports the purchase for each platform before you launch; see [Send each purchase from one place](/docs/campaigns/tracking#send-each-purchase-from-one-place).
-
-### Sonar and the Meta Pixel app
-
-If you use Triple Whale Sonar to send purchase events to Meta, and the NEXT Meta Pixel app also sends its server `Purchase` for the same order, Meta receives the order twice from two servers. Meta does not deduplicate two server events ([Meta deduplication guide](https://developers.facebook.com/documentation/ads-commerce/conversions-api/deduplicate-pixel-and-server-events)). The Meta Pixel app sends its server `Purchase` for campaign orders. Exclude orders tagged `NEXT` from Sonar if your Sonar setup allows it, or send the Meta purchase from only one of the two. NEXT has not tested Sonar with funnel orders, so treat this as Unconfirmed. See [Meta](/docs/campaigns/tracking/meta) for the Meta side.
-
-Triple Whale's [Sonar guide for headless Shopify stores](https://kb.triplewhale.com/en/articles/9548187-sonar-setup-for-headless-shopify-stores) also asks for `checkoutStarted` and `paymentSubmitted` on the checkout. The template does not send them, so Sonar's checkout and payment signals get nothing from the funnel.
-
-## Worked example
-
-A Shop Sync store with Triple Whale connected to its Shopify store, testing both configurations.
-
-Start with funnel purchases blocked:
-
-```json title="_data/campaigns.json"
-{
-  "summer-offer": {
-    "name": "Summer Offer",
-    "sdk_version": "0.4.43",
     "triplewhale_name": "your-store.myshopify.com",
     "triplewhale_platform": "SHOPIFY",
     "triplewhale_contact_enabled": "true",
@@ -193,51 +46,67 @@ Start with funnel purchases blocked:
 }
 ```
 
-1. Build with `npm run build` and deploy.
-2. In a fresh browser profile, open your landing page with UTM parameters you will recognize, for example `?utm_source=tw-test&utm_medium=test&utm_campaign=tw-test-a`.
-3. Type an email address in the checkout form and place an order.
-4. Check that the order reached Shopify with the `NEXT` tag. A [test order](https://docs.nextcommerce.com/docs/manage/orders/test-orders) is created in Shopify marked as a test, and test orders are not sent to fulfillment automatically. If it does not appear, request fulfillment on it in NEXT. NEXT has not confirmed whether Triple Whale counts Shopify test orders; if it does not, repeat the test with a real order.
-5. In Triple Whale, find the order, using the buyer's email or the Shopify order. Note whether it is attributed to your test source or shows as unattributed, and whether it appears once or twice.
-6. Remove `triplewhale_blocked_events`, rebuild and redeploy. Repeat steps 2 to 5 with a new browser profile, a different email address and `utm_campaign=tw-test-b`.
-7. Keep the configuration that gives one attributed order per sale.
+4. Build with `npm run build` and deploy.
 
-| What you see in Triple Whale | What it suggests |
+| Line | What it does |
 | --- | --- |
-| One order, attributed to your test source | That configuration attributes on your account |
-| One order, unattributed | The Shopify order arrived, but Triple Whale did not tie it to the funnel session |
-| Two orders for one sale | The pixel `Purchase` was recorded as a separate order from the Shopify order |
-| No order | The Shopify order was not created yet, or Triple Whale is not connected to that Shopify store |
+| `triplewhale_name` | Turns the pixel on for your Triple Whale shop |
+| `triplewhale_platform` | Ties the funnel to your Shopify store in Triple Whale |
+| `triplewhale_contact_enabled` | Sends the shopper's email and phone, so the Shopify order can be connected to the visit |
+| `triplewhale_blocked_events` | Stops the funnel sending the purchase, so the sale is counted once |
+
+<Callout type="info" title="This sends personal data">
+`triplewhale_contact_enabled` sends the shopper's email and phone to Triple Whale as soon as they are entered. It is not tied to the marketing opt-in checkbox. Turn it on only when your privacy policy covers it. See [Privacy and consent](/docs/campaigns/tracking#privacy-and-consent).
+</Callout>
+
+## What gets tracked
+
+| When | What Triple Whale receives |
+| --- | --- |
+| Any page loads | The visit |
+| An item is added to the cart | `AddToCart` |
+| The shopper enters an email or phone at checkout | `Contact` |
+| The order syncs to Shopify | The order, through Triple Whale's Shopify connection |
+
+The sale appears in Triple Whale after the order syncs to Shopify, not at the moment of payment. An accepted upsell is added to the same NEXT order, so it is included when that order syncs.
+
+<Callout type="warn" title="Express wallet buyers">
+A shopper who pays with Apple Pay, Google Pay or PayPal may never type an email or phone into the checkout. No `Contact` is sent for them, so Triple Whale may not be able to connect their order to an ad.
+</Callout>
 
 ## Verify it works
 
-1. Open a funnel page on your production domain with `?nfdebug=true` added to the URL. Do not add `?ignore=true`, which turns all tracking off for the browser tab, and never use it when you are proving a purchase.
-2. In the browser console, run `TriplePixelData`. It should return an object with your `TripleName`, your `plat` value and `isHeadless: true`. `undefined` means the pixel is not installed or the page is a cached copy.
-3. Run `TriplePixel('State')`. It should return `"Ready"`.
-4. Run `NextForwarder.getStatus()`. The `triplewhale` entry should show `active: true`. With Contact on, `contact` is not `null`. `blocked` shows any events you blocked.
-5. Type an email on the checkout. With Contact on, `contacts` in the `triplewhale` entry should go up.
-6. Place a test order with a [test card](/docs/testing). On the first page after payment, `sent` should go up for `Purchase` (unless you blocked it), and you should see a request to `api.config-security.com`. Accept an upsell and `UpsellPurchase` is sent on the next page.
-7. For a visual check, use Triple Whale's Pixel Helper Chrome extension in a normal Chrome window. It does not report from headless or automated browsers.
-8. In Triple Whale's Pixel Settings, "Online Store: Not Installed" is expected for a headless install. That check looks only at the Shopify theme app embed.
+1. Open your funnel in a new private window, with test details on the link, for example `?utm_source=tw-test&utm_campaign=tw-test`.
+2. In the browser console, run `TriplePixel('State')`. It should return `"Ready"`.
+3. Type an email at checkout and place an order.
+4. Check the order reached Shopify with the `NEXT` tag. A [test order](https://docs.nextcommerce.com/docs/manage/orders/test-orders) is not sent to Shopify automatically, so request fulfillment on it in NEXT. It arrives in Shopify marked as a test order.
+5. In Triple Whale, find the order by the buyer's email and check the source it is attributed to.
 
-These steps prove the events leave the page. They do not prove attribution; for that, run the [Worked example](#worked-example). More checks are in [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting).
+| What you see in Triple Whale | What it means |
+| --- | --- |
+| One order, attributed to your test source | Everything is working |
+| One order, not attributed | The order arrived from Shopify, but Triple Whale did not connect it to the visit. Check `triplewhale_contact_enabled` is on and the email matches |
+| Two orders for one sale | The funnel is still sending the purchase. Check `triplewhale_blocked_events`. If that is set, the order may have shipped in two parts, which [shows as two Shopify orders](https://guides.nextcommerce.com/guides/shop-sync-daily-operations#shopify-analytics) |
+| No order | The order has not reached Shopify yet, or Triple Whale is not connected to that Shopify store |
 
-## Troubleshooting and limits
+Triple Whale's Pixel Helper extension only works in a normal Chrome window. In Triple Whale's Pixel Settings, "Online Store: Not Installed" is expected for a funnel.
 
-| Symptom | Likely cause | Fix |
+## Stores without Shopify
+
+Add one line to your campaign, with your funnel's domain as the value:
+
+```json
+"triplewhale_name": "funnel.example.com"
+```
+
+The funnel then sends Triple Whale the visit, add to cart, and each purchase and upsell from the browser. Upsells arrive as an `UpsellPurchase` event; mark it as a conversion event in Triple Whale's settings to see its value.
+
+Triple Whale's own guidance is that a custom platform should also send each order to its Orders API for full attribution. NEXT does not send orders there, so check your attribution in Triple Whale after your first orders.
+
+## Troubleshooting
+
+| Problem | Likely cause | Fix |
 | --- | --- | --- |
-| Triple Whale shows no sales for funnel orders, store without Shopify | Triple Whale has no order record for them | Not supported today. See [Stores without Shopify](#attribution-requirements) |
-| Triple Whale shows no sales for funnel orders, Shop Sync store | The Shopify order was not created yet, Triple Whale is not connected to that Shopify store, `triplewhale_name` or `triplewhale_platform` points at another shop, or the configuration does not attribute on your account | Check the order in Shopify with the `NEXT` tag; check the two keys against your Triple Whale snippet; run the [Worked example](#worked-example) |
-| Orders counted twice in Triple Whale | Pixel `Purchase` on alongside the synced Shopify order | Test the configuration with funnel purchases blocked |
-| `TriplePixelData` is `undefined` | Built with `npm run dev`, `triplewhale_name` empty, or a cached page | Build with `npm run build`; check the key; reload the page without the cache |
-| No Triple Whale requests at all | Pixel blocked by a Content Security Policy, or `?ignore=true` set earlier in the tab | Allow `eval()` and the `config-security.com` hosts; open a new tab without `?ignore=true` |
-| No `Purchase` after a test order | Blocked by `triplewhale_blocked_events`, the shopper never reached a page after payment, or the order was already reported in that browser | Check `getStatus()`; load the upsell or receipt page; use a fresh browser profile for each test |
-| No `Contact` | `triplewhale_contact_enabled` not set, the email is not valid yet, or the buyer used an express wallet | Set the key to `"true"`; finish typing the email; see the express wallet note above |
-| Pixel Helper shows nothing | Headless or automated browser | Use a normal Chrome window |
-| Data lands in the wrong Triple Whale shop | Wrong `triplewhale_platform` or `triplewhale_name` | Copy both values from your Triple Whale snippet |
-| Meta counts the order twice | Triple Whale Sonar and the Meta Pixel app both send it | Send the Meta purchase from one of them |
-
-- Leave Triple Whale's Eval Restriction setting off unless Triple Whale support asks you to turn it on.
-- The template pins Triple Pixel snippet version `2.17`. It does not use the `ver` value from your copied snippet.
-- No NEXT app sends orders or events to Triple Whale from the server.
-- Triple Whale says subscription renewals are sent through its Orders API. NEXT does not send them, and the funnel sends nothing for a renewal.
-- This guide covers SDK 0.4.43, which the starter templates pin. Triple Whale behaviour on SDK 0.5.0 was not tested.
+| The pixel is not on the page | `triplewhale_name` is missing or empty | Add it and rebuild |
+| Data lands in the wrong Triple Whale shop | `triplewhale_name` does not match your Triple Whale snippet | Copy `TripleName` from the snippet again |
+| Meta counts each order twice | Triple Whale Sonar and the NEXT Meta Pixel app both send it to Meta | Exclude orders tagged `NEXT` in Sonar, or use only one of the two |

@@ -290,10 +290,7 @@ capabilities:
       - /docs/campaigns/tracking/getting-started
       - /docs/campaigns/tracking/triple-whale
       - /docs/campaigns/tracking/meta
-      - /docs/campaigns/tracking/tiktok
-      - /docs/campaigns/tracking/google-ads
       - /docs/campaigns/tracking/shop-sync
-      - /docs/campaigns/tracking/events-and-attribution
       - /docs/campaigns/tracking/testing-and-troubleshooting
     api_operations: [tag:campaigns]
     webhooks: []

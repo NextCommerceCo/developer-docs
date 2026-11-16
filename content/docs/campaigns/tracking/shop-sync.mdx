@@ -1,6 +1,6 @@
 ---
 title: Tracking on Shop Sync stores
-description: What reaches Shopify when Shop Sync pushes a NEXT campaign order, which Shopify-side tracking tools see synced orders, how to pick one purchase sender per ad platform, and how to map a click ID such as gclid onto the Shopify order.
+description: How to avoid counting funnel sales twice when Shop Sync copies your NEXT campaign orders into Shopify, and where to find the guide for putting a click ID on the Shopify order.
 sidebar_label: Shop Sync stores
 audience: [merchant, developer]
 last_verified: 2026-11-16
@@ -9,156 +9,71 @@ tags:
 ---
 import { Callout } from 'fumadocs-ui/components/callout';
 
-This page is for stores where NEXT campaign orders are pushed into Shopify by Shop Sync, and where you also run tracking apps on the Shopify side. On these stores one order can reach an ad platform twice: once from your funnel pages and once from a Shopify app that reads the synced Shopify order. Read [Send each purchase from one place](/docs/campaigns/tracking#send-each-purchase-from-one-place) first, then use this page to decide which sender to keep for each platform.
+Shop Sync copies your funnel orders into Shopify. That creates one risk for tracking: a sale can be reported twice, once by your funnel and once by a Shopify app that sees the copied order.
 
-## Verification status
+This page shows which Shopify tools see those orders, and what to turn off so each sale is counted once.
 
-| Claim | Status | How it was checked | Date | SDK |
-| --- | --- | --- | --- | --- |
-| The NEXT order carries the UTM parameters and `gclid` as attribution fields, and `fbclid` in attribution metadata | Verified | Test order placed through a starter template funnel, then read through the Admin API | 2026-11-16 | 0.4.43 |
-| An accepted upsell is added to the same NEXT order | Verified | Test order with an accepted upsell; the order total included the upsell line | 2026-11-16 | 0.4.43 |
-| The `landing_page` attribution metadata on the order holds the checkout URL, not the first page the shopper landed on | Verified | Same test order, read through the Admin API | 2026-11-16 | 0.4.43 |
-| The funnel's Meta `Purchase` carries an event ID in the `{store}-{order number}` format that the Meta Pixel app uses | Verified | Test order, Meta pixel requests observed in the browser | 2026-11-16 | 0.4.43 |
-| Shop Sync creates the Shopify order tagged `NEXT`, with no UTM or click ID fields | Unconfirmed | Shop Sync source and the Shop Sync guides | | |
-| Only mapped `order` and `attribution` metadata fields are written to the Shopify order, once, when it is created | Unconfirmed | Shop Sync source and the Shop Sync metadata guide | | |
-| Copying `gclid` into metadata with `next.addMetadata` lets Shop Sync map it | Unconfirmed | Shop Sync metadata guide and SDK source | | 0.4.43 |
-| Which Shopify-side tools see synced orders | Unconfirmed | Shop Sync source, template documentation and vendor documentation | | |
-| The template `*_blocked_events` keys and the SDK `blockedEvents` setting stop the funnel purchase | Unconfirmed | Starter template and SDK source; not run in the test order | | 0.4.43 |
-| A Meta Pixel app server `Purchase` deduplicates against the funnel's browser `Purchase` | Unconfirmed | Meta Pixel app source and Meta documentation | | |
+## What Shop Sync puts in Shopify
 
-No Shop Sync store was used for the test order, so nothing that happens after the order leaves NEXT was observed: the Shopify order, its metafields, and what any Shopify-side app or ad platform did with it.
+Two things matter for tracking:
 
-## What reaches Shopify
+- **The order arrives when it is sent for fulfillment**, not at the moment of payment, and it is tagged `NEXT`.
+- **It carries no ad details.** There are no UTM parameters, click IDs, referrer or landing page on the Shopify order.
 
-Shop Sync creates the Shopify order when your NEXT store sends a fulfillment request for the order. It is not created at the moment of payment.
+For everything else about these orders, such as finding one by its PO number or how split shipments are counted, see [Do my NEXT sales show in Shopify analytics?](https://guides.nextcommerce.com/guides/shop-sync-daily-operations#shopify-analytics) in the Shop Sync guide.
 
-| On the Shopify order | Value |
+## Which Shopify tools see these orders
+
+When Shop Sync creates the order, Shopify notifies every app that listens for new orders. Shopify calls that notification a webhook.
+
+**Any tool that uses Shopify order webhooks creates its own purchase event for the synced order, with its own ID.** It builds that ID from Shopify's order details, which did not exist when your funnel reported the sale. The two IDs can never match, so the ad platform sees two separate purchases and counts both.
+
+| Tool | Reports funnel orders? |
 | --- | --- |
-| Tags | The NEXT order's tags plus `NEXT`. Subscription renewal orders also get `Recurring` |
-| PO number | The NEXT order number |
-| Financial status | Paid |
-| Processed at | The date the order was placed in NEXT |
-| Other fields | Currency, shipping address, line items, email, phone, and the test flag |
-| Payment transaction | Added only when payment sync is turned on for your Shop Sync store |
-| UTM parameters, click IDs, referrer, landing page | Not sent |
-| Metafields | Only the metadata fields you map in Shop Sync (see below) |
+| Tracking apps that send purchases from Shopify order webhooks | Yes, as their own purchase with their own ID |
+| Triple Whale and Northbeam, connected to Shopify | Yes, they read the Shopify order |
+| Shopify admin and reports | Yes |
+| Shopify's own Facebook & Instagram channel | No. It follows the Shopify checkout, which the shopper never used |
+| Pixels on your Shopify storefront or checkout | No. The shopper never visits those pages |
 
-An accepted upsell is added to the same NEXT order, so the NEXT order total includes it. Whether the Shopify order includes an upsell depends on the NEXT order's contents when the fulfillment request is sent; that timing was not checked.
+For a tool not listed here, ask one question: does it listen for Shopify orders, or does it only run on Shopify pages? If it listens for orders, it reports funnel sales too.
 
-Subscription renewals are synced like other orders, tagged `Recurring`, and copy the renewal order's own metadata. To carry a value such as a click ID onto renewals, set it on the subscription's attribution metadata through the Admin API.
+## Count each sale once
 
-### Attribution and metadata
+For each platform, choose one thing to report the purchase.
 
-Shop Sync does not copy attribution to Shopify on its own. After it creates the Shopify order, it writes Shopify order metafields for the keys you have mapped, and nothing else. It can read from two NEXT objects only: the order's `metadata` (object `order`) and the order's `attribution.metadata` (object `attribution`). Empty or null values are skipped.
+| Platform | Report the purchase from | Turn off |
+| --- | --- | --- |
+| Meta | Your funnel and the NEXT Meta Pixel app | Any Shopify app that also sends purchases to the same Meta pixel. Exclude orders tagged `NEXT` in that app |
+| Triple Whale | Shopify | The funnel's purchase. See [Triple Whale](/docs/campaigns/tracking/triple-whale) |
+| Northbeam | Shopify | The funnel's purchase. See [Northbeam](/docs/campaigns/tracking/more-integrations#northbeam-on-a-shop-sync-store) |
+| Google Analytics 4 and Google Ads | Your funnel | Any Shopify Google app that also reports these orders. Exclude orders tagged `NEXT` |
+| TikTok | Your funnel | Any Shopify TikTok app that also reports these orders. Exclude orders tagged `NEXT` |
 
-The SDK puts some click IDs into `attribution.metadata` and others into top-level attribution fields. `fbclid` is already in metadata. `gclid` and the UTM parameters are top-level fields, so Shop Sync cannot map them until you copy them into metadata. The section Mapping a click ID to Shopify, below, shows how.
-
-To map a field:
-
-1. In NEXT, open **Settings**, then **Metadata Fields**, click **Add Metadata Definition**, give it a name, choose the object (**Attribution** for click IDs), enter the key, choose the type, and click **Save Changes**. See [Metadata fields and tags](https://docs.nextcommerce.com/docs/build-a-store/technical-settings/metadata-fields-and-tags).
-2. In Shopify, open **Settings**, then **Custom data**, and add an **Orders** metafield definition of the matching type.
-3. In Shop Sync, click **Add Metadata Sync**. Choose the NEXT field under **Next Commerce Metadata** and the Shopify field under **Shopify Order Metafield**, then save.
-
-The two types must match or the save fails with "Metadata type mismatch":
-
-| NEXT type | Shopify metafield type |
-| --- | --- |
-| Text | `single_line_text_field` |
-| Multi Text | `multi_line_text_field` |
-| Integer | `number_integer` |
-| Decimal | `number_decimal` |
-| Boolean | `boolean` |
-
-The Shop Sync guides cover the rest of the setup: [Shop Sync onboarding](https://guides.nextcommerce.com/guides/shop-sync-onboarding) and [Shop Sync metadata](https://guides.nextcommerce.com/guides/shop-sync-metadata).
-
-## Which tools see synced orders
-
-A synced order is created in Shopify through Shopify's Admin API. The shopper never loads a Shopify storefront or checkout page, so anything that depends on a Shopify browser session does not see the order. Tools that read Shopify orders after they exist do.
-
-| Tool type | Sees synced orders? | Status | Source |
-| --- | --- | --- | --- |
-| Shopify admin and reports | Yes. The order shows as imported, unfulfilled, tagged `NEXT` | Unconfirmed | Shop Sync onboarding guide |
-| Triple Whale connected to the Shopify store | Yes, it ingests the synced Shopify order | Unconfirmed | Starter template documentation; Triple Whale documentation says Shopify orders reach it by webhook |
-| Northbeam through its Shopify connector | Yes, it ingests the synced Shopify order as the order of record | Unconfirmed | Starter template source |
-| Shopify apps that send server events from Shopify order webhooks | Yes, they report synced orders as purchases | Unconfirmed | Internal NEXT notes only; not checked in source |
-| Shopify's native Meta sales channel | No, it does not report orders created through the API | Unconfirmed | Internal NEXT notes only; not checked in source |
-| Pixels that run in the Shopify storefront or checkout | No, the shopper never visits those pages | Unconfirmed | Follows from how Shop Sync creates the order; not tested |
-| Any Shopify-side tool that reads attribution from the Shopify order itself | Sees no UTM, referrer or landing page, only the metafields you map | Unconfirmed | Shop Sync source |
-
-If a tool is not in this table, check whether it reads Shopify orders through webhooks or the Admin API (it will see synced orders) or only through a browser pixel on Shopify pages (it will not).
-
-## Pick one purchase sender per platform
-
-For each ad platform, decide which one place sends the purchase. A campaign order can reach a platform from the funnel's browser pixel, from a NEXT store app on the server, and from a Shopify-side app that reads the synced order. The funnel side is turned off with a blocked-events key in `_data/campaigns.json`, or with `blockedEvents` in `assets/config.js` for the SDK's Meta provider. The Shopify side is turned off in the Shopify app, by excluding orders tagged `NEXT` if the app offers a tag filter, or by turning off its purchase events. No Shopify app's settings were checked for this page.
-
-| Platform | Senders that can reach it | Recommended single sender | How to stop the others | Status |
-| --- | --- | --- | --- | --- |
-| Meta | Funnel browser `Purchase` (SDK Meta provider); NEXT Meta Pixel app server `Purchase`; a Shopify-side server sender | The funnel browser `Purchase` and the NEXT Meta Pixel app, as one pair. They use the same event ID, `{store}-{order number}`, so Meta can deduplicate them | Exclude orders tagged `NEXT` in the Shopify-side sender, or turn its purchase events off for that pixel. If you keep the Shopify-side sender instead, turn off the NEXT Meta Pixel app and add `"dl_purchase"` to `analytics.providers.facebook.blockedEvents` | Partial: the funnel event ID was observed; the server side was not |
-| Triple Whale | Funnel adapter `Purchase` and `UpsellPurchase`; the synced Shopify order Triple Whale ingests | No default yet. Two configurations exist: the Shopify order as the only purchase, with the funnel sending `Contact` to tie the session to it; or the funnel `Purchase` left on, which Triple Whale's documentation says attribution needs | For the first, `"triplewhale_blocked_events": "dl_purchase, dl_upsell_purchase"` with `triplewhale_contact_enabled` on. Express wallet buyers may never type an email, so `Contact` may not fire for them. Test both in your own account as the [Triple Whale](/docs/campaigns/tracking/triple-whale#worked-example) guide describes | Unconfirmed, and see the note below |
-| Northbeam | Funnel adapter `purchase`; the synced Shopify order Northbeam ingests | The Shopify order from Northbeam's Shopify connector, with identity sent from the funnel | `"northbeam_blocked_events": "dl_purchase, dl_upsell_purchase"`, with `northbeam_identity_enabled` on. See [Northbeam](/docs/campaigns/tracking/more-integrations#northbeam) | Unconfirmed |
-| GA4 and Google Ads | Funnel GA4 adapter; any Shopify-side Google app that reports synced orders (not confirmed that one does) | The funnel GA4 adapter, with Google Ads importing GA4 key events | Exclude orders tagged `NEXT` in the Shopify-side Google app, or, to keep that app instead, `"ga4_blocked_events": "dl_purchase, dl_upsell_purchase"` | Unconfirmed |
-| TikTok | Funnel TikTok adapter `Purchase`; any Shopify-side TikTok app that reports synced orders (not confirmed that one does) | The funnel TikTok adapter. NEXT sends no TikTok server event for campaign orders | Exclude orders tagged `NEXT` in the Shopify-side TikTok app, or, to keep that app instead, `"tiktok_blocked_events": "dl_purchase, dl_upsell_purchase"` | Unconfirmed |
-
-Things to know about each row:
-
-- Meta deduplicates a browser event and a server event when the event name and event ID match and both arrive within 48 hours. Meta's documentation does not describe deduplicating two server events, so never run the NEXT Meta Pixel app and a Shopify-side server sender for the same pixel. See [Meta's deduplication guide](https://developers.facebook.com/documentation/ads-commerce/conversions-api/deduplicate-pixel-and-server-events) and the [Meta](/docs/campaigns/tracking/meta) guide.
-- The SDK's `blockedEvents` matches the SDK event name exactly. Use `"dl_purchase"`. A Meta event name such as `"Purchase"` blocks nothing.
-- The NEXT Meta Pixel app skips subscription renewals by default (**Ignore Subscription Renewal Orders**). A Shopify-side sender sees synced renewals tagged `Recurring` and may report them as purchases.
-- TikTok deduplicates a pixel event and an Events API event only when both carry the same event ID ([TikTok's deduplication guide](https://ads.tiktok.com/resources/help/article/event-deduplication?lang=en)). NEXT has not confirmed that any Shopify-side TikTok app uses the funnel's event ID, so treat two TikTok senders as a double count.
-- Google Ads setup is in [Google Ads and YouTube](/docs/campaigns/tracking/google-ads).
-
-<Callout type="warn" title="Triple Whale sources disagree">
-The starter template documentation says to block the funnel purchase on Shop Sync stores when Triple Whale is connected to Shopify, or orders are counted twice. Triple Whale's own documentation says attribution needs both a pixel purchase and a matching order record ([custom sales platform guide](https://triplewhale.readme.io/reference/pixel-setup-guide-for-custom-sales-platform)). Neither setup has been tested on a Shop Sync store. Check attribution in Triple Whale after your first orders, and see [Triple Whale](/docs/campaigns/tracking/triple-whale).
+<Callout type="warn" title="Meta cannot merge two server senders">
+If a Shopify app sends purchases to Meta and cannot exclude orders tagged `NEXT`, let that app be the only one. Turn off the NEXT Meta Pixel app, and stop the funnel's purchase with `blockedEvents: ['dl_purchase']` as shown in the [Meta](/docs/campaigns/tracking/meta#count-each-purchase-once) guide.
 </Callout>
 
-## Mapping a click ID to Shopify
+To stop the funnel reporting purchases to a platform, add its line to your campaign in `_data/campaigns.json`:
 
-This example puts the Google click ID and the Meta click ID on the Shopify order as metafields, so Shopify-side tools and your own reports can read them. None of it has been tested on a Shop Sync store.
+| Platform | Line |
+| --- | --- |
+| Triple Whale | `"triplewhale_blocked_events": "dl_purchase, dl_upsell_purchase"` |
+| Northbeam | `"northbeam_blocked_events": "dl_purchase, dl_upsell_purchase"` |
+| Google Analytics 4 | `"ga4_blocked_events": "dl_purchase, dl_upsell_purchase"` |
+| TikTok | `"tiktok_blocked_events": "dl_purchase, dl_upsell_purchase"` |
 
-### gclid
+Before you launch, place one order, send it for fulfillment, and check each platform shows it once. Repeat this check whenever you install a new Shopify app that tracks orders, because it may start reporting funnel sales too.
 
-The SDK stores `gclid` as a top-level attribution field, so Shop Sync cannot see it. Copy it into attribution metadata on your funnel pages before the order is placed:
+## Put a click ID on the Shopify order
 
-```html title="Funnel page, for example checkout"
-<script>
-  window.nextReady.push(function (sdk) {
-    function copyGclid() {
-      var attribution = sdk.getAttribution() || {};
-      var metadata = attribution.metadata || {};
-      if (attribution.gclid && metadata.gclid !== attribution.gclid) {
-        sdk.addMetadata('gclid', attribution.gclid);
-      }
-    }
-    copyGclid();
-    sdk.on('cart:updated', copyGclid);
-  });
-</script>
-```
+Shop Sync does not copy ad details to Shopify by itself. You can map individual values, such as a Meta or Google click ID, onto the Shopify order as metafields.
 
-`next.addMetadata(key, value)` merges one key into `attribution.metadata`. The script copies the value again on `cart:updated` as a precaution. SDK 0.4.38 to 0.4.43 can put a stale `fb_fbp` or `fb_fbc` value back on a cart update, and the starter templates' Meta adapter re-copies those two keys on `cart:updated` for that reason. The `window.nextReady.push` hook and `sdk.on('cart:updated', ...)` are the same calls that adapter uses.
+This is covered step by step in the Shop Sync guide, [Send NEXT order data to Shopify](https://guides.nextcommerce.com/guides/shop-sync-metadata):
 
-Then map it:
-
-1. In NEXT, add a metadata definition with object **Attribution**, key `gclid`, type **Text**.
-2. In Shopify, add an **Orders** metafield definition of type single line text.
-3. In Shop Sync, click **Add Metadata Sync** and map the NEXT `gclid` field to that Shopify metafield.
-
-### fbclid
-
-The SDK already stores `fbclid` in attribution metadata, so no script is needed. Add an **Attribution** metadata definition with key `fbclid` and type **Text**, a matching single line text **Orders** metafield in Shopify, and a metadata sync between them. The Shop Sync metadata guide lists `fb_fbc`, `fb_fbp`, `clickid` and `everflow_transaction_id` as other attribution keys you can map the same way.
-
-### Check it
-
-Place an order with a [test card](/docs/testing), then request fulfillment for it. Test orders are not sent to fulfillment automatically, so they reach Shopify only after a manual fulfillment request ([Test orders](https://docs.nextcommerce.com/docs/manage/orders/test-orders)). In Shopify, open the order, which is flagged as a test and tagged `NEXT`, and confirm the metafields hold the values from your landing URL.
-
-## Limits
-
-- Metafields are written once, when Shop Sync creates the Shopify order. A value added to the NEXT order later does not reach Shopify.
-- Only `order` and `attribution` metadata can be mapped. Top-level attribution fields such as `utm_source` and `gclid` must be copied into metadata first, as in the `gclid` example.
-- If you map `landing_page`, Shopify receives the checkout URL. The SDK replaces the landing page with the checkout URL when it creates the prospect cart.
-- `fb_fbp` and `fb_fbc` can be empty on a first visit, because the SDK reads the Meta cookies once when a page loads. Empty values are not written.
-- SDK 0.4.43 does not store `ttclid`, `msclkid`, `gbraid` or `wbraid`, so they cannot be mapped. SDK 0.5.0 stores them in attribution metadata, which should make them mappable; this has not been checked.
-- Coupon codes are not synced to the Shopify order, according to internal NEXT notes. Unconfirmed: not checked in Shop Sync source.
-- Triple Whale's documentation expects Shopify product and variant IDs in pixel events. The funnel sends NEXT SKUs. The effect on matching is not known.
-- Revenue differs by sender for the same order. The funnel's GA4 purchase `value` is item revenue without shipping (and without tax on tax-exclusive stores), while the NEXT Meta Pixel app sends the order total including tax.
-- More on what the SDK captures is in [Events and attribution](/docs/campaigns/tracking/events-and-attribution). Testing steps are in [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting).
+| What you want | Where |
+| --- | --- |
+| Map any value to a Shopify metafield | [Map a metadata field](https://guides.nextcommerce.com/guides/shop-sync-metadata#mapping) |
+| Send the Meta click ID, Meta browser IDs, or the Everflow ID | [Send click IDs to Shopify](https://guides.nextcommerce.com/guides/shop-sync-metadata#click-id) |
+| Send the Google click ID | [Google click ID](https://guides.nextcommerce.com/guides/shop-sync-metadata#gclid) |
+| Carry a value onto subscription renewals | [Subscriptions](https://guides.nextcommerce.com/guides/shop-sync-metadata#subscriptions) |

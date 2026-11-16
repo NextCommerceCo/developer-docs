@@ -134,7 +134,7 @@ The pages above are wired up by the **Campaign Cart SDK**. Its documentation is 
 | [Getting started](https://cart-sdk.nextcommerce.com/latest/quickstart/) | Loading the SDK and configuring it |
 | [Data attributes](https://cart-sdk.nextcommerce.com/latest/attributes/) | Every `data-next-*` attribute |
 | [JavaScript API](https://cart-sdk.nextcommerce.com/latest/javascript-api/) | The `window.next` methods |
-| [Analytics events](https://cart-sdk.nextcommerce.com/latest/analytics/) | Every tracking event and its payload |
+| [Analytics events](https://cart-sdk.nextcommerce.com/v0.4.43/reference/analytics-events) | Every tracking event and its payload |
 | [URL parameters](https://cart-sdk.nextcommerce.com/latest/attribute-reference/setup/url-parameters/) | Parameters the SDK reads at boot |
 | [Loader script](https://cart-sdk.nextcommerce.com/latest/attribute-reference/setup/loader-script/) | Attributes the loader script reads (`data-campaign`, `data-funnel`) |
 | [Debugger](https://cart-sdk.nextcommerce.com/latest/javascript-api/#debugging-with-debug1) | The `?debug=1` debug panel |
@@ -234,7 +234,7 @@ For conditional shipping discounts, such as free shipping at 3 or more, use a `s
 
 ### Domains
 
-Domains are configured in your store's **Campaign Settings** and apply across all campaigns. They control which domains are authorized to use your campaign API keys.
+Domains are configured in the Campaigns app, under **Settings**, then **Allowed Domains**, and apply across all campaigns. They control which domains are authorized to use your campaign API keys.
 
 | Type | SDK Access | NEXT campaign analytics |
 | --- | --- | --- |
@@ -244,7 +244,7 @@ Domains are configured in your store's **Campaign Settings** and apply across al
 The environment setting controls NEXT's own campaign analytics only. Vendor pixels and the SDK's event stream still run on development domains. See [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting).
 
 <Callout type="idea">
-Add `localhost` and any staging domains as **development** domains so you can test the full checkout flow without polluting analytics data.
+Add `localhost` and any staging domains as **development** domains so you can test the full checkout flow without adding sessions to NEXT campaign analytics. Vendor pixels on those pages still fire.
 </Callout>
 
 <Callout type="warn">
@@ -255,40 +255,18 @@ Requests from domains not listed in either production or development will be rej
 
 ## Analytics & Tracking
 
-Every starter template ships with NEXT Campaign Analytics **on by default** in auto mode. The SDK automatically tracks the full funnel (page views, add-to-cart, begin checkout, shipping and payment info, purchase, and upsells) through the internal `nextCampaign` provider, which templates ship turned on. No code required.
+Every starter template ships with NEXT Campaign Analytics **on by default**. The SDK automatically tracks the full funnel (page views, add-to-cart, begin checkout, shipping and payment info, purchase, and upsells) for NEXT's own campaign reports. No code required.
 
-Setup guides for every supported platform (Triple Whale, Meta, TikTok, Google Ads, GA4, GTM and more), the event and attribution reference, and testing steps are in [Tracking](/docs/campaigns/tracking).
-
-To also forward those events to **Google Tag Manager** or **Facebook Pixel**, add your IDs in `_data/campaigns.json`:
-
-```json
-{
-  "my-campaign": {
-    "name": "My Campaign",
-    "...": "...",
-    "gtm_id": "GTM-XXXXXXX",
-    "fb_pixel_id": "123456789012345"
-  }
-}
-```
-
-<Callout type="info">
-The matching `providers.gtm.enabled` and `providers.facebook.enabled` flags in `assets/config.js` control whether the SDK **forwards events** to each provider. Templates ship with these set to `false`. Flip them to `true` once your IDs are in place. The [Google Tag Manager](/docs/campaigns/tracking/google-tag-manager) and [Meta](/docs/campaigns/tracking/meta) guides cover the full wiring, and the other platforms use one key each in `_data/campaigns.json`.
-</Callout>
+To send those events to Meta, Google, TikTok, Triple Whale and other platforms, see [Tracking](/docs/campaigns/tracking).
 
 <Callout type="idea" title="Keep your campaign analytics clean">
-Two mechanisms keep test traffic out of your campaign dashboards, so they reflect **real customer conversions**, not internal QA:
+Two things keep test traffic out of NEXT's campaign reports:
 
-- **Development domains**: NEXT campaign analytics ignores events from any domain marked *development* in your store's Campaign Settings. Add `localhost`, staging URLs, and preview hosts here. Vendor pixels on those pages still fire.
-- **`?ignore=true` URL parameter**: append it to any URL to silence all SDK tracking for the browser session, useful for one-off testing on a production domain. Clear it with `window.NextAnalyticsClearIgnore()`.
+- **Development domains**: NEXT campaign analytics ignores visits from any domain set to *Development* in the Campaigns app, under **Settings**, then **Allowed Domains**. Add `localhost`, staging URLs and preview hosts there.
+- **`?ignore=true`**: add it to any link to turn tracking off for that browser tab.
 
-Do not use `?ignore=true` when you are testing that a purchase event fires: it stops every event, including the purchase.
+Do not use `?ignore=true` when you are checking that a purchase is reported. See [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting).
 </Callout>
-
-
-### Event reference
-
-- [Analytics events](https://cart-sdk.nextcommerce.com/latest/analytics/): every tracking event the SDK emits, what triggers it, and what each destination receives
 
 ---
 

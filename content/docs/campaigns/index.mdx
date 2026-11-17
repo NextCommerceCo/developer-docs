@@ -236,15 +236,17 @@ For conditional shipping discounts, such as free shipping at 3 or more, use a `s
 
 ### Domains
 
-Domains are configured in your store's **Campaign Settings** and apply across all campaigns. They control which domains are authorized to use your campaign API keys.
+Domains are configured in the Campaigns app, under **Settings**, then **Allowed Domains**, and apply across all campaigns. They control which domains are authorized to use your campaign API keys.
 
-| Type | SDK Access | Analytics Tracking |
+| Type | SDK Access | NEXT campaign analytics |
 | --- | --- | --- |
-| **Production** | Yes | Yes — events tracked automatically |
-| **Development** | Yes | No — events suppressed |
+| **Production** | Yes | Yes, events recorded automatically |
+| **Development** | Yes | No, events ignored |
+
+The environment setting controls NEXT's own campaign analytics only. Vendor pixels and the SDK's event stream still run on development domains. See [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting).
 
 <Callout type="idea">
-Add `localhost` and any staging domains as **development** domains so you can test the full checkout flow without polluting analytics data.
+Add `localhost` and any staging domains as **development** domains so you can test the full checkout flow without adding sessions to NEXT campaign analytics. Vendor pixels on those pages still fire.
 </Callout>
 
 <Callout type="warn">
@@ -255,36 +257,18 @@ Requests from domains not listed in either production or development will be rej
 
 ## Analytics & Tracking
 
-Every starter template ships with NEXT Campaign Analytics **on by default**. The SDK automatically tracks the full funnel — page views, add-to-cart, begin checkout, shipping/payment info, purchase, and upsells — through the always-on internal `nextCampaign` provider. No code required.
+Every starter template ships with NEXT Campaign Analytics **on by default**. The SDK automatically tracks the full funnel (page views, add-to-cart, begin checkout, shipping and payment info, purchase, and upsells) for NEXT's own campaign reports. No code required.
 
-To also forward those events to **Google Tag Manager** or **Facebook Pixel**, add your IDs in `_data/campaigns.json`:
-
-```json
-{
-  "my-campaign": {
-    "name": "My Campaign",
-    "...": "...",
-    "gtm_id": "GTM-XXXXXXX",
-    "fb_pixel_id": "123456789012345"
-  }
-}
-```
-
-<Callout type="info">
-The IDs above load the GTM container and Meta Pixel on your pages. Whether the SDK also **forwards its events** to them is a separate switch in `assets/config.js`. On Campaign Cart SDK 0.5, set `analytics.destinations.gtm.enabled` and `analytics.destinations.meta.enabled` to `true`; the Meta destination sends to the Pixel your page loads from `fb_pixel_id`. Templates built for 0.4.x use the older `analytics.providers.gtm` and `analytics.providers.facebook` flags instead. 0.5 still reads them, but when both are set, `destinations` wins. See [Destinations](https://cart-sdk.nextcommerce.com/latest/analytics-reference/destinations/overview/) for every destination and its config.
-</Callout>
+To send those events to your ad and analytics platforms, see [Tracking](/docs/campaigns/tracking).
 
 <Callout type="idea" title="Keep your campaign analytics clean">
-Two mechanisms skip tracking entirely — including the always-on internal `nextCampaign` provider — so your campaign dashboards reflect **real customer conversions**, not internal QA or test traffic:
+Two things keep test traffic out of NEXT's campaign reports:
 
-- **Development domains** — any domain marked *development* in your store's Campaign Settings suppresses all events. Add `localhost`, staging URLs, and preview hosts here.
-- **`?ignore=true` URL parameter** — append it to any URL to silence tracking for the rest of that browser tab, useful for one-off testing on a production domain. Turn tracking back on with `?ignore=false`.
+- **Development domains**: NEXT campaign analytics ignores visits from any domain set to *Development* in the Campaigns app, under **Settings**, then **Allowed Domains**. Add `localhost`, staging URLs and preview hosts there.
+- **`?ignore=true`**: add it to any link to turn tracking off for that browser tab. Turn it back on with `?ignore=false`.
+
+Do not use `?ignore=true` when you are checking that a purchase is reported. See [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting).
 </Callout>
-
-
-### Event reference
-
-- [Analytics events](https://cart-sdk.nextcommerce.com/latest/analytics/): every tracking event the SDK emits, what triggers it, and what each destination receives
 
 ---
 

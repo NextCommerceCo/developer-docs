@@ -1,0 +1,101 @@
+---
+title: Google Analytics 4
+description: Track your NEXT campaign in Google Analytics 4, and use those purchases as conversions in Google Ads, including for YouTube ads.
+sidebar_label: Google Analytics 4
+audience: [merchant, developer]
+last_verified: 2026-11-16
+tags:
+ - Guide
+---
+
+The starter templates include Google Analytics 4. Add your measurement ID and the campaign reports page views, checkout steps and purchases to your GA4 property.
+
+GA4 events are sent from the shopper's browser only. The **Google Analytics 4** app you set up under **Apps** in your NEXT dashboard only adds its script to your Storefront. It is not added to your Campaigns, so follow this page to add GA4 to your campaign.
+
+## Before you start
+
+- Your GA4 measurement ID. It starts with `G-`.
+- A campaign that is ready for tracking. See [Set up tracking](/docs/campaigns/tracking/getting-started).
+
+## Set up
+
+1. In `_data/campaigns.json`, add your measurement ID to your campaign:
+
+```json title="_data/campaigns.json"
+{
+  "my-campaign": {
+    "name": "My Campaign",
+    "ga4_id": "G-XXXXXXXXXX"
+  }
+}
+```
+
+2. Build with `npm run build` and deploy.
+
+Do not also add a GA4 tag for the same property in Google Tag Manager. Two copies send every event twice.
+
+## What gets tracked
+
+| When | GA4 event |
+| --- | --- |
+| Any page loads | `page_view` |
+| A page shows a product | `view_item` |
+| An item is added to the cart | `add_to_cart` |
+| The checkout loads | `begin_checkout` |
+| A shipping address is entered | `add_shipping_info` |
+| Payment details are entered | `add_payment_info` |
+| The order is paid | `purchase` |
+| An upsell is accepted | `upsell_purchase` |
+
+The `purchase` is sent on the first page after payment: the upsell page, or the receipt if there is no upsell.
+
+To stop an event, add `ga4_blocked_events` to your campaign, for example `"ga4_blocked_events": "dl_add_shipping_info"`.
+
+## Purchases and upsells
+
+| | Order | Upsell |
+| --- | --- | --- |
+| GA4 event | `purchase` | `upsell_purchase` |
+| Transaction ID | The order number, for example `100041` | The order reference followed by `-US1`, `-US2` and so on |
+| Amount | The price of the items as shown on your store, without shipping | The upsell only |
+
+Upsells are sent as their own event, so your purchase count and average order value describe the first sale. To see upsell revenue in GA4, mark `upsell_purchase` as a key event and include it in your reports.
+
+The purchase amount is lower than the order total because it is the item prices only. Shipping is sent as a separate field on the event, and so is tax.
+
+## Use GA4 purchases in Google Ads
+
+Google Ads, including YouTube ads, has no ID of its own to add to your campaign. Instead, Google Ads imports the purchases your campaign reports to GA4.
+
+1. In Google Ads, turn on **auto-tagging**. It adds the Google click ID (`gclid`) to your ad links.
+2. In GA4, mark `purchase` as a key event. Mark `upsell_purchase` too if you want upsell revenue counted in Google Ads.
+3. Link your GA4 property to your Google Ads account.
+4. In GA4, open **Advertising**, then **Tools**, then **Conversion management**, and select **New conversion**. Pick your Google Ads account and the key events, then save. Google's steps are in [Create Google Ads conversions from GA4 key events](https://support.google.com/google-ads/answer/10632359?hl=en).
+5. In Google Ads, set the new conversion as a primary conversion action if you want it used for bidding.
+
+Things to know:
+
+- If you only import `purchase`, Google Ads misses upsell revenue.
+- The conversion value is lower than the order total, because it is the item prices only.
+- A test order counts as a conversion.
+- The `gclid` is saved on the NEXT order, but NEXT does not send orders to Google Ads from its servers, and enhanced conversions are not available.
+
+If you manage your tags in Google Tag Manager, you can fire a Google Ads conversion tag from there instead. See [Google Tag Manager](/docs/campaigns/tracking/google-tag-manager#google-ads-conversions). Use one way, not both.
+
+## Keeping the source of the visit
+
+GA4 reads where a visitor came from off the page link, so keep your UTM parameters on your ad links. Keep every campaign page on one domain, or on subdomains of one domain, so GA4 follows the visitor from page to page.
+
+## Verify it works
+
+1. Connect Google Tag Assistant to your campaign at [tagassistant.google.com](https://tagassistant.google.com). This puts that browser's GA4 hits into debug mode, so they appear in DebugView.
+2. In GA4, open **Admin**, then **DebugView**.
+3. Go through checkout in the window Tag Assistant opens, so the events stay in debug mode. You should see `page_view`, `begin_checkout` and the other events.
+4. Place an order with a [test card](/docs/testing). On the next page you should see `purchase` with your order number as the transaction ID.
+5. Accept an upsell. You should see `upsell_purchase` on the page after it.
+
+## Troubleshooting
+
+If nothing reaches GA4, check that `ga4_id` is set, then rebuild. More help is in [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting).
+
+On a campaign that is not built from a starter template, send events to GA4 from your own [Google Tag Manager](/docs/campaigns/tracking/google-tag-manager) container.

@@ -8,6 +8,7 @@
         "index",
         "templates",
         "page-kit",
+        "tracking",
         "[Playground](/playground)",
         "---Cart SDK---",
         "external:[SDK documentation](https://cart-sdk.nextcommerce.com/latest/)",

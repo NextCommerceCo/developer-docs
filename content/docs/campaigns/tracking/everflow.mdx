@@ -1,0 +1,195 @@
+---
+title: Everflow
+description: Report NEXT Campaigns sales to Everflow with the Everflow app, for both redirect links and direct links, and avoid duplicate or missing conversions.
+sidebar_label: Everflow
+audience: [merchant, developer]
+last_verified: 2026-11-16
+tags:
+ - Guide
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Everflow pays affiliates for sales, so a missing or duplicated conversion costs real money. This guide shows the setup we recommend and the mistakes to avoid.
+
+## How it works
+
+Everflow gives every ad click an ID, called the transaction ID. To report a sale, Everflow needs that same ID back.
+
+1. The shopper clicks an affiliate link, and Everflow creates a transaction ID.
+2. Your campaign saves the transaction ID on the order.
+3. The NEXT Everflow app sends the sale to Everflow from NEXT's servers, with that ID.
+
+The rule that keeps this working: **one order, one transaction ID, one thing reporting the sale.**
+
+## What we recommend
+
+- **Let the NEXT Everflow app report the sale.** It runs on NEXT's servers and only reports real, placed orders.
+- **Use redirect links where you can.** They are the simplest and most reliable way to get the transaction ID onto the order.
+- **Use direct links when the ad platform needs them**, with the bridge snippet below.
+- **Do not also report the sale from Google Tag Manager.** A purchase tag in GTM alongside the app is the usual cause of duplicate conversions.
+
+## Before you start
+
+- Your Everflow network ID and postback URL, from your Everflow account or your affiliate network.
+- A campaign that is ready for tracking. See [Set up tracking](/docs/campaigns/tracking/getting-started).
+
+## Set up the Everflow app
+
+1. In your store dashboard, open **Apps**, then **Everflow**.
+2. Enter your **Everflow Postback URL** and **Everflow Network ID**. Only the domain of the postback URL is used; anything after it is ignored.
+3. Keep **Enable Everflow S2S Postback** on.
+
+| Setting | What it does |
+| --- | --- |
+| **Everflow Postback Delay Minutes** | 0 by default, so the conversion is sent straight away and does not include upsells. Set it to up to 10 minutes so upsells accepted in that time are included in the amount |
+| **Everflow Verification Token** | Optional. Sent with each conversion if your network requires one |
+| **Include Tax in Conversion Value** | Off by default. The amount is the order total without tax unless you turn this on |
+| **Enable S2S Postback for test orders** | Off by default. Test orders are skipped unless this is on |
+
+See the [Everflow app docs](https://docs.nextcommerce.com/docs/apps/everflow) for more.
+
+## Get the transaction ID onto the order
+
+Which setup you need depends on how your affiliate links work.
+
+| | Redirect links | Direct links |
+| --- | --- | --- |
+| How the shopper arrives | Through Everflow first, then to your campaign | Straight to your campaign |
+| Where the transaction ID comes from | It is on the link, as `evclid` | Everflow's click script creates it in the browser |
+| What you add to the campaign | Nothing | The bridge snippet |
+| Use it when | The ad platform allows a redirecting link | The ad platform does not. Google Ads requires the final URL to stay on one domain |
+
+### Redirect links
+
+Set up your Everflow offer so the link to your campaign carries Everflow's transaction ID in a parameter named `evclid`:
+
+```text
+https://campaign.example.com/?evclid=EVERFLOW_TRANSACTION_ID
+```
+
+Use Everflow's transaction ID macro for the value. See Everflow's [guide to parameters and macros](https://helpdesk.everflow.io/en/articles/6173403-a-guide-to-parameters-and-macros).
+
+The campaign saves it on the order by itself. Nothing else is needed.
+
+### Direct links
+
+With a direct link there is no `evclid`. Everflow's click script, which your affiliate partner usually runs in their own Google Tag Manager container, creates the transaction ID when the page loads. That ID then has to be handed to the campaign, or the order has no ID and nothing is reported.
+
+Keep the partner's own `EF.click` call as it is, and add this to what happens after it. It saves the ID and puts it on the order:
+
+```js
+EF.click({
+  // ...the partner's usual click settings (offer, affiliate, subs)
+}).then(function (transactionId) {
+  // Do nothing when Everflow returns no ID, so a good ID is never replaced by an empty one.
+  if (!transactionId) return;
+  var id = String(transactionId);
+
+  // Keep the ID for later pages.
+  try { localStorage.setItem('evclid', id); } catch (e) {}
+
+  // Put the ID on the order.
+  var apply = function (next) {
+    next.setMetadata({ everflow_transaction_id: id });
+  };
+  if (window.next && typeof window.next.setMetadata === 'function') apply(window.next);
+  else (window.nextReady = window.nextReady || []).push(apply);
+});
+```
+
+<Callout type="warn" title="Do not create a second ID on later pages">
+Each time the click script runs, Everflow can create a new transaction ID. If that happens on the checkout or upsell page, the order and the conversion can end up with different IDs. Use one of these:
+
+- Run the click once per visit, on the page the shopper lands on.
+- Or run it on every page, but pass the saved ID back in as `transaction_id`, so Everflow reuses it. If you run more than one offer on a domain, only pass an ID back for the offer it was created for.
+
+Either way, do not attach the click script to a purchase or upsell tag.
+</Callout>
+
+Direct links are less reliable than redirect links. If the click script does not return an ID, for example because it was blocked, that order has no ID and is not reported.
+
+## Affiliate details on the link
+
+The campaign also saves the affiliate (`aff` or `affid`) and sub-affiliate values (`sub1` to `sub5`) from the link onto the order. See the SDK's [attribution parameters](https://cart-sdk.nextcommerce.com/v0.4.43/reference/url-parameters#attribution).
+
+## What the app sends
+
+For each order with a transaction ID, the app sends a conversion to Everflow with:
+
+- Your network ID
+- The transaction ID
+- The order number, as Everflow's Order ID
+- The amount and currency
+
+The app sends only these fields, plus the verification token if you set one. If your affiliate network's postback needs extra parameters, such as `aid` or `adv1`, set the Everflow offer up to work with the standard fields.
+
+An order is not sent when it has no transaction ID, or when it is canceled.
+
+If an order is reopened later, for example after being archived, the app sends its conversion again with the same transaction ID. Keep **Allow Duplicate Conversions** off on the Everflow offer so Everflow rejects the repeat.
+
+## More rules to avoid duplicate and missing conversions
+
+- **Never pay affiliates from a GTM purchase tag alone.** A browser tag can fire without a completed order behind it. The app cannot.
+- **Funnel-step events are fine in GTM.** A partner can send page views, checkout started and similar events from their own container. Those are not sales.
+- **Changing setups? Add before you remove.** When moving a partner from a GTM conversion tag to the app, add the bridge, check one test order end to end, and only then remove the old tag.
+
+## If a partner also reports from GTM
+
+Some partners want their own Everflow conversion tag in GTM as well as the app. That only works when the tag sends the same transaction ID that is on the order.
+
+- **Pass the ID yourself.** Read it from where the click script saved it:
+
+```js
+EF.conversion({
+  // ...the partner's other fields
+  transaction_id: localStorage.getItem('evclid')
+});
+```
+
+- **Do not let Everflow pick the ID.** A conversion sent without `transaction_id`, or one that uses `EF.getTransactionId()` or `EF.getAdvertiserTransactionId()`, can send a different click's ID, or several IDs joined together. The sale is then credited to the wrong click, or counted twice.
+- **Turn off Allow Duplicate Conversions** on the Everflow offer. Everflow then rejects the second copy of a sale it already has.
+- **Put quotes around GTM variables** inside the tag, for example `'{{DLV - Order ID}}'`. Without quotes, a value that is not a number breaks the whole tag and the conversion never fires.
+
+## More than one affiliate network
+
+**Several affiliates in one Everflow network** need nothing extra. Each click gets its own transaction ID, and the app reports every sale to that network.
+
+**A second Everflow network on the same store** needs its own setup. The app holds one network ID, and it sends whatever is in the order's Everflow transaction ID to that network. So the second network must stay out of that slot:
+
+1. **Put the second network's click ID in a `sub` parameter** on its links, for example `sub2`. Do not use `evclid`.
+2. **Let the second network report its own sales** from a conversion tag in its own GTM container, sending that click ID.
+3. **Keep its click script separate.** It must not save its ID as `evclid`, and must not set `everflow_transaction_id` on the order.
+4. **Run each network's scripts only on its own traffic.** If both containers can load on the same pages, make each network's tags fire only for visits that came from that network.
+
+| | First network | Second network |
+| --- | --- | --- |
+| Click ID arrives as | `evclid`, or the bridge | A `sub` parameter, for example `sub2` |
+| Sale reported by | The NEXT Everflow app | The network's own GTM conversion tag |
+| Saved on the order as | Everflow transaction ID | Subaffiliate 2 |
+
+If the second network's ID ends up in `evclid`, its sales are sent to the first network and credited there.
+
+## Verify it works
+
+1. Turn on **Enable S2S Postback for test orders** in the app.
+2. Open your campaign through an Everflow test link, in a new private window.
+3. Place an order with a [test card](/docs/testing).
+4. Open the order in your store dashboard. Its attribution should show an Everflow transaction ID.
+5. In Everflow, search for that transaction ID. You should see one conversion with your order number as the Order ID.
+6. **Reject the test conversion in Everflow.** If you do not, it counts as a real conversion and the affiliate is paid for it.
+7. Turn **Enable S2S Postback for test orders** off again.
+
+## Comparing your numbers with your partner's
+
+- **Match on the order number.** Everflow's Order ID is the NEXT order number. The transaction ID is the click's ID and never matches an order number.
+- **Use the same timezone.** NEXT reports in your store's timezone and Everflow defaults to UTC. Line them up before comparing counts.
+
+## Troubleshooting
+
+| Problem | Likely cause | Fix |
+| --- | --- | --- |
+| No conversions in Everflow | The orders have no transaction ID | Redirect links: check `evclid` is on the link. Direct links: check the bridge is in the click script |
+| Some direct-link orders are missing | The click script did not return an ID for those visits | Use redirect links where the ad platform allows |
+| Conversions counted twice | A GTM conversion tag and the app both report the sale with different IDs | Remove the GTM tag, or make it send the order's transaction ID. See [If a partner also reports from GTM](#if-a-partner-also-reports-from-gtm) |
+| A sale is credited to the wrong affiliate or offer | The conversion used an ID from an earlier click | Pass `transaction_id` from the saved ID, and run the click once per visit |
+| The amount is lower than expected | Tax is left out, or the upsell was accepted after the conversion was sent | Turn on **Include Tax in Conversion Value**, or set a postback delay |

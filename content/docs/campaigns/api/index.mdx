@@ -36,6 +36,8 @@ Session tracking is available to enable visibility into campaign performance by 
 
 These events flow into Campaign Performance reports for real-time monitoring of activity on your campaign.
 
+Session tracking feeds NEXT's own campaign reports only. To send events to ad and analytics platforms, and for the attribution fields you can pass on carts and orders, see [Tracking](/docs/campaigns/tracking).
+
 ### Packages
 A **package** is a virtual link to a product or product variant in your campaign — what customers reference by `package_id` when creating carts and orders. Each package is usually one product variant at its campaign price. In Campaigns App, packages are created when an offer selects a store product, and they are listed on the campaign's **Products** tab; over the [Admin API](/docs/campaigns/admin-api#add-packages-to-a-campaign) you create them directly. Send the selected package and quantity from the page. Older campaigns may still expose package-level quantity for compatibility, but new quantity tiers should be modeled with offers rather than separate `1x`, `2x`, and `3x` package records.
 

@@ -1,6 +1,6 @@
 ---
 title: Set up tracking
-description: Turn on tracking for a NEXT Campaigns funnel. Add your platform IDs to a starter template, publish, and run a first test order.
+description: Turn on tracking for your NEXT campaign. Add your platform IDs to a starter template, publish, and run a first test order.
 sidebar_label: Getting started
 audience: [merchant, developer]
 last_verified: 2026-11-16
@@ -9,17 +9,17 @@ tags:
 ---
 import { Callout } from 'fumadocs-ui/components/callout';
 
-This page turns tracking on for a funnel and walks you through a first test. Do it once per funnel. For how tracking works, see the [Tracking overview](/docs/campaigns/tracking).
+This page turns tracking on for a campaign and walks you through a first test. Do it once per campaign. For how tracking works, see the [Tracking overview](/docs/campaigns/tracking).
 
 ## Before you start
 
 You need:
 
-- A funnel built from a [starter template](/docs/campaigns/templates). The `landing` template family has no tracking, so use one of the others.
-- Your funnel's domain added in the Campaigns app. Open **Settings**, then **Allowed Domains**, click **Add Domain**, and set **Environment** to **Production**.
+- A campaign built from a [starter template](/docs/campaigns/templates). The `landing` template family has no tracking, so use one of the others.
+- Your campaign's domain added in the Campaigns app. Open **Settings**, then **Allowed Domains**, click **Add Domain**, and set **Environment** to **Production**.
 - The ID for each platform you advertise on, such as your Meta pixel ID or GA4 measurement ID. Each platform guide says where to find it.
 
-Built your funnel by hand instead of from a starter template? See [Hand-built funnels](#hand-built-funnels).
+Built your campaign by hand instead of from a starter template? See [Hand-built campaigns](#hand-built-campaigns).
 
 ## Step 1: Add your platform IDs
 
@@ -69,10 +69,10 @@ Build with `npm run build` and deploy to the domain you added as **Production**.
 ## Step 4: Run a test order
 
 1. Open a new private browser window.
-2. Open your funnel with test details on the link:
+2. Open your campaign with test details on the link:
 
 ```text
-https://funnel.example.com/?utm_source=test&utm_medium=cpc&utm_campaign=launch-test
+https://campaign.example.com/?utm_source=test&utm_medium=cpc&utm_campaign=launch-test
 ```
 
 3. Go through checkout and pay with a [test card](/docs/testing).
@@ -94,6 +94,6 @@ Make sure each platform hears about a sale once. If more than one thing reports 
 
 If your orders sync to Shopify through Shop Sync, read [Tracking on Shop Sync stores](/docs/campaigns/tracking/shop-sync) before you launch.
 
-## Hand-built funnels
+## Hand-built campaigns
 
-The steps above are for starter templates, which include the tracking code for every supported platform. A funnel you built by hand does not include it. For a hand-built funnel, load your own Google Tag Manager container on every page and send events to your platforms from there. See [Google Tag Manager](/docs/campaigns/tracking/google-tag-manager).
+The steps above are for starter templates, which include the tracking code for every supported platform. A campaign you built by hand does not include it. For a hand-built campaign, load your own Google Tag Manager container on every page and send events to your platforms from there. See [Google Tag Manager](/docs/campaigns/tracking/google-tag-manager).

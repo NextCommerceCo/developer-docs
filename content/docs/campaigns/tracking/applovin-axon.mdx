@@ -1,6 +1,6 @@
 ---
 title: AppLovin Axon
-description: Track a NEXT Campaigns funnel in AppLovin Axon. Turn on the Axon pixel in a starter template, and keep Axon's cookie for a year with a small server function.
+description: Track your NEXT campaign in AppLovin Axon. Turn on the Axon pixel in a starter template, and keep Axon's cookie for a year with a small server function.
 sidebar_label: AppLovin Axon
 audience: [merchant, developer]
 last_verified: 2026-11-16
@@ -8,14 +8,14 @@ tags:
  - Guide
 ---
 
-The starter templates include the AppLovin Axon pixel. Add your event key and the funnel reports page views, checkout steps and purchases to Axon from the shopper's browser.
+The starter templates include the AppLovin Axon pixel. Add your event key and the campaign reports page views, checkout steps and purchases to Axon from the shopper's browser.
 
-The **AppLovin AXON** store app covers your NEXT storefront, not funnels.
+The **AppLovin AXON** app you set up under **Apps** in your NEXT dashboard only adds its script to your Storefront. It is not added to your Campaigns, so follow this page to add Axon to your campaign.
 
 ## Before you start
 
 - Your Axon event key, from your AppLovin account.
-- A funnel that is ready for tracking. See [Set up tracking](/docs/campaigns/tracking/getting-started).
+- A campaign that is ready for tracking. See [Set up tracking](/docs/campaigns/tracking/getting-started).
 
 ## Set up
 
@@ -53,7 +53,7 @@ Turn it on only when your privacy policy covers it. See [Privacy and consent](/d
 
 Axon's pixel recognises a returning shopper with a cookie named `_axwrt`. Some browsers, including Safari, shorten the life of cookies that a script sets. AppLovin [strongly recommends](https://support.applovin.com/en/growth/promoting-your-websites/track-and-optimize/google-tag-manager) that your site's server sets the same value again as a one-year cookie named `axwrt`.
 
-A starter template funnel is a static site, so this needs a small server function. On Netlify, add this one file. It runs on every page request, and when the shopper already has `_axwrt`, it adds `axwrt` to the response:
+A starter template campaign is a static site, so this needs a small server function. On Netlify, add this one file. It runs on every page request, and when the shopper already has `_axwrt`, it adds `axwrt` to the response:
 
 ```js title="netlify/edge-functions/axwrt.js"
 const ROOT_DOMAIN = 'example.com';
@@ -84,15 +84,15 @@ export const config = {
 };
 ```
 
-Set `ROOT_DOMAIN` to your funnel's root domain, without `www`. There is nothing to add to your pages or to `netlify.toml`. The cookie is in place from the shopper's second page view.
+Set `ROOT_DOMAIN` to your campaign's root domain, without `www`. There is nothing to add to your pages or to `netlify.toml`. The cookie is in place from the shopper's second page view.
 
 Any server or edge platform can do the same thing; Netlify is the example.
 
 ## Verify it works
 
-1. Open your funnel in a new private window and go through it.
+1. Open your campaign in a new private window and go through it.
 2. Place an order with a [test card](/docs/testing) and continue to the next page.
 3. In your AppLovin account, check that the events arrive, including the purchase.
-4. Open a second funnel page, then check in your browser's developer tools that a cookie named `axwrt` is set.
+4. Open a second campaign page, then check in your browser's developer tools that a cookie named `axwrt` is set.
 
 More help is in [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting).

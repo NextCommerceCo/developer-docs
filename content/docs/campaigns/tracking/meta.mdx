@@ -1,6 +1,6 @@
 ---
 title: Meta Pixel and Conversions API
-description: Track a NEXT Campaigns funnel in Meta. Turn on the Meta pixel on your funnel pages, send purchases from NEXT's servers with the Meta Pixel app, and make sure Meta counts each purchase once.
+description: Track your NEXT campaign in Meta. Turn on the Meta pixel on your campaign pages, send purchases from NEXT's servers with the Meta Pixel app, and make sure Meta counts each purchase once.
 sidebar_label: Meta
 audience: [merchant, developer]
 last_verified: 2026-11-16
@@ -9,9 +9,9 @@ tags:
 ---
 import { Callout } from 'fumadocs-ui/components/callout';
 
-Meta tracking on a funnel has two parts:
+Meta tracking on a campaign has two parts:
 
-- **The Meta pixel** reports page views, checkout steps and purchases from the shopper's browser. You set it up in your funnel files.
+- **The Meta pixel** reports page views, checkout steps and purchases from the shopper's browser. You set it up in your campaign files.
 - **The Meta Pixel app** reports each purchase again from NEXT's servers. You set it up in your store dashboard.
 
 You can use the pixel on its own, but both together give Meta the most complete picture. When both report a purchase, they label it with the same ID, so Meta counts it once.
@@ -20,7 +20,7 @@ You can use the pixel on its own, but both together give Meta the most complete 
 
 - Your Meta pixel ID. For the Meta Pixel app you also need an access token for that pixel.
 - Your store name: the part before `.29next.store` in your store address. For `your-store.29next.store` it is `your-store`.
-- A funnel that is ready for tracking. See [Set up tracking](/docs/campaigns/tracking/getting-started).
+- A campaign that is ready for tracking. See [Set up tracking](/docs/campaigns/tracking/getting-started).
 
 ## Set up
 
@@ -65,7 +65,7 @@ window.nextConfig = {
 With only `fb_pixel_id`, the pixel loads but sends nothing. With only the `config.js` setting, there is no pixel to send through. Templates ship with `storeName: 'store-name'` and `facebook` switched off, so change both.
 </Callout>
 
-Do not add your own `fbq('track', 'PageView')` to the pages. The funnel already sends page views, and a second call counts each one twice.
+Do not add your own `fbq('track', 'PageView')` to the pages. The campaign already sends page views, and a second call counts each one twice.
 
 ### Part 2: Meta Pixel app
 
@@ -169,13 +169,13 @@ Set the same ID as `pixelId` in each campaign's `assets/config.js`. Then add eve
 ## Verify it works
 
 1. In Meta Events Manager, open **Test Events** for your pixel.
-2. Start the test from that page and go through your funnel in the same browser. You should see `PageView` on each page.
+2. Start the test from that page and go through your campaign in the same browser. You should see `PageView` on each page.
 3. Place an order with a [test card](/docs/testing). On the next page you should see `Purchase` with the event ID `your-store-` followed by the order number.
 
 To test the Meta Pixel app as well:
 
 1. Turn on **Enable Sending Test Data** in the app.
-2. Copy the test code shown in **Test Events** and add this to a funnel page, with your code in place of `TEST12345`:
+2. Copy the test code shown in **Test Events** and add this to a campaign page, with your code in place of `TEST12345`:
 
 ```html
 <script>
@@ -194,7 +194,7 @@ The app keeps a 30-day log of what it sent, under **Logs** in the app.
 Tips for **Test Events**:
 
 - **Keep the Test Events page open.** A server purchase that arrives while the page is closed does not show up later.
-- **Use the same browser for the funnel.** Browser events only appear when the funnel is opened from Test Events, in that browser. A private window or another browser shows nothing.
+- **Use the same browser for the campaign.** Browser events only appear when the campaign is opened from Test Events, in that browser. A private window or another browser shows nothing.
 - **Check the test code is current.** Meta drops events sent with an expired code without telling you. Copy a fresh code before each session.
 - **Two purchases listed is normal.** Test Events lists both the browser and the server purchase. Meta still counts them as one when the event IDs match.
 
@@ -210,6 +210,6 @@ Tips for **Test Events**:
 
 More help is in [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting).
 
-## Hand-built funnels
+## Hand-built campaigns
 
-On a funnel that is not built from a starter template, add Meta's pixel base code to every page yourself, without a `fbq('track', 'PageView')` call, then follow step 2 of Part 1. The Meta Pixel app works the same way for any funnel.
+On a campaign that is not built from a starter template, add Meta's pixel base code to every page yourself, without a `fbq('track', 'PageView')` call, then follow step 2 of Part 1. The Meta Pixel app works the same way for any campaign.

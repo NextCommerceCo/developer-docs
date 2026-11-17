@@ -1,6 +1,6 @@
 ---
 title: Triple Whale
-description: Track a NEXT Campaigns funnel in Triple Whale on a store that syncs orders to Shopify. Stores without Shopify can load the pixel but do not get attributed sales yet.
+description: Track your NEXT campaign in Triple Whale on a store that syncs orders to Shopify. Stores without Shopify can load the pixel but do not get attributed sales yet.
 sidebar_label: Triple Whale
 audience: [merchant, developer]
 last_verified: 2026-11-16
@@ -9,24 +9,24 @@ tags:
 ---
 import { Callout } from 'fumadocs-ui/components/callout';
 
-The starter templates include the Triple Whale pixel. Add your Triple Whale details and the pixel loads on every funnel page, so Triple Whale can see the visit.
+The starter templates include the Triple Whale pixel. Add your Triple Whale details and the pixel loads on every campaign page, so Triple Whale can see the visit.
 
-This guide is for stores that sync their orders to Shopify with Shop Sync, where Triple Whale gets the sale from Shopify. On a store without Shopify, Triple Whale cannot attribute funnel sales yet. See [Stores without Shopify](#stores-without-shopify).
+This guide is for stores that sync their orders to Shopify with Shop Sync, where Triple Whale gets the sale from Shopify. On a store without Shopify, Triple Whale cannot attribute campaign sales yet. See [Stores without Shopify](#stores-without-shopify).
 
 ## How it works on a Shop Sync store
 
-1. The pixel on your funnel records the shopper's visit and where they came from.
-2. When the shopper enters their email or phone at checkout, the funnel sends it to Triple Whale.
+1. The pixel on your campaign records the shopper's visit and where they came from.
+2. When the shopper enters their email or phone at checkout, the campaign sends it to Triple Whale.
 3. Shop Sync creates the order in Shopify, and Triple Whale picks it up from there.
-4. Triple Whale uses the email or phone to connect the Shopify order to the funnel visit.
+4. Triple Whale uses the email or phone to connect the Shopify order to the campaign visit.
 
-The funnel does not send the purchase itself. If it did, Triple Whale would see the same sale twice: once from the funnel and once from Shopify.
+The campaign does not send the purchase itself. If it did, Triple Whale would see the same sale twice: once from the campaign and once from Shopify.
 
 ## Before you start
 
 - A Triple Whale account connected to the Shopify store your orders sync to.
-- Shop Sync set up, so funnel orders reach Shopify with the `NEXT` tag. See the [Shop Sync onboarding guide](https://guides.nextcommerce.com/guides/shop-sync-onboarding).
-- A funnel that is ready for tracking. See [Set up tracking](/docs/campaigns/tracking/getting-started).
+- Shop Sync set up, so campaign orders reach Shopify with the `NEXT` tag. See the [Shop Sync onboarding guide](https://guides.nextcommerce.com/guides/shop-sync-onboarding).
+- A campaign that is ready for tracking. See [Set up tracking](/docs/campaigns/tracking/getting-started).
 
 ## Set up
 
@@ -51,9 +51,9 @@ The funnel does not send the purchase itself. If it did, Triple Whale would see 
 | Line | What it does |
 | --- | --- |
 | `triplewhale_name` | Turns the pixel on for your Triple Whale shop |
-| `triplewhale_platform` | Ties the funnel to your Shopify store in Triple Whale |
+| `triplewhale_platform` | Ties the campaign to your Shopify store in Triple Whale |
 | `triplewhale_contact_enabled` | Sends the shopper's email and phone, so the Shopify order can be connected to the visit |
-| `triplewhale_blocked_events` | Stops the funnel sending the purchase, so the sale is counted once |
+| `triplewhale_blocked_events` | Stops the campaign sending the purchase, so the sale is counted once |
 
 <Callout type="info" title="This sends personal data">
 `triplewhale_contact_enabled` sends the shopper's email and phone to Triple Whale as soon as they are entered. It is not tied to the marketing opt-in checkbox. Turn it on only when your privacy policy covers it. See [Privacy and consent](/docs/campaigns/tracking#privacy-and-consent).
@@ -76,7 +76,7 @@ A shopper who pays with Apple Pay, Google Pay or PayPal may never type an email 
 
 ## Verify it works
 
-1. Open your funnel in a new private window, with test details on the link, for example `?utm_source=tw-test&utm_campaign=tw-test`.
+1. Open your campaign in a new private window, with test details on the link, for example `?utm_source=tw-test&utm_campaign=tw-test`.
 2. In the browser console, run `TriplePixel('State')`. It should return `"Ready"`.
 3. Type an email at checkout and place an order.
 4. Check the order reached Shopify with the `NEXT` tag. A [test order](https://docs.nextcommerce.com/docs/manage/orders/test-orders) is not sent to Shopify automatically, so request fulfillment on it in NEXT. It arrives in Shopify marked as a test order.
@@ -86,24 +86,24 @@ A shopper who pays with Apple Pay, Google Pay or PayPal may never type an email 
 | --- | --- |
 | One order, attributed to your test source | Everything is working |
 | One order, not attributed | The order arrived from Shopify, but Triple Whale did not connect it to the visit. Check `triplewhale_contact_enabled` is on and the email matches |
-| Two orders for one sale | The funnel is still sending the purchase. Check `triplewhale_blocked_events`. If that is set, the order may have shipped in two parts, which [shows as two Shopify orders](https://guides.nextcommerce.com/guides/shop-sync-daily-operations#shopify-analytics) |
+| Two orders for one sale | The campaign is still sending the purchase. Check `triplewhale_blocked_events`. If that is set, the order may have shipped in two parts, which [shows as two Shopify orders](https://guides.nextcommerce.com/guides/shop-sync-daily-operations#shopify-analytics) |
 | No order | The order has not reached Shopify yet, or Triple Whale is not connected to that Shopify store |
 
-Triple Whale's Pixel Helper extension only works in a normal Chrome window. In Triple Whale's Pixel Settings, "Online Store: Not Installed" is expected for a funnel.
+Triple Whale's Pixel Helper extension only works in a normal Chrome window. In Triple Whale's Pixel Settings, "Online Store: Not Installed" is expected for a campaign.
 
 ## Stores without Shopify
 
 <Callout type="warn" title="Attributed sales are not supported yet">
-Triple Whale only attributes a sale when it receives two things: the purchase from the pixel, and a matching order record. On a Shopify store the order record comes from Shopify. On any other store it has to be sent to [Triple Whale's Orders API](https://triplewhale.readme.io/reference/pixel-setup-guide-for-custom-sales-platform), and NEXT does not send orders there. Without Shopify, Triple Whale gets the pixel events but no orders, so funnel sales will not be attributed to your ads.
+Triple Whale only attributes a sale when it receives two things: the purchase from the pixel, and a matching order record. On a Shopify store the order record comes from Shopify. On any other store it has to be sent to [Triple Whale's Orders API](https://triplewhale.readme.io/reference/pixel-setup-guide-for-custom-sales-platform), and NEXT does not send orders there. Without Shopify, Triple Whale gets the pixel events but no orders, so campaign sales will not be attributed to your ads.
 </Callout>
 
-You can still load the pixel to see funnel visits in Triple Whale. Add only this line to your campaign, with your funnel's domain as the value, and leave out the other three lines from the Shop Sync setup:
+You can still load the pixel to see campaign visits in Triple Whale. Add only this line to your campaign, with your campaign's domain as the value, and leave out the other three lines from the Shop Sync setup:
 
 ```json
-"triplewhale_name": "funnel.example.com"
+"triplewhale_name": "campaign.example.com"
 ```
 
-The funnel then sends Triple Whale the visit, add to cart, and each purchase and upsell from the browser. Upsells arrive as an `UpsellPurchase` event. None of these turn into attributed revenue until Triple Whale also receives the order.
+The campaign then sends Triple Whale the visit, add to cart, and each purchase and upsell from the browser. Upsells arrive as an `UpsellPurchase` event. None of these turn into attributed revenue until Triple Whale also receives the order.
 
 If Triple Whale attribution matters for a store without Shopify, use Shop Sync to send the orders to a Shopify store connected to Triple Whale, and follow the setup above.
 
@@ -113,5 +113,5 @@ If Triple Whale attribution matters for a store without Shopify, use Shop Sync t
 | --- | --- | --- |
 | The pixel is not on the page | `triplewhale_name` is missing or empty | Add it and rebuild |
 | Data lands in the wrong Triple Whale shop | `triplewhale_name` does not match your Triple Whale snippet | Copy `TripleName` from the snippet again |
-| Visits show in Triple Whale but no sales are attributed, on a store without Shopify | Triple Whale gets no order record for the funnel's sales | Not supported yet. See [Stores without Shopify](#stores-without-shopify) |
+| Visits show in Triple Whale but no sales are attributed, on a store without Shopify | Triple Whale gets no order record for the campaign's sales | Not supported yet. See [Stores without Shopify](#stores-without-shopify) |
 | Meta counts each order twice | Triple Whale Sonar and the NEXT Meta Pixel app both send it to Meta | Exclude orders tagged `NEXT` in Sonar, or use only one of the two |

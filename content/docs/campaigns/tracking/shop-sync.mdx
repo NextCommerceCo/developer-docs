@@ -1,6 +1,6 @@
 ---
 title: Tracking on Shop Sync stores
-description: How to avoid counting funnel sales twice when Shop Sync copies your NEXT campaign orders into Shopify, and where to find the guide for putting a click ID on the Shopify order.
+description: How to avoid counting campaign sales twice when Shop Sync copies your NEXT campaign orders into Shopify, and where to find the guide for putting a click ID on the Shopify order.
 sidebar_label: Shop Sync stores
 audience: [merchant, developer]
 last_verified: 2026-11-16
@@ -9,7 +9,7 @@ tags:
 ---
 import { Callout } from 'fumadocs-ui/components/callout';
 
-Shop Sync copies your funnel orders into Shopify. That creates one risk for tracking: a sale can be reported twice, once by your funnel and once by a Shopify app that sees the copied order.
+Shop Sync copies your campaign orders into Shopify. That creates one risk for tracking: a sale can be reported twice, once by your campaign and once by a Shopify app that sees the copied order.
 
 This page shows which Shopify tools see those orders, and what to turn off so each sale is counted once.
 
@@ -26,9 +26,9 @@ For everything else about these orders, such as finding one by its PO number or 
 
 When Shop Sync creates the order, Shopify notifies every app that listens for new orders. Shopify calls that notification a webhook.
 
-**Any tool that uses Shopify order webhooks creates its own purchase event for the synced order, with its own ID.** It builds that ID from Shopify's order details, which did not exist when your funnel reported the sale. The two IDs can never match, so the ad platform sees two separate purchases and counts both.
+**Any tool that uses Shopify order webhooks creates its own purchase event for the synced order, with its own ID.** It builds that ID from Shopify's order details, which did not exist when your campaign reported the sale. The two IDs can never match, so the ad platform sees two separate purchases and counts both.
 
-| Tool | Reports funnel orders? |
+| Tool | Reports campaign orders? |
 | --- | --- |
 | Tracking apps that send purchases from Shopify order webhooks | Yes, as their own purchase with their own ID |
 | Triple Whale and Northbeam, connected to Shopify | Yes, they read the Shopify order |
@@ -36,7 +36,7 @@ When Shop Sync creates the order, Shopify notifies every app that listens for ne
 | Shopify's own Facebook & Instagram channel | No. It follows the Shopify checkout, which the shopper never used |
 | Pixels on your Shopify storefront or checkout | No. The shopper never visits those pages |
 
-For a tool not listed here, ask one question: does it listen for Shopify orders, or does it only run on Shopify pages? If it listens for orders, it reports funnel sales too.
+For a tool not listed here, ask one question: does it listen for Shopify orders, or does it only run on Shopify pages? If it listens for orders, it reports campaign sales too.
 
 ## Count each sale once
 
@@ -44,17 +44,17 @@ For each platform, choose one thing to report the purchase.
 
 | Platform | Report the purchase from | Turn off |
 | --- | --- | --- |
-| Meta | Your funnel and the NEXT Meta Pixel app | Any Shopify app that also sends purchases to the same Meta pixel. Exclude orders tagged `NEXT` in that app |
-| Triple Whale | Shopify | The funnel's purchase. See [Triple Whale](/docs/campaigns/tracking/triple-whale) |
-| Northbeam | Shopify | The funnel's purchase. See [Northbeam](/docs/campaigns/tracking/more-integrations#northbeam-on-a-shop-sync-store) |
-| Google Analytics 4 and Google Ads | Your funnel | Any Shopify Google app that also reports these orders. Exclude orders tagged `NEXT` |
-| TikTok | Your funnel | Any Shopify TikTok app that also reports these orders. Exclude orders tagged `NEXT` |
+| Meta | Your campaign and the NEXT Meta Pixel app | Any Shopify app that also sends purchases to the same Meta pixel. Exclude orders tagged `NEXT` in that app |
+| Triple Whale | Shopify | The campaign's purchase. See [Triple Whale](/docs/campaigns/tracking/triple-whale) |
+| Northbeam | Shopify | The campaign's purchase. See [Northbeam](/docs/campaigns/tracking/more-integrations#northbeam-on-a-shop-sync-store) |
+| Google Analytics 4 and Google Ads | Your campaign | Any Shopify Google app that also reports these orders. Exclude orders tagged `NEXT` |
+| TikTok | Your campaign | Any Shopify TikTok app that also reports these orders. Exclude orders tagged `NEXT` |
 
 <Callout type="warn" title="Meta cannot merge two server senders">
-If a Shopify app sends purchases to Meta and cannot exclude orders tagged `NEXT`, let that app be the only one. Turn off the NEXT Meta Pixel app, and stop the funnel's purchase with `blockedEvents: ['dl_purchase']` as shown in the [Meta](/docs/campaigns/tracking/meta#count-each-purchase-once) guide.
+If a Shopify app sends purchases to Meta and cannot exclude orders tagged `NEXT`, let that app be the only one. Turn off the NEXT Meta Pixel app, and stop the campaign's purchase with `blockedEvents: ['dl_purchase']` as shown in the [Meta](/docs/campaigns/tracking/meta#count-each-purchase-once) guide.
 </Callout>
 
-To stop the funnel reporting purchases to a platform, add its line to your campaign in `_data/campaigns.json`:
+To stop the campaign reporting purchases to a platform, add its line to your campaign in `_data/campaigns.json`:
 
 | Platform | Line |
 | --- | --- |
@@ -63,7 +63,7 @@ To stop the funnel reporting purchases to a platform, add its line to your campa
 | Google Analytics 4 | `"ga4_blocked_events": "dl_purchase, dl_upsell_purchase"` |
 | TikTok | `"tiktok_blocked_events": "dl_purchase, dl_upsell_purchase"` |
 
-Before you launch, place one order, send it for fulfillment, and check each platform shows it once. Repeat this check whenever you install a new Shopify app that tracks orders, because it may start reporting funnel sales too.
+Before you launch, place one order, send it for fulfillment, and check each platform shows it once. Repeat this check whenever you install a new Shopify app that tracks orders, because it may start reporting campaign sales too.
 
 ## Put a click ID on the Shopify order
 

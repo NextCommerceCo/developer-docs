@@ -1,6 +1,6 @@
 ---
 title: Everflow
-description: Report NEXT Campaigns funnel sales to Everflow with the Everflow app, for both redirect links and direct links, and avoid duplicate or missing conversions.
+description: Report NEXT Campaigns sales to Everflow with the Everflow app, for both redirect links and direct links, and avoid duplicate or missing conversions.
 sidebar_label: Everflow
 audience: [merchant, developer]
 last_verified: 2026-11-16
@@ -16,7 +16,7 @@ Everflow pays affiliates for sales, so a missing or duplicated conversion costs 
 Everflow gives every ad click an ID, called the transaction ID. To report a sale, Everflow needs that same ID back.
 
 1. The shopper clicks an affiliate link, and Everflow creates a transaction ID.
-2. Your funnel saves the transaction ID on the order.
+2. Your campaign saves the transaction ID on the order.
 3. The NEXT Everflow app sends the sale to Everflow from NEXT's servers, with that ID.
 
 The rule that keeps this working: **one order, one transaction ID, one thing reporting the sale.**
@@ -31,7 +31,7 @@ The rule that keeps this working: **one order, one transaction ID, one thing rep
 ## Before you start
 
 - Your Everflow network ID and postback URL, from your Everflow account or your affiliate network.
-- A funnel that is ready for tracking. See [Set up tracking](/docs/campaigns/tracking/getting-started).
+- A campaign that is ready for tracking. See [Set up tracking](/docs/campaigns/tracking/getting-started).
 
 ## Set up the Everflow app
 
@@ -54,26 +54,26 @@ Which setup you need depends on how your affiliate links work.
 
 | | Redirect links | Direct links |
 | --- | --- | --- |
-| How the shopper arrives | Through Everflow first, then to your funnel | Straight to your funnel |
+| How the shopper arrives | Through Everflow first, then to your campaign | Straight to your campaign |
 | Where the transaction ID comes from | It is on the link, as `evclid` | Everflow's click script creates it in the browser |
-| What you add to the funnel | Nothing | The bridge snippet |
+| What you add to the campaign | Nothing | The bridge snippet |
 | Use it when | The ad platform allows a redirecting link | The ad platform does not. Google Ads requires the final URL to stay on one domain |
 
 ### Redirect links
 
-Set up your Everflow offer so the link to your funnel carries Everflow's transaction ID in a parameter named `evclid`:
+Set up your Everflow offer so the link to your campaign carries Everflow's transaction ID in a parameter named `evclid`:
 
 ```text
-https://funnel.example.com/?evclid=EVERFLOW_TRANSACTION_ID
+https://campaign.example.com/?evclid=EVERFLOW_TRANSACTION_ID
 ```
 
 Use Everflow's transaction ID macro for the value. See Everflow's [guide to parameters and macros](https://helpdesk.everflow.io/en/articles/6173403-a-guide-to-parameters-and-macros).
 
-The funnel saves it on the order by itself. Nothing else is needed.
+The campaign saves it on the order by itself. Nothing else is needed.
 
 ### Direct links
 
-With a direct link there is no `evclid`. Everflow's click script, which your affiliate partner usually runs in their own Google Tag Manager container, creates the transaction ID when the page loads. That ID then has to be handed to the funnel, or the order has no ID and nothing is reported.
+With a direct link there is no `evclid`. Everflow's click script, which your affiliate partner usually runs in their own Google Tag Manager container, creates the transaction ID when the page loads. That ID then has to be handed to the campaign, or the order has no ID and nothing is reported.
 
 Keep the partner's own `EF.click` call as it is, and add this to what happens after it. It saves the ID and puts it on the order:
 
@@ -110,7 +110,7 @@ Direct links are less reliable than redirect links. If the click script does not
 
 ## Affiliate details on the link
 
-The funnel also saves the affiliate (`aff` or `affid`) and sub-affiliate values (`sub1` to `sub5`) from the link onto the order. See the SDK's [attribution parameters](https://cart-sdk.nextcommerce.com/v0.4.43/reference/url-parameters#attribution).
+The campaign also saves the affiliate (`aff` or `affid`) and sub-affiliate values (`sub1` to `sub5`) from the link onto the order. See the SDK's [attribution parameters](https://cart-sdk.nextcommerce.com/v0.4.43/reference/url-parameters#attribution).
 
 ## What the app sends
 
@@ -172,7 +172,7 @@ If the second network's ID ends up in `evclid`, its sales are sent to the first 
 ## Verify it works
 
 1. Turn on **Enable S2S Postback for test orders** in the app.
-2. Open your funnel through an Everflow test link, in a new private window.
+2. Open your campaign through an Everflow test link, in a new private window.
 3. Place an order with a [test card](/docs/testing).
 4. Open the order in your store dashboard. Its attribution should show an Everflow transaction ID.
 5. In Everflow, search for that transaction ID. You should see one conversion with your order number as the Order ID.

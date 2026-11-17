@@ -1,6 +1,6 @@
 ---
 title: Google Tag Manager
-description: Send NEXT Campaigns funnel events to your own Google Tag Manager container, and build tags on them.
+description: Send your campaign's events to your own Google Tag Manager container, and build tags on them.
 sidebar_label: Google Tag Manager
 audience: [merchant, developer]
 last_verified: 2026-11-16
@@ -9,16 +9,16 @@ tags:
 ---
 import { Callout } from 'fumadocs-ui/components/callout';
 
-Google Tag Manager (GTM) does not report anything by itself. It is a container for your own tags. Your funnel sends its events to GTM, and the tags you build decide which platforms hear about them.
+Google Tag Manager (GTM) does not report anything by itself. It is a container for your own tags. Your campaign sends its events to GTM, and the tags you build decide which platforms hear about them.
 
 Use GTM when you want to manage tags yourself, or for a platform that has no guide in this section.
 
 ## Before you start
 
 - A GTM web container and its ID, which looks like `GTM-XXXXXXX`.
-- A funnel that is ready for tracking. See [Set up tracking](/docs/campaigns/tracking/getting-started).
+- A campaign that is ready for tracking. See [Set up tracking](/docs/campaigns/tracking/getting-started).
 
-The **Google Tag Manager** store app covers your NEXT storefront, not funnels.
+The **Google Tag Manager** app you set up under **Apps** in your NEXT dashboard only adds its script to your Storefront. It is not added to your Campaigns, so follow this page to add GTM to your campaign.
 
 ## Set up
 
@@ -35,7 +35,7 @@ Setup has two parts, and you need both.
 }
 ```
 
-2. In `assets/config.js`, switch `gtm` on. This makes the funnel send its events to the container:
+2. In `assets/config.js`, switch `gtm` on. This makes the campaign send its events to the container:
 
 ```js title="assets/config.js"
 // Inside analytics.providers:
@@ -47,7 +47,7 @@ gtm: {
 3. Build with `npm run build` and deploy.
 
 <Callout type="warn" title="Both parts are needed">
-With only `gtm_id`, the container loads but receives no funnel events. With only the `config.js` setting, the events are sent but there is no container to receive them.
+With only `gtm_id`, the container loads but receives no campaign events. With only the `config.js` setting, the events are sent but there is no container to receive them.
 </Callout>
 
 ## Events you can build tags on
@@ -98,7 +98,7 @@ The events also carry the shopper's email, phone, name and address under `user_p
 - The amount is the item prices only. Add `ecommerce.shipping` if your platform should see shipping. On a store that shows prices without tax, add `ecommerce.tax` as well.
 
 <Callout type="warn" title="Send each platform one purchase">
-If a platform is already turned on in your funnel, for example GA4 or TikTok, do not also send it purchases from GTM. See [Send each purchase from one place](/docs/campaigns/tracking#send-each-purchase-from-one-place).
+If a platform is already turned on in your campaign, for example GA4 or TikTok, do not also send it purchases from GTM. See [Send each purchase from one place](/docs/campaigns/tracking#send-each-purchase-from-one-place).
 </Callout>
 
 ### Google Ads conversions
@@ -109,7 +109,7 @@ Do this only if you are not already importing purchases into Google Ads from GA4
 
 ## Verify it works
 
-1. Start **Preview** mode in your GTM container and open your funnel.
+1. Start **Preview** mode in your GTM container and open your campaign.
 2. You should see `dl_user_data` first, then the other events as you move through the funnel.
 3. Place an order with a [test card](/docs/testing). On the next page, `dl_purchase` appears with the order number.
 4. Accept an upsell. `dl_upsell_purchase` appears on the page after it.
@@ -125,6 +125,6 @@ Do this only if you are not already importing purchases into Google Ads from GA4
 
 More help is in [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting).
 
-## Hand-built funnels
+## Hand-built campaigns
 
-On a funnel that is not built from a starter template, add your GTM container to every page yourself, then switch `gtm` on as in step 2. See the [Campaign Cart SDK analytics docs](https://cart-sdk.nextcommerce.com/v0.4.43/reference/analytics-events).
+On a campaign that is not built from a starter template, add your GTM container to every page yourself, then switch `gtm` on as in step 2. See the [Campaign Cart SDK analytics docs](https://cart-sdk.nextcommerce.com/v0.4.43/reference/analytics-events).

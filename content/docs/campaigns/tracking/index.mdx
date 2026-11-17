@@ -1,6 +1,6 @@
 ---
 title: Tracking overview
-description: How ad and analytics tracking works on NEXT Campaigns funnels, which platforms are supported, and which guide to follow for Google, Meta, Everflow, Triple Whale, TikTok and more.
+description: How ad and analytics tracking works in NEXT Campaigns, which platforms are supported, and which guide to follow for Google, Meta, Everflow, Triple Whale, TikTok and more.
 sidebar_label: Overview
 audience: [merchant, developer]
 last_verified: 2026-11-16
@@ -9,20 +9,22 @@ tags:
 ---
 import { Callout } from 'fumadocs-ui/components/callout';
 
-Tracking tells your ad platforms which clicks turned into sales. A NEXT Campaigns funnel is made of your own pages, so tracking is something you turn on for each platform you advertise on. This section shows you how.
+Tracking tells your ad platforms which clicks turned into sales. A campaign in NEXT Campaigns is made of your own pages, so tracking is something you turn on for each platform you advertise on. This section shows you how.
 
 Start with [Set up tracking](/docs/campaigns/tracking/getting-started), then open the guide for your platform.
 
 ## How tracking works
 
 1. **A shopper clicks your ad.** The link carries details about the ad, such as UTM parameters and a click ID.
-2. **Your funnel remembers where they came from.** It keeps those details as the shopper moves from page to page, and saves them on the order.
-3. **Your funnel tells each platform what happened.** Page views, checkout steps and purchases are sent to the platforms you have turned on.
+2. **Your campaign remembers where they came from.** It keeps those details as the shopper moves from page to page, and saves them on the order.
+3. **Your campaign tells each platform what happened.** Page views, checkout steps and purchases are sent to the platforms you have turned on.
 
-You turn a platform on by adding its ID to your funnel. For a few platforms a NEXT store app also sends the purchase from NEXT's servers. Each guide tells you exactly what to add and where.
+You turn a platform on by adding its ID to your campaign. For a few platforms a NEXT store app also sends the purchase from NEXT's servers. Each guide tells you exactly what to add and where.
 
-<Callout type="warn" title="Storefront tracking apps do not cover funnels">
-Tracking apps you installed for your NEXT storefront, such as TikTok Pixel Events, Google Analytics 4 or Google Tag Manager, only run on the storefront. Set tracking up for your funnel with the guides below.
+<Callout type="warn" title="Apps in your dashboard do not add tracking to Campaigns">
+Tracking apps you install and set up under **Apps** in your NEXT dashboard, such as TikTok Pixel Events, Google Analytics 4, Google Tag Manager, AppLovin AXON and Taboola Pixel Events, only add their scripts to your Storefront. Their settings do not say this, but nothing from them is added to your Campaigns. To track a campaign, add each platform's tracking to the campaign itself, using the guides below.
+
+The exceptions are apps that send an order event from NEXT's servers after the order is placed: the Meta Pixel app's Conversions API purchase, Everflow and Klaviyo. Those cover campaign orders as well as Storefront orders.
 </Callout>
 
 ## Supported integrations
@@ -44,13 +46,13 @@ If your orders sync to Shopify through Shop Sync, also read [Tracking on Shop Sy
 
 Each platform should hear about a sale once. If two things report the same sale to the same platform, it is counted twice.
 
-A sale can be reported by your funnel pages, by a NEXT store app, and, on Shop Sync stores, by a Shopify app that sees the synced order. For each platform, pick one of them to report the purchase and turn the others off. The platform guides show how.
+A sale can be reported by your campaign pages, by a NEXT store app, and, on Shop Sync stores, by a Shopify app that sees the synced order. For each platform, pick one of them to report the purchase and turn the others off. The platform guides show how.
 
-Meta is the one exception: the funnel and the Meta Pixel app can both report the purchase, because they label it with the same ID and Meta merges the two. See the [Meta](/docs/campaigns/tracking/meta#count-each-purchase-once) guide.
+Meta is the one exception: the campaign and the Meta Pixel app can both report the purchase, because they label it with the same ID and Meta merges the two. See the [Meta](/docs/campaigns/tracking/meta#count-each-purchase-once) guide.
 
 ## Privacy and consent
 
-NEXT Campaigns does not include a cookie banner or consent tool. If your funnel needs one, add it to your pages and make sure it also stops the tracking scripts.
+NEXT Campaigns does not include a cookie banner or consent tool. If your campaign needs one, add it to your pages and make sure it also stops the tracking scripts.
 
 Some platforms can receive the shopper's email and phone to improve matching. Those settings are off unless you turn them on. Turn them on only when your privacy policy covers it.
 
@@ -61,7 +63,7 @@ Some platforms can receive the shopper's email and phone to improve matching. Th
 
 ## For developers
 
-The funnel's own events, their fields, and the ad details saved on each order are documented in the Campaign Cart SDK reference. The starter templates use SDK 0.4.43, so use the 0.4.43 pages:
+The campaign's own events, their fields, and the ad details saved on each order are documented in the Campaign Cart SDK reference. The starter templates use SDK 0.4.43, so use the 0.4.43 pages:
 
 | What you need | SDK reference |
 | --- | --- |

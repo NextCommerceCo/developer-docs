@@ -94,7 +94,7 @@ Triple Whale's Pixel Helper extension only works in a normal Chrome window. In T
 ## Stores without Shopify
 
 <Callout type="warn" title="Attributed sales are not supported yet">
-Triple Whale only attributes a sale when it receives two things: the purchase from the pixel, and a matching order record. On a Shopify store the order record comes from Shopify. On any other store it has to be sent to [Triple Whale's Orders API](https://triplewhale.readme.io/reference/pixel-setup-guide-for-custom-sales-platform), and NEXT does not send orders there. Without Shopify, Triple Whale gets the pixel events but no orders, so campaign sales will not be attributed to your ads.
+Triple Whale attributes a sale by connecting an order record to the shopper's visit. On a Shopify store the order record comes from Shopify. On any other store it has to be sent to [Triple Whale's Orders API](https://triplewhale.readme.io/reference/pixel-setup-guide-for-custom-sales-platform) alongside the pixel's purchase event, and NEXT does not send orders there. Without Shopify, Triple Whale gets the pixel events but no orders, so campaign sales will not be attributed to your ads.
 </Callout>
 
 You can still load the pixel to see campaign visits in Triple Whale. Add only this line to your campaign, with your campaign's domain as the value, and leave out the other three lines from the Shop Sync setup:

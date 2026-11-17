@@ -67,7 +67,7 @@ The two numbers should be close. If a platform shows noticeably more or fewer pu
 | One platform receives nothing | Its ID is missing from `_data/campaigns.json` | Add the ID and rebuild |
 | GTM or the Meta pixel loads but receives no events | It is switched off in `assets/config.js` | Switch it on. See [Google Tag Manager](/docs/campaigns/tracking/google-tag-manager#set-up) or [Meta](/docs/campaigns/tracking/meta#set-up) |
 | Checkout events arrive but no page views or purchases | `analytics.mode` in `assets/config.js` is not `'auto'` | Set it to `'auto'` |
-| A store app does nothing on the campaign | Tracking apps for your storefront do not cover Campaigns | Set the platform up with its guide in this section |
+| A store app does nothing on the campaign | Most tracking apps only add their scripts to your Storefront. A few, such as the Meta Pixel app's purchase, also cover campaign orders | Set the platform up with its guide in this section. See the [overview](/docs/campaigns/tracking#how-tracking-works) for the apps that cover campaign orders |
 | The checkout itself fails to load the cart | The campaign's domain is not in **Allowed Domains** | Add it in the Campaigns app under **Settings**, then **Allowed Domains** |
 
 ### Purchases are missing

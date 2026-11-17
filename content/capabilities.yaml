@@ -288,8 +288,12 @@ capabilities:
       - /docs/campaigns/admin-api
       - /docs/campaigns/tracking
       - /docs/campaigns/tracking/getting-started
-      - /docs/campaigns/tracking/triple-whale
+      - /docs/campaigns/tracking/google-tag-manager
+      - /docs/campaigns/tracking/google-analytics-4
       - /docs/campaigns/tracking/meta
+      - /docs/campaigns/tracking/everflow
+      - /docs/campaigns/tracking/triple-whale
+      - /docs/campaigns/tracking/more-integrations
       - /docs/campaigns/tracking/shop-sync
       - /docs/campaigns/tracking/testing-and-troubleshooting
     api_operations: [tag:campaigns]

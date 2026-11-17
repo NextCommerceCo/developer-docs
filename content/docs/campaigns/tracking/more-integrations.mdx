@@ -76,8 +76,8 @@ The **Taboola Pixel Events** app you set up under **Apps** in your NEXT dashboar
 
 - **What it tracks:** page views, product views, add to cart, checkout started, payment details and purchases.
 - **Upsells:** each accepted upsell counts as another purchase.
-- **Shopper details:** add `"axon_send_user_data": "true"` to send email, phone and customer ID with the purchase.
-- **Axon's cookie:** AppLovin [strongly recommends](https://support.applovin.com/en/growth/promoting-your-websites/track-and-optimize/google-tag-manager) that your site's server sets Axon's `_axwrt` cookie again as a one-year cookie named `axwrt`. A campaign built from a starter template is a static site, so this needs a server in front of it.
+- **Shopper details:** add `"axon_send_user_data": "true"` to send email, phone and customer ID with the purchase. Turn it on only when your privacy policy covers it. See [Privacy and consent](/docs/campaigns/tracking#privacy-and-consent).
+- **Axon's cookie (optional):** AppLovin [recommends](https://support.applovin.com/en/growth/promoting-your-websites/track-and-optimize/google-tag-manager) that your site's server sets Axon's `_axwrt` cookie again as a one-year cookie named `axwrt`. The starter templates do not do this. They are static sites, so it needs your own server in front of the campaign.
 
 The **AppLovin AXON** app you set up under **Apps** in your NEXT dashboard only adds its script to your Storefront. It is not added to your Campaigns, so add Axon to your campaign as shown above.
 

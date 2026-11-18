@@ -81,6 +81,7 @@ We also recommend processing events asynchronously so that spikes in delivery vo
 | `transaction.updated`     | Triggers when a payment transaction is updated. | [View Example](/docs/webhooks/reference/payments/transaction.updated) |
 | `subscription.created`    | Triggers when a new subscription is created. | [View Example](/docs/webhooks/reference/subscriptions/subscription.created) |
 | `subscription.updated`    | Triggers when an existing subscription is updated. | [View Example](/docs/webhooks/reference/subscriptions/subscription.updated) |
+| `subscription.upcoming_renewal` | Triggers once when an active subscription's next renewal is within 72 hours. | [View Example](/docs/webhooks/reference/subscriptions/subscription.upcoming_renewal) |
 | `store.updated`           | Triggers when store settings are updated. | [View Example](/docs/webhooks/reference/store/store.updated) |
 | `ticket.created`          | Triggers a new support ticket is created. |  [View Example](/docs/webhooks/reference/support/ticket.created) |
 | `ticket.updated`          | Triggers when an existing support ticket is updated. | [View Example](/docs/webhooks/reference/support/ticket.updated) |
@@ -88,7 +89,16 @@ We also recommend processing events asynchronously so that spikes in delivery vo
 <Callout type="info" title="Handling subscription charges">
 The `subscription` object on a `transaction.created` webhook links the charge to its subscription and identifies the billing cycle. See [Identifying Subscription Charges](/docs/admin-api/guides/subscription-management#identifying-subscription-charges).
 
-There is no renewal-specific event. A renewal charge arrives as `transaction.created` with `billing_cycle` of 1 or higher on that `subscription` object; the initial charge has `billing_cycle` 0.
+There is no renewal-specific charge event. A renewal charge arrives as `transaction.created` with `billing_cycle` of 1 or higher on that `subscription` object; the initial charge has `billing_cycle` 0.
+</Callout>
+
+<Callout type="info" title="Upcoming renewal notice">
+`subscription.upcoming_renewal` is sent ahead of the charge, so you can remind the customer or sync your own systems before the renewal runs. It fires for active subscriptions whose `next_renewal_date` falls within the next 72 hours.
+
+- The check runs hourly, so the event arrives between 71 and 72 hours before `next_renewal_date`. If the renewal date is set less than 72 hours out, it arrives within the hour.
+- It is sent once per renewal date. If `next_renewal_date` changes, the event fires again when the new date comes within 72 hours.
+- Paused, canceled, retrying and test subscriptions do not trigger it.
+- The payload `data` is the full subscription object, the same as `subscription.updated`.
 </Callout>
 
 <Callout type="info" title="Disputes include chargebacks">

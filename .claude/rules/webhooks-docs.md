@@ -39,7 +39,7 @@ Called by `tools/update_api_docs.py` during spec download. For each webhook even
 
 ## Webhook Event Registry
 
-All 24 events are defined in `tools/config.py` `WEBHOOKS` list. Each entry:
+All 25 events are defined in `tools/config.py` `WEBHOOKS` list. Each entry:
 
 ```python
 {
@@ -59,7 +59,7 @@ All 24 events are defined in `tools/config.py` `WEBHOOKS` list. Each entry:
 - **orders**: `order.created`, `order.updated`
 - **payments**: `dispute.created`, `dispute.updated`, `gateway.created`, `gateway.updated`, `transaction.created`, `transaction.updated`
 - **products**: `product.created`, `product.updated`, `product.deleted`
-- **subscriptions**: `subscription.created`, `subscription.updated`
+- **subscriptions**: `subscription.created`, `subscription.updated`, `subscription.upcoming_renewal`
 - **store**: `store.updated`
 - **support**: `ticket.created`, `ticket.updated`
 

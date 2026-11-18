@@ -4,9 +4,14 @@ description: Connect a Page Kit repository, verify a branch preview and configur
 audience: [developer]
 ---
 
-## Connect the repository
+## Import the campaign from GitHub
 
-Import an existing project from Git and select the repository and production branch. Set the base directory to the folder containing the build package.json. For a standard Page Kit project, enter `npm run build` as the build command and `_site` as the publish directory. Match the Node version used locally. Start the deployment and check the build log for successful publication.
+1. In the Netlify team that will own the campaign, open **Projects → Add new project → Import an existing project**. Choose **GitHub**, authorize Netlify to access the campaign repository, then select it.
+2. Choose the branch to publish. Leave **Base directory** blank if the Page Kit build runs at the repository root. For a standalone project in a subfolder, enter that folder’s path.
+3. Set **Build command** to `npm run build` and **Publish directory** to `_site`. Netlify resolves the publish directory relative to the base directory. If the repository contains a `netlify.toml`, check its build settings first. They override matching dashboard values.
+4. Select **Publish**. When the deployment succeeds, open the campaign’s landing path on the assigned hostname and check that its images and checkout link load.
+
+See [Netlify’s Git import walkthrough](https://docs.netlify.com/start/quickstarts/deploy-from-repository/) and [build settings](https://docs.netlify.com/build/configure-builds/overview/).
 
 ## Review a branch preview
 

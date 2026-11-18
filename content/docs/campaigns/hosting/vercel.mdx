@@ -4,9 +4,16 @@ description: Connect a Page Kit repository, verify a branch preview and configur
 audience: [developer]
 ---
 
-## Connect the repository
+## Import the campaign from GitHub
 
-Use a plan that permits commercial campaigns. [Hobby is for personal, non-commercial use](https://vercel.com/docs/plans/hobby). Import the Git repository as a new project and choose framework preset **Other**. Set the root directory to the folder containing the build package.json. For a standard Page Kit project, enter `npm run build` as the build command and `_site` as the output directory. Match the Node version used locally. Start the deployment and check the build log for successful publication.
+Choose a Vercel team on a plan that permits commercial campaigns. [Vercel Hobby plan terms](https://vercel.com/docs/plans/hobby).
+
+1. In the team dashboard, choose **Add New… → Project**. Under **Import Git Repository**, connect GitHub if prompted. Select the GitHub account or organization that owns the campaign and click **Import** beside its repository. If the repo is missing, check the Vercel GitHub App’s repository access.
+2. Set **Root Directory** to the folder where the Page Kit build runs. Keep the repository root for a standard project. Choose **Other** for **Framework Preset**.
+3. In the build settings, enable the overrides for **Build Command** and **Output Directory**. Enter `npm run build` and `_site`, respectively. With the Other preset, Vercel otherwise serves `public` if present or the project root. Keep the default install command for a standard npm project. If the repo has a `vercel.json`, check its `buildCommand` and `outputDirectory` overrides.
+4. Select **Deploy**. Once the deployment is ready, open the campaign’s landing path on its assigned hostname and check that its images and checkout link load.
+
+See the [Vercel import screen](https://vercel.com/new) and [build settings](https://vercel.com/docs/builds/configure-a-build).
 
 ## Review a branch preview
 

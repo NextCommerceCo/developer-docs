@@ -16,7 +16,7 @@ Push a branch and open its preview deployment. For repeat QA use the branch alia
 
 Under **Custom domains**, add the campaign subdomain first. Follow the DNS instructions for that hostname and wait for activation.
 
-Include a `_redirects` file in the final `_site/` output. For a campaign subdomain whose root should send visitors to the storefront, use the rule `/ https://shop.example.com/ 301`, replacing the destination. Keep campaign paths outside that rule.
+Commit `_redirects` in the build directory. After `npm run build`, have the host run `cp _redirects _site/_redirects` so each deployment includes the rules. For a campaign subdomain whose root should send visitors to the storefront, use the rule `/ https://shop.example.com/ 301`, replacing the destination. Keep campaign paths outside that rule.
 
 ## Release and rollback
 

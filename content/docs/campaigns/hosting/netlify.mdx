@@ -16,7 +16,7 @@ Open a pull request targeting the production branch. Follow the Netlify Deploy P
 
 In Domain management, add the campaign hostname as a production domain. Apply the DNS record Netlify shows and check certificate provisioning.
 
-Put a `_redirects` file in the publish directory on every build. For a moved ad path, a rule such as `/products/old-name /spring-offer/landing/ 301` redirects that path. Test with the actual ad parameters.
+Commit `_redirects` in the build directory. After `npm run build`, have the host run `cp _redirects _site/_redirects` so each deployment includes the rules. For a moved ad path, a rule such as `/products/old-name /spring-offer/landing/ 301` redirects that path. Test with the actual ad parameters.
 
 ## Release and rollback
 

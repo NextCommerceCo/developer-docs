@@ -1,0 +1,25 @@
+---
+title: Deploy a campaign to Netlify
+description: Connect a Page Kit repository, verify a branch preview and configure a campaign domain on Netlify.
+audience: [developer]
+---
+
+## Connect the repository
+
+Import an existing project from Git and select the repository and production branch. Set the base directory to the folder containing the build package.json. For a standard Page Kit project, enter `npm run build` as the build command and `_site` as the publish directory. Match the Node version used locally. Start the deployment and check the build log for successful publication.
+
+## Review a branch preview
+
+Open a pull request targeting the production branch. Follow the Netlify Deploy Preview link for that PR. Copy the hostname and complete the [preview checks](/docs/campaigns/hosting#verify-the-preview). Record the commit and tested campaign URL for the person approving release.
+
+## Connect the live hostname
+
+In Domain management, add the campaign hostname as a production domain. Apply the DNS record Netlify shows and check certificate provisioning.
+
+Put a `_redirects` file in the publish directory on every build. For a moved ad path, a rule such as `/products/old-name /spring-offer/landing/ 301` redirects that path. Test with the actual ad parameters.
+
+## Release and rollback
+
+Merging to the configured production branch publishes the new build. Follow the [launch checks](/docs/campaigns/hosting#launch-and-recover) before directing ads to it. Open Deploys, select the previous successful production deploy and publish it.
+
+See the [Netlify deployment documentation](https://docs.netlify.com/deploy/deploy-types/deploy-previews/).

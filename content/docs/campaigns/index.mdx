@@ -291,25 +291,22 @@ Add `--json` for machine-readable stdout. See the [page-kit CLI reference](https
 
 ## Hosting
 
-`npm run build` outputs a fully static site to `_site/` — no server, no runtime, just HTML, CSS, JS, and images. That means you can host it on any static host. Configure your provider with:
-
-- **Build command:** `npm run build`
-- **Publish directory:** `_site`
-
-Make sure to add the host's domain (e.g. `*.netlify.app`, your custom domain) to your campaign's **authorized domains** in the Campaigns App so the SDK can call the API from that origin.
+Choose a host and follow the [campaign hosting guide](/docs/campaigns/hosting) to publish a preview, authorize its domain and check the campaign before launch.
 
 ### Netlify
 
-[Netlify](https://www.netlify.com/) — connect your Git repo, Netlify auto-detects the build command and serves `_site/` on a `*.netlify.app` subdomain (custom domains free). Best for: zero-config Git deploys, branch previews, instant rollbacks.
+[Deploy a campaign to Netlify](/docs/campaigns/hosting/netlify).
 
 ### Cloudflare Pages
 
-[Cloudflare Pages](https://pages.cloudflare.com/) — connect your Git repo, set framework preset to "None", build command to `npm run build`, output directory to `_site`. Best for: global edge network, generous free tier, fast cold starts via Cloudflare's CDN.
+[Deploy a campaign to Cloudflare Pages](/docs/campaigns/hosting/cloudflare-pages).
+
+### Vercel
+
+[Deploy a campaign to Vercel](/docs/campaigns/hosting/vercel).
 
 ### Render
 
 [Render](https://render.com/) — create a new **Static Site**, point it at your repo, set publish path to `_site`. Best for: a single dashboard alongside any backend services you already run on Render.
 
-### Other static hosts
-
-The same `_site/` output works on **[Vercel](https://vercel.com/)**, **[GitHub Pages](https://pages.github.com/)**, **[AWS S3 + CloudFront](https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html)**, **[Surge](https://surge.sh/)**, or any host that serves static files. There is no server-side rendering and no runtime dependency on Node, so any plain static host will do.
+Other static hosting options include AWS S3 with CloudFront and Surge. GitHub Pages excludes commercial transaction sites under its [usage limits](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits).

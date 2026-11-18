@@ -1,0 +1,25 @@
+---
+title: Deploy a campaign to Vercel
+description: Connect a Page Kit repository, verify a branch preview and configure a campaign domain on Vercel.
+audience: [developer]
+---
+
+## Connect the repository
+
+Use a plan that permits commercial campaigns. [Hobby is for personal, non-commercial use](https://vercel.com/docs/plans/hobby). Import the Git repository as a new project and choose framework preset **Other**. Set the root directory to the folder containing the build package.json. For a standard Page Kit project, enter `npm run build` as the build command and `_site` as the output directory. Match the Node version used locally. Start the deployment and check the build log for successful publication.
+
+## Review a branch preview
+
+Push a non-production branch and open the Preview deployment. If Deployment Protection is enabled, arrange reviewer access before running browser QA. Copy the hostname and complete the [preview checks](/docs/campaigns/hosting#verify-the-preview). Record the commit and tested campaign URL for the person approving release.
+
+## Connect the live hostname
+
+Under project Settings → Domains, add the campaign hostname to Production. Apply the DNS record Vercel shows and wait for verification and HTTPS.
+
+Define legacy paths in the project’s `vercel.json` redirects array. For example, an entry with source `/products/old-name`, destination `/spring-offer/landing/` and permanent set to true returns a permanent redirect.
+
+## Release and rollback
+
+Merging to the configured production branch publishes the new build. Follow the [launch checks](/docs/campaigns/hosting#launch-and-recover) before directing ads to it. Use Instant Rollback to restore an eligible previous production deployment, or revert the source change and redeploy.
+
+See the [Vercel deployment documentation](https://vercel.com/docs/deployments/environments).

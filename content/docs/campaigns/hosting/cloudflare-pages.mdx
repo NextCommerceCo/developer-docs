@@ -1,0 +1,25 @@
+---
+title: Deploy a campaign to Cloudflare Pages
+description: Connect a Page Kit repository, verify a branch preview and configure a campaign domain on Cloudflare Pages.
+audience: [developer]
+---
+
+## Connect the repository
+
+In Workers & Pages, create a **Pages** project, connect Git and select the campaign repository. Select the production branch and framework preset **None**. Set the root directory to the folder containing the build package.json. For a standard Page Kit project, enter `npm run build` as the build command and `_site` as the output directory. Match the Node version used locally. Start the deployment and check the build log for successful publication.
+
+## Review a branch preview
+
+Push a branch and open its preview deployment. For repeat QA use the branch alias shown by Pages. Copy the hostname and complete the [preview checks](/docs/campaigns/hosting#verify-the-preview). Record the commit and tested campaign URL for the person approving release.
+
+## Connect the live hostname
+
+Under **Custom domains**, add the campaign subdomain first. Follow the DNS instructions for that hostname and wait for activation.
+
+Include a `_redirects` file in the final `_site/` output. For a campaign subdomain whose root should send visitors to the storefront, use the rule `/ https://shop.example.com/ 301`, replacing the destination. Keep campaign paths outside that rule.
+
+## Release and rollback
+
+Merging to the configured production branch publishes the new build. Follow the [launch checks](/docs/campaigns/hosting#launch-and-recover) before directing ads to it. In Deployments, select the known-good production deployment and roll back to it.
+
+See the [Cloudflare Pages deployment documentation](https://developers.cloudflare.com/pages/configuration/preview-deployments/).

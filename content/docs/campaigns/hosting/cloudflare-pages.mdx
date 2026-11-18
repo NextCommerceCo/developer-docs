@@ -4,9 +4,15 @@ description: Connect a Page Kit repository, verify a branch preview and configur
 audience: [developer]
 ---
 
+Cloudflare recommends Workers for new projects. A Worker can serve the Page Kit build as static assets. Use the steps below when your team has chosen Pages. See [Cloudflare’s platform guidance](https://developers.cloudflare.com/pages/get-started/) and [Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/).
+
 ## Connect the repository
 
-In Workers & Pages, create a **Pages** project, connect Git and select the campaign repository. Select the production branch and framework preset **None**. Set the root directory to the folder containing the build package.json. For a standard Page Kit project, enter `npm run build` as the build command and `_site` as the output directory. Match the Node version used locally. Start the deployment and check the build log for successful publication.
+1. Open **Workers & Pages** in the Cloudflare dashboard and select **Create application**. Choose **Pages**.
+2. Choose the Git import option. Cloudflare’s [static HTML guide](https://developers.cloudflare.com/pages/framework-guides/deploy-anything/) calls it **Import an existing Git repository**. Its [Git integration guide](https://developers.cloudflare.com/pages/get-started/git-integration/) calls it **Connect to Git**.
+3. Authorize access to the campaign repository, select it and choose **Begin setup**.
+4. Select your production branch. For a standard Page Kit project, leave the framework preset unset, enter `npm run build` under **Build command** and `_site` under **Build output directory**. The root directory defaults to the repository root. For a nested project, set **Root directory (advanced) → Path** to the folder containing the build’s `package.json`. Match the Node version used locally.
+5. Choose **Save and Deploy**. After the build succeeds, open the assigned `pages.dev` hostname at the campaign’s landing path.
 
 ## Review a branch preview
 

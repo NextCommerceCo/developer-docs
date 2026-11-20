@@ -44,6 +44,8 @@ title: Start or continue a campaign with an agent
 description: Start from a funnel URL, existing repository or Map, prepare a local preview, and leave a handoff another agent can continue
 ---
 
+Start here to build or change a campaign with your own coding agent. Bring a URL, design, existing repository or saved Map; store access can follow when you are ready to connect commerce.
+
 Give your coding agent this instruction:
 
 \`\`\`text
@@ -51,6 +53,12 @@ Read https://developers.nextcommerce.com/agent-setup/prompt.md and help me start
 \`\`\`
 
 The fetched file is plain Markdown at a stable URL. It uses the same source as the instructions below, contains no credentials, and keeps the current CLI and Campaigns docs authoritative. It covers campaign intake, existing builds and continuation. It does not require a new project or store credentials before source inspection and local planning.
+
+Choose the continuation that fits your project:
+
+- **New campaign:** inspect the source and prepare a local preview. Use the [Page Kit guide](/docs/campaigns/page-kit) for a new static project, or the [Page Kit setup recipe](https://campaigns.nextcommerce.com/start/) for a new static project with its campaign and offers already configured.
+- **Existing campaign:** keep its build and host, inspect the current revision, and follow the [maintenance procedure](https://github.com/NextCommerceCo/campaigns-os/blob/main/docs/build-packet.md#changing-a-campaign-after-handoff) when it uses Campaigns OS.
+- **Saved Map:** open its Handoff in the [Workspace](https://campaign-map.nextcommerce.com/), the optional visual planning tool, and give the saved plan to your agent.
 
 ${humanInstructions}`;
 

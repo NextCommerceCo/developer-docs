@@ -5,6 +5,7 @@
     "description": "Campaign funnels & checkout",
     "pages": [
         "---Guides---",
+        "[Start with your agent](/docs/agent-setup)",
         "index",
         "templates",
         "page-kit",

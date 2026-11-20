@@ -1,0 +1,23 @@
+---
+title: Host a NEXT campaign
+description: Publish Page Kit output and verify the preview and live campaign domains.
+audience: [developer]
+---
+
+Choose [Cloudflare Workers](/docs/campaigns/hosting/cloudflare-workers), [Netlify](/docs/campaigns/hosting/netlify), or [Vercel](/docs/campaigns/hosting/vercel). For Render and other static hosts, use the shared build, preview and launch steps below. The recipes assume a Page Kit project. For an existing custom build, use the repository’s own build command, working directory and output folder.
+
+## Prepare the build
+
+From the folder containing the campaign’s package.json and lockfile, run `npm ci` and `npm run build`. Locate the landing and checkout pages under `_site/`. Use the same Node major version on the host. Publish only the build output. Page Kit uses the public Campaign API key in the browser. Keep private Admin API tokens out of source, build output and client settings.
+
+## Verify the preview
+
+1. Open the host’s preview for the reviewed commit. In Campaigns App → Settings → Allowed Domains, register the **exact hostname** as **Development**. For a changing preview URL, register the new hostname or use a stable branch hostname.
+2. Open the actual campaign path, such as `/spring-offer/landing/`. Verify styles, images, package prices and navigation through checkout. Paste a representative old ad URL with test click parameters and confirm the intended landing page receives them. If the original hostname serves the storefront, configure the redirect there.
+3. Run approved checkout-path tests against the preview. Confirm test orders in the dashboard and coordinate fulfillment cleanup. Development domains exclude NEXT analytics visits, but vendor pixels can still fire. See [tracking QA](/docs/campaigns/tracking/testing-and-troubleshooting) and [test orders](/docs/testing).
+
+## Launch and recover
+
+Have the domain owner confirm the campaign hostname before changing DNS. Check HTTPS and the same landing and checkout paths on that hostname. Get payment-method confirmation for this store. With launch approval, mark the live hostname **Production** in Allowed Domains and send traffic to the verified address. See [campaign domains](/docs/campaigns#domains).
+
+If checkout breaks, pause traffic, restore a known-good deployment and verify the public URL. A host rollback restores page files. Review any changed prices or offers separately in Campaigns App.

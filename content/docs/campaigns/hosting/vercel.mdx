@@ -1,0 +1,32 @@
+---
+title: Deploy a campaign to Vercel
+description: Connect a Page Kit repository, verify a branch preview and configure a campaign domain on Vercel.
+audience: [developer]
+---
+
+## Import the campaign from GitHub
+
+Choose a Vercel team on a plan that permits commercial campaigns. [Vercel Hobby plan terms](https://vercel.com/docs/plans/hobby).
+
+1. In the team dashboard, choose **Add New… → Project**. Under **Import Git Repository**, connect GitHub if prompted. Select the GitHub account or organization that owns the campaign and click **Import** beside its repository. If the repo is missing, check the Vercel GitHub App’s repository access.
+2. Set **Root Directory** to the folder where the Page Kit build runs. Keep the repository root for a standard project. Choose **Other** for **Framework Preset**.
+3. In the build settings, enable the overrides for **Build Command** and **Output Directory**. Enter `npm run build` and `_site`, respectively. With the Other preset, Vercel otherwise serves `public` if present or the project root. Keep the default install command for a standard npm project. If the repo has a `vercel.json`, check its `buildCommand` and `outputDirectory` overrides.
+4. Select **Deploy**. Once the deployment is ready, open the campaign’s landing path on its assigned hostname and check that its images and checkout link load.
+
+See the [Vercel import screen](https://vercel.com/new) and [build settings](https://vercel.com/docs/builds/configure-a-build).
+
+## Review a branch preview
+
+Push a non-production branch and open the Preview deployment. If Deployment Protection is enabled, arrange reviewer access before running browser QA. Copy the hostname and complete the [preview checks](/docs/campaigns/hosting#verify-the-preview). Record the commit and tested campaign URL for the person approving release.
+
+## Connect the live hostname
+
+Under project Settings → Domains, add the campaign hostname to Production. Apply the DNS record Vercel shows and wait for verification and HTTPS.
+
+Define legacy paths in the project’s `vercel.json` redirects array. For example, an entry with source `/products/old-name`, destination `/spring-offer/landing/` and permanent set to true returns a permanent redirect.
+
+## Release and rollback
+
+Merging to the configured production branch publishes the new build. Follow the [launch checks](/docs/campaigns/hosting#launch-and-recover) before directing ads to it. Use Instant Rollback to restore an eligible previous production deployment, or revert the source change and redeploy.
+
+See the [Vercel deployment documentation](https://vercel.com/docs/deployments/environments).

@@ -8,6 +8,7 @@
         "index",
         "templates",
         "page-kit",
+        "hosting",
         "tracking",
         "[Playground](/playground)",
         "---Cart SDK---",

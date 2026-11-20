@@ -293,7 +293,7 @@ Every template also has access to an `environment` variable indicating the curre
 {% endunless %}
 ```
 
-Override the default by setting `CPK_ENV` — useful for build pipelines like Netlify or GitHub Pages where you want a custom value such as `staging`:
+Override the default by setting `CPK_ENV` — useful for build pipelines like Netlify or Cloudflare Workers where you want a custom value such as `staging`:
 
 ```bash
 CPK_ENV=staging npm run build
@@ -416,7 +416,7 @@ Already-optimized images are skipped and reported in a debug line above the summ
 npm run build
 ```
 
-Output is written to `_site/` — fully static, no server, no runtime. From there, push to any static host. See **Hosting** in [Getting Started](./) for provider-specific setup (Netlify, Cloudflare Pages, Render, Vercel, etc.).
+Output is written to `_site/` — fully static, no server, no runtime. From there, push to any static host. See **Hosting** in [Getting Started](./) for provider-specific setup (Netlify, Cloudflare Workers, Render, Vercel, etc.).
 
 The command exits `1` when any page fails to render, and `0` otherwise. Build warnings (below) never change the exit code.
 

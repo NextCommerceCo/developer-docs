@@ -1,0 +1,30 @@
+---
+title: Deploy a campaign to Netlify
+description: Connect a Page Kit repository, verify a branch preview and configure a campaign domain on Netlify.
+audience: [developer]
+---
+
+## Import the campaign from GitHub
+
+1. In the Netlify team that will own the campaign, open **Projects → Add new project → Import an existing project**. Choose **GitHub**, authorize Netlify to access the campaign repository, then select it.
+2. Choose the branch to publish. Leave **Base directory** blank if the Page Kit build runs at the repository root. For a standalone project in a subfolder, enter that folder’s path.
+3. Set **Build command** to `npm run build` and **Publish directory** to `_site`. Netlify resolves the publish directory relative to the base directory. If the repository contains a `netlify.toml`, check its build settings first. They override matching dashboard values.
+4. Select **Publish**. When the deployment succeeds, open the campaign’s landing path on the assigned hostname and check that its images and checkout link load.
+
+See [Netlify’s Git import walkthrough](https://docs.netlify.com/start/quickstarts/deploy-from-repository/) and [build settings](https://docs.netlify.com/build/configure-builds/overview/).
+
+## Review a branch preview
+
+Open a pull request targeting the production branch. Follow the Netlify Deploy Preview link for that PR. Copy the hostname and complete the [preview checks](/docs/campaigns/hosting#verify-the-preview). Record the commit and tested campaign URL for the person approving release.
+
+## Connect the live hostname
+
+In Domain management, add the campaign hostname as a production domain. Apply the DNS record Netlify shows and check certificate provisioning.
+
+Commit `_redirects` in the build directory. After `npm run build`, have the host run `cp _redirects _site/_redirects` so each deployment includes the rules. For a moved ad path, a rule such as `/products/old-name /spring-offer/landing/ 301` redirects that path. Test with the actual ad parameters.
+
+## Release and rollback
+
+Merging to the configured production branch publishes the new build. Follow the [launch checks](/docs/campaigns/hosting#launch-and-recover) before directing ads to it. Open Deploys, select the previous successful production deploy and publish it.
+
+See the [Netlify deployment documentation](https://docs.netlify.com/deploy/deploy-types/deploy-previews/).

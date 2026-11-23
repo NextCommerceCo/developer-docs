@@ -132,9 +132,11 @@ The pages above are wired up by the **Campaign Cart SDK**. Its documentation is 
 | Reference | What it covers |
 | --- | --- |
 | [Getting started](https://cart-sdk.nextcommerce.com/latest/quickstart/) | Loading the SDK and configuring it |
+| [Migrating from 0.4.x](https://cart-sdk.nextcommerce.com/latest/migrating-from-0-4/) | What changed for pages built on 0.4.x: removed, deprecated, unchanged |
 | [Data attributes](https://cart-sdk.nextcommerce.com/latest/attributes/) | Every `data-next-*` attribute |
 | [JavaScript API](https://cart-sdk.nextcommerce.com/latest/javascript-api/) | The `window.next` methods |
-| [Analytics events](https://cart-sdk.nextcommerce.com/v0.4.43/reference/analytics-events) | Every tracking event and its payload |
+| [Events](https://cart-sdk.nextcommerce.com/latest/events/) | Every `next.on` event and its payload |
+| [Analytics events](https://cart-sdk.nextcommerce.com/latest/analytics/) | Every tracking event and its payload |
 | [URL parameters](https://cart-sdk.nextcommerce.com/latest/attribute-reference/setup/url-parameters/) | Parameters the SDK reads at boot |
 | [Loader script](https://cart-sdk.nextcommerce.com/latest/attribute-reference/setup/loader-script/) | Attributes the loader script reads (`data-campaign`, `data-funnel`) |
 | [Debugger](https://cart-sdk.nextcommerce.com/latest/javascript-api/#debugging-with-debug1) | The `?debug=1` debug panel |
@@ -148,7 +150,7 @@ Building a specific funnel page:
 | [Upsell page](https://cart-sdk.nextcommerce.com/latest/building-pages/upsell-page/) | Accept and decline flows |
 | [Receipt page](https://cart-sdk.nextcommerce.com/latest/building-pages/receipt-page/) | Order data rendering |
 
-Use the version selector on that site to read the docs for the SDK version your campaign loads.
+Use the version selector on that site to read the docs for the SDK version your campaign loads. A campaign that still loads 0.4.x keeps working on it; its reference is the [0.4.43 docs](https://cart-sdk.nextcommerce.com/v0.4.43/), and [Migrating from 0.4.x](https://cart-sdk.nextcommerce.com/latest/migrating-from-0-4/) lists what to change before moving it to 0.5.
 
 ---
 
@@ -263,7 +265,7 @@ To send those events to your ad and analytics platforms, see [Tracking](/docs/ca
 Two things keep test traffic out of NEXT's campaign reports:
 
 - **Development domains**: NEXT campaign analytics ignores visits from any domain set to *Development* in the Campaigns app, under **Settings**, then **Allowed Domains**. Add `localhost`, staging URLs and preview hosts there.
-- **`?ignore=true`**: add it to any link to turn tracking off for that browser tab.
+- **`?ignore=true`**: add it to any link to turn tracking off for that browser tab. Turn it back on with `?ignore=false`.
 
 Do not use `?ignore=true` when you are checking that a purchase is reported. See [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting).
 </Callout>

@@ -1,6 +1,6 @@
 ---
 title: PayPal Admin API Guide
-description: Create Admin API orders paid with PayPal using the redirect payment flow, with one-click upsells via Reference Transactions
+description: Create Admin API orders paid with PayPal using the redirect payment flow, with support for one-click upsells
 sidebar_label: PayPal
 sidebar_position: 3
 tags:
@@ -44,7 +44,6 @@ The response when creating the order will provide a `payment_complete_url`. Your
 
 ```json title="Response with Payment Complete URL"
 {
-    "reference_transaction_id": null,
     "payment_complete_url": "https://www.paypal.com/checkoutnow?token=<paypal token>"
 }
 ```
@@ -60,7 +59,4 @@ import RedirectPaymentStep3 from '../../../../_snippets/_redirect-payment-flows-
 
 PayPal supports one-click upsells through the [ordersAddLineItemsCreate](/docs/admin-api/reference/orders/ordersAddLineItemsCreate) API, enabling additional items to be added to the order with a payment transaction.
 
-<Callout type="info">
-To process upsells, the PayPal account must have [Reference Transactions](https://developer.paypal.com/api/nvp-soap/do-reference-transaction-soap/) enabled and configured on the store.
-</Callout>
-If the store PayPal account has reference transactions enabled, the [ordersCreate](/docs/admin-api/reference/orders/ordersCreate) API response will include `supports_post_purchase_upsells: true`, signaling you can process one-click upsell transactions.
+Check `supports_post_purchase_upsells` in the [ordersCreate](/docs/admin-api/reference/orders/ordersCreate) API response. When it is `true`, you can process one-click upsell transactions on the order.

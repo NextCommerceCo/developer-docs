@@ -3,7 +3,7 @@ title: Meta Pixel and Conversions API
 description: Track your NEXT campaign in Meta. Turn on the Meta pixel on your campaign pages, send purchases from NEXT's servers with the Meta Pixel app, and make sure Meta counts each purchase once.
 sidebar_label: Meta
 audience: [merchant, developer]
-last_verified: 2026-11-16
+last_verified: 2026-11-26
 tags:
  - Guide
 ---
@@ -99,6 +99,18 @@ See the [Meta Pixel app docs](https://docs.nextcommerce.com/docs/apps/meta-pixel
 | An upsell is declined | `SkippedUpsell` (custom event) |
 
 The `Purchase` is sent on the first page after payment: the upsell page, or the receipt if there is no upsell.
+
+<Callout type="info" title="Campaign Cart SDK 0.5.1">
+The table above is for SDK 0.4.x, which the starter templates use. On SDK 0.5.1 the pixel gets these events instead:
+
+- `PageView`, `ViewContent`, `InitiateCheckout` and `AddPaymentInfo`, as above.
+- `AddToCart` for the first item added in a session only.
+- `Lead` when the shopper's contact details are saved at checkout.
+- `Purchase` once per order, on the checkout page when the order is paid there. None is sent when an upsell is accepted.
+- No `RemoveFromCart`, `AddShippingInfo`, `ViewedUpsell` or `SkippedUpsell`.
+
+The SDK sends `PageView` itself on every page, so remove `fbq('track', 'PageView')` from your pixel base code or it is sent twice.
+</Callout>
 
 ## Purchases and upsells
 

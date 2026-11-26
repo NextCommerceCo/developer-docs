@@ -21,11 +21,9 @@ Store access, repository publishing, deployment, test orders and analytics sends
 | Funnel/store URL or design | Read the source and distinguish observed facts from proposed behavior | A build brief, commerce dependency plan and local preview |
 | Existing or cloned campaign repo | Read its instructions, build/configuration and retained evidence | Inspect current behavior and change only what the task requires |
 | Existing external build | Inspect its own source, build and deployment conventions | The relevant Campaign Cart checks; retain its framework and host |
-| Local CampaignSpec, saved Map or Build Packet | Identify the selected campaign and read existing intent/status | The Campaigns OS continuation command for that artifact |
+| Local CampaignSpec, saved Map or Build Packet | Identify the selected campaign and read existing intent/status | The Campaigns OS continuation command for that artifact; for a Map saved in the optional [Workspace](https://campaign-map.nextcommerce.com/), its Handoff gives the prompt to continue from |
 
 These entries can join the same work at different points. Do not replay provisioning or scaffolding because a new session starts.
-
-The optional [Workspace](https://campaign-map.nextcommerce.com/) is where a campaign is mapped, wired to products, previewed and checked. A Map is the campaign plan saved there; its Handoff provides the prompt for continuing with an agent.
 
 ## From a source URL to a proposal
 

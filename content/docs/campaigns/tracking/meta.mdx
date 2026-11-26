@@ -98,7 +98,7 @@ See the [Meta Pixel app docs](https://docs.nextcommerce.com/docs/apps/meta-pixel
 | An upsell page is shown | `ViewedUpsell` (custom event) |
 | An upsell is declined | `SkippedUpsell` (custom event) |
 
-The `Purchase` is sent on the first page after payment: the upsell page, or the receipt if there is no upsell.
+On SDK 0.4.x the `Purchase` is sent on the first page after payment: the upsell page, or the receipt if there is no upsell. On 0.5.1 it is usually sent earlier, as the note below says.
 
 <Callout type="info" title="Campaign Cart SDK 0.5.1">
 The table above is for SDK 0.4.x, which the starter templates use. On SDK 0.5.1 the pixel gets these events instead:
@@ -118,7 +118,7 @@ The browser and the server report the same purchase with different amounts.
 
 | | Meta pixel (browser) | Meta Pixel app (server) |
 | --- | --- | --- |
-| When | The first page after payment | 10 minutes after the order, with the delay on |
+| When | On SDK 0.4.x, the first page after payment. On 0.5.1, the checkout page when the order is paid there | 10 minutes after the order, with the delay on |
 | Amount | The price of the items in the first sale, as shown on your store, without shipping | The full order total, including tax and shipping |
 | Upsells | Not included | Included, when accepted within the 10 minutes |
 | ID | `your-store-100041` | `your-store-100041` |
@@ -193,7 +193,8 @@ To test the Meta Pixel app as well:
 <script>
   window.nextReady = window.nextReady || [];
   window.nextReady.push(function (next) {
-    next.addMetadata('fb_test_code', 'TEST12345');
+    if (next.actions && next.actions.setMetadata) next.actions.setMetadata({ fb_test_code: 'TEST12345' }); // SDK 0.5.1 and later
+    else next.addMetadata('fb_test_code', 'TEST12345'); // SDK 0.4.x
   });
 </script>
 ```

@@ -1,4 +1,4 @@
-<!-- next-commerce-agent-setup version=4 date=2026-11-02 -->
+<!-- next-commerce-agent-setup version=4 date=2026-11-26 -->
 
 # Start or continue a NEXT campaign with an AI agent
 
@@ -25,7 +25,7 @@ Store access, repository publishing, deployment, test orders and analytics sends
 
 These entries can join the same work at different points. Do not replay provisioning or scaffolding because a new session starts.
 
-The optional [Workspace](https://campaign-map.nextcommerce.com/) is a visual planning tool. A Map is the campaign plan saved there; its Handoff provides the prompt for continuing with an agent.
+The optional [Workspace](https://campaign-map.nextcommerce.com/) is where a campaign is mapped, wired to products, previewed and checked. A Map is the campaign plan saved there; its Handoff provides the prompt for continuing with an agent.
 
 ## From a source URL to a proposal
 

@@ -208,7 +208,7 @@ Users are first checked for an existing user by `email` before creating a new us
 **It is not recommended to pass `phone_number` directly on the user when creating a cart or order, we recommend passing a local phone number in the `shipping_address` instead.** Address fields have country context, which allows local phone numbers to be passed and converted to [E.164 format](https://en.wikipedia.org/wiki/E.164) before being saved. A `phone_number` passed to the `user` object directly must be in E.164 format.
 </Callout>
 ## Cart / Order Attribution Detail
-Cart and Order `attribution` object sets the [marketing attribution](https://docs.nextcommerce.com/docs/features/offers/marketing-attribution) on the order for tracking the source of orders and use in orders reporting. You can also pass in [metadata](https://docs.nextcommerce.com/docs/build-a-store/technical-settings/metadata-fields-and-tags) fields that are configured on the store to track custom attribution parameters and integrate external tracking platforms.
+Cart and Order `attribution` object sets the [marketing attribution](https://docs.nextcommerce.com/docs/features/offers/marketing-attribution) on the order for tracking the source of orders and use in orders reporting. You can also pass in [metadata](https://docs.nextcommerce.com/docs/build-a-store/technical-settings/metadata-fields-and-tags) fields that are configured on the store to track custom attribution parameters and integrate external tracking platforms. For how NEXT Campaigns funnels fill these fields, see [Tracking](/docs/campaigns/tracking#for-developers).
 
 ```json title="Attribution Detail"
 "attribution": {

@@ -1,0 +1,96 @@
+---
+title: Test and troubleshoot tracking
+description: Place a test order on your campaign, check what was reported at each step, and fix the tracking problems that come up most often.
+sidebar_label: Testing and troubleshooting
+audience: [merchant, developer]
+last_verified: 2026-11-16
+tags:
+ - Guide
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Use this page to check your tracking before you launch, and to fix it when something is missing.
+
+## Before you test
+
+- **Test on a deployed production build.** Build with `npm run build`. The development server (`npm run dev`) leaves tracking out.
+- **Use a new private window for each test.** It starts a clean visit, with no ad details left over from an earlier test.
+- **Pay with a [test card](/docs/testing).** No money moves.
+- **Do not use `?ignore=true`.** It turns tracking off for that browser tab.
+
+<Callout type="warn" title="Test orders reach your ad platforms">
+A test order reports a real-looking purchase to every platform you have turned on. A domain set to **Development** does not stop this; it only keeps the visit out of NEXT's own campaign analytics. Expect your test orders in your ad platform reports.
+</Callout>
+
+Store apps handle test orders in their own way:
+
+| Store app | Test orders |
+| --- | --- |
+| Meta Pixel | Skipped unless **Enable Sending Test Data** is on |
+| Everflow | Skipped unless **Enable S2S Postback for test orders** is on |
+| Klaviyo | Skipped unless **Enable Sending Test Data to Klaviyo** is on |
+| Shop Sync | Sent to Shopify only when you request fulfillment on the order |
+
+## Run a test order
+
+1. Open your campaign in a new private window, with test details on the link:
+
+```text
+https://campaign.example.com/?utm_source=test&utm_medium=cpc&utm_campaign=tracking-test&gclid=TEST&fbclid=TEST
+```
+
+2. Go to checkout. Your platforms should show a page view and a checkout-started event.
+3. Enter your details and pay with a test card.
+4. Continue to the next page. This is where the purchase is reported. Each platform should show one purchase with your order number.
+5. Reload that page. No second purchase should appear.
+6. Accept an upsell if you have one. The upsell is reported on the page after it.
+7. Open the order in your store dashboard. Its attribution should show the test details from your link.
+
+Each platform guide has a **Verify it works** section that says where to look in that platform. Developers can also inspect the campaign's events in the browser with the SDK's [debugger](https://cart-sdk.nextcommerce.com/v0.4.43/reference/debugger).
+
+A payment that fails reports no purchase. Only paid orders are reported. To check this yourself, a store with the Test Gateway can pay with the declining test card in the [testing guide](/docs/admin-api/guides/testing-guide#test-gateway).
+
+## Check your numbers after launch
+
+Once you have a few days of live orders, compare the number of orders in NEXT with the purchases each ad platform reports. Use the same days and the same timezone for both.
+
+The two numbers should be close. If a platform shows noticeably more or fewer purchases than NEXT, see [Common problems](#common-problems).
+
+## Common problems
+
+### Nothing is tracked
+
+| Problem | Cause | Fix |
+| --- | --- | --- |
+| No platform receives anything | The campaign was built with `npm run dev` | Build with `npm run build` and deploy that |
+| No platform receives anything, in one browser tab | `?ignore=true` was used earlier in the tab | Open a new private window |
+| One platform receives nothing | Its ID is missing from `_data/campaigns.json` | Add the ID and rebuild |
+| GTM or the Meta pixel loads but receives no events | It is switched off in `assets/config.js` | Switch it on. See [Google Tag Manager](/docs/campaigns/tracking/google-tag-manager#set-up) or [Meta](/docs/campaigns/tracking/meta#set-up) |
+| Checkout events arrive but no page views or purchases | `analytics.mode` in `assets/config.js` is not `'auto'` | Set it to `'auto'` |
+| A store app does nothing on the campaign | Most tracking apps only add their scripts to your Storefront. A few, such as the Meta Pixel app's purchase, also cover campaign orders | Set the platform up with its guide in this section. See the [overview](/docs/campaigns/tracking#how-tracking-works) for the apps that cover campaign orders |
+| The checkout itself fails to load the cart | The campaign's domain is not in **Allowed Domains** | Add it in the Campaigns app under **Settings**, then **Allowed Domains** |
+
+### Purchases are missing
+
+| Problem | Cause | Fix |
+| --- | --- | --- |
+| No purchase after a test order | The shopper never reached the page after payment | Continue to the upsell or receipt page |
+| No purchase when you reopen an order's page | Each order is reported once | Expected. Place a new test order |
+| NEXT campaign analytics shows no sessions | The domain is set to **Development** | Set it to **Production** |
+
+### Things are counted twice
+
+| Problem | Cause | Fix |
+| --- | --- | --- |
+| Every event counted twice on one platform | The platform is set up in the template and also in Google Tag Manager or a page script | Keep one |
+| Meta counts each purchase twice | `storeName` in `assets/config.js` is missing or wrong, or a second server sender reports to the same pixel | Set `storeName` to your store name. See [Meta](/docs/campaigns/tracking/meta#count-each-purchase-once) |
+| Meta shows two page views per page | A second Meta pixel or your own page view call | Remove the extra one |
+| Sales counted twice on a Shop Sync store | The campaign and a Shopify app both report the order | See [Tracking on Shop Sync stores](/docs/campaigns/tracking/shop-sync) |
+
+### Numbers look wrong
+
+| Problem | Cause | Fix |
+| --- | --- | --- |
+| Purchase amount is lower than the order total | The purchase amount is the item prices only, without shipping | Expected. GA4 and Google Tag Manager also receive shipping and tax as separate fields. Other platforms receive the amount alone |
+| Upsell revenue is missing, or there are more purchases than orders | Each platform counts upsells in its own way | See **Purchases and upsells** in the platform's guide |
+| Ad details are missing on the order | The link lost its parameters, or the shopper moved to another domain or a new tab | Keep the campaign on one domain and keep parameters on your ad links |

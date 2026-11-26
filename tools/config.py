@@ -343,6 +343,13 @@ WEBHOOKS = [
         "description": "Triggers when a subscription is updated.",
     },
     {
+        "event": "subscription.upcoming_renewal",
+        "object": "subscription",
+        "schema_ref": "#/components/schemas/Subscription",
+        "tag": "subscriptions",
+        "description": "Triggers once when an active subscription's next renewal is within 72 hours.",
+    },
+    {
         "event": "store.updated",
         "object": "store",
         "schema_ref": "#/components/schemas/Store",

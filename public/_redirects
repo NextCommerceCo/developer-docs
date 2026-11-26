@@ -1,4 +1,4 @@
-# Ported from netlify.toml — Cloudflare Workers static assets redirects
+# Cloudflare Workers static assets redirects
 /api/admin /docs/admin-api 301
 /apps/oauth /docs/apps/oauth 301
 /apps/app-development-flow /docs/apps/app-development-flow 301
@@ -61,38 +61,38 @@
 # templates, admin-api) or never did. campaign-cart sub-paths are handled by the
 # /docs/campaigns/campaign-cart/:path rule above; the bare index has its own rule
 # below.
-/docs/campaigns/utilities/debugger https://cart-sdk.nextcommerce.com/latest/reference/debugger/ 301
-/docs/campaigns/utilities/debugger/* https://cart-sdk.nextcommerce.com/latest/reference/debugger/ 301
-/docs/campaigns/utilities/exit-intent https://cart-sdk.nextcommerce.com/latest/reference/javascript-api/#on-page-popups 301
-/docs/campaigns/utilities/exit-intent/* https://cart-sdk.nextcommerce.com/latest/reference/javascript-api/#on-page-popups 301
-/docs/campaigns/utilities/loading-states https://cart-sdk.nextcommerce.com/latest/reference/data-attributes/#hiding-placeholders-until-prices-load 301
-/docs/campaigns/utilities/loading-states/* https://cart-sdk.nextcommerce.com/latest/reference/data-attributes/#hiding-placeholders-until-prices-load 301
-/docs/campaigns/analytics https://cart-sdk.nextcommerce.com/latest/reference/analytics-events/ 301
-/docs/campaigns/analytics/* https://cart-sdk.nextcommerce.com/latest/reference/analytics-events/ 301
-/docs/campaigns/bundle-selector https://cart-sdk.nextcommerce.com/latest/reference/data-attributes/#bundle-selector 301
-/docs/campaigns/bundle-selector/* https://cart-sdk.nextcommerce.com/latest/reference/data-attributes/#bundle-selector 301
-/docs/campaigns/cart-summary https://cart-sdk.nextcommerce.com/latest/reference/data-attributes/#cart-summary 301
-/docs/campaigns/cart-summary/* https://cart-sdk.nextcommerce.com/latest/reference/data-attributes/#cart-summary 301
-/docs/campaigns/cart-system https://cart-sdk.nextcommerce.com/latest/reference/javascript-api/#cart-operations 301
-/docs/campaigns/cart-system/* https://cart-sdk.nextcommerce.com/latest/reference/javascript-api/#cart-operations 301
-/docs/campaigns/checkout https://cart-sdk.nextcommerce.com/latest/pages/checkout-page/ 301
-/docs/campaigns/checkout/* https://cart-sdk.nextcommerce.com/latest/pages/checkout-page/ 301
-/docs/campaigns/configuration https://cart-sdk.nextcommerce.com/latest/reference/window-globals/#windownextconfig 301
-/docs/campaigns/configuration/* https://cart-sdk.nextcommerce.com/latest/reference/window-globals/#windownextconfig 301
-/docs/campaigns/data-attributes https://cart-sdk.nextcommerce.com/latest/reference/data-attributes/ 301
-/docs/campaigns/data-attributes/* https://cart-sdk.nextcommerce.com/latest/reference/data-attributes/ 301
-/docs/campaigns/guides https://cart-sdk.nextcommerce.com/latest/start-here/getting-started/ 301
-/docs/campaigns/guides/* https://cart-sdk.nextcommerce.com/latest/start-here/getting-started/ 301
-/docs/campaigns/javascript-api https://cart-sdk.nextcommerce.com/latest/reference/javascript-api/ 301
-/docs/campaigns/javascript-api/* https://cart-sdk.nextcommerce.com/latest/reference/javascript-api/ 301
-/docs/campaigns/package-toggle https://cart-sdk.nextcommerce.com/latest/reference/data-attributes/#order-bumps 301
-/docs/campaigns/package-toggle/* https://cart-sdk.nextcommerce.com/latest/reference/data-attributes/#order-bumps 301
-/docs/campaigns/upsells https://cart-sdk.nextcommerce.com/latest/pages/upsell-page/ 301
-/docs/campaigns/upsells/* https://cart-sdk.nextcommerce.com/latest/pages/upsell-page/ 301
-/docs/campaigns/utilities https://cart-sdk.nextcommerce.com/latest/reference/javascript-api/#utilities 301
+/docs/campaigns/utilities/debugger https://cart-sdk.nextcommerce.com/latest/javascript-api/#debugging-with-debug1 301
+/docs/campaigns/utilities/debugger/* https://cart-sdk.nextcommerce.com/latest/javascript-api/#debugging-with-debug1 301
+/docs/campaigns/utilities/exit-intent https://cart-sdk.nextcommerce.com/latest/event-reference/promotions/lifecycle/#exit-intent-popup 301
+/docs/campaigns/utilities/exit-intent/* https://cart-sdk.nextcommerce.com/latest/event-reference/promotions/lifecycle/#exit-intent-popup 301
+/docs/campaigns/utilities/loading-states https://cart-sdk.nextcommerce.com/latest/attribute-reference/setup/page-state/ 301
+/docs/campaigns/utilities/loading-states/* https://cart-sdk.nextcommerce.com/latest/attribute-reference/setup/page-state/ 301
+/docs/campaigns/analytics https://cart-sdk.nextcommerce.com/latest/analytics/ 301
+/docs/campaigns/analytics/* https://cart-sdk.nextcommerce.com/latest/analytics/ 301
+/docs/campaigns/bundle-selector https://cart-sdk.nextcommerce.com/latest/recipes/bundle-tiers/ 301
+/docs/campaigns/bundle-selector/* https://cart-sdk.nextcommerce.com/latest/recipes/bundle-tiers/ 301
+/docs/campaigns/cart-summary https://cart-sdk.nextcommerce.com/latest/recipes/cart-state/ 301
+/docs/campaigns/cart-summary/* https://cart-sdk.nextcommerce.com/latest/recipes/cart-state/ 301
+/docs/campaigns/cart-system https://cart-sdk.nextcommerce.com/latest/javascript-api/#actions 301
+/docs/campaigns/cart-system/* https://cart-sdk.nextcommerce.com/latest/javascript-api/#actions 301
+/docs/campaigns/checkout https://cart-sdk.nextcommerce.com/latest/building-pages/checkout-page/ 301
+/docs/campaigns/checkout/* https://cart-sdk.nextcommerce.com/latest/building-pages/checkout-page/ 301
+/docs/campaigns/configuration https://cart-sdk.nextcommerce.com/latest/attribute-reference/setup/loader-script/#04x 301
+/docs/campaigns/configuration/* https://cart-sdk.nextcommerce.com/latest/attribute-reference/setup/loader-script/#04x 301
+/docs/campaigns/data-attributes https://cart-sdk.nextcommerce.com/latest/attributes/ 301
+/docs/campaigns/data-attributes/* https://cart-sdk.nextcommerce.com/latest/attributes/ 301
+/docs/campaigns/guides https://cart-sdk.nextcommerce.com/latest/quickstart/ 301
+/docs/campaigns/guides/* https://cart-sdk.nextcommerce.com/latest/quickstart/ 301
+/docs/campaigns/javascript-api https://cart-sdk.nextcommerce.com/latest/javascript-api/ 301
+/docs/campaigns/javascript-api/* https://cart-sdk.nextcommerce.com/latest/javascript-api/ 301
+/docs/campaigns/package-toggle https://cart-sdk.nextcommerce.com/latest/recipes/order-bump/ 301
+/docs/campaigns/package-toggle/* https://cart-sdk.nextcommerce.com/latest/recipes/order-bump/ 301
+/docs/campaigns/upsells https://cart-sdk.nextcommerce.com/latest/building-pages/upsell-page/ 301
+/docs/campaigns/upsells/* https://cart-sdk.nextcommerce.com/latest/building-pages/upsell-page/ 301
+/docs/campaigns/utilities https://cart-sdk.nextcommerce.com/latest/javascript-api/ 301
 # The bare campaign-cart index needs its own rule: /docs/campaigns/campaign-cart/:path
 # above only matches sub-paths, so without this the index 404s.
-/docs/campaigns/campaign-cart https://cart-sdk.nextcommerce.com/latest/start-here/how-it-works/ 301
+/docs/campaigns/campaign-cart https://cart-sdk.nextcommerce.com/latest/ 301
 # Old Redoc-style reference URL still linked from the platform changelog (with and without
 # trailing slash). Exact-path rules on purpose: /docs/admin-api/reference/<group>/<op> are real pages.
 /docs/admin-api/reference /docs/admin-api 301

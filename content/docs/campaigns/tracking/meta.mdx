@@ -1,0 +1,215 @@
+---
+title: Meta Pixel and Conversions API
+description: Track your NEXT campaign in Meta. Turn on the Meta pixel on your campaign pages, send purchases from NEXT's servers with the Meta Pixel app, and make sure Meta counts each purchase once.
+sidebar_label: Meta
+audience: [merchant, developer]
+last_verified: 2026-11-16
+tags:
+ - Guide
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Meta tracking on a campaign has two parts:
+
+- **The Meta pixel** reports page views, checkout steps and purchases from the shopper's browser. You set it up in your campaign files.
+- **The Meta Pixel app** reports each purchase again from NEXT's servers. You set it up in your store dashboard.
+
+You can use the pixel on its own, but both together give Meta the most complete picture. When both report a purchase, they label it with the same ID, so Meta counts it once.
+
+## Before you start
+
+- Your Meta pixel ID. For the Meta Pixel app you also need an access token for that pixel.
+- Your store name: the part before `.29next.store` in your store address. For `your-store.29next.store` it is `your-store`.
+- A campaign that is ready for tracking. See [Set up tracking](/docs/campaigns/tracking/getting-started).
+
+## Set up
+
+### Part 1: Meta pixel
+
+1. In `_data/campaigns.json`, add your pixel ID to your campaign:
+
+```json title="_data/campaigns.json"
+{
+  "my-campaign": {
+    "name": "My Campaign",
+    "fb_pixel_id": "123456789012345"
+  }
+}
+```
+
+2. In `assets/config.js`, set `storeName` to your store name, switch `facebook` on, and enter the same pixel ID:
+
+```js title="assets/config.js"
+window.nextConfig = {
+  // ...your existing settings
+  storeName: 'your-store',
+  analytics: {
+    enabled: true,
+    mode: 'auto',
+    providers: {
+      // ...other providers unchanged
+      facebook: {
+        enabled: true,
+        settings: {
+          pixelId: '123456789012345'
+        }
+      }
+    }
+  }
+};
+```
+
+3. Build with `npm run build` and deploy.
+
+<Callout type="warn" title="Both settings are needed">
+With only `fb_pixel_id`, the pixel loads but sends nothing. With only the `config.js` setting, there is no pixel to send through. Templates ship with `storeName: 'store-name'` and `facebook` switched off, so change both.
+</Callout>
+
+Do not add your own `fbq('track', 'PageView')` to the pages. The campaign already sends page views, and a second call counts each one twice.
+
+### Part 2: Meta Pixel app
+
+1. In your store dashboard, open **Apps**, then **Meta Pixel**.
+2. Select **Add Pixel**, enter the **Pixel ID** and **Access Token**, and save. Use the same pixel as in Part 1.
+3. Set it as the **Default Meta Pixel**.
+
+The app's other settings:
+
+| Setting | Default | What it does |
+| --- | --- | --- |
+| **Enable Delay Order Confirmation** | On | Waits 10 minutes before sending the purchase, so upsells accepted in that time are included |
+| **Enable Sending Test Data** | Off | Test orders are skipped unless this is on |
+| **Ignore Subscription Renewal Orders** | On | Subscription renewals are not sent as purchases |
+
+See the [Meta Pixel app docs](https://docs.nextcommerce.com/docs/apps/meta-pixel) for more.
+
+## What gets tracked
+
+| When | Meta event |
+| --- | --- |
+| Any page loads | `PageView` |
+| A page shows a product | `ViewContent` |
+| An item is added to the cart | `AddToCart` |
+| An item is removed from the cart | `RemoveFromCart` (custom event) |
+| The checkout loads | `InitiateCheckout` |
+| A shipping address is entered | `AddShippingInfo` (custom event) |
+| Payment details are entered | `AddPaymentInfo` |
+| The order is paid | `Purchase` |
+| An upsell page is shown | `ViewedUpsell` (custom event) |
+| An upsell is declined | `SkippedUpsell` (custom event) |
+
+The `Purchase` is sent on the first page after payment: the upsell page, or the receipt if there is no upsell.
+
+## Purchases and upsells
+
+The browser and the server report the same purchase with different amounts.
+
+| | Meta pixel (browser) | Meta Pixel app (server) |
+| --- | --- | --- |
+| When | The first page after payment | 10 minutes after the order, with the delay on |
+| Amount | The price of the items in the first sale, as shown on your store, without shipping | The full order total, including tax and shipping |
+| Upsells | Not included | Included, when accepted within the 10 minutes |
+| ID | `your-store-100041` | `your-store-100041` |
+
+The pixel sends nothing when an upsell is accepted. Upsell revenue reaches Meta only through the Meta Pixel app.
+
+Because the IDs match, Meta keeps one of the two. It usually keeps the first one it receives, which is the browser's, so the amount Meta shows can be the first sale without upsells. If you want Meta to see the full order total, use the server-only option below.
+
+## Count each purchase once
+
+Pick one of these.
+
+**Option 1: pixel and app together (default).** Both report the purchase with the same ID and Meta merges them. This is what the setup above gives you. It only works when `storeName` is exactly your store name.
+
+**Option 2: app only.** The pixel reports everything except the purchase, and the app is the only one that reports it. Meta then sees the full order total with upsells. Add `blockedEvents` to the `facebook` settings:
+
+```js title="assets/config.js"
+facebook: {
+  enabled: true,
+  settings: { pixelId: '123456789012345' },
+  blockedEvents: ['dl_purchase']
+}
+```
+
+<Callout type="warn" title="Do not add a second Meta sender">
+If Meta events are also sent from Google Tag Manager, or from a Shopify app on a Shop Sync store, Meta counts purchases twice. Meta cannot merge two purchases that both come from servers. See [Tracking on Shop Sync stores](/docs/campaigns/tracking/shop-sync).
+</Callout>
+
+## Optional settings
+
+### Advanced matching
+
+Advanced matching sends the shopper's email, phone, name, city, state, postcode and country to Meta through the pixel to improve matching. To turn it on, add this to your campaign in `_data/campaigns.json`:
+
+```json
+"meta_advanced_matching_enabled": "true"
+```
+
+It is not tied to the marketing opt-in checkbox on your checkout. Turn it on only when your privacy policy covers it. See [Privacy and consent](/docs/campaigns/tracking#privacy-and-consent).
+
+### More than one pixel
+
+Each campaign reports to the pixel in its own `fb_pixel_id`, so two campaigns can use two pixels:
+
+```json title="_data/campaigns.json"
+{
+  "summer-offer": {
+    "name": "Summer Offer",
+    "fb_pixel_id": "123456789012345"
+  },
+  "winter-offer": {
+    "name": "Winter Offer",
+    "fb_pixel_id": "987654321098765"
+  }
+}
+```
+
+Set the same ID as `pixelId` in each campaign's `assets/config.js`. Then add every pixel you use in the Meta Pixel app, before you send traffic to the campaign. See the [Meta Pixel app docs](https://docs.nextcommerce.com/docs/apps/meta-pixel).
+
+## Verify it works
+
+1. In Meta Events Manager, open **Test Events** for your pixel.
+2. Start the test from that page and go through your campaign in the same browser. You should see `PageView` on each page.
+3. Place an order with a [test card](/docs/testing). On the next page you should see `Purchase` with the event ID `your-store-` followed by the order number.
+
+To test the Meta Pixel app as well:
+
+1. Turn on **Enable Sending Test Data** in the app.
+2. Copy the test code shown in **Test Events** and add this to a campaign page, with your code in place of `TEST12345`:
+
+```html
+<script>
+  window.nextReady = window.nextReady || [];
+  window.nextReady.push(function (next) {
+    next.addMetadata('fb_test_code', 'TEST12345');
+  });
+</script>
+```
+
+3. Place another test order and wait 10 minutes. **Test Events** should show a second `Purchase`, from the server, with the same event ID.
+4. Remove the snippet and turn **Enable Sending Test Data** off before you launch.
+
+The app keeps a 30-day log of what it sent, under **Logs** in the app.
+
+Tips for **Test Events**:
+
+- **Keep the Test Events page open.** A server purchase that arrives while the page is closed does not show up later.
+- **Use the same browser for the campaign.** Browser events only appear when the campaign is opened from Test Events, in that browser. A private window or another browser shows nothing.
+- **Check the test code is current.** Meta drops events sent with an expired code without telling you. Copy a fresh code before each session.
+- **Two purchases listed is normal.** Test Events lists both the browser and the server purchase. Meta still counts them as one when the event IDs match.
+
+## Troubleshooting
+
+| Problem | Likely cause | Fix |
+| --- | --- | --- |
+| Nothing reaches Meta | `fb_pixel_id` is missing or empty | Add your pixel ID and rebuild |
+| The pixel loads but sends no events | `facebook` is switched off in `assets/config.js`, or `pixelId` is empty | Switch it on and set `pixelId` |
+| Every purchase counted twice | `storeName` is missing, still `store-name`, or not your exact store name | Set `storeName` correctly, or use option 2 |
+| No server purchase for a real order | The campaign's pixel is not added in the app, the order is a subscription renewal, or 10 minutes have not passed | Add the pixel in the app and wait 10 minutes |
+| `blockedEvents` does nothing | A Meta event name was used | Use `dl_purchase`, not `Purchase` |
+
+More help is in [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting).
+
+## Hand-built campaigns
+
+On a campaign that is not built from a starter template, add Meta's pixel base code to every page yourself, without a `fbq('track', 'PageView')` call, then follow step 2 of Part 1. The Meta Pixel app works the same way for any campaign.

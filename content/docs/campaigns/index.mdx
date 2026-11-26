@@ -133,25 +133,26 @@ The pages above are wired up by the **Campaign Cart SDK**. Its documentation is 
 
 | Reference | What it covers |
 | --- | --- |
-| [Getting started](https://cart-sdk.nextcommerce.com/latest/start-here/getting-started/) | Loading the SDK and configuring it |
-| [How it works](https://cart-sdk.nextcommerce.com/latest/start-here/how-it-works/) | Boot sequence and progressive enhancement |
-| [Data attributes](https://cart-sdk.nextcommerce.com/latest/reference/data-attributes/) | Every `data-next-*` attribute |
-| [JavaScript API](https://cart-sdk.nextcommerce.com/latest/reference/javascript-api/) | The `window.next` methods |
-| [Analytics events](https://cart-sdk.nextcommerce.com/latest/reference/analytics-events/) | Every `dl_*` event and its payload |
-| [URL parameters](https://cart-sdk.nextcommerce.com/latest/reference/url-parameters/) | Parameters the SDK reads at boot |
-| [Window globals](https://cart-sdk.nextcommerce.com/latest/reference/window-globals/) | Configuration on `window` |
-| [Debugger](https://cart-sdk.nextcommerce.com/latest/reference/debugger/) | The on-page debug overlay |
+| [Getting started](https://cart-sdk.nextcommerce.com/latest/quickstart/) | Loading the SDK and configuring it |
+| [Migrating from 0.4.x](https://cart-sdk.nextcommerce.com/latest/migrating-from-0-4/) | What changed for pages built on 0.4.x: removed, deprecated, unchanged |
+| [Data attributes](https://cart-sdk.nextcommerce.com/latest/attributes/) | Every `data-next-*` attribute |
+| [JavaScript API](https://cart-sdk.nextcommerce.com/latest/javascript-api/) | The `window.next` methods |
+| [Events](https://cart-sdk.nextcommerce.com/latest/events/) | Every `next.on` event and its payload |
+| [Analytics events](https://cart-sdk.nextcommerce.com/latest/analytics/) | Every tracking event and its payload |
+| [URL parameters](https://cart-sdk.nextcommerce.com/latest/attribute-reference/setup/url-parameters/) | Parameters the SDK reads at boot |
+| [Loader script](https://cart-sdk.nextcommerce.com/latest/attribute-reference/setup/loader-script/) | Attributes the loader script reads (`data-campaign`, `data-funnel`) |
+| [Debugger](https://cart-sdk.nextcommerce.com/latest/javascript-api/#debugging-with-debug1) | The `?debug=1` debug panel |
 
 Building a specific funnel page:
 
 | Page | What it covers |
 | --- | --- |
-| [Landing and presell](https://cart-sdk.nextcommerce.com/latest/pages/landing-presell/) | Selectors, bundles, add to cart |
-| [Checkout page](https://cart-sdk.nextcommerce.com/latest/pages/checkout-page/) | Form fields, payment, express checkout |
-| [Upsell page](https://cart-sdk.nextcommerce.com/latest/pages/upsell-page/) | Accept and decline flows |
-| [Receipt page](https://cart-sdk.nextcommerce.com/latest/pages/receipt-page/) | Order data rendering |
+| [Landing and presell](https://cart-sdk.nextcommerce.com/latest/building-pages/landing-and-presell/) | Selectors, bundles, add to cart |
+| [Checkout page](https://cart-sdk.nextcommerce.com/latest/building-pages/checkout-page/) | Form fields, payment, express checkout |
+| [Upsell page](https://cart-sdk.nextcommerce.com/latest/building-pages/upsell-page/) | Accept and decline flows |
+| [Receipt page](https://cart-sdk.nextcommerce.com/latest/building-pages/receipt-page/) | Order data rendering |
 
-Use the version selector on that site to read the docs for the SDK version your campaign loads.
+Use the version selector on that site to read the docs for the SDK version your campaign loads. A campaign that still loads 0.4.x keeps working on it; its reference is the [0.4.43 docs](https://cart-sdk.nextcommerce.com/v0.4.43/), and [Migrating from 0.4.x](https://cart-sdk.nextcommerce.com/latest/migrating-from-0-4/) lists what to change before moving it to 0.5.
 
 ---
 
@@ -237,15 +238,17 @@ For conditional shipping discounts, such as free shipping at 3 or more, use a `s
 
 ### Domains
 
-Domains are configured in your store's **Campaign Settings** and apply across all campaigns. They control which domains are authorized to use your campaign API keys.
+Domains are configured in the Campaigns app, under **Settings**, then **Allowed Domains**, and apply across all campaigns. They control which domains are authorized to use your campaign API keys.
 
-| Type | SDK Access | Analytics Tracking |
+| Type | SDK Access | NEXT campaign analytics |
 | --- | --- | --- |
-| **Production** | Yes | Yes — events tracked automatically |
-| **Development** | Yes | No — events suppressed |
+| **Production** | Yes | Yes, events recorded automatically |
+| **Development** | Yes | No, events ignored |
+
+The environment setting controls NEXT's own campaign analytics only. Vendor pixels and the SDK's event stream still run on development domains. See [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting).
 
 <Callout type="idea">
-Add `localhost` and any staging domains as **development** domains so you can test the full checkout flow without polluting analytics data.
+Add `localhost` and any staging domains as **development** domains so you can test the full checkout flow without adding sessions to NEXT campaign analytics. Vendor pixels on those pages still fire.
 </Callout>
 
 <Callout type="warn">
@@ -256,36 +259,18 @@ Requests from domains not listed in either production or development will be rej
 
 ## Analytics & Tracking
 
-Every starter template ships with NEXT Campaign Analytics **on by default** in auto mode. The SDK automatically tracks the full funnel — page views, add-to-cart, begin checkout, shipping/payment info, purchase, and upsells — through the always-on internal `nextCampaign` provider. No code required.
+Every starter template ships with NEXT Campaign Analytics **on by default**. The SDK automatically tracks the full funnel (page views, add-to-cart, begin checkout, shipping and payment info, purchase, and upsells) for NEXT's own campaign reports. No code required.
 
-To also forward those events to **Google Tag Manager** or **Facebook Pixel**, add your IDs in `_data/campaigns.json`:
-
-```json
-{
-  "my-campaign": {
-    "name": "My Campaign",
-    "...": "...",
-    "gtm_id": "GTM-XXXXXXX",
-    "fb_pixel_id": "123456789012345"
-  }
-}
-```
-
-<Callout type="info">
-The matching `providers.gtm.enabled` and `providers.facebook.enabled` flags in `assets/config.js` control whether the SDK **forwards events** to each provider. Templates ship with these set to `false` — flip them to `true` once your IDs are in place. See the per-provider guides below for the full wiring.
-</Callout>
+To send those events to your ad and analytics platforms, see [Tracking](/docs/campaigns/tracking).
 
 <Callout type="idea" title="Keep your campaign analytics clean">
-Two mechanisms skip tracking entirely — including the always-on internal `nextCampaign` provider — so your campaign dashboards reflect **real customer conversions**, not internal QA or test traffic:
+Two things keep test traffic out of NEXT's campaign reports:
 
-- **Development domains** — any domain marked *development* in your store's Campaign Settings suppresses all events. Add `localhost`, staging URLs, and preview hosts here.
-- **`?ignore=true` URL parameter** — append it to any URL to silence tracking for the entire session, useful for one-off testing on a production domain. Clear it with `window.NextAnalyticsClearIgnore()`.
+- **Development domains**: NEXT campaign analytics ignores visits from any domain set to *Development* in the Campaigns app, under **Settings**, then **Allowed Domains**. Add `localhost`, staging URLs and preview hosts there.
+- **`?ignore=true`**: add it to any link to turn tracking off for that browser tab. Turn it back on with `?ignore=false`.
+
+Do not use `?ignore=true` when you are checking that a purchase is reported. See [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting).
 </Callout>
-
-
-### Event reference
-
-- [Analytics events](https://cart-sdk.nextcommerce.com/latest/reference/analytics-events/) — every `dl_*` event the SDK emits, which ones fire automatically, and what each provider receives
 
 ---
 

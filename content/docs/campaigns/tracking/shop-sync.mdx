@@ -1,0 +1,79 @@
+---
+title: Tracking on Shop Sync stores
+description: How to avoid counting campaign sales twice when Shop Sync copies your NEXT campaign orders into Shopify, and where to find the guide for putting a click ID on the Shopify order.
+sidebar_label: Shop Sync stores
+audience: [merchant, developer]
+last_verified: 2026-11-16
+tags:
+ - Guide
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Shop Sync copies your campaign orders into Shopify. That creates one risk for tracking: a sale can be reported twice, once by your campaign and once by a Shopify app that sees the copied order.
+
+This page shows which Shopify tools see those orders, and what to turn off so each sale is counted once.
+
+## What Shop Sync puts in Shopify
+
+Two things matter for tracking:
+
+- **The order arrives when it is sent for fulfillment**, not at the moment of payment, and it is tagged `NEXT`.
+- **It carries no ad details.** There are no UTM parameters, click IDs, referrer or landing page on the Shopify order.
+
+For everything else about these orders, such as finding one by its PO number or how split shipments are counted, see [Do my NEXT sales show in Shopify analytics?](https://guides.nextcommerce.com/guides/shop-sync-daily-operations#shopify-analytics) in the Shop Sync guide.
+
+## Which Shopify tools see these orders
+
+When Shop Sync creates the order, Shopify notifies every app that listens for new orders. Shopify calls that notification a webhook.
+
+**Any tool that uses Shopify order webhooks creates its own purchase event for the synced order, with its own ID.** It builds that ID from Shopify's order details, which did not exist when your campaign reported the sale. The two IDs can never match, so the ad platform sees two separate purchases and counts both.
+
+| Tool | Reports campaign orders? |
+| --- | --- |
+| Tracking apps that send purchases from Shopify order webhooks | Yes, as their own purchase with their own ID |
+| Triple Whale and Northbeam, connected to Shopify | Yes, they read the Shopify order |
+| Shopify admin and reports | Yes |
+| Shopify's own Facebook & Instagram channel | No. It follows the Shopify checkout, which the shopper never used |
+| Pixels on your Shopify storefront or checkout | No. The shopper never visits those pages |
+
+For a tool not listed here, ask one question: does it listen for Shopify orders, or does it only run on Shopify pages? If it listens for orders, it reports campaign sales too.
+
+## Count each sale once
+
+For each platform, choose one thing to report the purchase.
+
+| Platform | Report the purchase from | Turn off |
+| --- | --- | --- |
+| Meta | Your campaign and the NEXT Meta Pixel app | Any Shopify app that also sends purchases to the same Meta pixel. Exclude orders tagged `NEXT` in that app |
+| Triple Whale | Shopify | The campaign's purchase. See [Triple Whale](/docs/campaigns/tracking/triple-whale) |
+| Northbeam | Shopify | The campaign's purchase. See [Northbeam](/docs/campaigns/tracking/more-integrations#northbeam-on-a-shop-sync-store) |
+| Google Analytics 4 and Google Ads | Your campaign | Any Shopify Google app that also reports these orders. Exclude orders tagged `NEXT` |
+| TikTok | Your campaign | Any Shopify TikTok app that also reports these orders. Exclude orders tagged `NEXT` |
+
+<Callout type="warn" title="Meta cannot merge two server senders">
+If a Shopify app sends purchases to Meta and cannot exclude orders tagged `NEXT`, let that app be the only one. Turn off the NEXT Meta Pixel app, and stop the campaign's purchase with `blockedEvents: ['dl_purchase']` as shown in the [Meta](/docs/campaigns/tracking/meta#count-each-purchase-once) guide.
+</Callout>
+
+To stop the campaign reporting purchases to a platform, add its line to your campaign in `_data/campaigns.json`:
+
+| Platform | Line |
+| --- | --- |
+| Triple Whale | `"triplewhale_blocked_events": "dl_purchase, dl_upsell_purchase"` |
+| Northbeam | `"northbeam_blocked_events": "dl_purchase, dl_upsell_purchase"` |
+| Google Analytics 4 | `"ga4_blocked_events": "dl_purchase, dl_upsell_purchase"` |
+| TikTok | `"tiktok_blocked_events": "dl_purchase, dl_upsell_purchase"` |
+
+Before you launch, place one order, send it for fulfillment, and check each platform shows it once. Repeat this check whenever you install a new Shopify app that tracks orders, because it may start reporting campaign sales too.
+
+## Put a click ID on the Shopify order
+
+Shop Sync does not copy ad details to Shopify by itself. You can map individual values, such as a Meta or Google click ID, onto the Shopify order as metafields.
+
+This is covered step by step in the Shop Sync guide, [Send NEXT order data to Shopify](https://guides.nextcommerce.com/guides/shop-sync-metadata):
+
+| What you want | Where |
+| --- | --- |
+| Map any value to a Shopify metafield | [Map a metadata field](https://guides.nextcommerce.com/guides/shop-sync-metadata#mapping) |
+| Send the Meta click ID, Meta browser IDs, or the Everflow ID | [Send click IDs to Shopify](https://guides.nextcommerce.com/guides/shop-sync-metadata#click-id) |
+| Send the Google click ID | [Google click ID](https://guides.nextcommerce.com/guides/shop-sync-metadata#gclid) |
+| Carry a value onto subscription renewals | [Subscriptions](https://guides.nextcommerce.com/guides/shop-sync-metadata#subscriptions) |

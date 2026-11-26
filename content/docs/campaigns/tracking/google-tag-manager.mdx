@@ -1,0 +1,130 @@
+---
+title: Google Tag Manager
+description: Send your campaign's events to your own Google Tag Manager container, and build tags on them.
+sidebar_label: Google Tag Manager
+audience: [merchant, developer]
+last_verified: 2026-11-16
+tags:
+ - Guide
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Google Tag Manager (GTM) does not report anything by itself. It is a container for your own tags. Your campaign sends its events to GTM, and the tags you build decide which platforms hear about them.
+
+Use GTM when you want to manage tags yourself, or for a platform that has no guide in this section.
+
+## Before you start
+
+- A GTM web container and its ID, which looks like `GTM-XXXXXXX`.
+- A campaign that is ready for tracking. See [Set up tracking](/docs/campaigns/tracking/getting-started).
+
+The **Google Tag Manager** app you set up under **Apps** in your NEXT dashboard only adds its script to your Storefront. It is not added to your Campaigns, so follow this page to add GTM to your campaign.
+
+## Set up
+
+Setup has two parts, and you need both.
+
+1. In `_data/campaigns.json`, add your container ID to your campaign. This loads your container on every page:
+
+```json title="_data/campaigns.json"
+{
+  "my-campaign": {
+    "name": "My Campaign",
+    "gtm_id": "GTM-XXXXXXX"
+  }
+}
+```
+
+2. In `assets/config.js`, switch `gtm` on. This makes the campaign send its events to the container:
+
+```js title="assets/config.js"
+// Inside analytics.providers:
+gtm: {
+  enabled: true
+},
+```
+
+3. Build with `npm run build` and deploy.
+
+<Callout type="warn" title="Both parts are needed">
+With only `gtm_id`, the container loads but receives no campaign events. With only the `config.js` setting, the events are sent but there is no container to receive them.
+</Callout>
+
+## Events you can build tags on
+
+Each event reaches GTM as a data layer event. Create a **Custom Event** trigger with the event name, then attach your tag.
+
+| Event name | When it happens |
+| --- | --- |
+| `dl_user_data` | Any page loads. Use this for page view tags |
+| `dl_view_item` | A page shows a product |
+| `dl_add_to_cart` | An item is added to the cart |
+| `dl_begin_checkout` | The checkout loads |
+| `dl_add_shipping_info` | A shipping address is entered |
+| `dl_add_payment_info` | Payment details are entered |
+| `dl_purchase` | The order is paid. Sent on the first page after payment |
+| `dl_viewed_upsell` | An upsell page is shown |
+| `dl_upsell_purchase` | An upsell is accepted. Sent on the page after it |
+
+The full list, with every field, is in the SDK's [Analytics events reference](https://cart-sdk.nextcommerce.com/v0.4.43/reference/analytics-events).
+
+## Reading values in your tags
+
+Create **Data Layer Variables** in GTM for the values you need.
+
+| What you want | Data layer variable |
+| --- | --- |
+| Order number | `ecommerce.transaction_id` |
+| Amount | `ecommerce.value` |
+| Currency | `ecommerce.currency` |
+| Items | `ecommerce.items` |
+| Shipping and tax | `ecommerce.shipping`, `ecommerce.tax` |
+| UTM parameters | `attribution.utm_source`, `attribution.utm_medium`, `attribution.utm_campaign` |
+| Google click ID | `attribution.gclid` |
+| Meta click ID | `attribution.metadata.fbclid` |
+
+The events also carry the shopper's email, phone, name and address under `user_properties`. Decide which tags may read them, and see [Privacy and consent](/docs/campaigns/tracking#privacy-and-consent).
+
+## Purchases and upsells
+
+| | `dl_purchase` | `dl_upsell_purchase` |
+| --- | --- | --- |
+| When | The first page after payment | The page after an upsell is accepted |
+| Order ID | The order number, for example `100041` | The order reference followed by `-US1`, `-US2` and so on |
+| Amount | The price of the items as shown on your store, without shipping | The upsell only |
+
+- A purchase is sent once per order. Reloading the page does not send it again.
+- A tag on `dl_purchase` alone misses upsell revenue. Add a tag on `dl_upsell_purchase` if you want it.
+- The amount is the item prices only. Add `ecommerce.shipping` if your platform should see shipping. On a store that shows prices without tax, add `ecommerce.tax` as well.
+
+<Callout type="warn" title="Send each platform one purchase">
+If a platform is already turned on in your campaign, for example GA4 or TikTok, do not also send it purchases from GTM. See [Send each purchase from one place](/docs/campaigns/tracking#send-each-purchase-from-one-place).
+</Callout>
+
+### Google Ads conversions
+
+To count purchases in Google Ads from GTM, add a Google Ads conversion tag on a `dl_purchase` trigger. Set its order ID to `ecommerce.transaction_id`, its value to `ecommerce.value` and its currency to `ecommerce.currency`. Add a second tag on `dl_upsell_purchase` to count upsells.
+
+Do this only if you are not already importing purchases into Google Ads from GA4. See [Use GA4 purchases in Google Ads](/docs/campaigns/tracking/google-analytics-4#use-ga4-purchases-in-google-ads).
+
+## Verify it works
+
+1. Start **Preview** mode in your GTM container and open your campaign.
+2. You should see `dl_user_data` first, then the other events as you move through the funnel.
+3. Place an order with a [test card](/docs/testing). On the next page, `dl_purchase` appears with the order number.
+4. Accept an upsell. `dl_upsell_purchase` appears on the page after it.
+
+## Troubleshooting
+
+| Problem | Likely cause | Fix |
+| --- | --- | --- |
+| The container does not load | `gtm_id` is missing or empty | Add your container ID and rebuild |
+| The container loads but receives no events | `gtm` is switched off in `assets/config.js` | Switch it on |
+| Tags do not fire | The trigger's event name does not match | Copy the name from GTM Preview |
+| A page view trigger never fires | It listens for `dl_page_view` | Use `dl_user_data` |
+
+More help is in [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting).
+
+## Hand-built campaigns
+
+On a campaign that is not built from a starter template, add your GTM container to every page yourself, then switch `gtm` on as in step 2. See the [Campaign Cart SDK analytics docs](https://cart-sdk.nextcommerce.com/v0.4.43/reference/analytics-events).

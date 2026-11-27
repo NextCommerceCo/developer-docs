@@ -53,6 +53,9 @@ https://yourapp.com/setup/authorize/?store={network_domain}&code={authorization_
 After you have the `authorization_code`, you then need to retrieve the access token to gain access to the Admin API.
 
 **Send a POST Request to `https://{network_domain}/oauth2/token/` to retrieve your access token**
+<Callout type="warn">
+Check `network_domain` before you send this request. It must be a store network domain in the format `{store}.29next.store`. The `store` parameter arrives in the URL, so anyone can call your Redirect URL with a different domain. If you post to an unchecked domain, you send your `client_secret` to whoever owns it.
+</Callout>
 <Callout type="info">
 Post request must be sent as `application/x-www-form-urlencoded` format.
 </Callout>

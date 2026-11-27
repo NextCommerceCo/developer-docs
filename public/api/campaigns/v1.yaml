@@ -997,6 +997,8 @@ components:
 
             * `sofort` - Sofort
 
+            * `swish` - Swish
+
             * `twint` - Twint'
           nullable: true
           oneOf:
@@ -1427,6 +1429,8 @@ components:
 
             * `sofort` - Sofort
 
+            * `swish` - Swish
+
             * `twint` - Twint'
       required:
       - payment_method
@@ -1483,6 +1487,8 @@ components:
 
         * `sofort` - Sofort
 
+        * `swish` - Swish
+
         * `twint` - Twint'
       enum:
       - affirm
@@ -1500,6 +1506,7 @@ components:
       - sepa_debit
       - shop_pay
       - sofort
+      - swish
       - twint
       type: string
     ProductInventoryAvailabilityEnum:

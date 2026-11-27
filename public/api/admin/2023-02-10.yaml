@@ -162,7 +162,7 @@ components:
           type:
           - string
           - 'null'
-          x-spec-enum-id: 0615dfb0936c2c3f
+          x-spec-enum-id: c0cf6bc6e54c4dfa
         lines:
           items:
             type:
@@ -174,10 +174,12 @@ components:
           - boolean
           - 'null'
         tracking_code:
+          maxLength: 256
           type:
           - string
           - 'null'
         tracking_link:
+          maxLength: 256
           type:
           - string
           - 'null'
@@ -209,6 +211,7 @@ components:
       properties:
         email:
           format: email
+          maxLength: 254
           title: Email address
           type:
           - string
@@ -234,7 +237,9 @@ components:
         file:
           format: uri
           pattern: (?:jpg|png|pdf|webp|jpeg|doc|docx|csv|xlsx|xls|gif|svg|ico|eot|ttf|woff|woff2|mp4|webm|mp3|mov|css|js|scss|sass|zip|rar|tar|gz|7z)$
-          type: string
+          type:
+          - string
+          - 'null'
         id:
           readOnly: true
           type: integer
@@ -289,6 +294,7 @@ components:
       properties:
         email:
           format: email
+          maxLength: 254
           title: Email address
           type:
           - string
@@ -324,6 +330,126 @@ components:
           type: object
       required:
       - available_locations
+      type: object
+    BaseTransaction:
+      properties:
+        amount:
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          type: string
+        amount_available_for_refund:
+          default: '0.00'
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          type: string
+        attribution:
+          allOf:
+          - $ref: '#/components/schemas/MarketingAttribution'
+          readOnly: true
+        auth_code:
+          maxLength: 255
+          type:
+          - string
+          - 'null'
+        currency:
+          maxLength: 6
+          type:
+          - string
+          - 'null'
+        date_created:
+          format: date-time
+          readOnly: true
+          type: string
+        external_id:
+          maxLength: 255
+          type:
+          - string
+          - 'null'
+        id:
+          readOnly: true
+          type: integer
+        initiator:
+          allOf:
+          - $ref: '#/components/schemas/Agent'
+          readOnly: true
+        is_disputed:
+          type: boolean
+        is_external:
+          type: boolean
+        is_test:
+          type:
+          - boolean
+          - 'null'
+        network_transaction_id:
+          maxLength: 255
+          type:
+          - string
+          - 'null'
+        order:
+          type:
+          - string
+          - 'null'
+        parent_id:
+          description: "The ID of an associated transaction.\n- For capture transactions,\
+            \ the parent is the authorization transaction. \n- For void transactions,\
+            \ the parent is the authorization transaction. \n- For refund transactions,\
+            \ the parent is the debit transaction. \n"
+          readOnly: true
+          type:
+          - integer
+          - 'null'
+        payment_details:
+          allOf:
+          - $ref: '#/components/schemas/TransactionPaymentDetail'
+          readOnly: true
+        payment_method:
+          maxLength: 255
+          type:
+          - string
+          - 'null'
+        report_values:
+          allOf:
+          - $ref: '#/components/schemas/TransactionReportValues'
+          readOnly: true
+        response_code:
+          type: integer
+        statement_descriptor:
+          maxLength: 255
+          type:
+          - string
+          - 'null'
+        status:
+          description: '* `succeeded` - Succeeded
+
+            * `failed` - Failed'
+          enum:
+          - succeeded
+          - failed
+          - ''
+          type: string
+          x-spec-enum-id: d90eeb0b4be0fcef
+        subscription:
+          allOf:
+          - $ref: '#/components/schemas/TransactionSubscription'
+          readOnly: true
+        type:
+          type: string
+        user:
+          $ref: '#/components/schemas/UserInline'
+      required:
+      - amount
+      - attribution
+      - date_created
+      - id
+      - initiator
+      - order
+      - parent_id
+      - payment_details
+      - report_values
+      - response_code
+      - subscription
+      - type
+      - user
       type: object
     BillingAddress:
       properties:
@@ -487,8 +613,9 @@ components:
           - schedule_ended
           - other
           type: string
-          x-spec-enum-id: f4552e8661c0211b
+          x-spec-enum-id: 4d85ae9d9d4c9e39
         cancel_reason_other_message:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -501,6 +628,7 @@ components:
     CancellationRequestAcceptRequest:
       properties:
         message:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -508,6 +636,7 @@ components:
     CancellationRequestCancelRequest:
       properties:
         message:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -519,6 +648,7 @@ components:
           readOnly: true
           type: string
         message:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -537,6 +667,7 @@ components:
     CancellationRequestRejectRequest:
       properties:
         message:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -544,6 +675,7 @@ components:
     CancellationRequestRequest:
       properties:
         message:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -757,6 +889,7 @@ components:
         external_tax_code:
           description: Tax code to be used with external tax systems such as Avalara,
             Taxjar.
+          maxLength: 64
           title: Tax Code
           type:
           - string
@@ -766,10 +899,13 @@ components:
           type: integer
         image:
           description: URL of the image to fetch and associate with the category
-          format: uri
-          type:
-          - string
-          - 'null'
+          oneOf:
+          - format: uri
+            type:
+            - string
+            - 'null'
+          - maxLength: 0
+            type: string
         is_public:
           description: Show this category in search results and catalogue listings.
           type: boolean
@@ -778,6 +914,7 @@ components:
           - string
           - 'null'
         meta_title:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -791,6 +928,7 @@ components:
         template:
           description: Use a custom template from your theme to customize the category
             display.
+          maxLength: 256
           title: Theme Template
           type:
           - string
@@ -807,16 +945,20 @@ components:
         external_tax_code:
           description: Tax code to be used with external tax systems such as Avalara,
             Taxjar.
+          maxLength: 64
           title: Tax Code
           type:
           - string
           - 'null'
         image:
           description: URL of the image to fetch and associate with the category
-          format: uri
-          type:
-          - string
-          - 'null'
+          oneOf:
+          - format: uri
+            type:
+            - string
+            - 'null'
+          - maxLength: 0
+            type: string
         is_public:
           description: Show this category in search results and catalogue listings.
           type: boolean
@@ -825,6 +967,7 @@ components:
           - string
           - 'null'
         meta_title:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -840,6 +983,7 @@ components:
         template:
           description: Use a custom template from your theme to customize the category
             display.
+          maxLength: 256
           title: Theme Template
           type:
           - string
@@ -986,7 +1130,7 @@ components:
           - blog
           - page
           type: string
-          x-spec-enum-id: 06e58adfbb02ad1f
+          x-spec-enum-id: 0f14c63699a4309c
         type:
           description: 'Expected data type.
 
@@ -1013,7 +1157,7 @@ components:
           - file
           - boolean
           type: string
-          x-spec-enum-id: 079b46b0c121a3e8
+          x-spec-enum-id: 75a72eebc60d38aa
         validations:
           items:
             $ref: '#/components/schemas/ValidationRequest'
@@ -1042,10 +1186,12 @@ components:
           - string
           - 'null'
         arn:
+          maxLength: 256
           type:
           - string
           - 'null'
         case_number:
+          maxLength: 256
           type:
           - string
           - 'null'
@@ -1100,8 +1246,9 @@ components:
           type:
           - string
           - 'null'
-          x-spec-enum-id: 8848f3a079993862
+          x-spec-enum-id: e6e5fbbffbd90aea
         resolution_other_message:
+          maxLength: 256
           title: Other Message
           type:
           - string
@@ -1169,7 +1316,7 @@ components:
           - fulfillment_list
           - fulfillment_line_items
           type: string
-          x-spec-enum-id: d018e10950f018b1
+          x-spec-enum-id: 30c9aea5b6855a62
       required:
       - date_from
       - date_to
@@ -1207,12 +1354,14 @@ components:
           - 'null'
         line1:
           description: The first line of the address.
+          maxLength: 255
           title: First line of address
           type:
           - string
           - 'null'
         line2:
           description: Optional second line of of the address.
+          maxLength: 255
           title: Second line of address
           type:
           - string
@@ -1225,17 +1374,20 @@ components:
           - number
           - 'null'
         message:
+          maxLength: 1024
           type:
           - string
           - 'null'
         postcode:
           description: The address post code or zip code.
+          maxLength: 64
           title: Post/Zip-code
           type:
           - string
           - 'null'
         state:
           description: The address state/province.
+          maxLength: 255
           title: State/County
           type:
           - string
@@ -1281,7 +1433,7 @@ components:
           - delivered
           - delayed
           type: string
-          x-spec-enum-id: 99c7bdf85f387700
+          x-spec-enum-id: 5245d9f0b9d4d718
       required:
       - status
       type: object
@@ -1333,6 +1485,7 @@ components:
       properties:
         affiliate:
           description: Affiliate identifier.
+          maxLength: 500
           type:
           - string
           - 'null'
@@ -1343,11 +1496,13 @@ components:
           - 'null'
         funnel:
           description: The marketing funnel attributed to the order.
+          maxLength: 500
           type:
           - string
           - 'null'
         gclid:
           description: Google Click Identifier.
+          maxLength: 500
           type:
           - string
           - 'null'
@@ -1355,56 +1510,66 @@ components:
           description: Additional attribution metadata.
         subaffiliate1:
           description: Sub-affiliate identifier 1.
+          maxLength: 500
           title: Sub-Affiliate 1
           type:
           - string
           - 'null'
         subaffiliate2:
           description: Sub-affiliate identifier 2.
+          maxLength: 500
           title: Sub-Affiliate 2
           type:
           - string
           - 'null'
         subaffiliate3:
           description: Sub-affiliate identifier 3.
+          maxLength: 500
           title: Sub-Affiliate 3
           type:
           - string
           - 'null'
         subaffiliate4:
           description: Sub-affiliate identifier 4.
+          maxLength: 500
           title: Sub-Affiliate 4
           type:
           - string
           - 'null'
         subaffiliate5:
           description: ' Sub-affiliate identifier 5.'
+          maxLength: 500
           title: Sub-Affiliate 5
           type:
           - string
           - 'null'
         utm_campaign:
           description: Campaign name.
+          maxLength: 500
           type:
           - string
           - 'null'
         utm_content:
           description: Content of the traffic (e.g., banner, text link).
+          maxLength: 500
           type:
           - string
           - 'null'
         utm_medium:
           description: Medium of the traffic (e.g., email, CPC).
+          maxLength: 500
           type:
           - string
           - 'null'
         utm_source:
           description: Source of the traffic (e.g., search engine, newsletter).
+          maxLength: 500
           type:
           - string
           - 'null'
         utm_term:
           description: Search term or keyword.
+          maxLength: 500
           type:
           - string
           - 'null'
@@ -1542,7 +1707,7 @@ components:
           type:
           - string
           - 'null'
-          x-spec-enum-id: a675a9ef34de654c
+          x-spec-enum-id: 8245140393ae0d5a
         send_receipt:
           default: true
           type: boolean
@@ -1551,6 +1716,7 @@ components:
           - $ref: '#/components/schemas/ShippingAddressRequest'
           - type: 'null'
         shipping_code:
+          maxLength: 128
           minLength: 1
           type:
           - string
@@ -1573,7 +1739,7 @@ components:
           type:
           - string
           - 'null'
-          x-spec-enum-id: 84cac15b283ee444
+          x-spec-enum-id: af219430b549e143
         tags:
           items:
             minLength: 1
@@ -1615,7 +1781,7 @@ components:
           - month
           - year
           type: string
-          x-spec-enum-id: b47bd58ee0e62834
+          x-spec-enum-id: cf8e742c49e533bc
         interval_count:
           minimum: 1
           type: integer
@@ -1645,6 +1811,7 @@ components:
         external_tax_code:
           description: Tax code to be used with external tax systems such as Avalara,
             TaxJar.
+          maxLength: 64
           title: Tax Code
           type:
           - string
@@ -1668,7 +1835,7 @@ components:
           type:
           - string
           - 'null'
-          x-spec-enum-id: b47bd58ee0e62834
+          x-spec-enum-id: cf8e742c49e533bc
         interval_counts:
           description: Choose a predefined value or type to enter custom value(s).
           items:
@@ -1692,6 +1859,7 @@ components:
           - string
           - 'null'
         meta_title:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -1715,6 +1883,7 @@ components:
           type: string
         template:
           description: Custom template name from your theme, ie catalogue/product.{custom_name}.html
+          maxLength: 256
           title: Theme Template
           type:
           - string
@@ -1759,6 +1928,7 @@ components:
           type: boolean
         sku:
           description: Stock Keeping Unit
+          maxLength: 128
           type:
           - string
           - 'null'
@@ -1779,6 +1949,7 @@ components:
           - 'null'
         upc:
           description: Universal Product Code
+          maxLength: 64
           type:
           - string
           - 'null'
@@ -1809,6 +1980,7 @@ components:
           type: boolean
         sku:
           description: Stock Keeping Unit
+          maxLength: 128
           type:
           - string
           - 'null'
@@ -1829,6 +2001,7 @@ components:
           - 'null'
         upc:
           description: Universal Product Code
+          maxLength: 64
           type:
           - string
           - 'null'
@@ -1894,7 +2067,7 @@ components:
           - month
           - year
           type: string
-          x-spec-enum-id: b47bd58ee0e62834
+          x-spec-enum-id: cf8e742c49e533bc
         interval_count:
           minimum: 1
           type: integer
@@ -1921,6 +2094,7 @@ components:
           - $ref: '#/components/schemas/ShippingAddressRequest'
           - type: 'null'
         shipping_code:
+          maxLength: 128
           minLength: 1
           type:
           - string
@@ -1962,10 +2136,14 @@ components:
         from_email:
           description: In case user contact from email and user does not in system
             yet.
-          format: email
-          type:
-          - string
-          - 'null'
+          oneOf:
+          - format: email
+            maxLength: 254
+            type:
+            - string
+            - 'null'
+          - maxLength: 0
+            type: string
         is_public:
           type: boolean
       type: object
@@ -1978,6 +2156,7 @@ components:
           - string
           - 'null'
         meta_title:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -1986,11 +2165,13 @@ components:
           - {}
           - type: 'null'
         slug:
+          maxLength: 100
           type:
           - string
           - 'null'
         template:
           description: Custom template name from your theme, ie pages/page.{custom_name}.html
+          maxLength: 256
           type:
           - string
           - 'null'
@@ -2030,10 +2211,14 @@ components:
         from_email:
           description: In case user contact from email and user does not in system
             yet.
-          format: email
-          type:
-          - string
-          - 'null'
+          oneOf:
+          - format: email
+            maxLength: 254
+            type:
+            - string
+            - 'null'
+          - maxLength: 0
+            type: string
         order:
           minLength: 1
           title: Order number
@@ -2051,7 +2236,7 @@ components:
           - medium
           - low
           type: string
-          x-spec-enum-id: 2d141e09614b8e57
+          x-spec-enum-id: 3cd2babd9a875ec3
         products:
           items:
             type: integer
@@ -2077,7 +2262,7 @@ components:
           - solved
           - closed
           type: string
-          x-spec-enum-id: 30751850e74b0756
+          x-spec-enum-id: cb3ac9163b5b890b
         subject:
           minLength: 1
           type: string
@@ -2139,7 +2324,7 @@ components:
           type:
           - string
           - 'null'
-          x-spec-enum-id: 70ceea9c8488568b
+          x-spec-enum-id: db1e31d38860b082
         last_name:
           maxLength: 255
           type: string
@@ -2148,6 +2333,7 @@ components:
           - {}
           - type: 'null'
         phone_number:
+          maxLength: 128
           type:
           - string
           - 'null'
@@ -2158,6 +2344,7 @@ components:
             - 'null'
           type: array
         user_agent:
+          maxLength: 500
           type:
           - string
           - 'null'
@@ -2354,7 +2541,7 @@ components:
           type:
           - string
           - 'null'
-          x-spec-enum-id: 70ceea9c8488568b
+          x-spec-enum-id: db1e31d38860b082
         last_name:
           maxLength: 255
           type: string
@@ -2363,6 +2550,7 @@ components:
           - {}
           - type: 'null'
         phone_number:
+          maxLength: 128
           type:
           - string
           - 'null'
@@ -2374,6 +2562,7 @@ components:
             - 'null'
           type: array
         user_agent:
+          maxLength: 500
           type:
           - string
           - 'null'
@@ -2445,7 +2634,7 @@ components:
           - blog
           - page
           type: string
-          x-spec-enum-id: 06e58adfbb02ad1f
+          x-spec-enum-id: 0f14c63699a4309c
         type:
           description: 'Expected data type.
 
@@ -2472,7 +2661,7 @@ components:
           - file
           - boolean
           type: string
-          x-spec-enum-id: 079b46b0c121a3e8
+          x-spec-enum-id: 75a72eebc60d38aa
         updated_at:
           format: date-time
           readOnly: true
@@ -2502,14 +2691,18 @@ components:
           - string
           - 'null'
         arn:
+          maxLength: 256
           type:
           - string
           - 'null'
         case_number:
+          maxLength: 256
           type:
           - string
           - 'null'
         currency:
+          maxLength: 3
+          title: Dispute Currency
           type:
           - string
           - 'null'
@@ -2519,7 +2712,6 @@ components:
           type: string
         happened_at:
           format: date-time
-          readOnly: true
           title: Dispute Date
           type: string
         id:
@@ -2537,12 +2729,11 @@ components:
         report_amount:
           format: decimal
           pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
-          readOnly: true
           type:
           - string
           - 'null'
         report_currency:
-          readOnly: true
+          maxLength: 3
           type:
           - string
           - 'null'
@@ -2585,8 +2776,9 @@ components:
           type:
           - string
           - 'null'
-          x-spec-enum-id: 8848f3a079993862
+          x-spec-enum-id: e6e5fbbffbd90aea
         resolution_other_message:
+          maxLength: 256
           title: Other Message
           type:
           - string
@@ -2601,13 +2793,12 @@ components:
           - new
           - open
           - resolved
-          readOnly: true
           type: string
           x-spec-enum-id: 4c48cc1c536a35b2
         transaction:
-          type:
-          - integer
-          - 'null'
+          allOf:
+          - $ref: '#/components/schemas/BaseTransaction'
+          readOnly: true
         type:
           description: '* `alert` - Alert
 
@@ -2615,18 +2806,13 @@ components:
           enum:
           - alert
           - chargeback
-          readOnly: true
           type: string
           x-spec-enum-id: 3c60da80149644ea
       required:
       - date_created
-      - happened_at
       - id
       - order
-      - report_amount
-      - report_currency
-      - status
-      - type
+      - transaction
       type: object
     DisputeNote:
       properties:
@@ -2654,81 +2840,6 @@ components:
       - id
       - message
       - updated_at
-      type: object
-    DisputeRequest:
-      properties:
-        amount:
-          format: decimal
-          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
-          title: Dispute Amount
-          type:
-          - string
-          - 'null'
-        arn:
-          type:
-          - string
-          - 'null'
-        case_number:
-          type:
-          - string
-          - 'null'
-        currency:
-          type:
-          - string
-          - 'null'
-        metadata:
-          oneOf:
-          - {}
-          - type: 'null'
-        resolution:
-          description: '* `could_not_find_order` - Transaction Not found
-
-            * `declined_or_canceled_nothing_to_do` - Nothing To Do
-
-            * `issued_full_refund` - Issued Full Refund
-
-            * `issued_refund_for_remaining_amount` - Refunded Remaining Amount
-
-            * `3ds_authorized_successfully` - Transaction 3DS Authorized
-
-            * `previously_refunded_nothing_to_do` - Previously Refunded
-
-            * `unable_to_refund_merchant_account_closed` - Unable to Refund
-
-            * `won` - Won
-
-            * `lost` - Lost
-
-            * `accepted` - Accepted
-
-            * `other` - Other'
-          enum:
-          - could_not_find_order
-          - declined_or_canceled_nothing_to_do
-          - issued_full_refund
-          - issued_refund_for_remaining_amount
-          - 3ds_authorized_successfully
-          - previously_refunded_nothing_to_do
-          - unable_to_refund_merchant_account_closed
-          - won
-          - lost
-          - accepted
-          - other
-          - ''
-          - null
-          type:
-          - string
-          - 'null'
-          x-spec-enum-id: 8848f3a079993862
-        resolution_other_message:
-          title: Other Message
-          type:
-          - string
-          - 'null'
-        transaction:
-          type:
-          - integer
-          - 'null'
       type: object
     Export:
       properties:
@@ -2800,7 +2911,7 @@ components:
           - fulfillment_line_items
           readOnly: true
           type: string
-          x-spec-enum-id: d018e10950f018b1
+          x-spec-enum-id: 30c9aea5b6855a62
         url:
           format: uri
           readOnly: true
@@ -2882,7 +2993,7 @@ components:
           - delayed
           - ''
           readOnly: true
-          x-spec-enum-id: 3b886e5b796c0603
+          x-spec-enum-id: 78c64ad217bd1c84
         id:
           readOnly: true
           type: integer
@@ -2961,12 +3072,14 @@ components:
           - 'null'
         line1:
           description: The first line of the address.
+          maxLength: 255
           title: First line of address
           type:
           - string
           - 'null'
         line2:
           description: Optional second line of of the address.
+          maxLength: 255
           title: Second line of address
           type:
           - string
@@ -2979,6 +3092,7 @@ components:
           - number
           - 'null'
         message:
+          maxLength: 1024
           type:
           - string
           - 'null'
@@ -2986,12 +3100,14 @@ components:
           type: string
         postcode:
           description: The address post code or zip code.
+          maxLength: 64
           title: Post/Zip-code
           type:
           - string
           - 'null'
         state:
           description: The address state/province.
+          maxLength: 255
           title: State/County
           type:
           - string
@@ -3037,7 +3153,7 @@ components:
           - delivered
           - delayed
           type: string
-          x-spec-enum-id: 99c7bdf85f387700
+          x-spec-enum-id: 5245d9f0b9d4d718
         updated_at:
           format: date-time
           readOnly: true
@@ -3074,8 +3190,9 @@ components:
           - awaiting_payment
           - other
           type: string
-          x-spec-enum-id: 673dfdc898bbc483
+          x-spec-enum-id: 4d22461e9de575ca
         reason_message:
+          maxLength: 512
           type:
           - string
           - 'null'
@@ -3129,7 +3246,9 @@ components:
         product_image:
           format: uri
           readOnly: true
-          type: string
+          type:
+          - string
+          - 'null'
         product_title:
           readOnly: true
           type: string
@@ -3249,7 +3368,7 @@ components:
           - cancel_rejected
           - closed
           type: string
-          x-spec-enum-id: 5e87a3d9cb8f7ccc
+          x-spec-enum-id: 87616f6e5cb69292
         shipping_address:
           oneOf:
           - $ref: '#/components/schemas/FulfillmentShippingAddress'
@@ -3279,7 +3398,7 @@ components:
           - closed
           - canceled
           type: string
-          x-spec-enum-id: 4980268d45eef5a2
+          x-spec-enum-id: 4f648d8930039938
         supported_actions:
           items: {}
           type:
@@ -3352,7 +3471,9 @@ components:
         product_image:
           format: uri
           readOnly: true
-          type: string
+          type:
+          - string
+          - 'null'
         product_title:
           readOnly: true
           type: string
@@ -3433,6 +3554,7 @@ components:
     FulfillmentRequestAcceptRequest:
       properties:
         message:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -3440,6 +3562,7 @@ components:
     FulfillmentRequestCancelRequest:
       properties:
         message:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -3451,6 +3574,7 @@ components:
           readOnly: true
           type: string
         message:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -3475,7 +3599,7 @@ components:
           type:
           - string
           - 'null'
-          x-spec-enum-id: e024b9d5cc05f27d
+          x-spec-enum-id: 03f2bb14b0902f0f
         type:
           description: '* `accepted` - Accepted
 
@@ -3491,6 +3615,7 @@ components:
     FulfillmentRequestRejectRequest:
       properties:
         message:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -3515,7 +3640,7 @@ components:
           type:
           - string
           - 'null'
-          x-spec-enum-id: e024b9d5cc05f27d
+          x-spec-enum-id: 03f2bb14b0902f0f
       type: object
     FulfillmentRequestRequest:
       properties:
@@ -3524,6 +3649,7 @@ components:
             $ref: '#/components/schemas/FulfillmentOrderLineItemRequest'
           type: array
         message:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -3583,7 +3709,7 @@ components:
           - delayed
           - ''
           readOnly: true
-          x-spec-enum-id: 3b886e5b796c0603
+          x-spec-enum-id: 78c64ad217bd1c84
         id:
           readOnly: true
           type: integer
@@ -3624,7 +3750,7 @@ components:
           - canceled
           readOnly: true
           type: string
-          x-spec-enum-id: 4d2f0d468cf04267
+          x-spec-enum-id: df583f0f55f46c75
         tracking_carrier:
           type: string
         tracking_carriers:
@@ -3815,8 +3941,9 @@ components:
           - awaiting_payment
           - other
           type: string
-          x-spec-enum-id: 673dfdc898bbc483
+          x-spec-enum-id: 4d22461e9de575ca
         reason_message:
+          maxLength: 512
           type:
           - string
           - 'null'
@@ -3998,6 +4125,7 @@ components:
       properties:
         affiliate:
           description: Affiliate identifier.
+          maxLength: 500
           type:
           - string
           - 'null'
@@ -4010,6 +4138,7 @@ components:
           - 'null'
         gclid:
           description: Google Click Identifier.
+          maxLength: 500
           type:
           - string
           - 'null'
@@ -4017,56 +4146,66 @@ components:
           description: Additional attribution metadata.
         subaffiliate1:
           description: Sub-affiliate identifier 1.
+          maxLength: 500
           title: Sub-Affiliate 1
           type:
           - string
           - 'null'
         subaffiliate2:
           description: Sub-affiliate identifier 2.
+          maxLength: 500
           title: Sub-Affiliate 2
           type:
           - string
           - 'null'
         subaffiliate3:
           description: Sub-affiliate identifier 3.
+          maxLength: 500
           title: Sub-Affiliate 3
           type:
           - string
           - 'null'
         subaffiliate4:
           description: Sub-affiliate identifier 4.
+          maxLength: 500
           title: Sub-Affiliate 4
           type:
           - string
           - 'null'
         subaffiliate5:
           description: ' Sub-affiliate identifier 5.'
+          maxLength: 500
           title: Sub-Affiliate 5
           type:
           - string
           - 'null'
         utm_campaign:
           description: Campaign name.
+          maxLength: 500
           type:
           - string
           - 'null'
         utm_content:
           description: Content of the traffic (e.g., banner, text link).
+          maxLength: 500
           type:
           - string
           - 'null'
         utm_medium:
           description: Medium of the traffic (e.g., email, CPC).
+          maxLength: 500
           type:
           - string
           - 'null'
         utm_source:
           description: Source of the traffic (e.g., search engine, newsletter).
+          maxLength: 500
           type:
           - string
           - 'null'
         utm_term:
           description: Search term or keyword.
+          maxLength: 500
           type:
           - string
           - 'null'
@@ -4120,6 +4259,7 @@ components:
           readOnly: true
           type: string
         message:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -4133,7 +4273,7 @@ components:
           - fulfill_request
           - cancel_request
           type: string
-          x-spec-enum-id: 4d67e89980fba849
+          x-spec-enum-id: 3f100ec001141fee
       required:
       - created_at
       type: object
@@ -4168,7 +4308,7 @@ components:
     OAuthApp:
       properties:
         client_id:
-          maxLength: 100
+          maxLength: 255
           type: string
         name:
           maxLength: 255
@@ -4222,7 +4362,7 @@ components:
           - fulfilled
           - incomplete
           type: string
-          x-spec-enum-id: f7a016fc10fb8390
+          x-spec-enum-id: ff859f1a4104382a
         fulfillments:
           items:
             $ref: '#/components/schemas/Fulfillment'
@@ -4307,7 +4447,7 @@ components:
           - partially_voided
           readOnly: true
           type: string
-          x-spec-enum-id: 4ddf29c57b2eb8f6
+          x-spec-enum-id: 1ca0522e41da3869
         refunds:
           items:
             $ref: '#/components/schemas/Refund'
@@ -4725,7 +4865,7 @@ components:
           - fulfilled
           - incomplete
           type: string
-          x-spec-enum-id: f7a016fc10fb8390
+          x-spec-enum-id: ff859f1a4104382a
         is_test:
           readOnly: true
           type: boolean
@@ -4806,7 +4946,7 @@ components:
           - partially_voided
           readOnly: true
           type: string
-          x-spec-enum-id: 4ddf29c57b2eb8f6
+          x-spec-enum-id: 1ca0522e41da3869
         shipping_address:
           deprecated: true
           oneOf:
@@ -5094,6 +5234,7 @@ components:
           - string
           - 'null'
         meta_title:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -5106,6 +5247,7 @@ components:
           type: string
         template:
           description: Custom template name from your theme, ie pages/page.{custom_name}.html
+          maxLength: 256
           type:
           - string
           - 'null'
@@ -5677,6 +5819,7 @@ components:
           - string
           - 'null'
         meta_title:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -5685,11 +5828,13 @@ components:
           - {}
           - type: 'null'
         slug:
+          maxLength: 100
           type:
           - string
           - 'null'
         template:
           description: Custom template name from your theme, ie pages/page.{custom_name}.html
+          maxLength: 256
           type:
           - string
           - 'null'
@@ -5724,10 +5869,14 @@ components:
         from_email:
           description: In case user contact from email and user does not in system
             yet.
-          format: email
-          type:
-          - string
-          - 'null'
+          oneOf:
+          - format: email
+            maxLength: 254
+            type:
+            - string
+            - 'null'
+          - maxLength: 0
+            type: string
         order:
           minLength: 1
           title: Order number
@@ -5745,7 +5894,7 @@ components:
           - medium
           - low
           type: string
-          x-spec-enum-id: 2d141e09614b8e57
+          x-spec-enum-id: 3cd2babd9a875ec3
         products:
           items:
             type: integer
@@ -5771,7 +5920,7 @@ components:
           - solved
           - closed
           type: string
-          x-spec-enum-id: 30751850e74b0756
+          x-spec-enum-id: cb3ac9163b5b890b
         subject:
           minLength: 1
           type: string
@@ -5783,81 +5932,6 @@ components:
             - 'null'
           type: array
         ticket_type:
-          type:
-          - integer
-          - 'null'
-      type: object
-    PatchedDisputeRequest:
-      properties:
-        amount:
-          format: decimal
-          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
-          title: Dispute Amount
-          type:
-          - string
-          - 'null'
-        arn:
-          type:
-          - string
-          - 'null'
-        case_number:
-          type:
-          - string
-          - 'null'
-        currency:
-          type:
-          - string
-          - 'null'
-        metadata:
-          oneOf:
-          - {}
-          - type: 'null'
-        resolution:
-          description: '* `could_not_find_order` - Transaction Not found
-
-            * `declined_or_canceled_nothing_to_do` - Nothing To Do
-
-            * `issued_full_refund` - Issued Full Refund
-
-            * `issued_refund_for_remaining_amount` - Refunded Remaining Amount
-
-            * `3ds_authorized_successfully` - Transaction 3DS Authorized
-
-            * `previously_refunded_nothing_to_do` - Previously Refunded
-
-            * `unable_to_refund_merchant_account_closed` - Unable to Refund
-
-            * `won` - Won
-
-            * `lost` - Lost
-
-            * `accepted` - Accepted
-
-            * `other` - Other'
-          enum:
-          - could_not_find_order
-          - declined_or_canceled_nothing_to_do
-          - issued_full_refund
-          - issued_refund_for_remaining_amount
-          - 3ds_authorized_successfully
-          - previously_refunded_nothing_to_do
-          - unable_to_refund_merchant_account_closed
-          - won
-          - lost
-          - accepted
-          - other
-          - ''
-          - null
-          type:
-          - string
-          - 'null'
-          x-spec-enum-id: 8848f3a079993862
-        resolution_other_message:
-          title: Other Message
-          type:
-          - string
-          - 'null'
-        transaction:
           type:
           - integer
           - 'null'
@@ -5922,11 +5996,89 @@ components:
           - blog
           - page
           type: string
-          x-spec-enum-id: 06e58adfbb02ad1f
+          x-spec-enum-id: 0f14c63699a4309c
         validations:
           items:
             $ref: '#/components/schemas/ValidationRequest'
           type: array
+      type: object
+    PatchedUpdateDisputeRequest:
+      properties:
+        amount:
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          title: Dispute Amount
+          type:
+          - string
+          - 'null'
+        arn:
+          maxLength: 256
+          type:
+          - string
+          - 'null'
+        case_number:
+          maxLength: 256
+          type:
+          - string
+          - 'null'
+        currency:
+          type:
+          - string
+          - 'null'
+        metadata:
+          oneOf:
+          - {}
+          - type: 'null'
+        resolution:
+          description: '* `could_not_find_order` - Transaction Not found
+
+            * `declined_or_canceled_nothing_to_do` - Nothing To Do
+
+            * `issued_full_refund` - Issued Full Refund
+
+            * `issued_refund_for_remaining_amount` - Refunded Remaining Amount
+
+            * `3ds_authorized_successfully` - Transaction 3DS Authorized
+
+            * `previously_refunded_nothing_to_do` - Previously Refunded
+
+            * `unable_to_refund_merchant_account_closed` - Unable to Refund
+
+            * `won` - Won
+
+            * `lost` - Lost
+
+            * `accepted` - Accepted
+
+            * `other` - Other'
+          enum:
+          - could_not_find_order
+          - declined_or_canceled_nothing_to_do
+          - issued_full_refund
+          - issued_refund_for_remaining_amount
+          - 3ds_authorized_successfully
+          - previously_refunded_nothing_to_do
+          - unable_to_refund_merchant_account_closed
+          - won
+          - lost
+          - accepted
+          - other
+          - ''
+          - null
+          type:
+          - string
+          - 'null'
+          x-spec-enum-id: e6e5fbbffbd90aea
+        resolution_other_message:
+          maxLength: 256
+          title: Other Message
+          type:
+          - string
+          - 'null'
+        transaction:
+          type:
+          - integer
+          - 'null'
       type: object
     PatchedUpdateGiftCardRequest:
       properties:
@@ -5972,7 +6124,7 @@ components:
           - fulfilled
           - incomplete
           type: string
-          x-spec-enum-id: f7a016fc10fb8390
+          x-spec-enum-id: ff859f1a4104382a
         metadata:
           description: Additional order metadata.
           oneOf:
@@ -6041,6 +6193,7 @@ components:
         external_tax_code:
           description: Tax code to be used with external tax systems such as Avalara,
             TaxJar.
+          maxLength: 64
           title: Tax Code
           type:
           - string
@@ -6064,7 +6217,7 @@ components:
           type:
           - string
           - 'null'
-          x-spec-enum-id: b47bd58ee0e62834
+          x-spec-enum-id: cf8e742c49e533bc
         interval_counts:
           description: Choose a predefined value or type to enter custom value(s).
           items:
@@ -6088,6 +6241,7 @@ components:
           - string
           - 'null'
         meta_title:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -6111,6 +6265,7 @@ components:
           type: string
         template:
           description: Custom template name from your theme, ie catalogue/product.{custom_name}.html
+          maxLength: 256
           title: Theme Template
           type:
           - string
@@ -6145,6 +6300,7 @@ components:
           type: boolean
         sku:
           description: Stock Keeping Unit
+          maxLength: 128
           type:
           - string
           - 'null'
@@ -6161,6 +6317,7 @@ components:
           - 'null'
         upc:
           description: Universal Product Code
+          maxLength: 64
           type:
           - string
           - 'null'
@@ -6192,7 +6349,7 @@ components:
           - month
           - year
           type: string
-          x-spec-enum-id: b47bd58ee0e62834
+          x-spec-enum-id: cf8e742c49e533bc
         interval_count:
           minimum: 1
           type: integer
@@ -6236,7 +6393,7 @@ components:
           - canceled
           - retrying
           type: string
-          x-spec-enum-id: c5c93fe104ef015e
+          x-spec-enum-id: 219810e8b465a6df
       type: object
     PatchedUpdateUserRequest:
       properties:
@@ -6282,7 +6439,7 @@ components:
           type:
           - string
           - 'null'
-          x-spec-enum-id: 70ceea9c8488568b
+          x-spec-enum-id: db1e31d38860b082
         last_name:
           maxLength: 255
           type: string
@@ -6291,6 +6448,7 @@ components:
           - {}
           - type: 'null'
         phone_number:
+          maxLength: 128
           type:
           - string
           - 'null'
@@ -6302,6 +6460,7 @@ components:
             - 'null'
           type: array
         user_agent:
+          maxLength: 500
           type:
           - string
           - 'null'
@@ -6311,6 +6470,7 @@ components:
         active:
           type: boolean
         api_version:
+          maxLength: 64
           type:
           - string
           - 'null'
@@ -6339,16 +6499,18 @@ components:
             - product.updated
             - store.updated
             - subscription.created
+            - subscription.upcoming_renewal
             - subscription.updated
             - transaction.created
             - transaction.updated
             type:
             - string
             - 'null'
-            x-spec-enum-id: 2fff8156f601ff82
+            x-spec-enum-id: 17ad0a105ef56b3c
           type: array
         name:
           description: A label to identify this webhook in the list. Maximum 50 characters.
+          maxLength: 50
           title: Webhook Name
           type:
           - string
@@ -6427,7 +6589,7 @@ components:
           type:
           - string
           - 'null'
-          x-spec-enum-id: 70ceea9c8488568b
+          x-spec-enum-id: db1e31d38860b082
         payment_gateway:
           type:
           - integer
@@ -6538,7 +6700,7 @@ components:
           - charge
           - auth-capture
           type: string
-          x-spec-enum-id: 0e887a41ea162b2f
+          x-spec-enum-id: 83305e27cd52df96
         re_attemp_group:
           allOf:
           - $ref: '#/components/schemas/GatewayGroup'
@@ -6561,7 +6723,7 @@ components:
           - always
           title: 3DS Mode
           type: string
-          x-spec-enum-id: 01a6e8274c41131f
+          x-spec-enum-id: e13ca462d635e843
       required:
       - card_types
       - currencies
@@ -6658,6 +6820,7 @@ components:
         external_tax_code:
           description: Tax code to be used with external tax systems such as Avalara,
             TaxJar.
+          maxLength: 64
           title: Tax Code
           type:
           - string
@@ -6689,7 +6852,7 @@ components:
           type:
           - string
           - 'null'
-          x-spec-enum-id: b47bd58ee0e62834
+          x-spec-enum-id: cf8e742c49e533bc
         interval_counts:
           description: Choose a predefined value or type to enter custom value(s).
           items:
@@ -6713,6 +6876,7 @@ components:
           - string
           - 'null'
         meta_title:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -6752,9 +6916,10 @@ components:
           readOnly: true
           title: Product Structure
           type: string
-          x-spec-enum-id: a1df31d9b9dfd9ac
+          x-spec-enum-id: 1bcbf87f79ec2d91
         template:
           description: Custom template name from your theme, ie catalogue/product.{custom_name}.html
+          maxLength: 256
           title: Theme Template
           type:
           - string
@@ -6803,6 +6968,7 @@ components:
           type: string
         upc:
           description: Universal Product Code
+          maxLength: 64
           type:
           - string
           - 'null'
@@ -6821,6 +6987,7 @@ components:
       properties:
         upc:
           description: Universal Product Code
+          maxLength: 64
           type:
           - string
           - 'null'
@@ -6934,6 +7101,7 @@ components:
         external_tax_code:
           description: Tax code to be used with external tax systems such as Avalara,
             TaxJar.
+          maxLength: 64
           title: Tax Code
           type:
           - string
@@ -6965,7 +7133,7 @@ components:
           type:
           - string
           - 'null'
-          x-spec-enum-id: b47bd58ee0e62834
+          x-spec-enum-id: cf8e742c49e533bc
         interval_counts:
           description: Choose a predefined value or type to enter custom value(s).
           items:
@@ -7020,7 +7188,7 @@ components:
           readOnly: true
           title: Product Structure
           type: string
-          x-spec-enum-id: a1df31d9b9dfd9ac
+          x-spec-enum-id: 1bcbf87f79ec2d91
         title:
           readOnly: true
           type: string
@@ -7183,6 +7351,7 @@ components:
           type: boolean
         sku:
           description: Stock Keeping Unit
+          maxLength: 128
           type:
           - string
           - 'null'
@@ -7202,7 +7371,7 @@ components:
           - child
           title: Product Structure
           type: string
-          x-spec-enum-id: a1df31d9b9dfd9ac
+          x-spec-enum-id: 1bcbf87f79ec2d91
         title:
           readOnly: true
           type: string
@@ -7217,6 +7386,7 @@ components:
           type: string
         upc:
           description: Universal Product Code
+          maxLength: 64
           type:
           - string
           - 'null'
@@ -7294,6 +7464,7 @@ components:
     PublicApp:
       properties:
         client_id:
+          maxLength: 100
           type:
           - string
           - 'null'
@@ -7313,6 +7484,7 @@ components:
           readOnly: true
           type: string
         version:
+          maxLength: 32
           type:
           - string
           - 'null'
@@ -7334,6 +7506,7 @@ components:
           readOnly: true
           type: integer
         note:
+          maxLength: 512
           type:
           - string
           - 'null'
@@ -7409,7 +7582,7 @@ components:
           - refund_shipping
           - refund_discrepancy
           type: string
-          x-spec-enum-id: 1bc4eac94a84cc0a
+          x-spec-enum-id: 948494e93c5b1fcf
       required:
       - id
       - report_values
@@ -7453,7 +7626,7 @@ components:
           - refund_shipping
           - refund_discrepancy
           type: string
-          x-spec-enum-id: 1bc4eac94a84cc0a
+          x-spec-enum-id: 948494e93c5b1fcf
       required:
       - type
       type: object
@@ -7607,6 +7780,7 @@ components:
           format: date-time
           type: string
         note:
+          maxLength: 512
           type:
           - string
           - 'null'
@@ -7687,8 +7861,9 @@ components:
           type:
           - string
           - 'null'
-          x-spec-enum-id: 8848f3a079993862
+          x-spec-enum-id: e6e5fbbffbd90aea
         resolution_other_message:
+          maxLength: 256
           title: Other Message
           type:
           - string
@@ -7703,6 +7878,7 @@ components:
           - string
           - 'null'
         code:
+          maxLength: 128
           type:
           - string
           - 'null'
@@ -7939,9 +8115,12 @@ components:
         code:
           description: If left empty, a code name will be generated based on the name
             of the shipping method.
-          maxLength: 128
-          pattern: ^[-a-zA-Z0-9_]+$
-          type: string
+          oneOf:
+          - maxLength: 128
+            pattern: ^[-a-zA-Z0-9_]+$
+            type: string
+          - maxLength: 0
+            type: string
         countries:
           items:
             $ref: '#/components/schemas/Country'
@@ -8127,6 +8306,7 @@ components:
           - string
           - 'null'
         price_currency:
+          maxLength: 12
           title: Currency
           type:
           - string
@@ -8244,6 +8424,7 @@ components:
           - string
           - 'null'
         price_currency:
+          maxLength: 12
           title: Currency
           type:
           - string
@@ -8345,7 +8526,7 @@ components:
           - month
           - year
           type: string
-          x-spec-enum-id: b47bd58ee0e62834
+          x-spec-enum-id: cf8e742c49e533bc
         interval_count:
           minimum: 1
           type: integer
@@ -8410,7 +8591,7 @@ components:
           - retrying
           - paused
           type: string
-          x-spec-enum-id: 99133723086a4290
+          x-spec-enum-id: 7dd7ec10bcae69c1
         total:
           format: decimal
           pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
@@ -8482,7 +8663,7 @@ components:
           - month
           - year
           type: string
-          x-spec-enum-id: b47bd58ee0e62834
+          x-spec-enum-id: cf8e742c49e533bc
         interval_count:
           minimum: 1
           type: integer
@@ -8547,7 +8728,7 @@ components:
           - retrying
           - paused
           type: string
-          x-spec-enum-id: 99133723086a4290
+          x-spec-enum-id: 7dd7ec10bcae69c1
         total:
           format: decimal
           pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
@@ -8694,10 +8875,12 @@ components:
           - $ref: '#/components/schemas/MarketingAttribution'
           readOnly: true
         auth_code:
+          maxLength: 255
           type:
           - string
           - 'null'
         currency:
+          maxLength: 6
           type:
           - string
           - 'null'
@@ -8706,6 +8889,7 @@ components:
           readOnly: true
           type: string
         external_id:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -8725,6 +8909,7 @@ components:
           - boolean
           - 'null'
         network_transaction_id:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -8746,6 +8931,7 @@ components:
           - $ref: '#/components/schemas/TransactionPaymentDetail'
           readOnly: true
         payment_method:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -8756,6 +8942,7 @@ components:
         response_code:
           type: integer
         statement_descriptor:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -8768,7 +8955,7 @@ components:
           - failed
           - ''
           type: string
-          x-spec-enum-id: a6661c405ff6d2ee
+          x-spec-enum-id: d90eeb0b4be0fcef
         subscription:
           allOf:
           - $ref: '#/components/schemas/TransactionSubscription'
@@ -8872,6 +9059,7 @@ components:
           pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
           type: string
         currency:
+          maxLength: 10
           type:
           - string
           - 'null'
@@ -8887,6 +9075,7 @@ components:
           - $ref: '#/components/schemas/TaxReportValueSeraizlier'
           readOnly: true
         source:
+          maxLength: 32
           type:
           - string
           - 'null'
@@ -8906,10 +9095,12 @@ components:
           pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
           type: string
         currency:
+          maxLength: 10
           type:
           - string
           - 'null'
         source:
+          maxLength: 32
           type:
           - string
           - 'null'
@@ -8921,7 +9112,9 @@ components:
         file:
           format: uri
           title: Upload File
-          type: string
+          type:
+          - string
+          - 'null'
         name:
           description: 'Example: ''flatpages/default.html'''
           maxLength: 256
@@ -8932,7 +9125,6 @@ components:
           - 'null'
       required:
       - name
-      - theme
       type: object
     TemplateRequest:
       properties:
@@ -8953,7 +9145,6 @@ components:
           - 'null'
       required:
       - name
-      - theme
       type: object
     Theme:
       properties:
@@ -9003,7 +9194,7 @@ components:
           - api
           - follow_up
           type: string
-          x-spec-enum-id: c3aad35666245662
+          x-spec-enum-id: a1bcd0153063fefa
         comments:
           items:
             $ref: '#/components/schemas/TicketComment'
@@ -9015,10 +9206,14 @@ components:
         from_email:
           description: In case user contact from email and user does not in system
             yet.
-          format: email
-          type:
-          - string
-          - 'null'
+          oneOf:
+          - format: email
+            maxLength: 254
+            type:
+            - string
+            - 'null'
+          - maxLength: 0
+            type: string
         id:
           readOnly: true
           type: integer
@@ -9037,7 +9232,7 @@ components:
           - medium
           - low
           type: string
-          x-spec-enum-id: 2d141e09614b8e57
+          x-spec-enum-id: 3cd2babd9a875ec3
         products:
           items:
             type: integer
@@ -9063,7 +9258,7 @@ components:
           - solved
           - closed
           type: string
-          x-spec-enum-id: 30751850e74b0756
+          x-spec-enum-id: cb3ac9163b5b890b
         subject:
           type: string
         tags:
@@ -9107,10 +9302,14 @@ components:
         from_email:
           description: In case user contact from email and user does not in system
             yet.
-          format: email
-          type:
-          - string
-          - 'null'
+          oneOf:
+          - format: email
+            maxLength: 254
+            type:
+            - string
+            - 'null'
+          - maxLength: 0
+            type: string
         id:
           readOnly: true
           type: integer
@@ -9260,18 +9459,24 @@ components:
           type: string
           x-spec-enum-id: c0cf6bc6e54c4dfa
         carrier_other_name:
+          maxLength: 256
           type:
           - string
           - 'null'
         tracking_code:
+          maxLength: 256
           type:
           - string
           - 'null'
         tracking_link:
-          format: uri
-          type:
-          - string
-          - 'null'
+          oneOf:
+          - format: uri
+            maxLength: 256
+            type:
+            - string
+            - 'null'
+          - maxLength: 0
+            type: string
       required:
       - carrier
       type: object
@@ -9291,10 +9496,12 @@ components:
           - $ref: '#/components/schemas/MarketingAttribution'
           readOnly: true
         auth_code:
+          maxLength: 255
           type:
           - string
           - 'null'
         currency:
+          maxLength: 6
           type:
           - string
           - 'null'
@@ -9303,6 +9510,7 @@ components:
           readOnly: true
           type: string
         external_id:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -9322,6 +9530,7 @@ components:
           - boolean
           - 'null'
         network_transaction_id:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -9343,6 +9552,7 @@ components:
           - $ref: '#/components/schemas/TransactionPaymentDetail'
           readOnly: true
         payment_method:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -9353,6 +9563,7 @@ components:
         response_code:
           type: integer
         statement_descriptor:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -9365,7 +9576,7 @@ components:
           - failed
           - ''
           type: string
-          x-spec-enum-id: a6661c405ff6d2ee
+          x-spec-enum-id: d90eeb0b4be0fcef
         subscription:
           allOf:
           - $ref: '#/components/schemas/TransactionSubscription'
@@ -9405,10 +9616,12 @@ components:
           - $ref: '#/components/schemas/MarketingAttribution'
           readOnly: true
         auth_code:
+          maxLength: 255
           type:
           - string
           - 'null'
         currency:
+          maxLength: 6
           type:
           - string
           - 'null'
@@ -9417,6 +9630,7 @@ components:
           readOnly: true
           type: string
         external_id:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -9432,6 +9646,7 @@ components:
         is_external:
           type: boolean
         network_transaction_id:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -9453,6 +9668,7 @@ components:
           - $ref: '#/components/schemas/TransactionPaymentDetail'
           readOnly: true
         payment_method:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -9467,7 +9683,7 @@ components:
           - failed
           - ''
           type: string
-          x-spec-enum-id: a6661c405ff6d2ee
+          x-spec-enum-id: d90eeb0b4be0fcef
         subscription:
           allOf:
           - $ref: '#/components/schemas/TransactionSubscription'
@@ -9497,10 +9713,12 @@ components:
           pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
           type: string
         auth_code:
+          maxLength: 255
           type:
           - string
           - 'null'
         currency:
+          maxLength: 6
           type:
           - string
           - 'null'
@@ -9509,6 +9727,7 @@ components:
           readOnly: true
           type: string
         external_id:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -9528,6 +9747,7 @@ components:
           - boolean
           - 'null'
         network_transaction_id:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -9546,6 +9766,7 @@ components:
           - $ref: '#/components/schemas/TransactionPaymentDetail'
           readOnly: true
         payment_method:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -9556,6 +9777,7 @@ components:
         response_code:
           type: integer
         statement_descriptor:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -9568,7 +9790,7 @@ components:
           - failed
           - ''
           type: string
-          x-spec-enum-id: a6661c405ff6d2ee
+          x-spec-enum-id: d90eeb0b4be0fcef
         type:
           type: string
       required:
@@ -9588,14 +9810,17 @@ components:
           pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
           type: string
         auth_code:
+          maxLength: 255
           type:
           - string
           - 'null'
         currency:
+          maxLength: 6
           type:
           - string
           - 'null'
         external_id:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -9612,16 +9837,19 @@ components:
           - boolean
           - 'null'
         network_transaction_id:
+          maxLength: 255
           type:
           - string
           - 'null'
         payment_method:
+          maxLength: 255
           type:
           - string
           - 'null'
         response_code:
           type: integer
         statement_descriptor:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -9634,7 +9862,7 @@ components:
           - failed
           - ''
           type: string
-          x-spec-enum-id: a6661c405ff6d2ee
+          x-spec-enum-id: d90eeb0b4be0fcef
         type:
           minLength: 1
           type: string
@@ -9835,7 +10063,7 @@ components:
           - blog
           - page
           type: string
-          x-spec-enum-id: 06e58adfbb02ad1f
+          x-spec-enum-id: 0f14c63699a4309c
         validations:
           items:
             $ref: '#/components/schemas/ValidationRequest'
@@ -9843,6 +10071,84 @@ components:
       required:
       - name
       - object
+      type: object
+    UpdateDisputeRequest:
+      properties:
+        amount:
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          title: Dispute Amount
+          type:
+          - string
+          - 'null'
+        arn:
+          maxLength: 256
+          type:
+          - string
+          - 'null'
+        case_number:
+          maxLength: 256
+          type:
+          - string
+          - 'null'
+        currency:
+          type:
+          - string
+          - 'null'
+        metadata:
+          oneOf:
+          - {}
+          - type: 'null'
+        resolution:
+          description: '* `could_not_find_order` - Transaction Not found
+
+            * `declined_or_canceled_nothing_to_do` - Nothing To Do
+
+            * `issued_full_refund` - Issued Full Refund
+
+            * `issued_refund_for_remaining_amount` - Refunded Remaining Amount
+
+            * `3ds_authorized_successfully` - Transaction 3DS Authorized
+
+            * `previously_refunded_nothing_to_do` - Previously Refunded
+
+            * `unable_to_refund_merchant_account_closed` - Unable to Refund
+
+            * `won` - Won
+
+            * `lost` - Lost
+
+            * `accepted` - Accepted
+
+            * `other` - Other'
+          enum:
+          - could_not_find_order
+          - declined_or_canceled_nothing_to_do
+          - issued_full_refund
+          - issued_refund_for_remaining_amount
+          - 3ds_authorized_successfully
+          - previously_refunded_nothing_to_do
+          - unable_to_refund_merchant_account_closed
+          - won
+          - lost
+          - accepted
+          - other
+          - ''
+          - null
+          type:
+          - string
+          - 'null'
+          x-spec-enum-id: e6e5fbbffbd90aea
+        resolution_other_message:
+          maxLength: 256
+          title: Other Message
+          type:
+          - string
+          - 'null'
+        transaction:
+          type:
+          - integer
+          - 'null'
       type: object
     UpdateOrderRequest:
       properties:
@@ -9878,7 +10184,7 @@ components:
           - fulfilled
           - incomplete
           type: string
-          x-spec-enum-id: f7a016fc10fb8390
+          x-spec-enum-id: ff859f1a4104382a
         metadata:
           description: Additional order metadata.
           oneOf:
@@ -9949,6 +10255,7 @@ components:
         external_tax_code:
           description: Tax code to be used with external tax systems such as Avalara,
             TaxJar.
+          maxLength: 64
           title: Tax Code
           type:
           - string
@@ -9972,7 +10279,7 @@ components:
           type:
           - string
           - 'null'
-          x-spec-enum-id: b47bd58ee0e62834
+          x-spec-enum-id: cf8e742c49e533bc
         interval_counts:
           description: Choose a predefined value or type to enter custom value(s).
           items:
@@ -9996,6 +10303,7 @@ components:
           - string
           - 'null'
         meta_title:
+          maxLength: 255
           type:
           - string
           - 'null'
@@ -10019,6 +10327,7 @@ components:
           type: string
         template:
           description: Custom template name from your theme, ie catalogue/product.{custom_name}.html
+          maxLength: 256
           title: Theme Template
           type:
           - string
@@ -10051,6 +10360,7 @@ components:
           type: boolean
         sku:
           description: Stock Keeping Unit
+          maxLength: 128
           type:
           - string
           - 'null'
@@ -10067,6 +10377,7 @@ components:
           - 'null'
         upc:
           description: Universal Product Code
+          maxLength: 64
           type:
           - string
           - 'null'
@@ -10095,6 +10406,7 @@ components:
           type: boolean
         sku:
           description: Stock Keeping Unit
+          maxLength: 128
           type:
           - string
           - 'null'
@@ -10111,6 +10423,7 @@ components:
           - 'null'
         upc:
           description: Universal Product Code
+          maxLength: 64
           type:
           - string
           - 'null'
@@ -10186,7 +10499,7 @@ components:
           type:
           - string
           - 'null'
-          x-spec-enum-id: 70ceea9c8488568b
+          x-spec-enum-id: db1e31d38860b082
         last_name:
           maxLength: 255
           type: string
@@ -10195,6 +10508,7 @@ components:
           - {}
           - type: 'null'
         phone_number:
+          maxLength: 128
           type:
           - string
           - 'null'
@@ -10206,6 +10520,7 @@ components:
             - 'null'
           type: array
         user_agent:
+          maxLength: 500
           type:
           - string
           - 'null'
@@ -10264,7 +10579,7 @@ components:
           type:
           - string
           - 'null'
-          x-spec-enum-id: 70ceea9c8488568b
+          x-spec-enum-id: db1e31d38860b082
         last_name:
           maxLength: 255
           type: string
@@ -10277,6 +10592,7 @@ components:
           readOnly: true
           type: integer
         phone_number:
+          maxLength: 128
           type:
           - string
           - 'null'
@@ -10296,6 +10612,7 @@ components:
           readOnly: true
           type: string
         user_agent:
+          maxLength: 500
           type:
           - string
           - 'null'
@@ -10460,6 +10777,7 @@ components:
           type: boolean
         email:
           format: email
+          maxLength: 254
           title: Email address
           type:
           - string
@@ -10476,6 +10794,7 @@ components:
           - string
           - 'null'
         language:
+          maxLength: 10
           title: Preferred language
           type:
           - string
@@ -10484,6 +10803,7 @@ components:
           maxLength: 255
           type: string
         phone_number:
+          maxLength: 128
           type:
           - string
           - 'null'
@@ -10501,6 +10821,7 @@ components:
           type: boolean
         email:
           format: email
+          maxLength: 254
           minLength: 1
           title: Email address
           type:
@@ -10515,6 +10836,7 @@ components:
           - string
           - 'null'
         language:
+          maxLength: 10
           title: Preferred language
           type:
           - string
@@ -10523,6 +10845,7 @@ components:
           maxLength: 255
           type: string
         phone_number:
+          maxLength: 128
           type:
           - string
           - 'null'
@@ -10606,7 +10929,7 @@ components:
           - fulfilled
           - incomplete
           type: string
-          x-spec-enum-id: f7a016fc10fb8390
+          x-spec-enum-id: ff859f1a4104382a
         fulfillments:
           items:
             $ref: '#/components/schemas/Fulfillment'
@@ -10691,7 +11014,7 @@ components:
           - partially_voided
           readOnly: true
           type: string
-          x-spec-enum-id: 4ddf29c57b2eb8f6
+          x-spec-enum-id: 1ca0522e41da3869
         refunds:
           items:
             $ref: '#/components/schemas/Refund'
@@ -10885,7 +11208,7 @@ components:
           type:
           - string
           - 'null'
-          x-spec-enum-id: 70ceea9c8488568b
+          x-spec-enum-id: db1e31d38860b082
         last_name:
           maxLength: 255
           type: string
@@ -10894,6 +11217,7 @@ components:
           - {}
           - type: 'null'
         phone_number:
+          maxLength: 128
           type:
           - string
           - 'null'
@@ -10905,6 +11229,7 @@ components:
             - 'null'
           type: array
         user_agent:
+          maxLength: 500
           type:
           - string
           - 'null'
@@ -10930,7 +11255,7 @@ components:
           - maximum_precision
           - accept_only_image
           type: string
-          x-spec-enum-id: e6e4b370566eb845
+          x-spec-enum-id: 871752701faef3f8
         value:
           type: string
       required:
@@ -10956,7 +11281,7 @@ components:
           - maximum_precision
           - accept_only_image
           type: string
-          x-spec-enum-id: e6e4b370566eb845
+          x-spec-enum-id: 871752701faef3f8
         value:
           type: string
       required:
@@ -11046,6 +11371,7 @@ components:
         active:
           type: boolean
         api_version:
+          maxLength: 64
           type:
           - string
           - 'null'
@@ -11078,19 +11404,21 @@ components:
             - product.updated
             - store.updated
             - subscription.created
+            - subscription.upcoming_renewal
             - subscription.updated
             - transaction.created
             - transaction.updated
             type:
             - string
             - 'null'
-            x-spec-enum-id: 2fff8156f601ff82
+            x-spec-enum-id: 17ad0a105ef56b3c
           type: array
         id:
           readOnly: true
           type: integer
         name:
           description: A label to identify this webhook in the list. Maximum 50 characters.
+          maxLength: 50
           title: Webhook Name
           type:
           - string
@@ -11132,6 +11460,7 @@ components:
         active:
           type: boolean
         api_version:
+          maxLength: 64
           type:
           - string
           - 'null'
@@ -11160,16 +11489,18 @@ components:
             - product.updated
             - store.updated
             - subscription.created
+            - subscription.upcoming_renewal
             - subscription.updated
             - transaction.created
             - transaction.updated
             type:
             - string
             - 'null'
-            x-spec-enum-id: 2fff8156f601ff82
+            x-spec-enum-id: 17ad0a105ef56b3c
           type: array
         name:
           description: A label to identify this webhook in the list. Maximum 50 characters.
+          maxLength: 50
           title: Webhook Name
           type:
           - string
@@ -11667,7 +11998,7 @@ paths:
           - fulfillment_requested
           - fulfillment_unrequested
           type: string
-          x-spec-enum-id: 5e87a3d9cb8f7ccc
+          x-spec-enum-id: 87616f6e5cb69292
       - description: YYYY-MM-DD
         in: query
         name: date_created_from
@@ -12262,7 +12593,7 @@ paths:
           type:
           - string
           - 'null'
-          x-spec-enum-id: 8848f3a079993862
+          x-spec-enum-id: e6e5fbbffbd90aea
       - description: YYYY-MM-DD
         in: query
         name: dispute_date_from
@@ -12415,13 +12746,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedDisputeRequest'
+              $ref: '#/components/schemas/PatchedUpdateDisputeRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedDisputeRequest'
+              $ref: '#/components/schemas/PatchedUpdateDisputeRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedDisputeRequest'
+              $ref: '#/components/schemas/PatchedUpdateDisputeRequest'
       responses:
         '200':
           content:
@@ -12456,13 +12787,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DisputeRequest'
+              $ref: '#/components/schemas/UpdateDisputeRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/DisputeRequest'
+              $ref: '#/components/schemas/UpdateDisputeRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/DisputeRequest'
+              $ref: '#/components/schemas/UpdateDisputeRequest'
       responses:
         '200':
           content:
@@ -12644,7 +12975,7 @@ paths:
           - subscription_list
           - transaction_list
           type: string
-          x-spec-enum-id: d0060bc4b12d9a83
+          x-spec-enum-id: 6e61f8e754abe144
       - description: YYYY-MM-DD
         in: query
         name: date_created_from
@@ -12851,7 +13182,7 @@ paths:
             - open
             - processing
             type: string
-            x-spec-enum-id: 4980268d45eef5a2
+            x-spec-enum-id: 4f648d8930039938
           type: array
         style: form
       - description: 'Request Status
@@ -12887,7 +13218,7 @@ paths:
             - rejected
             - requested
             type: string
-            x-spec-enum-id: 5e87a3d9cb8f7ccc
+            x-spec-enum-id: 87616f6e5cb69292
           type: array
         style: form
       - description: Fulfillment Order  Id
@@ -14249,7 +14580,7 @@ paths:
             - product
             - variant
             type: string
-            x-spec-enum-id: 06e58adfbb02ad1f
+            x-spec-enum-id: 0f14c63699a4309c
           type: array
         style: form
       - description: Metadata Key
@@ -14287,7 +14618,7 @@ paths:
             - rich_text
             - text
             type: string
-            x-spec-enum-id: 079b46b0c121a3e8
+            x-spec-enum-id: 75a72eebc60d38aa
           type: array
         style: form
       - description: Export
@@ -14620,7 +14951,7 @@ paths:
             - rejected
             - unfulfilled
             type: string
-            x-spec-enum-id: 732a013686f682ba
+            x-spec-enum-id: 70f4562512aef826
           type: array
         style: form
       - description: 'Delivery Status
@@ -14694,7 +15025,7 @@ paths:
             - refunded
             - voided
             type: string
-            x-spec-enum-id: 4ddf29c57b2eb8f6
+            x-spec-enum-id: 1ca0522e41da3869
           type: array
         style: form
       - description: 'Subscription Lifecycle
@@ -14793,7 +15124,7 @@ paths:
             type:
             - string
             - 'null'
-            x-spec-enum-id: 560f42e2fb5961ae
+            x-spec-enum-id: 3336e21ec8c42142
           type: array
         style: form
       - description: Agents
@@ -17075,7 +17406,7 @@ paths:
             - paused
             - retrying
             type: string
-            x-spec-enum-id: 99133723086a4290
+            x-spec-enum-id: 7dd7ec10bcae69c1
           type: array
         style: form
       - explode: true
@@ -18024,7 +18355,7 @@ paths:
             - pending
             - solved
             type: string
-            x-spec-enum-id: 30751850e74b0756
+            x-spec-enum-id: cb3ac9163b5b890b
           type: array
         style: form
       - description: Requester
@@ -18076,7 +18407,7 @@ paths:
           - low
           - medium
           type: string
-          x-spec-enum-id: 2d141e09614b8e57
+          x-spec-enum-id: 3cd2babd9a875ec3
       - description: '* `customer_account` - Customer account
 
           * `dashboard` - Dashboard
@@ -18096,7 +18427,7 @@ paths:
           - email
           - follow_up
           type: string
-          x-spec-enum-id: c3aad35666245662
+          x-spec-enum-id: a1bcd0153063fefa
       - description: Created From
         in: query
         name: created_from
@@ -18585,7 +18916,7 @@ paths:
           - failed
           - succeeded
           type: string
-          x-spec-enum-id: a6661c405ff6d2ee
+          x-spec-enum-id: d90eeb0b4be0fcef
       - description: Auth Code
         in: query
         name: auth_code
@@ -18619,7 +18950,7 @@ paths:
           - recurring
           title: Subscription Lifecycle
           type: string
-          x-spec-enum-id: 1f42528346cd911e
+          x-spec-enum-id: 0d461cdf638d861c
       - description: Funnels
         explode: true
         in: query
@@ -19485,6 +19816,7 @@ paths:
             - product.updated
             - store.updated
             - subscription.created
+            - subscription.upcoming_renewal
             - subscription.updated
             - transaction.created
             - transaction.updated
@@ -19742,6 +20074,7 @@ webhooks:
                 data:
                   properties:
                     client_id:
+                      maxLength: 100
                       type:
                       - string
                       - 'null'
@@ -19757,6 +20090,7 @@ webhooks:
                       format: date-time
                       type: string
                     version:
+                      maxLength: 32
                       type:
                       - string
                       - 'null'
@@ -19923,6 +20257,7 @@ webhooks:
                       properties:
                         affiliate:
                           description: Affiliate identifier.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
@@ -19930,6 +20265,7 @@ webhooks:
                           properties:
                             email:
                               format: email
+                              maxLength: 254
                               title: Email address
                               type:
                               - string
@@ -19952,6 +20288,7 @@ webhooks:
                           - 'null'
                         gclid:
                           description: Google Click Identifier.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
@@ -19959,58 +20296,68 @@ webhooks:
                           description: Additional attribution metadata.
                         subaffiliate1:
                           description: Sub-affiliate identifier 1.
+                          maxLength: 500
                           title: Sub-Affiliate 1
                           type:
                           - string
                           - 'null'
                         subaffiliate2:
                           description: Sub-affiliate identifier 2.
+                          maxLength: 500
                           title: Sub-Affiliate 2
                           type:
                           - string
                           - 'null'
                         subaffiliate3:
                           description: Sub-affiliate identifier 3.
+                          maxLength: 500
                           title: Sub-Affiliate 3
                           type:
                           - string
                           - 'null'
                         subaffiliate4:
                           description: Sub-affiliate identifier 4.
+                          maxLength: 500
                           title: Sub-Affiliate 4
                           type:
                           - string
                           - 'null'
                         subaffiliate5:
                           description: ' Sub-affiliate identifier 5.'
+                          maxLength: 500
                           title: Sub-Affiliate 5
                           type:
                           - string
                           - 'null'
                         utm_campaign:
                           description: Campaign name.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_content:
                           description: Content of the traffic (e.g., banner, text
                             link).
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_medium:
                           description: Medium of the traffic (e.g., email, CPC).
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_source:
                           description: Source of the traffic (e.g., search engine,
                             newsletter).
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_term:
                           description: Search term or keyword.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
@@ -20092,6 +20439,7 @@ webhooks:
                                 type: string
                               upc:
                                 description: Universal Product Code
+                                maxLength: 64
                                 type:
                                 - string
                                 - 'null'
@@ -20152,6 +20500,7 @@ webhooks:
                                 - string
                                 - 'null'
                               price_currency:
+                                maxLength: 12
                                 title: Currency
                                 type:
                                 - string
@@ -20206,6 +20555,7 @@ webhooks:
                           type: boolean
                         email:
                           format: email
+                          maxLength: 254
                           title: Email address
                           type:
                           - string
@@ -20221,6 +20571,7 @@ webhooks:
                           - string
                           - 'null'
                         language:
+                          maxLength: 10
                           title: Preferred language
                           type:
                           - string
@@ -20229,6 +20580,7 @@ webhooks:
                           maxLength: 255
                           type: string
                         phone_number:
+                          maxLength: 128
                           type:
                           - string
                           - 'null'
@@ -20518,7 +20870,7 @@ webhooks:
                       type:
                       - string
                       - 'null'
-                      x-spec-enum-id: 70ceea9c8488568b
+                      x-spec-enum-id: db1e31d38860b082
                     last_name:
                       maxLength: 255
                       type: string
@@ -20528,6 +20880,7 @@ webhooks:
                       default: 0
                       type: integer
                     phone_number:
+                      maxLength: 128
                       type:
                       - string
                       - 'null'
@@ -20545,6 +20898,7 @@ webhooks:
                       pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
                       type: string
                     user_agent:
+                      maxLength: 500
                       type:
                       - string
                       - 'null'
@@ -20893,7 +21247,7 @@ webhooks:
                       type:
                       - string
                       - 'null'
-                      x-spec-enum-id: 70ceea9c8488568b
+                      x-spec-enum-id: db1e31d38860b082
                     last_name:
                       maxLength: 255
                       type: string
@@ -20903,6 +21257,7 @@ webhooks:
                       default: 0
                       type: integer
                     phone_number:
+                      maxLength: 128
                       type:
                       - string
                       - 'null'
@@ -20920,6 +21275,7 @@ webhooks:
                       pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
                       type: string
                     user_agent:
+                      maxLength: 500
                       type:
                       - string
                       - 'null'
@@ -21010,7 +21366,86 @@ webhooks:
                 resolution: null
                 resolution_other_message: null
                 status: string
-                transaction: null
+                transaction:
+                  amount: '0.00'
+                  amount_available_for_refund: '0.00'
+                  attribution:
+                    affiliate: null
+                    agent:
+                      email: null
+                      first_name: string
+                      id: 0
+                      last_name: string
+                    funnel: null
+                    gclid: null
+                    metadata: {}
+                    subaffiliate1: null
+                    subaffiliate2: null
+                    subaffiliate3: null
+                    subaffiliate4: null
+                    subaffiliate5: null
+                    utm_campaign: null
+                    utm_content: null
+                    utm_medium: null
+                    utm_source: null
+                    utm_term: null
+                  auth_code: null
+                  currency: null
+                  date_created: '2024-01-01T00:00:00Z'
+                  external_id: null
+                  id: 0
+                  initiator:
+                    email: null
+                    first_name: string
+                    id: 0
+                    last_name: string
+                  is_disputed: false
+                  is_external: false
+                  is_test: null
+                  network_transaction_id: null
+                  order: null
+                  parent_id: null
+                  payment_details:
+                    avs_code: string
+                    avs_message: string
+                    bankcard_exp_month: null
+                    bankcard_exp_year: null
+                    bankcard_first_six: null
+                    bankcard_last_four: null
+                    bankcard_number: null
+                    card_token: string
+                    cvv_code: string
+                    cvv_message: string
+                    gateway:
+                      id: 0
+                      is_next_payments: false
+                      name: string
+                      type: string
+                    is_3ds: false
+                    optimized_3ds: false
+                    paypal_vault_id: string
+                    sca_flow: string
+                  payment_method: null
+                  report_values:
+                    amount: '0.00'
+                    currency: string
+                  response_code: 0
+                  statement_descriptor: null
+                  status: string
+                  subscription:
+                    billing_cycle: null
+                    id: 0
+                  type: string
+                  user:
+                    accepts_marketing: false
+                    email: null
+                    first_name: string
+                    id: 0
+                    ip: null
+                    language: null
+                    last_name: string
+                    phone_number: null
+                    user_agent: null
                 type: string
               event_id: a7a26ff2-e851-45b6-9634-d595f45458b7
               event_type: dispute.created
@@ -21038,14 +21473,18 @@ webhooks:
                       - string
                       - 'null'
                     arn:
+                      maxLength: 256
                       type:
                       - string
                       - 'null'
                     case_number:
+                      maxLength: 256
                       type:
                       - string
                       - 'null'
                     currency:
+                      maxLength: 3
+                      title: Dispute Currency
                       type:
                       - string
                       - 'null'
@@ -21071,6 +21510,7 @@ webhooks:
                       - string
                       - 'null'
                     report_currency:
+                      maxLength: 3
                       type:
                       - string
                       - 'null'
@@ -21114,8 +21554,9 @@ webhooks:
                       type:
                       - string
                       - 'null'
-                      x-spec-enum-id: 8848f3a079993862
+                      x-spec-enum-id: e6e5fbbffbd90aea
                     resolution_other_message:
+                      maxLength: 256
                       title: Other Message
                       type:
                       - string
@@ -21133,9 +21574,334 @@ webhooks:
                       type: string
                       x-spec-enum-id: 4c48cc1c536a35b2
                     transaction:
-                      type:
-                      - integer
-                      - 'null'
+                      properties:
+                        amount:
+                          format: decimal
+                          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                          type: string
+                        amount_available_for_refund:
+                          default: '0.00'
+                          format: decimal
+                          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                          type: string
+                        attribution:
+                          properties:
+                            affiliate:
+                              description: Affiliate identifier.
+                              maxLength: 500
+                              type:
+                              - string
+                              - 'null'
+                            agent:
+                              properties:
+                                email:
+                                  format: email
+                                  maxLength: 254
+                                  title: Email address
+                                  type:
+                                  - string
+                                  - 'null'
+                                first_name:
+                                  maxLength: 255
+                                  type: string
+                                id:
+                                  type: integer
+                                last_name:
+                                  maxLength: 255
+                                  type: string
+                              required:
+                              - id
+                              type: object
+                            funnel:
+                              description: The marketing funnel attributed to the
+                                order.
+                              type:
+                              - string
+                              - 'null'
+                            gclid:
+                              description: Google Click Identifier.
+                              maxLength: 500
+                              type:
+                              - string
+                              - 'null'
+                            metadata:
+                              description: Additional attribution metadata.
+                            subaffiliate1:
+                              description: Sub-affiliate identifier 1.
+                              maxLength: 500
+                              title: Sub-Affiliate 1
+                              type:
+                              - string
+                              - 'null'
+                            subaffiliate2:
+                              description: Sub-affiliate identifier 2.
+                              maxLength: 500
+                              title: Sub-Affiliate 2
+                              type:
+                              - string
+                              - 'null'
+                            subaffiliate3:
+                              description: Sub-affiliate identifier 3.
+                              maxLength: 500
+                              title: Sub-Affiliate 3
+                              type:
+                              - string
+                              - 'null'
+                            subaffiliate4:
+                              description: Sub-affiliate identifier 4.
+                              maxLength: 500
+                              title: Sub-Affiliate 4
+                              type:
+                              - string
+                              - 'null'
+                            subaffiliate5:
+                              description: ' Sub-affiliate identifier 5.'
+                              maxLength: 500
+                              title: Sub-Affiliate 5
+                              type:
+                              - string
+                              - 'null'
+                            utm_campaign:
+                              description: Campaign name.
+                              maxLength: 500
+                              type:
+                              - string
+                              - 'null'
+                            utm_content:
+                              description: Content of the traffic (e.g., banner, text
+                                link).
+                              maxLength: 500
+                              type:
+                              - string
+                              - 'null'
+                            utm_medium:
+                              description: Medium of the traffic (e.g., email, CPC).
+                              maxLength: 500
+                              type:
+                              - string
+                              - 'null'
+                            utm_source:
+                              description: Source of the traffic (e.g., search engine,
+                                newsletter).
+                              maxLength: 500
+                              type:
+                              - string
+                              - 'null'
+                            utm_term:
+                              description: Search term or keyword.
+                              maxLength: 500
+                              type:
+                              - string
+                              - 'null'
+                          type: object
+                        auth_code:
+                          maxLength: 255
+                          type:
+                          - string
+                          - 'null'
+                        currency:
+                          maxLength: 6
+                          type:
+                          - string
+                          - 'null'
+                        date_created:
+                          format: date-time
+                          type: string
+                        external_id:
+                          maxLength: 255
+                          type:
+                          - string
+                          - 'null'
+                        id:
+                          type: integer
+                        initiator:
+                          properties:
+                            email:
+                              format: email
+                              maxLength: 254
+                              title: Email address
+                              type:
+                              - string
+                              - 'null'
+                            first_name:
+                              maxLength: 255
+                              type: string
+                            id:
+                              type: integer
+                            last_name:
+                              maxLength: 255
+                              type: string
+                          type: object
+                        is_disputed:
+                          type: boolean
+                        is_external:
+                          type: boolean
+                        is_test:
+                          type:
+                          - boolean
+                          - 'null'
+                        network_transaction_id:
+                          maxLength: 255
+                          type:
+                          - string
+                          - 'null'
+                        order:
+                          type:
+                          - string
+                          - 'null'
+                        parent_id:
+                          description: "The ID of an associated transaction.\n- For\
+                            \ capture transactions, the parent is the authorization\
+                            \ transaction. \n- For void transactions, the parent is\
+                            \ the authorization transaction. \n- For refund transactions,\
+                            \ the parent is the debit transaction. \n"
+                          type:
+                          - integer
+                          - 'null'
+                        payment_details:
+                          properties:
+                            avs_code:
+                              description: AVS result code returned by the gateway.
+                              type: string
+                            avs_message:
+                              description: Description of the AVS result.
+                              type: string
+                            bankcard_exp_month:
+                              type:
+                              - integer
+                              - 'null'
+                            bankcard_exp_year:
+                              type:
+                              - integer
+                              - 'null'
+                            bankcard_first_six:
+                              title: First Six
+                              type:
+                              - string
+                              - 'null'
+                            bankcard_last_four:
+                              title: Last four
+                              type:
+                              - string
+                              - 'null'
+                            bankcard_number:
+                              type:
+                              - string
+                              - 'null'
+                            card_token:
+                              type: string
+                            cvv_code:
+                              description: CVV result code returned by the gateway.
+                              type: string
+                            cvv_message:
+                              description: Description of the CVV result.
+                              type: string
+                            gateway:
+                              properties:
+                                id:
+                                  type: integer
+                                is_next_payments:
+                                  type: boolean
+                                name:
+                                  type: string
+                                type:
+                                  type: string
+                              type: object
+                            is_3ds:
+                              type: boolean
+                            optimized_3ds:
+                              type: boolean
+                            paypal_vault_id:
+                              type: string
+                            sca_flow:
+                              type: string
+                          type: object
+                        payment_method:
+                          maxLength: 255
+                          type:
+                          - string
+                          - 'null'
+                        report_values:
+                          properties:
+                            amount:
+                              format: decimal
+                              pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                              type: string
+                            currency:
+                              type: string
+                          type: object
+                        response_code:
+                          type: integer
+                        statement_descriptor:
+                          maxLength: 255
+                          type:
+                          - string
+                          - 'null'
+                        status:
+                          description: '* `succeeded` - Succeeded
+
+                            * `failed` - Failed'
+                          enum:
+                          - succeeded
+                          - failed
+                          - ''
+                          type: string
+                          x-spec-enum-id: d90eeb0b4be0fcef
+                        subscription:
+                          properties:
+                            billing_cycle:
+                              type:
+                              - integer
+                              - 'null'
+                            id:
+                              type: integer
+                          type: object
+                        type:
+                          type: string
+                        user:
+                          properties:
+                            accepts_marketing:
+                              title: Subscribe to Marketing Emails
+                              type: boolean
+                            email:
+                              format: email
+                              maxLength: 254
+                              title: Email address
+                              type:
+                              - string
+                              - 'null'
+                            first_name:
+                              maxLength: 255
+                              type: string
+                            id:
+                              type: integer
+                            ip:
+                              title: Ip address
+                              type:
+                              - string
+                              - 'null'
+                            language:
+                              maxLength: 10
+                              title: Preferred language
+                              type:
+                              - string
+                              - 'null'
+                            last_name:
+                              maxLength: 255
+                              type: string
+                            phone_number:
+                              maxLength: 128
+                              type:
+                              - string
+                              - 'null'
+                            user_agent:
+                              type:
+                              - string
+                              - 'null'
+                          required:
+                          - id
+                          type: object
+                      type: object
                     type:
                       description: '* `alert` - Alert
 
@@ -21147,13 +21913,9 @@ webhooks:
                       x-spec-enum-id: 3c60da80149644ea
                   required:
                   - date_created
-                  - happened_at
                   - id
                   - order
-                  - report_amount
-                  - report_currency
-                  - status
-                  - type
+                  - transaction
                   type: object
                 event_id:
                   description: Unique id associated with this webhook event.
@@ -21226,7 +21988,86 @@ webhooks:
                 resolution: null
                 resolution_other_message: null
                 status: string
-                transaction: null
+                transaction:
+                  amount: '0.00'
+                  amount_available_for_refund: '0.00'
+                  attribution:
+                    affiliate: null
+                    agent:
+                      email: null
+                      first_name: string
+                      id: 0
+                      last_name: string
+                    funnel: null
+                    gclid: null
+                    metadata: {}
+                    subaffiliate1: null
+                    subaffiliate2: null
+                    subaffiliate3: null
+                    subaffiliate4: null
+                    subaffiliate5: null
+                    utm_campaign: null
+                    utm_content: null
+                    utm_medium: null
+                    utm_source: null
+                    utm_term: null
+                  auth_code: null
+                  currency: null
+                  date_created: '2024-01-01T00:00:00Z'
+                  external_id: null
+                  id: 0
+                  initiator:
+                    email: null
+                    first_name: string
+                    id: 0
+                    last_name: string
+                  is_disputed: false
+                  is_external: false
+                  is_test: null
+                  network_transaction_id: null
+                  order: null
+                  parent_id: null
+                  payment_details:
+                    avs_code: string
+                    avs_message: string
+                    bankcard_exp_month: null
+                    bankcard_exp_year: null
+                    bankcard_first_six: null
+                    bankcard_last_four: null
+                    bankcard_number: null
+                    card_token: string
+                    cvv_code: string
+                    cvv_message: string
+                    gateway:
+                      id: 0
+                      is_next_payments: false
+                      name: string
+                      type: string
+                    is_3ds: false
+                    optimized_3ds: false
+                    paypal_vault_id: string
+                    sca_flow: string
+                  payment_method: null
+                  report_values:
+                    amount: '0.00'
+                    currency: string
+                  response_code: 0
+                  statement_descriptor: null
+                  status: string
+                  subscription:
+                    billing_cycle: null
+                    id: 0
+                  type: string
+                  user:
+                    accepts_marketing: false
+                    email: null
+                    first_name: string
+                    id: 0
+                    ip: null
+                    language: null
+                    last_name: string
+                    phone_number: null
+                    user_agent: null
                 type: string
               event_id: a7a26ff2-e851-45b6-9634-d595f45458b7
               event_type: dispute.updated
@@ -21254,14 +22095,18 @@ webhooks:
                       - string
                       - 'null'
                     arn:
+                      maxLength: 256
                       type:
                       - string
                       - 'null'
                     case_number:
+                      maxLength: 256
                       type:
                       - string
                       - 'null'
                     currency:
+                      maxLength: 3
+                      title: Dispute Currency
                       type:
                       - string
                       - 'null'
@@ -21287,6 +22132,7 @@ webhooks:
                       - string
                       - 'null'
                     report_currency:
+                      maxLength: 3
                       type:
                       - string
                       - 'null'
@@ -21330,8 +22176,9 @@ webhooks:
                       type:
                       - string
                       - 'null'
-                      x-spec-enum-id: 8848f3a079993862
+                      x-spec-enum-id: e6e5fbbffbd90aea
                     resolution_other_message:
+                      maxLength: 256
                       title: Other Message
                       type:
                       - string
@@ -21349,9 +22196,334 @@ webhooks:
                       type: string
                       x-spec-enum-id: 4c48cc1c536a35b2
                     transaction:
-                      type:
-                      - integer
-                      - 'null'
+                      properties:
+                        amount:
+                          format: decimal
+                          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                          type: string
+                        amount_available_for_refund:
+                          default: '0.00'
+                          format: decimal
+                          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                          type: string
+                        attribution:
+                          properties:
+                            affiliate:
+                              description: Affiliate identifier.
+                              maxLength: 500
+                              type:
+                              - string
+                              - 'null'
+                            agent:
+                              properties:
+                                email:
+                                  format: email
+                                  maxLength: 254
+                                  title: Email address
+                                  type:
+                                  - string
+                                  - 'null'
+                                first_name:
+                                  maxLength: 255
+                                  type: string
+                                id:
+                                  type: integer
+                                last_name:
+                                  maxLength: 255
+                                  type: string
+                              required:
+                              - id
+                              type: object
+                            funnel:
+                              description: The marketing funnel attributed to the
+                                order.
+                              type:
+                              - string
+                              - 'null'
+                            gclid:
+                              description: Google Click Identifier.
+                              maxLength: 500
+                              type:
+                              - string
+                              - 'null'
+                            metadata:
+                              description: Additional attribution metadata.
+                            subaffiliate1:
+                              description: Sub-affiliate identifier 1.
+                              maxLength: 500
+                              title: Sub-Affiliate 1
+                              type:
+                              - string
+                              - 'null'
+                            subaffiliate2:
+                              description: Sub-affiliate identifier 2.
+                              maxLength: 500
+                              title: Sub-Affiliate 2
+                              type:
+                              - string
+                              - 'null'
+                            subaffiliate3:
+                              description: Sub-affiliate identifier 3.
+                              maxLength: 500
+                              title: Sub-Affiliate 3
+                              type:
+                              - string
+                              - 'null'
+                            subaffiliate4:
+                              description: Sub-affiliate identifier 4.
+                              maxLength: 500
+                              title: Sub-Affiliate 4
+                              type:
+                              - string
+                              - 'null'
+                            subaffiliate5:
+                              description: ' Sub-affiliate identifier 5.'
+                              maxLength: 500
+                              title: Sub-Affiliate 5
+                              type:
+                              - string
+                              - 'null'
+                            utm_campaign:
+                              description: Campaign name.
+                              maxLength: 500
+                              type:
+                              - string
+                              - 'null'
+                            utm_content:
+                              description: Content of the traffic (e.g., banner, text
+                                link).
+                              maxLength: 500
+                              type:
+                              - string
+                              - 'null'
+                            utm_medium:
+                              description: Medium of the traffic (e.g., email, CPC).
+                              maxLength: 500
+                              type:
+                              - string
+                              - 'null'
+                            utm_source:
+                              description: Source of the traffic (e.g., search engine,
+                                newsletter).
+                              maxLength: 500
+                              type:
+                              - string
+                              - 'null'
+                            utm_term:
+                              description: Search term or keyword.
+                              maxLength: 500
+                              type:
+                              - string
+                              - 'null'
+                          type: object
+                        auth_code:
+                          maxLength: 255
+                          type:
+                          - string
+                          - 'null'
+                        currency:
+                          maxLength: 6
+                          type:
+                          - string
+                          - 'null'
+                        date_created:
+                          format: date-time
+                          type: string
+                        external_id:
+                          maxLength: 255
+                          type:
+                          - string
+                          - 'null'
+                        id:
+                          type: integer
+                        initiator:
+                          properties:
+                            email:
+                              format: email
+                              maxLength: 254
+                              title: Email address
+                              type:
+                              - string
+                              - 'null'
+                            first_name:
+                              maxLength: 255
+                              type: string
+                            id:
+                              type: integer
+                            last_name:
+                              maxLength: 255
+                              type: string
+                          type: object
+                        is_disputed:
+                          type: boolean
+                        is_external:
+                          type: boolean
+                        is_test:
+                          type:
+                          - boolean
+                          - 'null'
+                        network_transaction_id:
+                          maxLength: 255
+                          type:
+                          - string
+                          - 'null'
+                        order:
+                          type:
+                          - string
+                          - 'null'
+                        parent_id:
+                          description: "The ID of an associated transaction.\n- For\
+                            \ capture transactions, the parent is the authorization\
+                            \ transaction. \n- For void transactions, the parent is\
+                            \ the authorization transaction. \n- For refund transactions,\
+                            \ the parent is the debit transaction. \n"
+                          type:
+                          - integer
+                          - 'null'
+                        payment_details:
+                          properties:
+                            avs_code:
+                              description: AVS result code returned by the gateway.
+                              type: string
+                            avs_message:
+                              description: Description of the AVS result.
+                              type: string
+                            bankcard_exp_month:
+                              type:
+                              - integer
+                              - 'null'
+                            bankcard_exp_year:
+                              type:
+                              - integer
+                              - 'null'
+                            bankcard_first_six:
+                              title: First Six
+                              type:
+                              - string
+                              - 'null'
+                            bankcard_last_four:
+                              title: Last four
+                              type:
+                              - string
+                              - 'null'
+                            bankcard_number:
+                              type:
+                              - string
+                              - 'null'
+                            card_token:
+                              type: string
+                            cvv_code:
+                              description: CVV result code returned by the gateway.
+                              type: string
+                            cvv_message:
+                              description: Description of the CVV result.
+                              type: string
+                            gateway:
+                              properties:
+                                id:
+                                  type: integer
+                                is_next_payments:
+                                  type: boolean
+                                name:
+                                  type: string
+                                type:
+                                  type: string
+                              type: object
+                            is_3ds:
+                              type: boolean
+                            optimized_3ds:
+                              type: boolean
+                            paypal_vault_id:
+                              type: string
+                            sca_flow:
+                              type: string
+                          type: object
+                        payment_method:
+                          maxLength: 255
+                          type:
+                          - string
+                          - 'null'
+                        report_values:
+                          properties:
+                            amount:
+                              format: decimal
+                              pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                              type: string
+                            currency:
+                              type: string
+                          type: object
+                        response_code:
+                          type: integer
+                        statement_descriptor:
+                          maxLength: 255
+                          type:
+                          - string
+                          - 'null'
+                        status:
+                          description: '* `succeeded` - Succeeded
+
+                            * `failed` - Failed'
+                          enum:
+                          - succeeded
+                          - failed
+                          - ''
+                          type: string
+                          x-spec-enum-id: d90eeb0b4be0fcef
+                        subscription:
+                          properties:
+                            billing_cycle:
+                              type:
+                              - integer
+                              - 'null'
+                            id:
+                              type: integer
+                          type: object
+                        type:
+                          type: string
+                        user:
+                          properties:
+                            accepts_marketing:
+                              title: Subscribe to Marketing Emails
+                              type: boolean
+                            email:
+                              format: email
+                              maxLength: 254
+                              title: Email address
+                              type:
+                              - string
+                              - 'null'
+                            first_name:
+                              maxLength: 255
+                              type: string
+                            id:
+                              type: integer
+                            ip:
+                              title: Ip address
+                              type:
+                              - string
+                              - 'null'
+                            language:
+                              maxLength: 10
+                              title: Preferred language
+                              type:
+                              - string
+                              - 'null'
+                            last_name:
+                              maxLength: 255
+                              type: string
+                            phone_number:
+                              maxLength: 128
+                              type:
+                              - string
+                              - 'null'
+                            user_agent:
+                              type:
+                              - string
+                              - 'null'
+                          required:
+                          - id
+                          type: object
+                      type: object
                     type:
                       description: '* `alert` - Alert
 
@@ -21363,13 +22535,9 @@ webhooks:
                       x-spec-enum-id: 3c60da80149644ea
                   required:
                   - date_created
-                  - happened_at
                   - id
                   - order
-                  - report_amount
-                  - report_currency
-                  - status
-                  - type
+                  - transaction
                   type: object
                 event_id:
                   description: Unique id associated with this webhook event.
@@ -21518,7 +22686,7 @@ webhooks:
                       - fulfillment_list
                       - fulfillment_line_items
                       type: string
-                      x-spec-enum-id: d018e10950f018b1
+                      x-spec-enum-id: 30c9aea5b6855a62
                     url:
                       format: uri
                       type: string
@@ -21602,7 +22770,7 @@ webhooks:
                   price_incl_tax: '0.00'
                   price_incl_tax_excl_discounts: '0.00'
                   product_id: 0
-                  product_image: https://example.com
+                  product_image: null
                   product_title: string
                   properties:
                   - key: null
@@ -21696,7 +22864,7 @@ webhooks:
                       - delivered
                       - delayed
                       - ''
-                      x-spec-enum-id: 3b886e5b796c0603
+                      x-spec-enum-id: 78c64ad217bd1c84
                     id:
                       type: integer
                     last_event_date:
@@ -21740,7 +22908,9 @@ webhooks:
                             type: integer
                           product_image:
                             format: uri
-                            type: string
+                            type:
+                            - string
+                            - 'null'
                           product_title:
                             type: string
                           properties:
@@ -21888,7 +23058,7 @@ webhooks:
                       - success
                       - canceled
                       type: string
-                      x-spec-enum-id: 4d2f0d468cf04267
+                      x-spec-enum-id: df583f0f55f46c75
                     tracking_carrier:
                       type: string
                     tracking_carriers:
@@ -21992,7 +23162,7 @@ webhooks:
                   price_incl_tax: '0.00'
                   price_incl_tax_excl_discounts: '0.00'
                   product_id: 0
-                  product_image: https://example.com
+                  product_image: null
                   product_title: string
                   properties:
                   - key: null
@@ -22086,7 +23256,7 @@ webhooks:
                       - delivered
                       - delayed
                       - ''
-                      x-spec-enum-id: 3b886e5b796c0603
+                      x-spec-enum-id: 78c64ad217bd1c84
                     id:
                       type: integer
                     last_event_date:
@@ -22130,7 +23300,9 @@ webhooks:
                             type: integer
                           product_image:
                             format: uri
-                            type: string
+                            type:
+                            - string
+                            - 'null'
                           product_title:
                             type: string
                           properties:
@@ -22278,7 +23450,7 @@ webhooks:
                       - success
                       - canceled
                       type: string
-                      x-spec-enum-id: 4d2f0d468cf04267
+                      x-spec-enum-id: df583f0f55f46c75
                     tracking_carrier:
                       type: string
                     tracking_carriers:
@@ -22578,7 +23750,7 @@ webhooks:
                       - charge
                       - auth-capture
                       type: string
-                      x-spec-enum-id: 0e887a41ea162b2f
+                      x-spec-enum-id: 83305e27cd52df96
                     re_attemp_group:
                       properties:
                         available_currencies:
@@ -22661,7 +23833,7 @@ webhooks:
                       - always
                       title: 3DS Mode
                       type: string
-                      x-spec-enum-id: 01a6e8274c41131f
+                      x-spec-enum-id: e13ca462d635e843
                   required:
                   - card_types
                   - currencies
@@ -22944,7 +24116,7 @@ webhooks:
                       - charge
                       - auth-capture
                       type: string
-                      x-spec-enum-id: 0e887a41ea162b2f
+                      x-spec-enum-id: 83305e27cd52df96
                     re_attemp_group:
                       properties:
                         available_currencies:
@@ -23027,7 +24199,7 @@ webhooks:
                       - always
                       title: 3DS Mode
                       type: string
-                      x-spec-enum-id: 01a6e8274c41131f
+                      x-spec-enum-id: e13ca462d635e843
                   required:
                   - card_types
                   - currencies
@@ -23396,6 +24568,7 @@ webhooks:
                       properties:
                         affiliate:
                           description: Affiliate identifier.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
@@ -23403,6 +24576,7 @@ webhooks:
                           properties:
                             email:
                               format: email
+                              maxLength: 254
                               title: Email address
                               type:
                               - string
@@ -23425,6 +24599,7 @@ webhooks:
                           - 'null'
                         gclid:
                           description: Google Click Identifier.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
@@ -23432,58 +24607,68 @@ webhooks:
                           description: Additional attribution metadata.
                         subaffiliate1:
                           description: Sub-affiliate identifier 1.
+                          maxLength: 500
                           title: Sub-Affiliate 1
                           type:
                           - string
                           - 'null'
                         subaffiliate2:
                           description: Sub-affiliate identifier 2.
+                          maxLength: 500
                           title: Sub-Affiliate 2
                           type:
                           - string
                           - 'null'
                         subaffiliate3:
                           description: Sub-affiliate identifier 3.
+                          maxLength: 500
                           title: Sub-Affiliate 3
                           type:
                           - string
                           - 'null'
                         subaffiliate4:
                           description: Sub-affiliate identifier 4.
+                          maxLength: 500
                           title: Sub-Affiliate 4
                           type:
                           - string
                           - 'null'
                         subaffiliate5:
                           description: ' Sub-affiliate identifier 5.'
+                          maxLength: 500
                           title: Sub-Affiliate 5
                           type:
                           - string
                           - 'null'
                         utm_campaign:
                           description: Campaign name.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_content:
                           description: Content of the traffic (e.g., banner, text
                             link).
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_medium:
                           description: Medium of the traffic (e.g., email, CPC).
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_source:
                           description: Source of the traffic (e.g., search engine,
                             newsletter).
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_term:
                           description: Search term or keyword.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
@@ -23577,7 +24762,7 @@ webhooks:
                       - fulfilled
                       - incomplete
                       type: string
-                      x-spec-enum-id: f7a016fc10fb8390
+                      x-spec-enum-id: ff859f1a4104382a
                     fulfillments:
                       items:
                         properties:
@@ -23620,7 +24805,7 @@ webhooks:
                             - delivered
                             - delayed
                             - ''
-                            x-spec-enum-id: 3b886e5b796c0603
+                            x-spec-enum-id: 78c64ad217bd1c84
                           id:
                             type: integer
                           last_event_date:
@@ -23743,6 +24928,7 @@ webhooks:
                                 type: string
                               upc:
                                 description: Universal Product Code
+                                maxLength: 64
                                 type:
                                 - string
                                 - 'null'
@@ -23796,6 +24982,7 @@ webhooks:
                                 - string
                                 - 'null'
                               price_currency:
+                                maxLength: 12
                                 title: Currency
                                 type:
                                 - string
@@ -23952,7 +25139,7 @@ webhooks:
                       - partially_refunded
                       - partially_voided
                       type: string
-                      x-spec-enum-id: 4ddf29c57b2eb8f6
+                      x-spec-enum-id: 1ca0522e41da3869
                     refunds:
                       items:
                         properties:
@@ -23990,7 +25177,7 @@ webhooks:
                                   - refund_shipping
                                   - refund_discrepancy
                                   type: string
-                                  x-spec-enum-id: 1bc4eac94a84cc0a
+                                  x-spec-enum-id: 948494e93c5b1fcf
                               required:
                               - id
                               - report_values
@@ -24003,6 +25190,7 @@ webhooks:
                           id:
                             type: integer
                           note:
+                            maxLength: 512
                             type:
                             - string
                             - 'null'
@@ -24106,10 +25294,12 @@ webhooks:
                                   pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
                                   type: string
                                 auth_code:
+                                  maxLength: 255
                                   type:
                                   - string
                                   - 'null'
                                 currency:
+                                  maxLength: 6
                                   type:
                                   - string
                                   - 'null'
@@ -24117,6 +25307,7 @@ webhooks:
                                   format: date-time
                                   type: string
                                 external_id:
+                                  maxLength: 255
                                   type:
                                   - string
                                   - 'null'
@@ -24135,6 +25326,7 @@ webhooks:
                                   - boolean
                                   - 'null'
                                 network_transaction_id:
+                                  maxLength: 255
                                   type:
                                   - string
                                   - 'null'
@@ -24210,6 +25402,7 @@ webhooks:
                                       type: string
                                   type: object
                                 payment_method:
+                                  maxLength: 255
                                   type:
                                   - string
                                   - 'null'
@@ -24225,6 +25418,7 @@ webhooks:
                                 response_code:
                                   type: integer
                                 statement_descriptor:
+                                  maxLength: 255
                                   type:
                                   - string
                                   - 'null'
@@ -24237,7 +25431,7 @@ webhooks:
                                   - failed
                                   - ''
                                   type: string
-                                  x-spec-enum-id: a6661c405ff6d2ee
+                                  x-spec-enum-id: d90eeb0b4be0fcef
                                 type:
                                   type: string
                               required:
@@ -24455,6 +25649,7 @@ webhooks:
                             pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
                             type: string
                           currency:
+                            maxLength: 10
                             type:
                             - string
                             - 'null'
@@ -24473,6 +25668,7 @@ webhooks:
                                 type: string
                             type: object
                           source:
+                            maxLength: 32
                             type:
                             - string
                             - 'null'
@@ -24511,10 +25707,12 @@ webhooks:
                             pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
                             type: string
                           auth_code:
+                            maxLength: 255
                             type:
                             - string
                             - 'null'
                           currency:
+                            maxLength: 6
                             type:
                             - string
                             - 'null'
@@ -24522,6 +25720,7 @@ webhooks:
                             format: date-time
                             type: string
                           external_id:
+                            maxLength: 255
                             type:
                             - string
                             - 'null'
@@ -24540,6 +25739,7 @@ webhooks:
                             - boolean
                             - 'null'
                           network_transaction_id:
+                            maxLength: 255
                             type:
                             - string
                             - 'null'
@@ -24612,6 +25812,7 @@ webhooks:
                                 type: string
                             type: object
                           payment_method:
+                            maxLength: 255
                             type:
                             - string
                             - 'null'
@@ -24627,6 +25828,7 @@ webhooks:
                           response_code:
                             type: integer
                           statement_descriptor:
+                            maxLength: 255
                             type:
                             - string
                             - 'null'
@@ -24639,7 +25841,7 @@ webhooks:
                             - failed
                             - ''
                             type: string
-                            x-spec-enum-id: a6661c405ff6d2ee
+                            x-spec-enum-id: d90eeb0b4be0fcef
                           type:
                             type: string
                         required:
@@ -24663,6 +25865,7 @@ webhooks:
                           type: boolean
                         email:
                           format: email
+                          maxLength: 254
                           title: Email address
                           type:
                           - string
@@ -24678,6 +25881,7 @@ webhooks:
                           - string
                           - 'null'
                         language:
+                          maxLength: 10
                           title: Preferred language
                           type:
                           - string
@@ -24686,6 +25890,7 @@ webhooks:
                           maxLength: 255
                           type: string
                         phone_number:
+                          maxLength: 128
                           type:
                           - string
                           - 'null'
@@ -25129,6 +26334,7 @@ webhooks:
                       properties:
                         affiliate:
                           description: Affiliate identifier.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
@@ -25136,6 +26342,7 @@ webhooks:
                           properties:
                             email:
                               format: email
+                              maxLength: 254
                               title: Email address
                               type:
                               - string
@@ -25158,6 +26365,7 @@ webhooks:
                           - 'null'
                         gclid:
                           description: Google Click Identifier.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
@@ -25165,58 +26373,68 @@ webhooks:
                           description: Additional attribution metadata.
                         subaffiliate1:
                           description: Sub-affiliate identifier 1.
+                          maxLength: 500
                           title: Sub-Affiliate 1
                           type:
                           - string
                           - 'null'
                         subaffiliate2:
                           description: Sub-affiliate identifier 2.
+                          maxLength: 500
                           title: Sub-Affiliate 2
                           type:
                           - string
                           - 'null'
                         subaffiliate3:
                           description: Sub-affiliate identifier 3.
+                          maxLength: 500
                           title: Sub-Affiliate 3
                           type:
                           - string
                           - 'null'
                         subaffiliate4:
                           description: Sub-affiliate identifier 4.
+                          maxLength: 500
                           title: Sub-Affiliate 4
                           type:
                           - string
                           - 'null'
                         subaffiliate5:
                           description: ' Sub-affiliate identifier 5.'
+                          maxLength: 500
                           title: Sub-Affiliate 5
                           type:
                           - string
                           - 'null'
                         utm_campaign:
                           description: Campaign name.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_content:
                           description: Content of the traffic (e.g., banner, text
                             link).
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_medium:
                           description: Medium of the traffic (e.g., email, CPC).
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_source:
                           description: Source of the traffic (e.g., search engine,
                             newsletter).
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_term:
                           description: Search term or keyword.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
@@ -25310,7 +26528,7 @@ webhooks:
                       - fulfilled
                       - incomplete
                       type: string
-                      x-spec-enum-id: f7a016fc10fb8390
+                      x-spec-enum-id: ff859f1a4104382a
                     fulfillments:
                       items:
                         properties:
@@ -25353,7 +26571,7 @@ webhooks:
                             - delivered
                             - delayed
                             - ''
-                            x-spec-enum-id: 3b886e5b796c0603
+                            x-spec-enum-id: 78c64ad217bd1c84
                           id:
                             type: integer
                           last_event_date:
@@ -25476,6 +26694,7 @@ webhooks:
                                 type: string
                               upc:
                                 description: Universal Product Code
+                                maxLength: 64
                                 type:
                                 - string
                                 - 'null'
@@ -25529,6 +26748,7 @@ webhooks:
                                 - string
                                 - 'null'
                               price_currency:
+                                maxLength: 12
                                 title: Currency
                                 type:
                                 - string
@@ -25685,7 +26905,7 @@ webhooks:
                       - partially_refunded
                       - partially_voided
                       type: string
-                      x-spec-enum-id: 4ddf29c57b2eb8f6
+                      x-spec-enum-id: 1ca0522e41da3869
                     refunds:
                       items:
                         properties:
@@ -25723,7 +26943,7 @@ webhooks:
                                   - refund_shipping
                                   - refund_discrepancy
                                   type: string
-                                  x-spec-enum-id: 1bc4eac94a84cc0a
+                                  x-spec-enum-id: 948494e93c5b1fcf
                               required:
                               - id
                               - report_values
@@ -25736,6 +26956,7 @@ webhooks:
                           id:
                             type: integer
                           note:
+                            maxLength: 512
                             type:
                             - string
                             - 'null'
@@ -25839,10 +27060,12 @@ webhooks:
                                   pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
                                   type: string
                                 auth_code:
+                                  maxLength: 255
                                   type:
                                   - string
                                   - 'null'
                                 currency:
+                                  maxLength: 6
                                   type:
                                   - string
                                   - 'null'
@@ -25850,6 +27073,7 @@ webhooks:
                                   format: date-time
                                   type: string
                                 external_id:
+                                  maxLength: 255
                                   type:
                                   - string
                                   - 'null'
@@ -25868,6 +27092,7 @@ webhooks:
                                   - boolean
                                   - 'null'
                                 network_transaction_id:
+                                  maxLength: 255
                                   type:
                                   - string
                                   - 'null'
@@ -25943,6 +27168,7 @@ webhooks:
                                       type: string
                                   type: object
                                 payment_method:
+                                  maxLength: 255
                                   type:
                                   - string
                                   - 'null'
@@ -25958,6 +27184,7 @@ webhooks:
                                 response_code:
                                   type: integer
                                 statement_descriptor:
+                                  maxLength: 255
                                   type:
                                   - string
                                   - 'null'
@@ -25970,7 +27197,7 @@ webhooks:
                                   - failed
                                   - ''
                                   type: string
-                                  x-spec-enum-id: a6661c405ff6d2ee
+                                  x-spec-enum-id: d90eeb0b4be0fcef
                                 type:
                                   type: string
                               required:
@@ -26188,6 +27415,7 @@ webhooks:
                             pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
                             type: string
                           currency:
+                            maxLength: 10
                             type:
                             - string
                             - 'null'
@@ -26206,6 +27434,7 @@ webhooks:
                                 type: string
                             type: object
                           source:
+                            maxLength: 32
                             type:
                             - string
                             - 'null'
@@ -26244,10 +27473,12 @@ webhooks:
                             pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
                             type: string
                           auth_code:
+                            maxLength: 255
                             type:
                             - string
                             - 'null'
                           currency:
+                            maxLength: 6
                             type:
                             - string
                             - 'null'
@@ -26255,6 +27486,7 @@ webhooks:
                             format: date-time
                             type: string
                           external_id:
+                            maxLength: 255
                             type:
                             - string
                             - 'null'
@@ -26273,6 +27505,7 @@ webhooks:
                             - boolean
                             - 'null'
                           network_transaction_id:
+                            maxLength: 255
                             type:
                             - string
                             - 'null'
@@ -26345,6 +27578,7 @@ webhooks:
                                 type: string
                             type: object
                           payment_method:
+                            maxLength: 255
                             type:
                             - string
                             - 'null'
@@ -26360,6 +27594,7 @@ webhooks:
                           response_code:
                             type: integer
                           statement_descriptor:
+                            maxLength: 255
                             type:
                             - string
                             - 'null'
@@ -26372,7 +27607,7 @@ webhooks:
                             - failed
                             - ''
                             type: string
-                            x-spec-enum-id: a6661c405ff6d2ee
+                            x-spec-enum-id: d90eeb0b4be0fcef
                           type:
                             type: string
                         required:
@@ -26396,6 +27631,7 @@ webhooks:
                           type: boolean
                         email:
                           format: email
+                          maxLength: 254
                           title: Email address
                           type:
                           - string
@@ -26411,6 +27647,7 @@ webhooks:
                           - string
                           - 'null'
                         language:
+                          maxLength: 10
                           title: Preferred language
                           type:
                           - string
@@ -26419,6 +27656,7 @@ webhooks:
                           maxLength: 255
                           type: string
                         phone_number:
+                          maxLength: 128
                           type:
                           - string
                           - 'null'
@@ -26771,6 +28009,7 @@ webhooks:
                             type: boolean
                           sku:
                             description: Stock Keeping Unit
+                            maxLength: 128
                             type:
                             - string
                             - 'null'
@@ -26839,7 +28078,7 @@ webhooks:
                             - child
                             title: Product Structure
                             type: string
-                            x-spec-enum-id: a1df31d9b9dfd9ac
+                            x-spec-enum-id: 1bcbf87f79ec2d91
                           title:
                             type: string
                           track_stock:
@@ -26853,6 +28092,7 @@ webhooks:
                             type: string
                           upc:
                             description: Universal Product Code
+                            maxLength: 64
                             type:
                             - string
                             - 'null'
@@ -26894,6 +28134,7 @@ webhooks:
                     external_tax_code:
                       description: Tax code to be used with external tax systems such
                         as Avalara, TaxJar.
+                      maxLength: 64
                       title: Tax Code
                       type:
                       - string
@@ -26942,7 +28183,7 @@ webhooks:
                       type:
                       - string
                       - 'null'
-                      x-spec-enum-id: b47bd58ee0e62834
+                      x-spec-enum-id: cf8e742c49e533bc
                     interval_counts:
                       description: Choose a predefined value or type to enter custom
                         value(s).
@@ -26968,6 +28209,7 @@ webhooks:
                       - string
                       - 'null'
                     meta_title:
+                      maxLength: 255
                       type:
                       - string
                       - 'null'
@@ -27003,9 +28245,10 @@ webhooks:
                       - child
                       title: Product Structure
                       type: string
-                      x-spec-enum-id: a1df31d9b9dfd9ac
+                      x-spec-enum-id: 1bcbf87f79ec2d91
                     template:
                       description: Custom template name from your theme, ie catalogue/product.{custom_name}.html
+                      maxLength: 256
                       title: Theme Template
                       type:
                       - string
@@ -27392,6 +28635,7 @@ webhooks:
                             type: boolean
                           sku:
                             description: Stock Keeping Unit
+                            maxLength: 128
                             type:
                             - string
                             - 'null'
@@ -27460,7 +28704,7 @@ webhooks:
                             - child
                             title: Product Structure
                             type: string
-                            x-spec-enum-id: a1df31d9b9dfd9ac
+                            x-spec-enum-id: 1bcbf87f79ec2d91
                           title:
                             type: string
                           track_stock:
@@ -27474,6 +28718,7 @@ webhooks:
                             type: string
                           upc:
                             description: Universal Product Code
+                            maxLength: 64
                             type:
                             - string
                             - 'null'
@@ -27515,6 +28760,7 @@ webhooks:
                     external_tax_code:
                       description: Tax code to be used with external tax systems such
                         as Avalara, TaxJar.
+                      maxLength: 64
                       title: Tax Code
                       type:
                       - string
@@ -27563,7 +28809,7 @@ webhooks:
                       type:
                       - string
                       - 'null'
-                      x-spec-enum-id: b47bd58ee0e62834
+                      x-spec-enum-id: cf8e742c49e533bc
                     interval_counts:
                       description: Choose a predefined value or type to enter custom
                         value(s).
@@ -27589,6 +28835,7 @@ webhooks:
                       - string
                       - 'null'
                     meta_title:
+                      maxLength: 255
                       type:
                       - string
                       - 'null'
@@ -27624,9 +28871,10 @@ webhooks:
                       - child
                       title: Product Structure
                       type: string
-                      x-spec-enum-id: a1df31d9b9dfd9ac
+                      x-spec-enum-id: 1bcbf87f79ec2d91
                     template:
                       description: Custom template name from your theme, ie catalogue/product.{custom_name}.html
+                      maxLength: 256
                       title: Theme Template
                       type:
                       - string
@@ -28061,6 +29309,7 @@ webhooks:
                       properties:
                         affiliate:
                           description: Affiliate identifier.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
@@ -28068,6 +29317,7 @@ webhooks:
                           properties:
                             email:
                               format: email
+                              maxLength: 254
                               title: Email address
                               type:
                               - string
@@ -28090,6 +29340,7 @@ webhooks:
                           - 'null'
                         gclid:
                           description: Google Click Identifier.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
@@ -28097,58 +29348,68 @@ webhooks:
                           description: Additional attribution metadata.
                         subaffiliate1:
                           description: Sub-affiliate identifier 1.
+                          maxLength: 500
                           title: Sub-Affiliate 1
                           type:
                           - string
                           - 'null'
                         subaffiliate2:
                           description: Sub-affiliate identifier 2.
+                          maxLength: 500
                           title: Sub-Affiliate 2
                           type:
                           - string
                           - 'null'
                         subaffiliate3:
                           description: Sub-affiliate identifier 3.
+                          maxLength: 500
                           title: Sub-Affiliate 3
                           type:
                           - string
                           - 'null'
                         subaffiliate4:
                           description: Sub-affiliate identifier 4.
+                          maxLength: 500
                           title: Sub-Affiliate 4
                           type:
                           - string
                           - 'null'
                         subaffiliate5:
                           description: ' Sub-affiliate identifier 5.'
+                          maxLength: 500
                           title: Sub-Affiliate 5
                           type:
                           - string
                           - 'null'
                         utm_campaign:
                           description: Campaign name.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_content:
                           description: Content of the traffic (e.g., banner, text
                             link).
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_medium:
                           description: Medium of the traffic (e.g., email, CPC).
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_source:
                           description: Source of the traffic (e.g., search engine,
                             newsletter).
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_term:
                           description: Search term or keyword.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
@@ -28235,7 +29496,7 @@ webhooks:
                       - month
                       - year
                       type: string
-                      x-spec-enum-id: b47bd58ee0e62834
+                      x-spec-enum-id: cf8e742c49e533bc
                     interval_count:
                       minimum: 1
                       type: integer
@@ -28305,6 +29566,7 @@ webhooks:
                                 type: string
                               upc:
                                 description: Universal Product Code
+                                maxLength: 64
                                 type:
                                 - string
                                 - 'null'
@@ -28365,6 +29627,7 @@ webhooks:
                                 - string
                                 - 'null'
                               price_currency:
+                                maxLength: 12
                                 title: Currency
                                 type:
                                 - string
@@ -28489,7 +29752,7 @@ webhooks:
                       - retrying
                       - paused
                       type: string
-                      x-spec-enum-id: 99133723086a4290
+                      x-spec-enum-id: 7dd7ec10bcae69c1
                     total:
                       format: decimal
                       pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
@@ -28501,6 +29764,7 @@ webhooks:
                           type: boolean
                         email:
                           format: email
+                          maxLength: 254
                           title: Email address
                           type:
                           - string
@@ -28516,6 +29780,7 @@ webhooks:
                           - string
                           - 'null'
                         language:
+                          maxLength: 10
                           title: Preferred language
                           type:
                           - string
@@ -28524,6 +29789,7 @@ webhooks:
                           maxLength: 255
                           type: string
                         phone_number:
+                          maxLength: 128
                           type:
                           - string
                           - 'null'
@@ -28731,6 +29997,7 @@ webhooks:
                       properties:
                         affiliate:
                           description: Affiliate identifier.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
@@ -28738,6 +30005,7 @@ webhooks:
                           properties:
                             email:
                               format: email
+                              maxLength: 254
                               title: Email address
                               type:
                               - string
@@ -28760,6 +30028,7 @@ webhooks:
                           - 'null'
                         gclid:
                           description: Google Click Identifier.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
@@ -28767,58 +30036,68 @@ webhooks:
                           description: Additional attribution metadata.
                         subaffiliate1:
                           description: Sub-affiliate identifier 1.
+                          maxLength: 500
                           title: Sub-Affiliate 1
                           type:
                           - string
                           - 'null'
                         subaffiliate2:
                           description: Sub-affiliate identifier 2.
+                          maxLength: 500
                           title: Sub-Affiliate 2
                           type:
                           - string
                           - 'null'
                         subaffiliate3:
                           description: Sub-affiliate identifier 3.
+                          maxLength: 500
                           title: Sub-Affiliate 3
                           type:
                           - string
                           - 'null'
                         subaffiliate4:
                           description: Sub-affiliate identifier 4.
+                          maxLength: 500
                           title: Sub-Affiliate 4
                           type:
                           - string
                           - 'null'
                         subaffiliate5:
                           description: ' Sub-affiliate identifier 5.'
+                          maxLength: 500
                           title: Sub-Affiliate 5
                           type:
                           - string
                           - 'null'
                         utm_campaign:
                           description: Campaign name.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_content:
                           description: Content of the traffic (e.g., banner, text
                             link).
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_medium:
                           description: Medium of the traffic (e.g., email, CPC).
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_source:
                           description: Source of the traffic (e.g., search engine,
                             newsletter).
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_term:
                           description: Search term or keyword.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
@@ -28905,7 +30184,7 @@ webhooks:
                       - month
                       - year
                       type: string
-                      x-spec-enum-id: b47bd58ee0e62834
+                      x-spec-enum-id: cf8e742c49e533bc
                     interval_count:
                       minimum: 1
                       type: integer
@@ -28975,6 +30254,7 @@ webhooks:
                                 type: string
                               upc:
                                 description: Universal Product Code
+                                maxLength: 64
                                 type:
                                 - string
                                 - 'null'
@@ -29035,6 +30315,7 @@ webhooks:
                                 - string
                                 - 'null'
                               price_currency:
+                                maxLength: 12
                                 title: Currency
                                 type:
                                 - string
@@ -29159,7 +30440,7 @@ webhooks:
                       - retrying
                       - paused
                       type: string
-                      x-spec-enum-id: 99133723086a4290
+                      x-spec-enum-id: 7dd7ec10bcae69c1
                     total:
                       format: decimal
                       pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
@@ -29171,6 +30452,7 @@ webhooks:
                           type: boolean
                         email:
                           format: email
+                          maxLength: 254
                           title: Email address
                           type:
                           - string
@@ -29186,6 +30468,7 @@ webhooks:
                           - string
                           - 'null'
                         language:
+                          maxLength: 10
                           title: Preferred language
                           type:
                           - string
@@ -29194,6 +30477,7 @@ webhooks:
                           maxLength: 255
                           type: string
                         phone_number:
+                          maxLength: 128
                           type:
                           - string
                           - 'null'
@@ -29288,11 +30572,11 @@ webhooks:
                   author: null
                   body: null
                   created_at: '2024-01-01T00:00:00Z'
-                  from_email: null
+                  from_email: {}
                   id: 0
                   is_public: false
                 created_at: '2024-01-01T00:00:00Z'
-                from_email: null
+                from_email: {}
                 id: 0
                 order: string
                 priority: string
@@ -29344,7 +30628,7 @@ webhooks:
                       - api
                       - follow_up
                       type: string
-                      x-spec-enum-id: c3aad35666245662
+                      x-spec-enum-id: a1bcd0153063fefa
                     comments:
                       items:
                         properties:
@@ -29379,10 +30663,7 @@ webhooks:
                           from_email:
                             description: In case user contact from email and user
                               does not in system yet.
-                            format: email
-                            type:
-                            - string
-                            - 'null'
+                            type: object
                           id:
                             type: integer
                           is_public:
@@ -29398,10 +30679,7 @@ webhooks:
                     from_email:
                       description: In case user contact from email and user does not
                         in system yet.
-                      format: email
-                      type:
-                      - string
-                      - 'null'
+                      type: object
                     id:
                       type: integer
                     order:
@@ -29418,7 +30696,7 @@ webhooks:
                       - medium
                       - low
                       type: string
-                      x-spec-enum-id: 2d141e09614b8e57
+                      x-spec-enum-id: 3cd2babd9a875ec3
                     products:
                       items:
                         type: integer
@@ -29444,7 +30722,7 @@ webhooks:
                       - solved
                       - closed
                       type: string
-                      x-spec-enum-id: 30751850e74b0756
+                      x-spec-enum-id: cb3ac9163b5b890b
                     subject:
                       type: string
                     tags:
@@ -29533,11 +30811,11 @@ webhooks:
                   author: null
                   body: null
                   created_at: '2024-01-01T00:00:00Z'
-                  from_email: null
+                  from_email: {}
                   id: 0
                   is_public: false
                 created_at: '2024-01-01T00:00:00Z'
-                from_email: null
+                from_email: {}
                 id: 0
                 order: string
                 priority: string
@@ -29589,7 +30867,7 @@ webhooks:
                       - api
                       - follow_up
                       type: string
-                      x-spec-enum-id: c3aad35666245662
+                      x-spec-enum-id: a1bcd0153063fefa
                     comments:
                       items:
                         properties:
@@ -29624,10 +30902,7 @@ webhooks:
                           from_email:
                             description: In case user contact from email and user
                               does not in system yet.
-                            format: email
-                            type:
-                            - string
-                            - 'null'
+                            type: object
                           id:
                             type: integer
                           is_public:
@@ -29643,10 +30918,7 @@ webhooks:
                     from_email:
                       description: In case user contact from email and user does not
                         in system yet.
-                      format: email
-                      type:
-                      - string
-                      - 'null'
+                      type: object
                     id:
                       type: integer
                     order:
@@ -29663,7 +30935,7 @@ webhooks:
                       - medium
                       - low
                       type: string
-                      x-spec-enum-id: 2d141e09614b8e57
+                      x-spec-enum-id: 3cd2babd9a875ec3
                     products:
                       items:
                         type: integer
@@ -29689,7 +30961,7 @@ webhooks:
                       - solved
                       - closed
                       type: string
-                      x-spec-enum-id: 30751850e74b0756
+                      x-spec-enum-id: cb3ac9163b5b890b
                     subject:
                       type: string
                     tags:
@@ -29878,6 +31150,7 @@ webhooks:
                       properties:
                         affiliate:
                           description: Affiliate identifier.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
@@ -29885,6 +31158,7 @@ webhooks:
                           properties:
                             email:
                               format: email
+                              maxLength: 254
                               title: Email address
                               type:
                               - string
@@ -29907,6 +31181,7 @@ webhooks:
                           - 'null'
                         gclid:
                           description: Google Click Identifier.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
@@ -29914,67 +31189,79 @@ webhooks:
                           description: Additional attribution metadata.
                         subaffiliate1:
                           description: Sub-affiliate identifier 1.
+                          maxLength: 500
                           title: Sub-Affiliate 1
                           type:
                           - string
                           - 'null'
                         subaffiliate2:
                           description: Sub-affiliate identifier 2.
+                          maxLength: 500
                           title: Sub-Affiliate 2
                           type:
                           - string
                           - 'null'
                         subaffiliate3:
                           description: Sub-affiliate identifier 3.
+                          maxLength: 500
                           title: Sub-Affiliate 3
                           type:
                           - string
                           - 'null'
                         subaffiliate4:
                           description: Sub-affiliate identifier 4.
+                          maxLength: 500
                           title: Sub-Affiliate 4
                           type:
                           - string
                           - 'null'
                         subaffiliate5:
                           description: ' Sub-affiliate identifier 5.'
+                          maxLength: 500
                           title: Sub-Affiliate 5
                           type:
                           - string
                           - 'null'
                         utm_campaign:
                           description: Campaign name.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_content:
                           description: Content of the traffic (e.g., banner, text
                             link).
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_medium:
                           description: Medium of the traffic (e.g., email, CPC).
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_source:
                           description: Source of the traffic (e.g., search engine,
                             newsletter).
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_term:
                           description: Search term or keyword.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                       type: object
                     auth_code:
+                      maxLength: 255
                       type:
                       - string
                       - 'null'
                     currency:
+                      maxLength: 6
                       type:
                       - string
                       - 'null'
@@ -29982,6 +31269,7 @@ webhooks:
                       format: date-time
                       type: string
                     external_id:
+                      maxLength: 255
                       type:
                       - string
                       - 'null'
@@ -29991,6 +31279,7 @@ webhooks:
                       properties:
                         email:
                           format: email
+                          maxLength: 254
                           title: Email address
                           type:
                           - string
@@ -30013,6 +31302,7 @@ webhooks:
                       - boolean
                       - 'null'
                     network_transaction_id:
+                      maxLength: 255
                       type:
                       - string
                       - 'null'
@@ -30088,6 +31378,7 @@ webhooks:
                           type: string
                       type: object
                     payment_method:
+                      maxLength: 255
                       type:
                       - string
                       - 'null'
@@ -30103,6 +31394,7 @@ webhooks:
                     response_code:
                       type: integer
                     statement_descriptor:
+                      maxLength: 255
                       type:
                       - string
                       - 'null'
@@ -30115,7 +31407,7 @@ webhooks:
                       - failed
                       - ''
                       type: string
-                      x-spec-enum-id: a6661c405ff6d2ee
+                      x-spec-enum-id: d90eeb0b4be0fcef
                     subscription:
                       properties:
                         billing_cycle:
@@ -30134,6 +31426,7 @@ webhooks:
                           type: boolean
                         email:
                           format: email
+                          maxLength: 254
                           title: Email address
                           type:
                           - string
@@ -30149,6 +31442,7 @@ webhooks:
                           - string
                           - 'null'
                         language:
+                          maxLength: 10
                           title: Preferred language
                           type:
                           - string
@@ -30157,6 +31451,7 @@ webhooks:
                           maxLength: 255
                           type: string
                         phone_number:
+                          maxLength: 128
                           type:
                           - string
                           - 'null'
@@ -30349,6 +31644,7 @@ webhooks:
                       properties:
                         affiliate:
                           description: Affiliate identifier.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
@@ -30356,6 +31652,7 @@ webhooks:
                           properties:
                             email:
                               format: email
+                              maxLength: 254
                               title: Email address
                               type:
                               - string
@@ -30378,6 +31675,7 @@ webhooks:
                           - 'null'
                         gclid:
                           description: Google Click Identifier.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
@@ -30385,67 +31683,79 @@ webhooks:
                           description: Additional attribution metadata.
                         subaffiliate1:
                           description: Sub-affiliate identifier 1.
+                          maxLength: 500
                           title: Sub-Affiliate 1
                           type:
                           - string
                           - 'null'
                         subaffiliate2:
                           description: Sub-affiliate identifier 2.
+                          maxLength: 500
                           title: Sub-Affiliate 2
                           type:
                           - string
                           - 'null'
                         subaffiliate3:
                           description: Sub-affiliate identifier 3.
+                          maxLength: 500
                           title: Sub-Affiliate 3
                           type:
                           - string
                           - 'null'
                         subaffiliate4:
                           description: Sub-affiliate identifier 4.
+                          maxLength: 500
                           title: Sub-Affiliate 4
                           type:
                           - string
                           - 'null'
                         subaffiliate5:
                           description: ' Sub-affiliate identifier 5.'
+                          maxLength: 500
                           title: Sub-Affiliate 5
                           type:
                           - string
                           - 'null'
                         utm_campaign:
                           description: Campaign name.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_content:
                           description: Content of the traffic (e.g., banner, text
                             link).
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_medium:
                           description: Medium of the traffic (e.g., email, CPC).
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_source:
                           description: Source of the traffic (e.g., search engine,
                             newsletter).
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                         utm_term:
                           description: Search term or keyword.
+                          maxLength: 500
                           type:
                           - string
                           - 'null'
                       type: object
                     auth_code:
+                      maxLength: 255
                       type:
                       - string
                       - 'null'
                     currency:
+                      maxLength: 6
                       type:
                       - string
                       - 'null'
@@ -30453,6 +31763,7 @@ webhooks:
                       format: date-time
                       type: string
                     external_id:
+                      maxLength: 255
                       type:
                       - string
                       - 'null'
@@ -30462,6 +31773,7 @@ webhooks:
                       properties:
                         email:
                           format: email
+                          maxLength: 254
                           title: Email address
                           type:
                           - string
@@ -30484,6 +31796,7 @@ webhooks:
                       - boolean
                       - 'null'
                     network_transaction_id:
+                      maxLength: 255
                       type:
                       - string
                       - 'null'
@@ -30559,6 +31872,7 @@ webhooks:
                           type: string
                       type: object
                     payment_method:
+                      maxLength: 255
                       type:
                       - string
                       - 'null'
@@ -30574,6 +31888,7 @@ webhooks:
                     response_code:
                       type: integer
                     statement_descriptor:
+                      maxLength: 255
                       type:
                       - string
                       - 'null'
@@ -30586,7 +31901,7 @@ webhooks:
                       - failed
                       - ''
                       type: string
-                      x-spec-enum-id: a6661c405ff6d2ee
+                      x-spec-enum-id: d90eeb0b4be0fcef
                     subscription:
                       properties:
                         billing_cycle:
@@ -30605,6 +31920,7 @@ webhooks:
                           type: boolean
                         email:
                           format: email
+                          maxLength: 254
                           title: Email address
                           type:
                           - string
@@ -30620,6 +31936,7 @@ webhooks:
                           - string
                           - 'null'
                         language:
+                          maxLength: 10
                           title: Preferred language
                           type:
                           - string
@@ -30628,6 +31945,7 @@ webhooks:
                           maxLength: 255
                           type: string
                         phone_number:
+                          maxLength: 128
                           type:
                           - string
                           - 'null'

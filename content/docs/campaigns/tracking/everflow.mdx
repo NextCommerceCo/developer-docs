@@ -3,7 +3,7 @@ title: Everflow
 description: Report NEXT Campaigns sales to Everflow with the Everflow app, for both redirect links and direct links, and avoid duplicate or missing conversions.
 sidebar_label: Everflow
 audience: [merchant, developer]
-last_verified: 2026-11-16
+last_verified: 2026-11-26
 tags:
  - Guide
 ---
@@ -90,9 +90,11 @@ EF.click({
 
   // Put the ID on the order.
   var apply = function (next) {
-    next.setMetadata({ everflow_transaction_id: id });
+    var metadata = { everflow_transaction_id: id };
+    if (next.actions && typeof next.actions.setMetadata === 'function') next.actions.setMetadata(metadata); // SDK 0.5.1 and later
+    else if (typeof next.setMetadata === 'function') next.setMetadata(metadata); // SDK 0.4.x
   };
-  if (window.next && typeof window.next.setMetadata === 'function') apply(window.next);
+  if (window.next && ((window.next.actions && window.next.actions.setMetadata) || typeof window.next.setMetadata === 'function')) apply(window.next);
   else (window.nextReady = window.nextReady || []).push(apply);
 });
 ```

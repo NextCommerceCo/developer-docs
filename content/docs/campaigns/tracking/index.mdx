@@ -1,0 +1,77 @@
+---
+title: Tracking overview
+description: How ad and analytics tracking works in NEXT Campaigns, which platforms are supported, and which guide to follow for Google, Meta, Everflow, Triple Whale, TikTok and more.
+sidebar_label: Overview
+audience: [merchant, developer]
+last_verified: 2026-11-16
+tags:
+ - Guide
+---
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Tracking tells your ad platforms which clicks turned into sales. A campaign in NEXT Campaigns is made of your own pages, so tracking is something you turn on for each platform you advertise on. This section shows you how.
+
+Start with [Set up tracking](/docs/campaigns/tracking/getting-started), then open the guide for your platform.
+
+## How tracking works
+
+1. **A shopper clicks your ad.** The link carries details about the ad, such as UTM parameters and a click ID.
+2. **Your campaign remembers where they came from.** It keeps those details as the shopper moves from page to page, and saves them on the order.
+3. **Your campaign tells each platform what happened.** Page views, checkout steps and purchases are sent to the platforms you have turned on.
+
+You turn a platform on by adding its ID to your campaign. For a few platforms a NEXT store app also sends the purchase from NEXT's servers. Each guide tells you exactly what to add and where.
+
+<Callout type="info" title="Add tracking to each campaign">
+Tracking apps under **Apps** in your NEXT dashboard, such as TikTok Pixel Events, Google Analytics 4, Google Tag Manager, AppLovin AXON and Taboola Pixel Events, add their scripts to your Storefront. For Campaigns, you add each platform's tracking to the campaign itself. The guides below show you what to add.
+
+Some apps already cover campaign orders, because they send the order from NEXT's servers once it is placed: the Meta Pixel app's Conversions API purchase, Everflow and Klaviyo.
+</Callout>
+
+## Supported integrations
+
+| Platform | Guide |
+| --- | --- |
+| Google Tag Manager | [Google Tag Manager](/docs/campaigns/tracking/google-tag-manager) |
+| Google Analytics 4 | [Google Analytics 4](/docs/campaigns/tracking/google-analytics-4) |
+| Google Ads and YouTube | [Use GA4 purchases in Google Ads](/docs/campaigns/tracking/google-analytics-4#use-ga4-purchases-in-google-ads) |
+| Meta (Facebook and Instagram) | [Meta Pixel and Conversions API](/docs/campaigns/tracking/meta) |
+| Everflow | [Everflow](/docs/campaigns/tracking/everflow) |
+| Triple Whale (stores that sync orders to Shopify) | [Triple Whale](/docs/campaigns/tracking/triple-whale) |
+| TikTok, Snapchat, Pinterest, Taboola, AppLovin Axon, Northbeam, RudderStack, Klaviyo | [More integrations](/docs/campaigns/tracking/more-integrations) |
+
+If your orders sync to Shopify through Shop Sync, also read [Tracking on Shop Sync stores](/docs/campaigns/tracking/shop-sync).
+
+## Send each purchase from one place
+
+Each platform should hear about a sale once. If two things report the same sale to the same platform, it is counted twice.
+
+A sale can be reported by your campaign pages, by a NEXT store app, and, on Shop Sync stores, by a Shopify app that sees the synced order. For each platform, pick one of them to report the purchase and turn the others off. The platform guides show how.
+
+Meta is the one exception: the campaign and the Meta Pixel app can both report the purchase, because they label it with the same ID and Meta merges the two. See the [Meta](/docs/campaigns/tracking/meta#count-each-purchase-once) guide.
+
+## Privacy and consent
+
+NEXT Campaigns does not include a cookie banner or consent tool. If your campaign needs one, add it to your pages and make sure it also stops the tracking scripts.
+
+Some platforms can receive the shopper's email and phone to improve matching. Those settings are off unless you turn them on. Turn them on only when your privacy policy covers it.
+
+## Next steps
+
+- [Set up tracking](/docs/campaigns/tracking/getting-started): turn platforms on and run your first test.
+- [Test and troubleshoot tracking](/docs/campaigns/tracking/testing-and-troubleshooting): check what was sent and fix common problems.
+
+## For developers
+
+The campaign's own events, their fields, and the ad details saved on each order are documented in the Campaign Cart SDK reference. The starter templates use SDK 0.4.43, so use the 0.4.43 pages:
+
+| What you need | SDK reference |
+| --- | --- |
+| Every event and when it is sent | [Analytics events: event names](https://cart-sdk.nextcommerce.com/v0.4.43/reference/analytics-events#event-names) |
+| The fields on each event | [Analytics events: payload reference](https://cart-sdk.nextcommerce.com/v0.4.43/reference/analytics-events#payload-reference) |
+| What GTM, Meta and RudderStack each receive | [Analytics events: providers](https://cart-sdk.nextcommerce.com/v0.4.43/reference/analytics-events#providers) |
+| Which link parameters are saved on the order | [URL parameters: attribution](https://cart-sdk.nextcommerce.com/v0.4.43/reference/url-parameters#attribution) |
+| Adding your own values to the order, with examples | [JavaScript API: attribution and metadata](https://cart-sdk.nextcommerce.com/v0.4.43/reference/javascript-api#attribution-and-metadata) |
+| Sending your own events, with examples | [JavaScript API: analytics](https://cart-sdk.nextcommerce.com/v0.4.43/reference/javascript-api#analytics) |
+| Checking events in the browser | [Debugger](https://cart-sdk.nextcommerce.com/v0.4.43/reference/debugger) |
+
+To read the saved ad details from an order, see [Marketing attribution](/docs/apps/guides/marketing-attribution).

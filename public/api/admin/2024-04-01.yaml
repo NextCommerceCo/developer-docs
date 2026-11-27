@@ -36039,6 +36039,600 @@ webhooks:
       security: []
       tags:
       - subscriptions
+  subscription.upcoming_renewal:
+    post:
+      description: Triggers once when an active subscription's next renewal is within
+        72 hours.
+      requestBody:
+        content:
+          application/json:
+            example:
+              api_version: '2024-04-01'
+              data:
+                attribution:
+                  affiliate: null
+                  agent:
+                    email: null
+                    first_name: string
+                    id: 0
+                    last_name: string
+                  funnel: null
+                  gclid: null
+                  metadata: {}
+                  subaffiliate1: null
+                  subaffiliate2: null
+                  subaffiliate3: null
+                  subaffiliate4: null
+                  subaffiliate5: null
+                  utm_campaign: null
+                  utm_content: null
+                  utm_medium: null
+                  utm_source: null
+                  utm_term: null
+                billing_address:
+                  country: string
+                  first_name: string
+                  id: 0
+                  last_name: string
+                  line1: string
+                  line2: string
+                  line3: string
+                  line4: string
+                  phone_number: string
+                  postcode: string
+                  state: string
+                cancel_reason: string
+                cancel_reason_other_message: null
+                currency: string
+                date_created: '2024-01-01T00:00:00Z'
+                frequency: string
+                id: 0
+                interval: string
+                interval_count: 0
+                is_tax_known: false
+                is_test: false
+                lines:
+                - id: 0
+                  metadata: {}
+                  price: '0.00'
+                  product_id: 0
+                  product_image: null
+                  product_title: string
+                  product_url: https://example.com
+                  properties:
+                  - key: null
+                    value: null
+                  quantity: 0
+                  sku: string
+                  variant_id: 0
+                  variant_title: string
+                next_renewal_date: null
+                num_lines: 0
+                num_orders: 0
+                orders:
+                - billing_cycle: 0
+                  order_number: string
+                payment_details: {}
+                payment_method: string
+                shipping_address:
+                  country: string
+                  first_name: string
+                  id: 0
+                  last_name: string
+                  line1: string
+                  line2: string
+                  line3: string
+                  line4: string
+                  notes: string
+                  phone_number: string
+                  postcode: string
+                  state: string
+                shipping_code: string
+                shipping_price: string
+                status: string
+                total: '0.00'
+                user:
+                  accepts_marketing: false
+                  email: null
+                  first_name: string
+                  id: 0
+                  ip: null
+                  language: null
+                  last_name: string
+                  phone_number: null
+                  user_agent: null
+              event_id: a7a26ff2-e851-45b6-9634-d595f45458b7
+              event_type: subscription.upcoming_renewal
+              object: subscription
+              webhook:
+                events:
+                - subscription.upcoming_renewal
+                id: 1
+                store: example
+                target: https://example.com/webhook/
+            schema:
+              properties:
+                api_version:
+                  description: API Version of the object data schema.
+                  examples:
+                  - '2024-04-01'
+                  type: string
+                data:
+                  properties:
+                    attribution:
+                      properties:
+                        affiliate:
+                          description: Affiliate identifier.
+                          maxLength: 500
+                          type:
+                          - string
+                          - 'null'
+                        agent:
+                          properties:
+                            email:
+                              format: email
+                              maxLength: 254
+                              title: Email address
+                              type:
+                              - string
+                              - 'null'
+                            first_name:
+                              maxLength: 255
+                              type: string
+                            id:
+                              type: integer
+                            last_name:
+                              maxLength: 255
+                              type: string
+                          required:
+                          - id
+                          type: object
+                        funnel:
+                          description: The marketing funnel attributed to the order.
+                          type:
+                          - string
+                          - 'null'
+                        gclid:
+                          description: Google Click Identifier.
+                          maxLength: 500
+                          type:
+                          - string
+                          - 'null'
+                        metadata:
+                          description: Additional attribution metadata.
+                        subaffiliate1:
+                          description: Sub-affiliate identifier 1.
+                          maxLength: 500
+                          title: Sub-Affiliate 1
+                          type:
+                          - string
+                          - 'null'
+                        subaffiliate2:
+                          description: Sub-affiliate identifier 2.
+                          maxLength: 500
+                          title: Sub-Affiliate 2
+                          type:
+                          - string
+                          - 'null'
+                        subaffiliate3:
+                          description: Sub-affiliate identifier 3.
+                          maxLength: 500
+                          title: Sub-Affiliate 3
+                          type:
+                          - string
+                          - 'null'
+                        subaffiliate4:
+                          description: Sub-affiliate identifier 4.
+                          maxLength: 500
+                          title: Sub-Affiliate 4
+                          type:
+                          - string
+                          - 'null'
+                        subaffiliate5:
+                          description: ' Sub-affiliate identifier 5.'
+                          maxLength: 500
+                          title: Sub-Affiliate 5
+                          type:
+                          - string
+                          - 'null'
+                        utm_campaign:
+                          description: Campaign name.
+                          maxLength: 500
+                          type:
+                          - string
+                          - 'null'
+                        utm_content:
+                          description: Content of the traffic (e.g., banner, text
+                            link).
+                          maxLength: 500
+                          type:
+                          - string
+                          - 'null'
+                        utm_medium:
+                          description: Medium of the traffic (e.g., email, CPC).
+                          maxLength: 500
+                          type:
+                          - string
+                          - 'null'
+                        utm_source:
+                          description: Source of the traffic (e.g., search engine,
+                            newsletter).
+                          maxLength: 500
+                          type:
+                          - string
+                          - 'null'
+                        utm_term:
+                          description: Search term or keyword.
+                          maxLength: 500
+                          type:
+                          - string
+                          - 'null'
+                      required:
+                      - agent
+                      type: object
+                    billing_address:
+                      properties:
+                        country:
+                          description: The address country code.
+                          title: ISO 3166-1 alpha-2
+                          type: string
+                        first_name:
+                          description: The first name of the address.
+                          maxLength: 255
+                          type: string
+                        id:
+                          type: integer
+                        last_name:
+                          description: The last name of the address.
+                          maxLength: 255
+                          type: string
+                        line1:
+                          description: The first line of the address.
+                          maxLength: 255
+                          title: First line of address
+                          type: string
+                        line2:
+                          description: Optional second line of of the address.
+                          maxLength: 255
+                          title: Second line of address
+                          type: string
+                        line3:
+                          description: Optional third line of of the address.
+                          maxLength: 255
+                          title: Third line of address
+                          type: string
+                        line4:
+                          description: City of the address.
+                          maxLength: 255
+                          title: City
+                          type: string
+                        phone_number:
+                          description: The address phone number.
+                          maxLength: 128
+                          type: string
+                        postcode:
+                          description: The address post code or zip code.
+                          maxLength: 64
+                          title: Post/Zip-code
+                          type: string
+                        state:
+                          description: The address state/province.
+                          maxLength: 255
+                          title: State/Province
+                          type: string
+                      type: object
+                    cancel_reason:
+                      type: string
+                    cancel_reason_other_message:
+                      type:
+                      - string
+                      - 'null'
+                    currency:
+                      type: string
+                    date_created:
+                      format: date-time
+                      type: string
+                    frequency:
+                      type: string
+                    id:
+                      type: integer
+                    interval:
+                      description: '* `day` - Day
+
+                        * `week` - Week
+
+                        * `month` - Month
+
+                        * `year` - Year'
+                      enum:
+                      - day
+                      - week
+                      - month
+                      - year
+                      type: string
+                      x-spec-enum-id: cf8e742c49e533bc
+                    interval_count:
+                      minimum: 1
+                      type: integer
+                    is_tax_known:
+                      deprecated: true
+                      type: boolean
+                    is_test:
+                      type: boolean
+                    lines:
+                      items:
+                        properties:
+                          id:
+                            type: integer
+                          metadata:
+                            type: object
+                          price:
+                            format: decimal
+                            pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                            type: string
+                          product_id:
+                            type: integer
+                          product_image:
+                            format: uri
+                            type:
+                            - string
+                            - 'null'
+                          product_title:
+                            type: string
+                          product_url:
+                            format: uri
+                            type: string
+                          properties:
+                            items:
+                              properties:
+                                key:
+                                  type: string
+                                value: {}
+                              required:
+                              - key
+                              - value
+                              type: object
+                            type: array
+                          quantity:
+                            maximum: 2147483647
+                            minimum: 0
+                            type: integer
+                          sku:
+                            type: string
+                          variant_id:
+                            type: integer
+                          variant_title:
+                            type: string
+                        required:
+                        - id
+                        - price
+                        - product_id
+                        - product_image
+                        - product_title
+                        - product_url
+                        - properties
+                        - sku
+                        - variant_id
+                        - variant_title
+                        type: object
+                      type: array
+                    next_renewal_date:
+                      format: date-time
+                      type:
+                      - string
+                      - 'null'
+                    num_lines:
+                      type: integer
+                    num_orders:
+                      type: integer
+                    orders:
+                      items:
+                        properties:
+                          billing_cycle:
+                            type: integer
+                          order_number:
+                            type: string
+                        required:
+                        - billing_cycle
+                        - order_number
+                        type: object
+                      type: array
+                    payment_details:
+                      additionalProperties: {}
+                      type: object
+                    payment_method:
+                      type: string
+                    shipping_address:
+                      properties:
+                        country:
+                          description: The address country code.
+                          title: ISO 3166-1 alpha-2
+                          type: string
+                        first_name:
+                          description: The first name of the address.
+                          maxLength: 255
+                          type: string
+                        id:
+                          type: integer
+                        last_name:
+                          description: The last name of the address.
+                          maxLength: 255
+                          type: string
+                        line1:
+                          description: The first line of the address.
+                          maxLength: 255
+                          title: First line of address
+                          type: string
+                        line2:
+                          description: Optional second line of of the address.
+                          maxLength: 255
+                          title: Second line of address
+                          type: string
+                        line3:
+                          description: Optional third line of of the address.
+                          maxLength: 255
+                          title: Third line of address
+                          type: string
+                        line4:
+                          description: City of the address.
+                          maxLength: 255
+                          title: City
+                          type: string
+                        notes:
+                          description: Tell us anything we should know when delivering
+                            your order.
+                          title: Instructions
+                          type: string
+                        phone_number:
+                          description: The address phone number.
+                          maxLength: 128
+                          type: string
+                        postcode:
+                          description: The address post code or zip code.
+                          maxLength: 64
+                          title: Post/Zip-code
+                          type: string
+                        state:
+                          description: The address state/province.
+                          maxLength: 255
+                          title: State/Province
+                          type: string
+                      type: object
+                    shipping_code:
+                      maxLength: 128
+                      type: string
+                    shipping_price:
+                      type: string
+                    status:
+                      description: '* `active` - Active
+
+                        * `past_due` - Past Due
+
+                        * `canceled` - Canceled
+
+                        * `retrying` - Retrying
+
+                        * `paused` - Paused'
+                      enum:
+                      - active
+                      - past_due
+                      - canceled
+                      - retrying
+                      - paused
+                      type: string
+                      x-spec-enum-id: 7dd7ec10bcae69c1
+                    total:
+                      format: decimal
+                      pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+                      type: string
+                    user:
+                      properties:
+                        accepts_marketing:
+                          title: Subscribe to Marketing Emails
+                          type: boolean
+                        email:
+                          format: email
+                          maxLength: 254
+                          title: Email address
+                          type:
+                          - string
+                          - 'null'
+                        first_name:
+                          maxLength: 255
+                          type: string
+                        id:
+                          type: integer
+                        ip:
+                          title: Ip address
+                          type:
+                          - string
+                          - 'null'
+                        language:
+                          maxLength: 10
+                          title: Preferred language
+                          type:
+                          - string
+                          - 'null'
+                        last_name:
+                          maxLength: 255
+                          type: string
+                        phone_number:
+                          maxLength: 128
+                          type:
+                          - string
+                          - 'null'
+                        user_agent:
+                          type:
+                          - string
+                          - 'null'
+                      type: object
+                  required:
+                  - attribution
+                  - cancel_reason
+                  - cancel_reason_other_message
+                  - currency
+                  - date_created
+                  - frequency
+                  - id
+                  - is_tax_known
+                  - lines
+                  - num_lines
+                  - num_orders
+                  - orders
+                  - payment_details
+                  - payment_method
+                  - shipping_price
+                  - total
+                  - user
+                  type: object
+                event_id:
+                  description: Unique id associated with this webhook event.
+                  format: uuid
+                  type: string
+                event_type:
+                  description: Webhook event type of the current event.
+                  examples:
+                  - subscription.upcoming_renewal
+                  type: string
+                object:
+                  description: Object data type.
+                  examples:
+                  - subscription
+                  type: string
+                webhook:
+                  properties:
+                    events:
+                      description: See webhook docs for available events.
+                      items:
+                        type: string
+                      type: array
+                    id:
+                      description: The webhook sending the event.
+                      type: integer
+                    store:
+                      description: The store identifier.
+                      examples:
+                      - example
+                      nullable: true
+                      type: string
+                    target:
+                      description: Full url for your webhook receiver endpoint.
+                      format: uri
+                      maxLength: 255
+                      title: Webhook target
+                      type: string
+                  type: object
+              type: object
+      responses:
+        '200':
+          description: Return a 200 status to indicate that the data was received
+            successfully.
+        '410':
+          description: Indicates the webhook target is no longer available and will
+            be disabled.
+      security: []
+      tags:
+      - subscriptions
   subscription.updated:
     post:
       description: Triggers when a subscription is updated.

@@ -1,0 +1,126 @@
+---
+title: More integrations
+description: How to turn on TikTok, Snapchat, Pinterest, Taboola, AppLovin Axon, Northbeam, RudderStack and Klaviyo for your NEXT campaign.
+sidebar_label: More integrations
+audience: [merchant, developer]
+last_verified: 2026-11-16
+tags:
+ - Guide
+---
+
+Most platforms here are turned on with one line in `_data/campaigns.json`. Add the line to your campaign, then build with `npm run build` and deploy. See [Set up tracking](/docs/campaigns/tracking/getting-started) for the full steps.
+
+| Platform | Line to add |
+| --- | --- |
+| [TikTok](#tiktok) | `tiktok_pixel_id` |
+| [Snapchat](#snapchat) | `snap_pixel_id` |
+| [Pinterest](#pinterest) | `pinterest_tag_id` |
+| [Taboola](#taboola) | `taboola_account_id` |
+| [AppLovin Axon](#applovin-axon) | `axon_event_key` |
+| [Northbeam](#northbeam) | `northbeam_client_id` |
+| [RudderStack](#rudderstack) | Two lines and a setting |
+| [Klaviyo](#klaviyo) | A store app |
+
+Everflow has [its own guide](/docs/campaigns/tracking/everflow).
+
+## TikTok
+
+```json
+"tiktok_pixel_id": "your-pixel-id"
+```
+
+- **What it tracks:** page views, product views, add to cart, checkout started, payment details and purchases.
+- **Upsells:** each accepted upsell counts as another purchase, so an order with two upsells shows as three purchases. To count one purchase per order, add `"tiktok_blocked_events": "dl_upsell_purchase"`. Upsell revenue then does not reach TikTok.
+- **Shopper details:** add `"tiktok_advanced_matching_enabled": "true"` to send email and phone. If your checkout has a marketing opt-in checkbox, nothing is sent when it is unticked.
+
+The **TikTok** app you set up under **Apps** in your NEXT dashboard only adds its script to your Storefront. It is not added to your Campaigns, so add TikTok to your campaign as shown above.
+
+## Snapchat
+
+```json
+"snap_pixel_id": "your-pixel-id"
+```
+
+- **What it tracks:** page views, product views, add to cart, checkout started, payment details and purchases.
+- **Upsells:** each accepted upsell counts as another purchase.
+- **Shopper details:** add `"snap_advanced_matching_enabled": "true"` to send email and phone. If your checkout has a marketing opt-in checkbox, nothing is sent when it is unticked.
+
+## Pinterest
+
+```json
+"pinterest_tag_id": "your-tag-id"
+```
+
+- **What it tracks:** page views, add to cart, and a `checkout` event for each order.
+- **Upsells:** each accepted upsell counts as another `checkout`.
+- **Shopper details:** add `"pinterest_enhanced_match_enabled": "true"` to send email. If your checkout has a marketing opt-in checkbox, nothing is sent when it is unticked.
+
+## Taboola
+
+```json
+"taboola_account_id": "1234567"
+```
+
+Use your numeric account ID.
+
+- **What it tracks:** page views, product views, add to cart, checkout started, payment details and purchases.
+- **Upsells:** sent as a separate `upsell_purchase` event. Create a Taboola conversion for it to count upsell revenue.
+
+The **Taboola Pixel Events** app you set up under **Apps** in your NEXT dashboard only adds its script to your Storefront. It is not added to your Campaigns, so add Taboola to your campaign as shown above.
+
+## AppLovin Axon
+
+```json
+"axon_event_key": "your-event-key"
+```
+
+- **What it tracks:** page views, product views, add to cart, checkout started, payment details and purchases.
+- **Upsells:** each accepted upsell counts as another purchase.
+- **Shopper details:** add `"axon_send_user_data": "true"` to send email, phone and customer ID with the purchase. Turn it on only when your privacy policy covers it. See [Privacy and consent](/docs/campaigns/tracking#privacy-and-consent).
+- **Axon's cookie (optional):** AppLovin [recommends](https://support.applovin.com/en/growth/promoting-your-websites/track-and-optimize/google-tag-manager) that your site's server sets Axon's `_axwrt` cookie again as a one-year cookie named `axwrt`. The starter templates do not do this. They are static sites, so it needs your own server in front of the campaign.
+
+The **AppLovin AXON** app you set up under **Apps** in your NEXT dashboard only adds its script to your Storefront. It is not added to your Campaigns, so add Axon to your campaign as shown above.
+
+## Northbeam
+
+```json
+"northbeam_client_id": "your-client-id"
+```
+
+- **What it tracks:** page views, and a purchase for each order.
+- **Upsells:** each accepted upsell counts as another purchase.
+- **Shopper details:** add `"northbeam_identity_enabled": "true"` to send the shopper's email, which helps Northbeam match orders.
+
+### Northbeam on a Shop Sync store
+
+Northbeam already receives your orders from Shopify. Stop the campaign sending them too, and turn identity on:
+
+```json
+"northbeam_client_id": "your-client-id",
+"northbeam_identity_enabled": "true",
+"northbeam_blocked_events": "dl_purchase, dl_upsell_purchase"
+```
+
+## RudderStack
+
+RudderStack needs two lines and one setting.
+
+```json
+"rudderstack_write_key": "your-write-key",
+"rudderstack_dataplane_url": "https://your-dataplane-url"
+```
+
+Then switch `rudderstack` on in `assets/config.js`:
+
+```js title="assets/config.js"
+// Inside analytics.providers:
+rudderstack: {
+  enabled: true
+},
+```
+
+RudderStack is a pipe, like Google Tag Manager. It reports nothing by itself; the destinations you connect in RudderStack do. It receives the shopper's details along with the events, and each accepted upsell arrives as another `Order Completed`.
+
+## Klaviyo
+
+Klaviyo is a store app, not a line in your campaign. Once installed, it sends order events to Klaviyo from NEXT's servers for campaign orders and storefront orders alike. See the [Klaviyo app docs](https://docs.nextcommerce.com/docs/apps/klaviyo).

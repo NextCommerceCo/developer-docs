@@ -9,8 +9,10 @@ Campaigns are fully custom checkout funnels — landing, checkout, upsell, and r
 
 Orders created through a campaign are regular store orders. They appear in the store's Orders list alongside storefront orders and are available through the Admin API and webhooks like any other order.
 
-<Callout type="info" title="Campaigns OS Start">
-Give an agent a funnel URL, existing repo or saved Map using the [campaign agent guide](/docs/agent-setup). It can inspect, plan and prepare a local concept before store access is available. The [Campaigns OS Start guide](https://campaigns.nextcommerce.com/start/) also provides the Workspace/Map route. Keep your existing builder and host; the Page Kit quick start below is the reference path for a new static project.
+<Callout type="info" title="Start or continue with your coding agent">
+Start with the [campaign agent guide](/docs/agent-setup). Give your agent a funnel URL, design, existing repository or saved Map. It can inspect, plan and prepare a local preview before store access is available, while preserving your builder and host.
+
+Once the campaign and its offers are configured in NEXT, [Campaigns OS Start](https://campaigns.nextcommerce.com/start/) sets up your agent to build the pages on a starter template and place a test order. The optional [Workspace](https://campaign-map.nextcommerce.com/) is where you map the campaign, wire products, preview pages and check it; the plan saved there is a Map. The quick start below covers direct Page Kit scaffolding.
 </Callout>
 
 For direct project scaffolding, use the **[Campaign Page Kit](https://github.com/NextCommerceCo/campaign-page-kit)**: a CLI that scaffolds an SDK-ready starter template, runs a hot-reload dev server, and outputs a static site you can deploy to Netlify, Cloudflare Pages, Vercel, or any static host.
@@ -100,7 +102,7 @@ my-campaigns/
 
 ## Starter templates
 
-Pick one at the `campaign-init` template prompt. Each template ships with SDK-ready checkout, upsell, and receipt surfaces, plus the supporting presell and landing pages for that family. Start from a maintained template, then replace campaign-specific copy, assets, package IDs, offer codes, shipping methods, tracking, and routes with values from Campaigns App and your build brief. Use the [current catalog](https://github.com/NextCommerceCo/campaign-cart-starter-templates/blob/main/templates.json) recommendations: Apollo for a standard tiered checkout, or Apollo MV for configurable variant slots. Preserve an existing family when it fits the project.
+Pick one at the `campaign-init` template prompt. Each template ships with SDK-ready checkout, upsell, and receipt surfaces, plus the supporting presell and landing pages for that family. Start from a maintained template, then replace campaign-specific copy, assets, package IDs, offer codes, shipping methods, tracking, and routes with values from Campaigns App and your build brief. Follow the recommendations in the [template browser](https://campaigns.nextcommerce.com/templates/): Apollo for a standard tiered checkout, or Apollo MV for configurable variant slots. Preserve an existing family when it fits the project.
 
 <CampaignTemplatesGrid slugs={['apollo', 'apollo-mv-single-step']} />
 
@@ -179,7 +181,7 @@ Packages can also be **recurring** for subscription products. When you reference
 
 ### Offers
 
-**Offers** are price mutation rules that apply when an order meets a condition. Two flavours:
+Configure campaign discounts in [Campaigns App Offers & Discounts](https://docs.nextcommerce.com/docs/apps/campaigns-app/campaigns-offers-and-discounts). These are the rules the SDK and campaign templates use for pricing and savings. Two flavours:
 
 - **Offer** — automatic, applies when the cart matches the rule (checkout page only)
 - **Code** — voucher-based, applies when the customer enters a code. Codes stack **on top of** automatic offers, and codes are also the mechanism for applying discounts on **upsell pages** (where automatic offers don't run).
@@ -276,7 +278,7 @@ Do not use `?ignore=true` when you are checking that a purchase is reported. See
 
 `campaign-init` can run with no prompts — pass every value as a flag:
 
-This example uses `apollo` for a single-step checkout; pick the family from the [template catalog](https://github.com/NextCommerceCo/campaign-cart-starter-templates/blob/main/templates.json). `CAMPAIGN_API_KEY` is the campaign's browser-visible Campaign Cart key, never an Admin API token.
+This example uses `apollo` for a single-step checkout; pick the family in the [template browser](https://campaigns.nextcommerce.com/templates/). `CAMPAIGN_API_KEY` is the campaign's browser-visible Campaign Cart key, never an Admin API token.
 
 ```bash
 npx campaign-init --non-interactive \

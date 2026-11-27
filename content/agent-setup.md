@@ -1,4 +1,4 @@
-<!-- next-commerce-agent-setup version=3 date=2026-10-22 -->
+<!-- next-commerce-agent-setup version=4 date=2026-11-26 -->
 
 # Start or continue a NEXT campaign with an AI agent
 
@@ -21,7 +21,7 @@ Store access, repository publishing, deployment, test orders and analytics sends
 | Funnel/store URL or design | Read the source and distinguish observed facts from proposed behavior | A build brief, commerce dependency plan and local preview |
 | Existing or cloned campaign repo | Read its instructions, build/configuration and retained evidence | Inspect current behavior and change only what the task requires |
 | Existing external build | Inspect its own source, build and deployment conventions | The relevant Campaign Cart checks; retain its framework and host |
-| Local CampaignSpec, saved Map or Build Packet | Identify the selected campaign and read existing intent/status | The Campaigns OS continuation command for that artifact |
+| Local CampaignSpec, saved Map or Build Packet | Identify the selected campaign and read existing intent/status | The Campaigns OS continuation command for that artifact; for a Map saved in the optional [Workspace](https://campaign-map.nextcommerce.com/), its Handoff gives the prompt to continue from |
 
 These entries can join the same work at different points. Do not replay provisioning or scaffolding because a new session starts.
 
@@ -41,7 +41,7 @@ npx campaigns-os standardize --target /path/to/existing-campaign --no-doctor --j
 
 The report inspects source without modifying the target and does not migrate the project, prove checkout or certify a launch. If the application is not recognized, record that and inspect its own integration rather than changing frameworks to satisfy the detector.
 
-For a clone, record the source commit and list the bindings to replace: campaign and store identity, packages, offers, domains, analytics IDs, URLs and custom business logic. Prior QA applies to the source campaign; new bindings need their own proof. For a maintenance task, compare the requested change with the existing brief, spec and commerce configuration, following the [reconciliation and handoff procedure](https://github.com/NextCommerceCo/campaigns-os/blob/main/docs/build-packet.md) where it applies.
+For a clone, record the source commit and list the bindings to replace: campaign and store identity, packages, offers, domains, analytics IDs, URLs and custom business logic. Prior QA applies to the source campaign; new bindings need their own proof. For a maintenance task, compare the requested change with the existing brief, spec and commerce configuration, following the [reconciliation and handoff procedure](https://github.com/NextCommerceCo/campaigns-os/blob/main/docs/build-packet.md#changing-a-campaign-after-handoff) where it applies.
 
 ## Build a local preview before connecting commerce
 
@@ -53,7 +53,7 @@ npm install next-campaign-page-kit
 npx campaign-init --help
 ```
 
-Choose a family from the [template catalog](https://github.com/NextCommerceCo/campaign-cart-starter-templates/blob/main/templates.json): preserve a template the user already chose, otherwise recommend one for the product, variant and page requirements and record why. For a non-interactive run, replace the placeholders with the selected values:
+Choose a family from the [picker catalog](https://github.com/NextCommerceCo/campaign-cart-starter-templates/blob/main/templates.json), presented with previews and use cases in the [template browser](https://campaigns.nextcommerce.com/templates/): preserve a template the user already chose, otherwise recommend one for the product, variant and page requirements and record why. For a non-interactive run, replace the placeholders with the selected values:
 
 ```bash
 npx campaign-init --non-interactive --json \
